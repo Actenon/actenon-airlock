@@ -11,6 +11,7 @@ import sys
 from pathlib import Path
 
 from . import __version__
+from .adapters import scope
 from .manifest import AirlockError, authority_diff, discover, origin
 from .state import State, atomic_json
 
@@ -33,6 +34,7 @@ def render(diff: dict) -> str:
                 [
                     f"{sign} {safe(p['action'])} @ {safe(p['resource'])}",
                     f"  Transport: {safe(p['transport'])}",
+                    f"  Scope: {safe(scope(p))}",
                 ]
             )
     for row in diff["blocked"]:
@@ -180,7 +182,8 @@ def main(argv=None):
                 state.approve(current)
                 if not args.json:
                     print(
-                        f"\nApproved {len(current['powers'])} powers. Unresolved powers remain blocked."
+                        f"\nApproved {len(current['powers'])} powers. Unresolved powers remain blocked;"
+                        " their calls are denied at runtime with receipts."
                     )
             elif not args.json:
                 print("\nReview these powers, then run airlock init --approve to activate them.")

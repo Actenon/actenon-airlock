@@ -139,8 +139,12 @@ def test_reduction_needs_no_new_approval(project):
     assert main(["check", "--path", str(state.root)]) == 0
 
 
-def test_unsupported_filesystem_remains_blocked(tmp_path):
-    (tmp_path / "main.py").write_text('open("out.txt", "w").write("oops")\n')
+def test_resolved_filesystem_write_is_a_power_and_unresolved_stays_blocked(tmp_path):
+    (tmp_path / "main.py").write_text(
+        'import sys\nopen("out.txt", "w").write("ok")\nopen(sys.argv[1], "w")\n'
+    )
     m = discover(tmp_path, env={})
-    assert m["powers"] == []
-    assert m["blocked"][0]["action"] == "filesystem.write"
+    assert m["powers"] == [
+        {"action": "filesystem.write", "resource": "./out.txt", "transport": "local-filesystem"}
+    ]
+    assert [(b["action"], b["state"]) for b in m["blocked"]] == [("filesystem.write", "UNRESOLVED")]

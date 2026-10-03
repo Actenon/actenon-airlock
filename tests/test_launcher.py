@@ -49,7 +49,7 @@ def test_new_power_is_blocked_even_if_agent_catches_error(project, server):
     "source",
     [
         'import socket\nsocket.socket().connect(("127.0.0.1", {port}))\n',
-        'import os\nos.system("true")\n',
+        'import os\ngetattr(os, "sys" + "tem")("touch output.txt")\n',
         'import os\nfd=os.open("output.txt", os.O_WRONLY|os.O_CREAT)\n',
     ],
 )

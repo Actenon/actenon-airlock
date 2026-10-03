@@ -28,17 +28,18 @@ from actenon_permit.pdp import PDP
 from actenon_permit.revocation import StoreRevocationChecker
 from actenon_permit.state import SQLiteStore
 
+from .adapters import CHANNELS, Context, scope
 from .manifest import (
     SECRET_NAME,
     AirlockError,
     authority_diff,
+    bind_runtime,
     capability,
     digest,
     discover,
     origin,
-    request_capability,
     source_fingerprint,
-    validate_url,
+    unadapted,
 )
 from .state import State
 from .wire import LIMIT, receive, send
@@ -53,6 +54,83 @@ MARKER = re.compile(r"airlock_credential_[a-f0-9]{32}")
 MUTABLE_GRANT_FIELDS = {"status", "budget"}
 
 
+class HttpDispatch:
+    """Parent-executed HTTP: credentials materialize only inside the verified Kernel callback."""
+
+    stage = "executed"
+
+    def __init__(self, broker: Broker, effect, message: dict):
+        self.broker, self.url, self.method = broker, effect.target, effect.params["method"]
+        self.body = base64.b64decode(message.get("body", ""), validate=True)
+        if (
+            len(self.body) > LIMIT // 2
+            or MARKER.search(self.url)
+            or MARKER.search(self.body.decode(errors="ignore"))
+        ):
+            raise AirlockError("Credential handles are forbidden in URLs and request bodies")
+        self.headers, _ = broker._headers(message.get("headers", {}), self.url, materialize=False)
+        self.params = {
+            "body_sha256": hashlib.sha256(self.body).hexdigest(),
+            "headers_sha256": digest(self.headers),
+        }
+        self.response = {}
+        self.credential_released = False
+        self.attempted = False
+
+    def run(self):
+        broker = self.broker
+        actual_headers, self.credential_released = broker._headers(
+            self.headers, self.url, materialize=True
+        )
+        self.attempted = True
+        # The exact URL/body/header handles used to mint the proof are used here.
+        with broker.http.stream(
+            self.method, self.url, headers=actual_headers, content=self.body, timeout=30
+        ) as response:
+            content = bytearray()
+            for part in response.iter_bytes():
+                content.extend(part)
+                if len(content) > LIMIT // 2:
+                    raise AirlockError("Response exceeds 4 MiB")
+            response_headers = dict(response.headers)
+            for marker, (secret, _) in broker.credentials.items():
+                content = content.replace(secret.encode(), marker.encode())
+                response_headers = {
+                    k: v.replace(secret, marker) for k, v in response_headers.items()
+                }
+            self.response.update(
+                status=response.status_code,
+                headers=response_headers,
+                body=base64.b64encode(content).decode(),
+                url=str(response.url),
+            )
+        return {"http_status": self.response["status"]}
+
+    def reply(self) -> dict:
+        return {"response": self.response}
+
+
+class ReleaseDispatch:
+    """Local effects need no credential: the verified Kernel callback releases the agent's call."""
+
+    stage = "released"
+    params: dict = {}
+    credential_released = False
+
+    def __init__(self, broker: Broker, effect, message: dict):
+        self.attempted = False
+
+    def run(self):
+        self.attempted = True
+        return {"released": True}
+
+    def reply(self) -> dict:
+        return {"response": {"released": True}}
+
+
+DISPATCH = {"broker": HttpDispatch, "agent": ReleaseDispatch}
+
+
 class Broker:
     def __init__(self, state: State, current: dict, bindings: dict | None = None):
         self.state = state
@@ -61,6 +139,9 @@ class Broker:
         self.allowed = {capability(p) for p in approved["powers"]} & {
             capability(p) for p in current["powers"]
         }
+        self.context = Context(
+            root=state.root, home=Path.home(), search_path=os.environ.get("PATH", os.defpath)
+        )
         self.bindings = dict(WELL_KNOWN, **(bindings or {}))
         self.credentials = {}
         self.markers = {}
@@ -130,8 +211,7 @@ class Broker:
             "execution_occurred": False,
             **extra,
         }
-        self.state.receipt(row)
-        return row
+        return self.state.receipt(row)
 
     def _deny(self, action, target, reason, **extra):
         self.denials += 1
@@ -174,31 +254,31 @@ class Broker:
                 message.get("target", "<local>"),
                 "Unsupported runtime effect",
             )
-        action_name, target = "http.request", "<unresolved>"
+        adapter = CHANNELS.get(message.get("kind"))
+        action_name = adapter.default_action if adapter else "unsupported"
+        target, labels = "<unresolved>", {"adapter": adapter.channel if adapter else None}
         try:
-            method = message["method"].upper()
-            url = validate_url(message["url"])
-            target = url
+            if adapter is None:
+                raise AirlockError("No Airlock adapter for this runtime effect")
+            effect = adapter.classify(message, self.context)
+            target = effect.target
+            labels.update(executor=adapter.executor, detail=effect.detail)
             if self.current["source_digest"] != source_fingerprint(self.state.root):
                 raise AirlockError("Source changed after runtime discovery")
-            cap, entry = request_capability(self.current, method, url, message["locations"])
+            cap, entry = bind_runtime(self.current, effect.candidates, message["locations"])
             action_name = entry["action"]
-            body = base64.b64decode(message.get("body", ""), validate=True)
-            if (
-                len(body) > LIMIT // 2
-                or MARKER.search(url)
-                or MARKER.search(body.decode(errors="ignore"))
-            ):
-                raise AirlockError("Credential handles are forbidden in URLs and request bodies")
-            headers, _ = self._headers(message.get("headers", {}), url, materialize=False)
+            if entry["evidence"] is None:
+                labels["callsite"] = (message["locations"] or [None])[0]
+            dispatch = (
+                DISPATCH[adapter.executor](self, effect, message) if adapter.executor else None
+            )
             action = Action(
                 grant_id=self.grant.id,
                 type=cap,
-                target=url,
+                target=target,
                 params={
-                    "method": method,
-                    "body_sha256": hashlib.sha256(body).hexdigest(),
-                    "headers_sha256": digest(headers),
+                    **effect.params,
+                    **(dispatch.params if dispatch else {}),
                     "authority_action": action_name,
                     "authority_resource": entry["resource"],
                     "source_digest": self.current["source_digest"],
@@ -222,7 +302,10 @@ class Broker:
                     target,
                     decision.reason,
                     permit_decision=decision.model_dump(mode="json"),
+                    **labels,
                 )
+            if dispatch is None:
+                raise AirlockError("No execution adapter for " + action_name)
             pending = self._receipt(
                 action_name,
                 target,
@@ -233,40 +316,11 @@ class Broker:
                 proof=proof.to_dict(),
                 intent=intent.to_dict(),
                 evidence=entry["evidence"],
+                scope=scope(entry),
+                **labels,
             )
-            response_wire = {}
-            credential_released = False
-            attempted = False
-
-            def execute():
-                nonlocal credential_released, attempted
-                actual_headers, credential_released = self._headers(headers, url, materialize=True)
-                attempted = True
-                # The exact URL/body/header handles used to mint the proof are used here.
-                with self.http.stream(
-                    method, url, headers=actual_headers, content=body, timeout=30
-                ) as response:
-                    content = bytearray()
-                    for part in response.iter_bytes():
-                        content.extend(part)
-                        if len(content) > LIMIT // 2:
-                            raise AirlockError("Response exceeds 4 MiB")
-                    response_headers = dict(response.headers)
-                    for marker, (secret, _) in self.credentials.items():
-                        content = content.replace(secret.encode(), marker.encode())
-                        response_headers = {
-                            k: v.replace(secret, marker) for k, v in response_headers.items()
-                        }
-                    response_wire.update(
-                        status=response.status_code,
-                        headers=response_headers,
-                        body=base64.b64encode(content).decode(),
-                        url=str(response.url),
-                    )
-                return {"http_status": response_wire["status"]}
-
             try:
-                outcome = self.edge.protect(intent, proof, execute)
+                outcome = self.edge.protect(intent, proof, dispatch.run)
             except Exception as exc:
                 self.execution_errors += 1
                 row = self._receipt(
@@ -276,14 +330,15 @@ class Broker:
                     decision="ALLOW",
                     stage="execution-error",
                     proof_id=proof.pccb_id,
-                    credential_released=credential_released,
-                    execution_attempted=attempted,
-                    execution_occurred=None if attempted else False,
+                    credential_released=dispatch.credential_released,
+                    execution_attempted=dispatch.attempted,
+                    execution_occurred=None if dispatch.attempted else False,
                     parent_receipt_id=pending["id"],
+                    **labels,
                 )
                 return {"ok": False, "reason": row["reason"], "receipt_id": row["id"]}
             if not outcome.ok:
-                if attempted:
+                if dispatch.attempted:
                     self.execution_errors += 1
                     row = self._receipt(
                         action_name,
@@ -293,10 +348,11 @@ class Broker:
                         stage="execution-error",
                         proof_id=proof.pccb_id,
                         kernel=outcome.to_dict(),
-                        credential_released=credential_released,
+                        credential_released=dispatch.credential_released,
                         execution_attempted=True,
                         execution_occurred=None,
                         parent_receipt_id=pending["id"],
+                        **labels,
                     )
                     return {"ok": False, "reason": row["reason"], "receipt_id": row["id"]}
                 return self._deny(
@@ -304,28 +360,36 @@ class Broker:
                     target,
                     outcome.reason_code or "Kernel refused",
                     kernel=outcome.to_dict(),
+                    **labels,
                 )
+            released = dispatch.stage == "released"
             row = self._receipt(
                 action_name,
                 target,
-                "Verified by Kernel and executed",
+                "Verified by Kernel; released to the agent process"
+                if released
+                else "Verified by Kernel and executed",
                 decision="ALLOW",
-                stage="executed",
+                stage=dispatch.stage,
                 proof_id=proof.pccb_id,
                 kernel=outcome.to_dict(),
-                credential_released=credential_released,
-                execution_occurred=True,
+                credential_released=dispatch.credential_released,
+                # A released local effect is performed by the agent, not observed by the broker.
+                execution_occurred=None if released else True,
                 parent_receipt_id=pending["id"],
+                evidence=entry["evidence"],
+                scope=scope(entry),
+                **labels,
             )
             print(f"AIRLOCK ALLOW {action_name} @ {target} [{row['id']}]", file=sys.stderr)
-            return {"ok": True, "response": response_wire, "receipt_id": row["id"]}
+            return {"ok": True, **dispatch.reply(), "receipt_id": row["id"]}
         except Exception as exc:
             reason = (
                 str(exc)
                 if isinstance(exc, AirlockError)
                 else "Invalid request: " + type(exc).__name__
             )
-            return self._deny(action_name, target, reason)
+            return self._deny(action_name, target, reason, **labels)
 
     def child_environment(self) -> dict:
         env = {"PYTHONDONTWRITEBYTECODE": "1", "PYTHONUNBUFFERED": "1"}
@@ -349,13 +413,23 @@ def launch(root: Path, command: list[str], bindings: dict | None = None) -> int:
     current = discover(root)
     if current["parse_errors"]:
         raise AirlockError("Source parse errors block runtime launch")
-    if any(not e["action"].startswith(("http.", "github.")) for e in current["blocked"]):
-        raise AirlockError("Unsupported consequential effects block launch; inspect airlock diff")
+    missing = unadapted(current)
+    if missing:
+        raise AirlockError(
+            "No Airlock adapter can intercept these Scan powers, so launch is refused: "
+            + ", ".join(missing)
+        )
     state = State(root)
     approved = state.approved()
     diff = authority_diff(approved, current)
     if diff["added"]:
         print(f"AIRLOCK: {len(diff['added'])} new powers remain blocked", file=sys.stderr)
+    if current["blocked"]:
+        print(
+            f"AIRLOCK: {len(current['blocked'])} unresolved or unadapted call sites "
+            "will be denied if reached",
+            file=sys.stderr,
+        )
     broker = Broker(state, current, bindings)
     parent, child = socket.socketpair()
     errors = []

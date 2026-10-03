@@ -16,7 +16,7 @@ from actenon_permit.ed25519_signer import (
 )
 from cryptography.hazmat.primitives.asymmetric.ed25519 import Ed25519PrivateKey, Ed25519PublicKey
 
-from .manifest import AirlockError, canonical
+from .common import AirlockError, canonical
 
 
 def atomic_json(path: Path, data: dict, mode: int = 0o600) -> None:
@@ -115,9 +115,14 @@ class State:
 
         return verify(read("approved.json"), read("public-key.json")["key"])
 
-    def receipt(self, value: dict) -> None:
+    @property
+    def receipts_path(self) -> Path:
+        return self.local / "receipts.jsonl"
+
+    def receipt(self, value: dict) -> dict:
         self.local.mkdir(parents=True, exist_ok=True, mode=0o700)
-        with (self.local / "receipts.jsonl").open("a", encoding="utf-8") as stream:
+        with self.receipts_path.open("a", encoding="utf-8") as stream:
             stream.write(canonical(value).decode() + "\n")
             stream.flush()
             os.fsync(stream.fileno())
+        return value
