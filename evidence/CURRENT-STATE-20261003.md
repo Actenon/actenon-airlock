@@ -37,6 +37,9 @@ VALIDATION EVIDENCE:
   to DELETE, produce JSON diff and a failing check, then deny DELETE. Only the POST reached the resource.
 - The new main branch requires Integration (Python 3.11), Integration (Python 3.12), and Package and lint,
   with admin enforcement and no force pushes or deletions.
+- Final local validation: 52 passed against the working code and 52 passed against the installed wheel.
+  A transport timeout after authorized dispatch preserves ALLOW, actual credential release, and an
+  unknown execution result rather than asserting that no effect happened.
 
 PUBLICATION:
 
