@@ -97,8 +97,26 @@ def test_revocation_denies_before_transport(project, server):
     state = project(f'import requests\nrequests.post("{url}/a")\n')
     broker = Broker(state, discover(state.root))
     try:
+        assert broker.handle(message(url + "/a"))["ok"]
+        assert broker.handle(message(url + "/a"))["ok"]
         broker.store.set_status(broker.grant.id, GrantStatus.REVOKED)
-        assert not broker.handle(message(url + "/a"))["ok"]
+        out = broker.handle(message(url + "/a"))
+        assert not out["ok"] and "revoked" in out["reason"]
+        assert len(calls) == 2
+    finally:
+        broker.close()
+
+
+def test_stored_grant_scope_tampering_is_refused(project, server):
+    url, calls = server
+    state = project(f'import requests\nrequests.post("{url}/a")\n')
+    broker = Broker(state, discover(state.root))
+    try:
+        tampered = broker.store.get_grant(broker.grant.id)
+        tampered.scopes.allow.append("*")
+        broker.store.put_grant(tampered)
+        out = broker.handle(message(url + "/a"))
+        assert not out["ok"] and out["reason"] == "Signed Permit grant could not be verified"
         assert not calls
     finally:
         broker.close()

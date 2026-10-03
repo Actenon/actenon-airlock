@@ -50,6 +50,7 @@ WELL_KNOWN = {
     "ANTHROPIC_API_KEY": "https://api.anthropic.com",
 }
 MARKER = re.compile(r"airlock_credential_[a-f0-9]{32}")
+MUTABLE_GRANT_FIELDS = {"status", "budget"}
 
 
 class Broker:
@@ -204,9 +205,15 @@ class Broker:
                 },
                 est_cost=0,
             )
-            # Load the signed grant; Permit owns the actual ALLOW/DENY decision.
+            # Permit rewrites status and budget in the stored body, so the stored
+            # copy only re-verifies through the signed in-memory grant.
             grant = self.store.get_grant(self.grant.id)
-            if grant is None or not grant.verify():
+            if (
+                grant is None
+                or not self.grant.verify()
+                or grant.model_dump(exclude=MUTABLE_GRANT_FIELDS)
+                != self.grant.model_dump(exclude=MUTABLE_GRANT_FIELDS)
+            ):
                 raise AirlockError("Signed Permit grant could not be verified")
             decision, intent, proof = self.pdp.decide_and_mint_pccb(grant, action)
             if decision.outcome != DecisionOutcome.ALLOW:

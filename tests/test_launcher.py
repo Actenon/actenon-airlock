@@ -4,6 +4,8 @@ import sys
 
 import pytest
 
+from actenon_airlock.manifest import discover
+
 
 def run(state):
     return subprocess.run(
@@ -84,9 +86,9 @@ def test_same_line_unresolved_call_cannot_inherit_static_call(project, server):
         f'URL="{url}/a"\n'
         "def tool(url):\n"
         f' requests.post("{url}/a"); requests.post(url)\n'
-        "tool_ref=tool\n"
-        "tool(URL)\n"
+        'tool("".join([URL]))\n'
     )
+    assert len(discover(state.root, env={})["blocked"]) == 1
     result = run(state)
     assert result.returncode == 3, result.stderr
     assert len(calls) == 1
@@ -114,15 +116,15 @@ def test_shared_helper_unresolved_context_does_not_inherit_static_context(projec
         "import requests\n"
         "def helper(url):\n requests.post(url)\n"
         "def tool(url):\n helper(url)\n"
-        "tool_ref=tool\n"
         f'helper("{url}/a")\n'
-        f'tool("{url}/a")\n'
+        f'tool("".join(["{url}/a"]))\n'
     )
     result = run(state)
     assert result.returncode == 3, result.stderr
-    # Scan distinguishes the literal caller from the unresolved tool context.
-    assert len(calls) == 1
-    assert result.stderr.count("AIRLOCK ALLOW") == 1
+    # Runtime frames cannot tell Scan's contexts apart at one leaf callsite, so an
+    # unresolved context blocks the literal context too.
+    assert calls == []
+    assert "AIRLOCK ALLOW" not in result.stderr
     assert "AIRLOCK DENY http.post" in result.stderr
 
 
