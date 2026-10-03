@@ -1,0 +1,115 @@
+* Getting build dependencies for sdist...
+running egg_info
+writing src/actenon_airlock.egg-info/PKG-INFO
+writing dependency_links to src/actenon_airlock.egg-info/dependency_links.txt
+writing entry points to src/actenon_airlock.egg-info/entry_points.txt
+writing requirements to src/actenon_airlock.egg-info/requires.txt
+writing top-level names to src/actenon_airlock.egg-info/top_level.txt
+reading manifest file 'src/actenon_airlock.egg-info/SOURCES.txt'
+adding license file 'LICENSE'
+writing manifest file 'src/actenon_airlock.egg-info/SOURCES.txt'
+* Building sdist...
+running sdist
+running egg_info
+writing src/actenon_airlock.egg-info/PKG-INFO
+writing dependency_links to src/actenon_airlock.egg-info/dependency_links.txt
+writing entry points to src/actenon_airlock.egg-info/entry_points.txt
+writing requirements to src/actenon_airlock.egg-info/requires.txt
+writing top-level names to src/actenon_airlock.egg-info/top_level.txt
+reading manifest file 'src/actenon_airlock.egg-info/SOURCES.txt'
+adding license file 'LICENSE'
+writing manifest file 'src/actenon_airlock.egg-info/SOURCES.txt'
+running check
+creating actenon_airlock-0.1.0.dev0
+creating actenon_airlock-0.1.0.dev0/src/actenon_airlock
+creating actenon_airlock-0.1.0.dev0/src/actenon_airlock.egg-info
+creating actenon_airlock-0.1.0.dev0/tests
+copying files to actenon_airlock-0.1.0.dev0...
+copying LICENSE -> actenon_airlock-0.1.0.dev0
+copying README.md -> actenon_airlock-0.1.0.dev0
+copying pyproject.toml -> actenon_airlock-0.1.0.dev0
+copying src/actenon_airlock/__init__.py -> actenon_airlock-0.1.0.dev0/src/actenon_airlock
+copying src/actenon_airlock/broker.py -> actenon_airlock-0.1.0.dev0/src/actenon_airlock
+copying src/actenon_airlock/cli.py -> actenon_airlock-0.1.0.dev0/src/actenon_airlock
+copying src/actenon_airlock/manifest.py -> actenon_airlock-0.1.0.dev0/src/actenon_airlock
+copying src/actenon_airlock/state.py -> actenon_airlock-0.1.0.dev0/src/actenon_airlock
+copying src/actenon_airlock/wire.py -> actenon_airlock-0.1.0.dev0/src/actenon_airlock
+copying src/actenon_airlock/worker.py -> actenon_airlock-0.1.0.dev0/src/actenon_airlock
+copying src/actenon_airlock.egg-info/PKG-INFO -> actenon_airlock-0.1.0.dev0/src/actenon_airlock.egg-info
+copying src/actenon_airlock.egg-info/SOURCES.txt -> actenon_airlock-0.1.0.dev0/src/actenon_airlock.egg-info
+copying src/actenon_airlock.egg-info/dependency_links.txt -> actenon_airlock-0.1.0.dev0/src/actenon_airlock.egg-info
+copying src/actenon_airlock.egg-info/entry_points.txt -> actenon_airlock-0.1.0.dev0/src/actenon_airlock.egg-info
+copying src/actenon_airlock.egg-info/requires.txt -> actenon_airlock-0.1.0.dev0/src/actenon_airlock.egg-info
+copying src/actenon_airlock.egg-info/top_level.txt -> actenon_airlock-0.1.0.dev0/src/actenon_airlock.egg-info
+copying tests/test_authority.py -> actenon_airlock-0.1.0.dev0/tests
+copying tests/test_broker.py -> actenon_airlock-0.1.0.dev0/tests
+copying tests/test_ci.py -> actenon_airlock-0.1.0.dev0/tests
+copying tests/test_launcher.py -> actenon_airlock-0.1.0.dev0/tests
+copying tests/test_provider_sdks.py -> actenon_airlock-0.1.0.dev0/tests
+Writing actenon_airlock-0.1.0.dev0/setup.cfg
+Creating tar archive
+removing 'actenon_airlock-0.1.0.dev0' (and everything under it)
+* Building wheel from sdist
+* Getting build dependencies for wheel...
+running egg_info
+writing src/actenon_airlock.egg-info/PKG-INFO
+writing dependency_links to src/actenon_airlock.egg-info/dependency_links.txt
+writing entry points to src/actenon_airlock.egg-info/entry_points.txt
+writing requirements to src/actenon_airlock.egg-info/requires.txt
+writing top-level names to src/actenon_airlock.egg-info/top_level.txt
+reading manifest file 'src/actenon_airlock.egg-info/SOURCES.txt'
+adding license file 'LICENSE'
+writing manifest file 'src/actenon_airlock.egg-info/SOURCES.txt'
+* Building wheel...
+running bdist_wheel
+running build
+running build_py
+creating build/lib/actenon_airlock
+copying src/actenon_airlock/worker.py -> build/lib/actenon_airlock
+copying src/actenon_airlock/manifest.py -> build/lib/actenon_airlock
+copying src/actenon_airlock/__init__.py -> build/lib/actenon_airlock
+copying src/actenon_airlock/wire.py -> build/lib/actenon_airlock
+copying src/actenon_airlock/cli.py -> build/lib/actenon_airlock
+copying src/actenon_airlock/broker.py -> build/lib/actenon_airlock
+copying src/actenon_airlock/state.py -> build/lib/actenon_airlock
+running egg_info
+writing src/actenon_airlock.egg-info/PKG-INFO
+writing dependency_links to src/actenon_airlock.egg-info/dependency_links.txt
+writing entry points to src/actenon_airlock.egg-info/entry_points.txt
+writing requirements to src/actenon_airlock.egg-info/requires.txt
+writing top-level names to src/actenon_airlock.egg-info/top_level.txt
+reading manifest file 'src/actenon_airlock.egg-info/SOURCES.txt'
+adding license file 'LICENSE'
+writing manifest file 'src/actenon_airlock.egg-info/SOURCES.txt'
+installing to build/bdist.macosx-11.0-arm64/wheel
+running install
+running install_lib
+creating build/bdist.macosx-11.0-arm64/wheel
+creating build/bdist.macosx-11.0-arm64/wheel/actenon_airlock
+copying build/lib/actenon_airlock/worker.py -> build/bdist.macosx-11.0-arm64/wheel/./actenon_airlock
+copying build/lib/actenon_airlock/manifest.py -> build/bdist.macosx-11.0-arm64/wheel/./actenon_airlock
+copying build/lib/actenon_airlock/__init__.py -> build/bdist.macosx-11.0-arm64/wheel/./actenon_airlock
+copying build/lib/actenon_airlock/wire.py -> build/bdist.macosx-11.0-arm64/wheel/./actenon_airlock
+copying build/lib/actenon_airlock/cli.py -> build/bdist.macosx-11.0-arm64/wheel/./actenon_airlock
+copying build/lib/actenon_airlock/broker.py -> build/bdist.macosx-11.0-arm64/wheel/./actenon_airlock
+copying build/lib/actenon_airlock/state.py -> build/bdist.macosx-11.0-arm64/wheel/./actenon_airlock
+running install_egg_info
+Copying src/actenon_airlock.egg-info to build/bdist.macosx-11.0-arm64/wheel/./actenon_airlock-0.1.0.dev0-py3.12.egg-info
+running install_scripts
+creating build/bdist.macosx-11.0-arm64/wheel/actenon_airlock-0.1.0.dev0.dist-info/WHEEL
+creating '/Users/ross/Documents/Codex/2026-10-03/referenced-chatgpt-conversation-this-is-an/work/actenon-airlock/dist/.tmp-aimpr2h4/actenon_airlock-0.1.0.dev0-py3-none-any.whl' and adding 'build/bdist.macosx-11.0-arm64/wheel' to it
+adding 'actenon_airlock/__init__.py'
+adding 'actenon_airlock/broker.py'
+adding 'actenon_airlock/cli.py'
+adding 'actenon_airlock/manifest.py'
+adding 'actenon_airlock/state.py'
+adding 'actenon_airlock/wire.py'
+adding 'actenon_airlock/worker.py'
+adding 'actenon_airlock-0.1.0.dev0.dist-info/licenses/LICENSE'
+adding 'actenon_airlock-0.1.0.dev0.dist-info/METADATA'
+adding 'actenon_airlock-0.1.0.dev0.dist-info/WHEEL'
+adding 'actenon_airlock-0.1.0.dev0.dist-info/entry_points.txt'
+adding 'actenon_airlock-0.1.0.dev0.dist-info/top_level.txt'
+adding 'actenon_airlock-0.1.0.dev0.dist-info/RECORD'
+removing build/bdist.macosx-11.0-arm64/wheel
+Successfully built actenon_airlock-0.1.0.dev0.tar.gz and actenon_airlock-0.1.0.dev0-py3-none-any.whl

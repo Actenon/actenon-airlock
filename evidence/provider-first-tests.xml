@@ -1,0 +1,252 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="0" failures="3" skipped="0" tests="47" time="14.031" timestamp="2026-10-03T22:15:11.009600+01:00" hostname="Rosss-MacBook-Air.local"><testcase classname="tests.test_authority" name="test_scan_evidence_drives_target_diff" time="0.002" /><testcase classname="tests.test_authority" name="test_unresolved_call_cannot_inherit_static_authority" time="0.001" /><testcase classname="tests.test_authority" name="test_templates_and_empty_authority_fail_closed" time="0.002" /><testcase classname="tests.test_authority" name="test_github_action_uses_scan_vocabulary" time="0.001" /><testcase classname="tests.test_authority" name="test_ambiguous_urls_refuse[file:///tmp/x]" time="0.000" /><testcase classname="tests.test_authority" name="test_ambiguous_urls_refuse[https://u:p@example.com/a]" time="0.000" /><testcase classname="tests.test_authority" name="test_ambiguous_urls_refuse[https://example.com/a#fragment]" time="0.000" /><testcase classname="tests.test_authority" name="test_ambiguous_urls_refuse[https://example.com/a/../b]" time="0.000" /><testcase classname="tests.test_authority" name="test_ambiguous_urls_refuse[https://example.com/a%2fb]" time="0.000" /><testcase classname="tests.test_authority" name="test_ambiguous_urls_refuse[https://example.com/a%252fb]" time="0.000" /><testcase classname="tests.test_authority" name="test_ambiguous_urls_refuse[https://example.com//a]" time="0.000" /><testcase classname="tests.test_authority" name="test_ambiguous_urls_refuse[https://example.com/?api_key=secret]" time="0.000" /><testcase classname="tests.test_authority" name="test_ambiguous_urls_refuse[https://example.com/a\\b]" time="0.000" /><testcase classname="tests.test_authority" name="test_scheme_and_query_are_distinct_authority" time="0.001" /><testcase classname="tests.test_authority" name="test_tampered_approval_refuses" time="0.013" /><testcase classname="tests.test_authority" name="test_changed_public_key_refuses" time="0.003" /><testcase classname="tests.test_authority" name="test_parse_error_blocks_approval" time="0.002" /><testcase classname="tests.test_authority" name="test_init_without_approval_is_proposal_only" time="0.002" /><testcase classname="tests.test_authority" name="test_check_json_reports_expansion" time="0.003" /><testcase classname="tests.test_authority" name="test_reduction_needs_no_new_approval" time="0.003" /><testcase classname="tests.test_authority" name="test_unsupported_filesystem_remains_blocked" time="0.001" /><testcase classname="tests.test_broker" name="test_real_permit_kernel_allow_and_deny" time="0.542" /><testcase classname="tests.test_broker" name="test_empty_scope_is_explicit_deny_all" time="0.504" /><testcase classname="tests.test_broker" name="test_old_target_revoked_new_target_needs_approval" time="0.537" /><testcase classname="tests.test_broker" name="test_unresolved_runtime_request_uses_permit_deny" time="0.503" /><testcase classname="tests.test_broker" name="test_revocation_denies_before_transport" time="0.503" /><testcase classname="tests.test_broker" name="test_source_mutation_during_run_refuses" time="0.504" /><testcase classname="tests.test_broker" name="test_kernel_rejects_target_mutation_and_replay" time="0.503" /><testcase classname="tests.test_broker" name="test_credentials_stay_parent_owned_and_origin_bound" time="0.018" /><testcase classname="tests.test_broker" name="test_attenuation_cannot_change_target_scope" time="0.008" /><testcase classname="tests.test_ci" name="test_pr_cannot_approve_itself" time="0.137" /><testcase classname="tests.test_ci" name="test_missing_trusted_baseline_fails" time="0.025" /><testcase classname="tests.test_ci" name="test_reapproval_preserves_command_and_bindings" time="0.004" /><testcase classname="tests.test_launcher" name="test_real_client_runs_without_application_changes[import requests\nassert requests.post(&quot;{url}/a&quot;, data=&quot;hello&quot;).json()[&quot;ok&quot;]\n]" time="1.046" /><testcase classname="tests.test_launcher" name="test_real_client_runs_without_application_changes[import httpx\nassert httpx.post(&quot;{url}/a&quot;, content=&quot;hello&quot;).json()[&quot;ok&quot;]\n]" time="1.022" /><testcase classname="tests.test_launcher" name="test_real_client_runs_without_application_changes[import urllib.request\nr=urllib.request.urlopen(urllib.request.Request(&quot;{url}/a&quot;, data=b&quot;hello&quot;))\nassert r.status == 200\n]" time="1.002" /><testcase classname="tests.test_launcher" name="test_real_client_runs_without_application_changes[import httpx, asyncio\nasync def go():\n async with httpx.AsyncClient() as c:\n  r=await c.post(&quot;{url}/a&quot;, content=&quot;hello&quot;)\n  assert r.json()[&quot;ok&quot;]\nasyncio.run(go())\n]" time="1.011" /><testcase classname="tests.test_launcher" name="test_new_power_is_blocked_even_if_agent_catches_error" time="1.005" /><testcase classname="tests.test_launcher" name="test_unscanned_bypass_is_blocked_at_runtime[import socket\nsocket.socket().connect((&quot;127.0.0.1&quot;, {port}))\n]" time="1.005" /><testcase classname="tests.test_launcher" name="test_unscanned_bypass_is_blocked_at_runtime[import os\nos.system(&quot;true&quot;)\n]" time="0.505" /><testcase classname="tests.test_launcher" name="test_unscanned_bypass_is_blocked_at_runtime[import os\nfd=os.open(&quot;output.txt&quot;, os.O_WRONLY|os.O_CREAT)\n]" time="1.005" /><testcase classname="tests.test_launcher" name="test_child_cannot_read_approval_key" time="0.503" /><testcase classname="tests.test_launcher" name="test_unknown_environment_secrets_are_not_inherited" time="0.498" /><testcase classname="tests.test_launcher" name="test_pygithub_requester_uses_requests_broker" time="0.529" /><testcase classname="tests.test_provider_sdks" name="test_real_sdk_through_real_permit_kernel_without_live_provider[from openai import OpenAI\nr=OpenAI().chat.completions.create(model=&quot;test&quot;, messages=[{&quot;role&quot;:&quot;user&quot;,&quot;content&quot;:&quot;hello&quot;}])\nassert r.choices[0].message.content == &quot;offline&quot;\n-OPENAI_API_KEY-body0]" time="0.309"><failure message="AssertionError: assert 3 == 0&#10; +  where 3 = launch(PosixPath('/private/var/folders/tz/y04t4d0900xdbmz96jp608180000gn/T/pytest-of-ross/pytest-217/test_real_sdk_through_real_per0'), ['main.py'])&#10; +    where PosixPath('/private/var/folders/tz/y04t4d0900xdbmz96jp608180000gn/T/pytest-of-ross/pytest-217/test_real_sdk_through_real_per0') = &lt;actenon_airlock.state.State object at 0x108c3ac90&gt;.root">project = &lt;function project.&lt;locals&gt;.create at 0x108c1f600&gt;
+monkeypatch = &lt;_pytest.monkeypatch.MonkeyPatch object at 0x108c3ae10&gt;
+source = 'from openai import OpenAI\nr=OpenAI().chat.completions.create(model="test", messages=[{"role":"user","content":"hello"}])\nassert r.choices[0].message.content == "offline"\n'
+env_name = 'OPENAI_API_KEY'
+body = {'id': 'chatcmpl-offline', 'object': 'chat.completion', 'created': 0, 'model': 'test', ...}
+
+    @pytest.mark.parametrize(
+        "source,env_name,body",
+        [
+            (
+                "from openai import OpenAI\n"
+                'r=OpenAI().chat.completions.create(model="test", messages=[{"role":"user","content":"hello"}])\n'
+                'assert r.choices[0].message.content == "offline"\n',
+                "OPENAI_API_KEY",
+                {
+                    "id": "chatcmpl-offline",
+                    "object": "chat.completion",
+                    "created": 0,
+                    "model": "test",
+                    "choices": [
+                        {
+                            "index": 0,
+                            "message": {"role": "assistant", "content": "offline"},
+                            "finish_reason": "stop",
+                        }
+                    ],
+                },
+            ),
+            (
+                "from anthropic import Anthropic\n"
+                'r=Anthropic().messages.create(model="test", max_tokens=10, messages=[{"role":"user","content":"hello"}])\n'
+                'assert r.content[0].text == "offline"\n',
+                "ANTHROPIC_API_KEY",
+                {
+                    "id": "msg_offline",
+                    "type": "message",
+                    "role": "assistant",
+                    "model": "test",
+                    "content": [{"type": "text", "text": "offline"}],
+                    "stop_reason": "end_turn",
+                    "stop_sequence": None,
+                    "usage": {"input_tokens": 1, "output_tokens": 1},
+                },
+            ),
+            (
+                "import os\nfrom github import Github, Auth\n"
+                'g=Github(auth=Auth.Token(os.environ["GITHUB_TOKEN"]))\n'
+                'issue=g.get_repo("acme/support", lazy=True).create_issue(title="offline")\n'
+                "assert issue.number == 1\n",
+                "GITHUB_TOKEN",
+                {
+                    "id": 1,
+                    "number": 1,
+                    "title": "offline",
+                    "url": "https://api.github.com/repos/acme/support/issues/1",
+                },
+            ),
+        ],
+    )
+    def test_real_sdk_through_real_permit_kernel_without_live_provider(
+        project, monkeypatch, source, env_name, body
+    ):
+        monkeypatch.setenv(env_name, "offline-secret")
+        state = project(source)
+        observed = []
+        original = Broker.__init__
+    
+        def initialize(self, *args, **kwargs):
+            original(self, *args, **kwargs)
+            self.http.close()
+    
+            def transport(req):
+                observed.append(req)
+                return httpx.Response(200, json=body)
+    
+            self.http = httpx.Client(transport=httpx.MockTransport(transport), trust_env=False)
+    
+        monkeypatch.setattr(Broker, "__init__", initialize)
+&gt;       assert launch(state.root, ["main.py"]) == 0
+E       AssertionError: assert 3 == 0
+E        +  where 3 = launch(PosixPath('/private/var/folders/tz/y04t4d0900xdbmz96jp608180000gn/T/pytest-of-ross/pytest-217/test_real_sdk_through_real_per0'), ['main.py'])
+E        +    where PosixPath('/private/var/folders/tz/y04t4d0900xdbmz96jp608180000gn/T/pytest-of-ross/pytest-217/test_real_sdk_through_real_per0') = &lt;actenon_airlock.state.State object at 0x108c3ac90&gt;.root
+
+tests/test_provider_sdks.py:79: AssertionError</failure></testcase><testcase classname="tests.test_provider_sdks" name="test_real_sdk_through_real_permit_kernel_without_live_provider[from anthropic import Anthropic\nr=Anthropic().messages.create(model=&quot;test&quot;, max_tokens=10, messages=[{&quot;role&quot;:&quot;user&quot;,&quot;content&quot;:&quot;hello&quot;}])\nassert r.content[0].text == &quot;offline&quot;\n-ANTHROPIC_API_KEY-body1]" time="0.338"><failure message="AssertionError: assert 3 == 0&#10; +  where 3 = launch(PosixPath('/private/var/folders/tz/y04t4d0900xdbmz96jp608180000gn/T/pytest-of-ross/pytest-217/test_real_sdk_through_real_per1'), ['main.py'])&#10; +    where PosixPath('/private/var/folders/tz/y04t4d0900xdbmz96jp608180000gn/T/pytest-of-ross/pytest-217/test_real_sdk_through_real_per1') = &lt;actenon_airlock.state.State object at 0x108c399a0&gt;.root">project = &lt;function project.&lt;locals&gt;.create at 0x108c1e200&gt;
+monkeypatch = &lt;_pytest.monkeypatch.MonkeyPatch object at 0x108c392e0&gt;
+source = 'from anthropic import Anthropic\nr=Anthropic().messages.create(model="test", max_tokens=10, messages=[{"role":"user","content":"hello"}])\nassert r.content[0].text == "offline"\n'
+env_name = 'ANTHROPIC_API_KEY'
+body = {'id': 'msg_offline', 'type': 'message', 'role': 'assistant', 'model': 'test', ...}
+
+    @pytest.mark.parametrize(
+        "source,env_name,body",
+        [
+            (
+                "from openai import OpenAI\n"
+                'r=OpenAI().chat.completions.create(model="test", messages=[{"role":"user","content":"hello"}])\n'
+                'assert r.choices[0].message.content == "offline"\n',
+                "OPENAI_API_KEY",
+                {
+                    "id": "chatcmpl-offline",
+                    "object": "chat.completion",
+                    "created": 0,
+                    "model": "test",
+                    "choices": [
+                        {
+                            "index": 0,
+                            "message": {"role": "assistant", "content": "offline"},
+                            "finish_reason": "stop",
+                        }
+                    ],
+                },
+            ),
+            (
+                "from anthropic import Anthropic\n"
+                'r=Anthropic().messages.create(model="test", max_tokens=10, messages=[{"role":"user","content":"hello"}])\n'
+                'assert r.content[0].text == "offline"\n',
+                "ANTHROPIC_API_KEY",
+                {
+                    "id": "msg_offline",
+                    "type": "message",
+                    "role": "assistant",
+                    "model": "test",
+                    "content": [{"type": "text", "text": "offline"}],
+                    "stop_reason": "end_turn",
+                    "stop_sequence": None,
+                    "usage": {"input_tokens": 1, "output_tokens": 1},
+                },
+            ),
+            (
+                "import os\nfrom github import Github, Auth\n"
+                'g=Github(auth=Auth.Token(os.environ["GITHUB_TOKEN"]))\n'
+                'issue=g.get_repo("acme/support", lazy=True).create_issue(title="offline")\n'
+                "assert issue.number == 1\n",
+                "GITHUB_TOKEN",
+                {
+                    "id": 1,
+                    "number": 1,
+                    "title": "offline",
+                    "url": "https://api.github.com/repos/acme/support/issues/1",
+                },
+            ),
+        ],
+    )
+    def test_real_sdk_through_real_permit_kernel_without_live_provider(
+        project, monkeypatch, source, env_name, body
+    ):
+        monkeypatch.setenv(env_name, "offline-secret")
+        state = project(source)
+        observed = []
+        original = Broker.__init__
+    
+        def initialize(self, *args, **kwargs):
+            original(self, *args, **kwargs)
+            self.http.close()
+    
+            def transport(req):
+                observed.append(req)
+                return httpx.Response(200, json=body)
+    
+            self.http = httpx.Client(transport=httpx.MockTransport(transport), trust_env=False)
+    
+        monkeypatch.setattr(Broker, "__init__", initialize)
+&gt;       assert launch(state.root, ["main.py"]) == 0
+E       AssertionError: assert 3 == 0
+E        +  where 3 = launch(PosixPath('/private/var/folders/tz/y04t4d0900xdbmz96jp608180000gn/T/pytest-of-ross/pytest-217/test_real_sdk_through_real_per1'), ['main.py'])
+E        +    where PosixPath('/private/var/folders/tz/y04t4d0900xdbmz96jp608180000gn/T/pytest-of-ross/pytest-217/test_real_sdk_through_real_per1') = &lt;actenon_airlock.state.State object at 0x108c399a0&gt;.root
+
+tests/test_provider_sdks.py:79: AssertionError</failure></testcase><testcase classname="tests.test_provider_sdks" name="test_real_sdk_through_real_permit_kernel_without_live_provider[import os\nfrom github import Github, Auth\ng=Github(auth=Auth.Token(os.environ[&quot;GITHUB_TOKEN&quot;]))\nissue=g.get_repo(&quot;acme/support&quot;, lazy=True).create_issue(title=&quot;offline&quot;)\nassert issue.number == 1\n-GITHUB_TOKEN-body2]" time="0.318"><failure message="assert 'offline-secret' in &quot;Headers({'host': 'api.github.com', 'user-agent': 'PyGithub/Python', 'accept-encoding': 'gzip, deflate', 'accept': '*/*', 'connection': 'keep-alive', 'authorization': '[secure]', 'content-type': 'application/json', 'content-length': '20'})&quot;&#10; +  where &quot;Headers({'host': 'api.github.com', 'user-agent': 'PyGithub/Python', 'accept-encoding': 'gzip, deflate', 'accept': '*/*', 'connection': 'keep-alive', 'authorization': '[secure]', 'content-type': 'application/json', 'content-length': '20'})&quot; = str(Headers({'host': 'api.github.com', 'user-agent': 'PyGithub/Python', 'accept-encoding': 'gzip, deflate', 'accept': '*/*', 'connection': 'keep-alive', 'authorization': '[secure]', 'content-type': 'application/json', 'content-length': '20'}))&#10; +    where Headers({'host': 'api.github.com', 'user-agent': 'PyGithub/Python', 'accept-encoding': 'gzip, deflate', 'accept': '*/*', 'connection': 'keep-alive', 'authorization': '[secure]', 'content-type': 'application/json', 'content-length': '20'}) = &lt;Request('POST', 'https://api.github.com/repos/acme/support/issues')&gt;.headers">project = &lt;function project.&lt;locals&gt;.create at 0x108c1f880&gt;
+monkeypatch = &lt;_pytest.monkeypatch.MonkeyPatch object at 0x108c3b560&gt;
+source = 'import os\nfrom github import Github, Auth\ng=Github(auth=Auth.Token(os.environ["GITHUB_TOKEN"]))\nissue=g.get_repo("acme/support", lazy=True).create_issue(title="offline")\nassert issue.number == 1\n'
+env_name = 'GITHUB_TOKEN'
+body = {'id': 1, 'number': 1, 'title': 'offline', 'url': 'https://api.github.com/repos/acme/support/issues/1'}
+
+    @pytest.mark.parametrize(
+        "source,env_name,body",
+        [
+            (
+                "from openai import OpenAI\n"
+                'r=OpenAI().chat.completions.create(model="test", messages=[{"role":"user","content":"hello"}])\n'
+                'assert r.choices[0].message.content == "offline"\n',
+                "OPENAI_API_KEY",
+                {
+                    "id": "chatcmpl-offline",
+                    "object": "chat.completion",
+                    "created": 0,
+                    "model": "test",
+                    "choices": [
+                        {
+                            "index": 0,
+                            "message": {"role": "assistant", "content": "offline"},
+                            "finish_reason": "stop",
+                        }
+                    ],
+                },
+            ),
+            (
+                "from anthropic import Anthropic\n"
+                'r=Anthropic().messages.create(model="test", max_tokens=10, messages=[{"role":"user","content":"hello"}])\n'
+                'assert r.content[0].text == "offline"\n',
+                "ANTHROPIC_API_KEY",
+                {
+                    "id": "msg_offline",
+                    "type": "message",
+                    "role": "assistant",
+                    "model": "test",
+                    "content": [{"type": "text", "text": "offline"}],
+                    "stop_reason": "end_turn",
+                    "stop_sequence": None,
+                    "usage": {"input_tokens": 1, "output_tokens": 1},
+                },
+            ),
+            (
+                "import os\nfrom github import Github, Auth\n"
+                'g=Github(auth=Auth.Token(os.environ["GITHUB_TOKEN"]))\n'
+                'issue=g.get_repo("acme/support", lazy=True).create_issue(title="offline")\n'
+                "assert issue.number == 1\n",
+                "GITHUB_TOKEN",
+                {
+                    "id": 1,
+                    "number": 1,
+                    "title": "offline",
+                    "url": "https://api.github.com/repos/acme/support/issues/1",
+                },
+            ),
+        ],
+    )
+    def test_real_sdk_through_real_permit_kernel_without_live_provider(
+        project, monkeypatch, source, env_name, body
+    ):
+        monkeypatch.setenv(env_name, "offline-secret")
+        state = project(source)
+        observed = []
+        original = Broker.__init__
+    
+        def initialize(self, *args, **kwargs):
+            original(self, *args, **kwargs)
+            self.http.close()
+    
+            def transport(req):
+                observed.append(req)
+                return httpx.Response(200, json=body)
+    
+            self.http = httpx.Client(transport=httpx.MockTransport(transport), trust_env=False)
+    
+        monkeypatch.setattr(Broker, "__init__", initialize)
+        assert launch(state.root, ["main.py"]) == 0
+        assert len(observed) == 1
+&gt;       assert "offline-secret" in str(observed[0].headers)
+E       assert 'offline-secret' in "Headers({'host': 'api.github.com', 'user-agent': 'PyGithub/Python', 'accept-encoding': 'gzip, deflate', 'accept': '*/*', 'connection': 'keep-alive', 'authorization': '[secure]', 'content-type': 'application/json', 'content-length': '20'})"
+E        +  where "Headers({'host': 'api.github.com', 'user-agent': 'PyGithub/Python', 'accept-encoding': 'gzip, deflate', 'accept': '*/*', 'connection': 'keep-alive', 'authorization': '[secure]', 'content-type': 'application/json', 'content-length': '20'})" = str(Headers({'host': 'api.github.com', 'user-agent': 'PyGithub/Python', 'accept-encoding': 'gzip, deflate', 'accept': '*/*', 'connection': 'keep-alive', 'authorization': '[secure]', 'content-type': 'application/json', 'content-length': '20'}))
+E        +    where Headers({'host': 'api.github.com', 'user-agent': 'PyGithub/Python', 'accept-encoding': 'gzip, deflate', 'accept': '*/*', 'connection': 'keep-alive', 'authorization': '[secure]', 'content-type': 'application/json', 'content-length': '20'}) = &lt;Request('POST', 'https://api.github.com/repos/acme/support/issues')&gt;.headers
+
+tests/test_provider_sdks.py:81: AssertionError</failure></testcase></testsuite></testsuites>

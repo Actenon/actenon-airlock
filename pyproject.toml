@@ -1,0 +1,47 @@
+[build-system]
+requires = ["setuptools>=77", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "actenon-airlock"
+version = "0.1.0.dev0"
+description = "See and control the powers of your Python AI agent."
+readme = "README.md"
+requires-python = ">=3.11"
+license = "Apache-2.0"
+dependencies = [
+  "actenon-scan @ git+https://github.com/Actenon/actenon-scan.git@a9de0ffed2ed67aa1565ab5382898468ca998ff8",
+  "actenon-protocol @ git+https://github.com/Actenon/actenon-protocol.git@e988c4d43f8b59d459628a306cd0117109e59d70",
+  "actenon-kernel @ git+https://github.com/Actenon/actenon-kernel.git@533c029d63b5ce070a1eb8d8513e8e57a75ec703",
+  "actenon-permit @ git+https://github.com/Actenon/actenon-permit.git@a0d2b8dae74972a06f5774e4667774df26fbad97",
+  "requests>=2.32,<3",
+  "httpx>=0.27,<1",
+]
+
+[project.optional-dependencies]
+test = [
+  "pytest>=8", "build>=1.2", "ruff>=0.8", "PyGithub>=2.5,<3",
+  "openai>=1.50,<3", "anthropic>=0.40,<1",
+]
+
+[project.scripts]
+airlock = "actenon_airlock.cli:main"
+
+[project.urls]
+Repository = "https://github.com/Actenon/actenon-airlock"
+Issues = "https://github.com/Actenon/actenon-airlock/issues"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-ra"
+
+[tool.ruff]
+line-length = 100
+target-version = "py311"
+
+[tool.ruff.lint]
+select = ["E", "F", "I"]
+ignore = ["E501"]
