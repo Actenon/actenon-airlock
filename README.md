@@ -121,6 +121,8 @@ See [the reusable action](action.yml) and [workflow example](docs/github-action.
 - Requests and responses are buffered, limited to 4 MiB. Redirects are returned without being followed.
 - Runtime HTTP must trace to resolved Scan evidence in the project. Unresolved calls cannot inherit
   the authority of a resolved call to the same URL.
+- Source lines and columns distinguish callsites. Ambiguous async expressions or source sites
+  shared with unresolved evidence remain blocked.
 - Unsupported filesystem writes/deletes, subprocess execution, raw sockets, ambiguous/encoded URLs,
   URL templates, dynamic HTTP methods, and GraphQL mutations fail closed.
 

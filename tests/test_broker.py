@@ -18,7 +18,7 @@ def message(url, line=2, method="POST"):
         "url": url,
         "headers": {},
         "body": base64.b64encode(b"hello").decode(),
-        "locations": [{"file": "main.py", "line": line}],
+        "locations": [{"file": "main.py", "line": line, "col": 1}],
     }
 
 
@@ -122,7 +122,9 @@ def test_kernel_rejects_target_mutation_and_replay(project, server):
     current = discover(state.root)
     broker = Broker(state, current)
     try:
-        cap, _ = request_capability(current, "POST", url + "/a", [{"file": "main.py", "line": 2}])
+        cap, _ = request_capability(
+            current, "POST", url + "/a", [{"file": "main.py", "line": 2, "col": 1}]
+        )
         action = Action(grant_id=broker.grant.id, type=cap, target=url + "/a", params={})
         _, intent, proof = broker.pdp.decide_and_mint_pccb(broker.grant, action)
         actual = intent.to_dict()

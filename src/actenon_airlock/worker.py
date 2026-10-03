@@ -54,7 +54,21 @@ def install(sock, root: Path):
         for frame in inspect.stack(context=0):
             path = Path(frame.filename).resolve()
             if path.is_relative_to(root) and not path.is_relative_to(package):
-                found.append({"file": str(path.relative_to(root)), "line": frame.lineno})
+                positions = frame.positions
+                found.append(
+                    {
+                        "file": str(path.relative_to(root)),
+                        "line": positions.lineno if positions is not None else frame.lineno,
+                        # Scan uses one-based columns; Python bytecode uses zero-based columns.
+                        "col": positions.col_offset + 1
+                        if positions is not None and positions.col_offset is not None
+                        else -1,
+                        "end_line": positions.end_lineno if positions is not None else frame.lineno,
+                        "end_col": positions.end_col_offset + 1
+                        if positions is not None and positions.end_col_offset is not None
+                        else -1,
+                    }
+                )
         return found
 
     def request(method, url, headers, body):

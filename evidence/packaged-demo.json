@@ -1,0 +1,317 @@
+{
+  "schema": "actenon-airlock/packaged-demo/v1",
+  "result": "PASS",
+  "steps": [
+    {
+      "command": [
+        "airlock",
+        "init",
+        "--approve"
+      ],
+      "exit_code": 0,
+      "stdout": "AIRLOCK AUTHORITY DIFF\n\n+ http.post @ 127.0.0.1:62677/events\n  Transport: http://127.0.0.1:62677/events\n\nRuntime: BLOCKED UNTIL APPROVED\n\nApproved 1 powers. Unresolved powers remain blocked.\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "airlock",
+        "run"
+      ],
+      "exit_code": 0,
+      "stdout": "{'ok': True}\n",
+      "stderr": "AIRLOCK ALLOW http.post @ http://127.0.0.1:62677/events [receipt_193510d476c845b984ed19f617913c40]\n"
+    },
+    {
+      "command": [
+        "airlock",
+        "diff",
+        "--json"
+      ],
+      "exit_code": 0,
+      "stdout": "{\n  \"schema\": \"actenon-airlock/diff/v1\",\n  \"added\": [\n    {\n      \"action\": \"http.delete\",\n      \"resource\": \"127.0.0.1:62677/events\",\n      \"transport\": \"http://127.0.0.1:62677/events\"\n    }\n  ],\n  \"removed\": [\n    {\n      \"action\": \"http.post\",\n      \"resource\": \"127.0.0.1:62677/events\",\n      \"transport\": \"http://127.0.0.1:62677/events\"\n    }\n  ],\n  \"blocked\": [],\n  \"parse_errors\": [],\n  \"runtime_status\": \"BLOCKED UNTIL APPROVED\"\n}\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "airlock",
+        "check",
+        "--json"
+      ],
+      "exit_code": 2,
+      "stdout": "{\n  \"schema\": \"actenon-airlock/diff/v1\",\n  \"added\": [\n    {\n      \"action\": \"http.delete\",\n      \"resource\": \"127.0.0.1:62677/events\",\n      \"transport\": \"http://127.0.0.1:62677/events\"\n    }\n  ],\n  \"removed\": [\n    {\n      \"action\": \"http.post\",\n      \"resource\": \"127.0.0.1:62677/events\",\n      \"transport\": \"http://127.0.0.1:62677/events\"\n    }\n  ],\n  \"blocked\": [],\n  \"parse_errors\": [],\n  \"runtime_status\": \"BLOCKED UNTIL APPROVED\"\n}\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "airlock",
+        "run"
+      ],
+      "exit_code": 3,
+      "stdout": "",
+      "stderr": "AIRLOCK: 1 new powers remain blocked\nAIRLOCK DENY http.delete @ http://127.0.0.1:62677/events: scope denied: * [receipt_c80873743c33474d95e343e765aa29a9]\nAIRLOCK BLOCKED: scope denied: *\n"
+    }
+  ],
+  "executed_http_calls": [
+    {
+      "method": "POST",
+      "path": "/events"
+    }
+  ],
+  "receipts": [
+    {
+      "action": "http.post",
+      "authority_source": "actenon-scan/authority-evidence/v1",
+      "credential_released": false,
+      "decision": "ALLOW",
+      "evidence": {
+        "col": 7,
+        "end_line": 2,
+        "file": "main.py",
+        "line": 2
+      },
+      "execution_occurred": false,
+      "grant_id": "grant_9a701ff257e14d3d",
+      "id": "receipt_89ea311711a2453eac2100c0358747e7",
+      "intent": {
+        "action": {
+          "capability": "airlock.cd67efa1a93c4eb72abcce93cea24af576b59df5c2bb98ff42afe6bdf49e7426",
+          "name": "airlock.cd67efa1a93c4eb72abcce93cea24af576b59df5c2bb98ff42afe6bdf49e7426",
+          "parameters": {
+            "authority_action": "http.post",
+            "authority_resource": "127.0.0.1:62677/events",
+            "body_sha256": "cf8f644b80ee8100db6f910fa33514be8e0ac3d3f54546de914b34c2206ad6a9",
+            "headers_sha256": "79ec0dd62e8ffffb8288f1d985cc390ef78d489a611b26a753bc752727aef73d",
+            "method": "POST",
+            "source_digest": "81f8bd589b4c2e08249c2a36c53db9a3baadf4d5fee5a824fb6719c29e7b1653"
+          }
+        },
+        "contract": {
+          "name": "action_intent",
+          "version": "v1"
+        },
+        "expires_at": "2026-10-03T21:38:16.323247Z",
+        "intent_id": "act_dbfd31a7df7843e6",
+        "issued_at": "2026-10-03T21:36:16.323247Z",
+        "metadata": {
+          "authority_ref": "authref_8010efc2215b7d9c6c14ff4789ca2c02",
+          "execution_mode": "brokered",
+          "grant_id": "grant_9a701ff257e14d3d",
+          "operation_id": "act_dbfd31a7df7843e6"
+        },
+        "requester": {
+          "id": "airlock:81f8bd589b4c2e08249c2a36c53db9a3baadf4d5fee5a824fb6719c29e7b1653",
+          "type": "agent"
+        },
+        "target": {
+          "resource_id": "http://127.0.0.1:62677/events",
+          "resource_type": "tool"
+        },
+        "tenant": {
+          "tenant_id": "default"
+        }
+      },
+      "manifest_digest": "8da47a7c3fd9faf340610caf513167d0aa33ee48d8a9534413f269e3d5f820d9",
+      "proof": {
+        "action": {
+          "capability": "airlock.cd67efa1a93c4eb72abcce93cea24af576b59df5c2bb98ff42afe6bdf49e7426",
+          "name": "airlock.cd67efa1a93c4eb72abcce93cea24af576b59df5c2bb98ff42afe6bdf49e7426",
+          "parameters": {
+            "authority_action": "http.post",
+            "authority_resource": "127.0.0.1:62677/events",
+            "body_sha256": "cf8f644b80ee8100db6f910fa33514be8e0ac3d3f54546de914b34c2206ad6a9",
+            "headers_sha256": "79ec0dd62e8ffffb8288f1d985cc390ef78d489a611b26a753bc752727aef73d",
+            "method": "POST",
+            "source_digest": "81f8bd589b4c2e08249c2a36c53db9a3baadf4d5fee5a824fb6719c29e7b1653"
+          }
+        },
+        "action_hash": {
+          "algorithm": "sha-256",
+          "canonicalization": "ACTENON-JCS-STRICT-1",
+          "value": "9d488aee133cab3fe1e1f54878e214d45097b27cfcde43958ac8a194eec4da21"
+        },
+        "audience": {
+          "id": "actenon-permit-gateway",
+          "type": "service"
+        },
+        "contract": {
+          "name": "pccb",
+          "version": "v1"
+        },
+        "expires_at": "2026-10-03T21:38:16.323247Z",
+        "extensions": {
+          "authority": {
+            "grant_id": "grant_9a701ff257e14d3d",
+            "issuer": "service:actenon-permit",
+            "revocable": true
+          }
+        },
+        "intent_id": "act_dbfd31a7df7843e6",
+        "issued_at": "2026-10-03T21:36:16.325492Z",
+        "issuer": {
+          "id": "actenon-permit",
+          "type": "service"
+        },
+        "nonce": "s9Jva5zDqRxw0CmwgUV38v638v-TI3t7",
+        "not_before": "2026-10-03T21:36:16.325492Z",
+        "pccb_id": "pccb_eefc96c21556480491bf41fa12d9be31",
+        "scope": {
+          "capabilities": [
+            "airlock.cd67efa1a93c4eb72abcce93cea24af576b59df5c2bb98ff42afe6bdf49e7426"
+          ],
+          "mode": "exact",
+          "single_use": true
+        },
+        "signature": {
+          "algorithm": "EdDSA",
+          "encoding": "base64url",
+          "key_id": "ed25519-77572bc038a2",
+          "value": "KgySZ9QlK6a3G7zSHBE9tDscDBaayfRZ2aukNXkhk84ZsFZyyA187yFba_BPQguJUNScdw0Qpg2NL-IHJSsOCQ"
+        },
+        "subject": {
+          "id": "airlock:81f8bd589b4c2e08249c2a36c53db9a3baadf4d5fee5a824fb6719c29e7b1653",
+          "type": "agent"
+        },
+        "target": {
+          "resource_id": "http://127.0.0.1:62677/events",
+          "resource_type": "tool"
+        },
+        "tenant": {
+          "tenant_id": "default"
+        }
+      },
+      "proof_id": "pccb_eefc96c21556480491bf41fa12d9be31",
+      "reason": "allowed",
+      "schema": "actenon-airlock/receipt/v1",
+      "source_digest": "81f8bd589b4c2e08249c2a36c53db9a3baadf4d5fee5a824fb6719c29e7b1653",
+      "stage": "authorized",
+      "target": "http://127.0.0.1:62677/events",
+      "timestamp": "2026-10-03T21:36:16.326122+00:00"
+    },
+    {
+      "action": "http.post",
+      "authority_source": "actenon-scan/authority-evidence/v1",
+      "credential_released": false,
+      "decision": "ALLOW",
+      "execution_occurred": true,
+      "grant_id": "grant_9a701ff257e14d3d",
+      "id": "receipt_193510d476c845b984ed19f617913c40",
+      "kernel": {
+        "ok": true,
+        "outcome": "executed",
+        "payload": {
+          "http_status": 200
+        },
+        "reason_code": null,
+        "receipt": {
+          "action": {
+            "capability": "airlock.cd67efa1a93c4eb72abcce93cea24af576b59df5c2bb98ff42afe6bdf49e7426",
+            "name": "airlock.cd67efa1a93c4eb72abcce93cea24af576b59df5c2bb98ff42afe6bdf49e7426",
+            "parameters": {
+              "authority_action": "http.post",
+              "authority_resource": "127.0.0.1:62677/events",
+              "body_sha256": "cf8f644b80ee8100db6f910fa33514be8e0ac3d3f54546de914b34c2206ad6a9",
+              "headers_sha256": "79ec0dd62e8ffffb8288f1d985cc390ef78d489a611b26a753bc752727aef73d",
+              "method": "POST",
+              "source_digest": "81f8bd589b4c2e08249c2a36c53db9a3baadf4d5fee5a824fb6719c29e7b1653"
+            }
+          },
+          "contract": {
+            "name": "receipt",
+            "version": "v1"
+          },
+          "correlation": {
+            "action_hash": {
+              "algorithm": "sha-256",
+              "canonicalization": "ACTENON-JCS-STRICT-1",
+              "value": "9d488aee133cab3fe1e1f54878e214d45097b27cfcde43958ac8a194eec4da21"
+            },
+            "pccb_id": "pccb_eefc96c21556480491bf41fa12d9be31",
+            "request_id": "req_gate_b6012ef9014e495b838f0213f062851f"
+          },
+          "details": {
+            "brokered_credential": {
+              "credential_id": "cred_5a66ddbff4754cad91695411cc75b26c",
+              "expires_at": "2026-10-03T21:38:16.323247Z",
+              "issued_at": "2026-10-03T21:36:16.326372Z",
+              "metadata": {
+                "audience": {
+                  "id": "actenon-permit-gateway",
+                  "type": "service"
+                },
+                "broker": "in_memory",
+                "capability": "airlock.cd67efa1a93c4eb72abcce93cea24af576b59df5c2bb98ff42afe6bdf49e7426",
+                "intent_id": "act_dbfd31a7df7843e6",
+                "pccb_id": "pccb_eefc96c21556480491bf41fa12d9be31"
+              },
+              "scope": [
+                "airlock.cd67efa1a93c4eb72abcce93cea24af576b59df5c2bb98ff42afe6bdf49e7426"
+              ],
+              "secret_reference": "memory://brokered-credential/cred_5a66ddbff4754cad91695411cc75b26c"
+            },
+            "credential_broker": {
+              "credential_material_exposed": false,
+              "mode": "protected_endpoint"
+            },
+            "http_status": 200
+          },
+          "intent_id": "act_dbfd31a7df7843e6",
+          "occurred_at": "2026-10-03T21:36:16.326372Z",
+          "outcome": "executed",
+          "phase": "execution",
+          "receipt_id": "rcpt_6bc64a3f474c42e5a7051b29913ee6e4",
+          "side_effects": {
+            "state": "completed"
+          },
+          "subject": {
+            "id": "airlock:81f8bd589b4c2e08249c2a36c53db9a3baadf4d5fee5a824fb6719c29e7b1653",
+            "type": "agent"
+          },
+          "summary": "The protected action executed successfully.",
+          "target": {
+            "resource_id": "http://127.0.0.1:62677/events",
+            "resource_type": "tool"
+          },
+          "tenant": {
+            "tenant_id": "default"
+          }
+        },
+        "unmet_requirements": []
+      },
+      "manifest_digest": "8da47a7c3fd9faf340610caf513167d0aa33ee48d8a9534413f269e3d5f820d9",
+      "parent_receipt_id": "receipt_89ea311711a2453eac2100c0358747e7",
+      "proof_id": "pccb_eefc96c21556480491bf41fa12d9be31",
+      "reason": "Verified by Kernel and executed",
+      "schema": "actenon-airlock/receipt/v1",
+      "source_digest": "81f8bd589b4c2e08249c2a36c53db9a3baadf4d5fee5a824fb6719c29e7b1653",
+      "stage": "executed",
+      "target": "http://127.0.0.1:62677/events",
+      "timestamp": "2026-10-03T21:36:16.330019+00:00"
+    },
+    {
+      "action": "http.delete",
+      "authority_source": "actenon-scan/authority-evidence/v1",
+      "credential_released": false,
+      "decision": "DENY",
+      "execution_occurred": false,
+      "grant_id": "grant_84effdf39d7248bf",
+      "id": "receipt_c80873743c33474d95e343e765aa29a9",
+      "manifest_digest": "940b44a56df0cd831932ba018ef2ef1e2aa1b21ea5316566574a67c7af028845",
+      "permit_decision": {
+        "failure_code": "SCOPE_DENIED",
+        "outcome": "DENY",
+        "reason": "scope denied: *",
+        "rule_matched": "deny:*",
+        "state_delta": {}
+      },
+      "reason": "scope denied: *",
+      "schema": "actenon-airlock/receipt/v1",
+      "source_digest": "0998d1388757b1465aba13725d9b33b4a6b08dd60b2c7eb82eb8ea543372a79b",
+      "target": "http://127.0.0.1:62677/events",
+      "timestamp": "2026-10-03T21:36:16.866712+00:00"
+    }
+  ],
+  "public_key": {
+    "key": "IgJrL1C2mgBo1vZU+joXJHE0oevauL6Mpr/LYXWfVHA="
+  },
+  "private_key_exported": false
+}

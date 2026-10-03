@@ -77,6 +77,55 @@ def test_unknown_environment_secrets_are_not_inherited(project, monkeypatch):
     assert result.returncode == 0, result.stderr
 
 
+def test_same_line_unresolved_call_cannot_inherit_static_call(project, server):
+    url, calls = server
+    state = project(
+        "import requests\n"
+        f'URL="{url}/a"\n'
+        "def tool(url):\n"
+        f' requests.post("{url}/a"); requests.post(url)\n'
+        "tool_ref=tool\n"
+        "tool(URL)\n"
+    )
+    result = run(state)
+    assert result.returncode == 3, result.stderr
+    assert len(calls) == 1
+    assert "AIRLOCK DENY" in result.stderr
+
+
+def test_ambiguous_await_expression_remains_blocked(project, server):
+    url, calls = server
+    state = project(
+        "import httpx, asyncio\n"
+        "async def tool(url, flag):\n"
+        " async with httpx.AsyncClient() as c:\n"
+        f'  await (c.post("{url}/a") if flag else c.post(url))\n'
+        "tool_ref=tool\n"
+        f'asyncio.run(tool("{url}/a", False))\n'
+    )
+    result = run(state)
+    assert result.returncode == 3, result.stderr
+    assert calls == []
+
+
+def test_shared_helper_unresolved_context_does_not_inherit_static_context(project, server):
+    url, calls = server
+    state = project(
+        "import requests\n"
+        "def helper(url):\n requests.post(url)\n"
+        "def tool(url):\n helper(url)\n"
+        "tool_ref=tool\n"
+        f'helper("{url}/a")\n'
+        f'tool("{url}/a")\n'
+    )
+    result = run(state)
+    assert result.returncode == 3, result.stderr
+    # Scan distinguishes the literal caller from the unresolved tool context.
+    assert len(calls) == 1
+    assert result.stderr.count("AIRLOCK ALLOW") == 1
+    assert "AIRLOCK DENY http.post" in result.stderr
+
+
 def test_pygithub_requester_uses_requests_broker(project, monkeypatch):
     # No real GitHub write: unapproved repo deletion must deny before transport.
     monkeypatch.setenv("GITHUB_TOKEN", "not-a-real-token")

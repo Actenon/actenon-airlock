@@ -1,7 +1,7 @@
 import json
 import subprocess
 
-from actenon_airlock.cli import main
+from actenon_airlock.cli import main, render
 from actenon_airlock.manifest import discover
 
 
@@ -61,6 +61,26 @@ def test_missing_trusted_baseline_fails(tmp_path):
     git(tmp_path, "init")
     (tmp_path / "main.py").write_text("print('hello')\n")
     assert main(["check", "--path", str(tmp_path), "--base", "HEAD", "--json"]) == 2
+
+
+def test_source_strings_cannot_inject_github_workflow_commands():
+    result = render(
+        {
+            "added": [
+                {
+                    "action": "http.post",
+                    "resource": "x\n::error::injected",
+                    "transport": "https://example.com",
+                }
+            ],
+            "removed": [],
+            "blocked": [],
+            "parse_errors": [],
+            "runtime_status": "BLOCKED",
+        }
+    )
+    assert "\n::error" not in result
+    assert "\\n::error" in result
 
 
 def test_reapproval_preserves_command_and_bindings(tmp_path):

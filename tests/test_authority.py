@@ -34,7 +34,7 @@ def test_unresolved_call_cannot_inherit_static_authority(tmp_path):
     manifest = discover(tmp_path, env={})
     assert len(manifest["powers"]) == 1 and len(manifest["blocked"]) == 1
     cap, _ = request_capability(
-        manifest, "post", "https://example.com/a", [{"file": "main.py", "line": 4}]
+        manifest, "post", "https://example.com/a", [{"file": "main.py", "line": 4, "col": 2}]
     )
     assert cap.startswith("airlock.unresolved.")
 
@@ -58,7 +58,7 @@ def test_github_action_uses_scan_vocabulary(tmp_path):
         m,
         "POST",
         "https://api.github.com/repos/acme/support/issues",
-        [{"file": "main.py", "line": 3}],
+        [{"file": "main.py", "line": 3, "col": 1}],
     )
     assert cap == capability(p) and entry["resource"] == "github.com/acme/support"
 
@@ -88,7 +88,7 @@ def test_scheme_and_query_are_distinct_authority(tmp_path):
     )
     m = discover(tmp_path, env={})
     for url in ["http://example.com/a?x=1", "https://example.com/a?x=2"]:
-        cap, _ = request_capability(m, "POST", url, [{"file": "main.py", "line": 2}])
+        cap, _ = request_capability(m, "POST", url, [{"file": "main.py", "line": 2, "col": 1}])
         assert cap not in {capability(p) for p in m["powers"]}
 
 

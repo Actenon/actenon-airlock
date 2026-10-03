@@ -25,10 +25,18 @@ VALIDATION EVIDENCE:
 
 - initial-local-tests.xml preserves the first 39 pass / 2 fail run.
 - provider-first-tests.xml preserves the expanded 44 pass / 3 fail run.
+- source-column-first-tests.xml preserves the fail-closed column integration failures before
+  correcting Scan's one-based versus Python's zero-based columns.
 - The corrected test results are in local-tests.xml.
 - Local wheel/sdist build output is in local-build.log.
 - GitHub Actions uploads JUnit, installed dependency identities, doctor output, and development builds.
 - GitHub checks and merge evidence are recorded after the PR completes.
+- Clean wheel installation also passed on the original implementation head. Updated packaging
+  also passed after the source-column fix. The clean wheel's complete suite is in packaged-tests.xml.
+- packaged-demo.json records an installed-wheel CLI flow: approve and execute POST, change source
+  to DELETE, produce JSON diff and a failing check, then deny DELETE. Only the POST reached the resource.
+- The new main branch requires Integration (Python 3.11), Integration (Python 3.12), and Package and lint,
+  with admin enforcement and no force pushes or deletions.
 
 PUBLICATION:
 
