@@ -161,3 +161,27 @@ def test_power_kind_without_adapter_refuses_launch(project, monkeypatch, capsys)
     assert main(["run", "--path", str(state.root)]) == 2
     assert "launch is refused: email.send" in capsys.readouterr().err
     assert not state.receipts_path.exists()
+
+
+def test_receipts_are_signed_chained_and_tamper_evident(project, capsys):
+    state = project('from pathlib import Path\nPath("out.txt").write_text("ok")\n')
+    assert run(state).returncode == 0
+    capsys.readouterr()
+    assert main(["receipts", "--path", str(state.root)]) == 0
+    out = capsys.readouterr().out
+    assert "2 of 2 verified against .airlock/public-key.json" in out
+    assert "filesystem.write" in out and "performed by the agent after release" in out
+    lines = state.receipts_path.read_text().splitlines()
+    rows = [json.loads(line) for line in lines]
+    assert rows[0]["prev"] is None and rows[1]["prev"] is not None
+    assert rows[1]["signature"]["algorithm"] == "EdDSA"
+
+    tampered = dict(rows[-1], target="/elsewhere")
+    state.receipts_path.write_text(lines[0] + "\n" + json.dumps(tampered) + "\n")
+    assert main(["receipts", "--path", str(state.root), "--json"]) == 2
+    result = json.loads(capsys.readouterr().out)
+    assert result["rows"][-1]["problem"].startswith("signature does not verify")
+
+    state.receipts_path.write_text(lines[1] + "\n")
+    assert main(["receipts", "--path", str(state.root), "--json"]) == 2
+    assert json.loads(capsys.readouterr().out)["rows"][0]["problem"].startswith("hash chain")

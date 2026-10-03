@@ -49,6 +49,48 @@ def render(diff: dict) -> str:
     return "\n".join(lines)
 
 
+def render_receipts(result: dict) -> str:
+    def safe(value):
+        return json.dumps(str(value), ensure_ascii=False)[1:-1]
+
+    lines = [
+        "AIRLOCK RECEIPTS",
+        f"{result['verified']} of {result['receipts']} verified against .airlock/public-key.json"
+        + ("" if result["ok"] else " - VERIFICATION FAILED"),
+        "",
+    ]
+    for item in result["rows"]:
+        row = item["row"] if isinstance(item["row"], dict) else {}
+        decision = row.get("decision", "?")
+        stage = row.get("stage", "")
+        head = f"{safe(row.get('timestamp', '?'))}  {decision:<5} {stage:<16}"
+        lines.append(f"{head}{safe(row.get('action', '?'))} @ {safe(row.get('target', '?'))}")
+        facts = []
+        evidence = row.get("evidence")
+        if isinstance(evidence, dict):
+            facts.append(f"{safe(evidence.get('file'))}:{evidence.get('line')}")
+        if decision == "DENY" or stage == "execution-error":
+            facts.append("reason: " + safe(row.get("reason", "")))
+        facts.append(
+            "credential released" if row.get("credential_released") else "no credential released"
+        )
+        executed = row.get("execution_occurred")
+        facts.append(
+            {True: "executed", False: "not executed"}.get(
+                executed,
+                "performed by the agent after release"
+                if stage == "released"
+                else "execution result unknown",
+            )
+        )
+        if not item["verified"]:
+            facts.append("UNVERIFIED: " + safe(item["problem"]))
+        lines.append("    " + " | ".join(facts) + f"  [{safe(row.get('id', '?'))}]")
+    if not result["rows"]:
+        lines.append("No receipts yet.")
+    return "\n".join(lines)
+
+
 def doctor(root: Path):
     checks = []
     for name, expected in EXPECTED.items():
@@ -87,7 +129,7 @@ def main(argv=None):
     )
     parser.add_argument("--version", action="version", version=__version__)
     sub = parser.add_subparsers(dest="cmd", required=True)
-    for cmd in ("init", "diff", "check", "doctor", "run"):
+    for cmd in ("init", "diff", "check", "doctor", "run", "receipts"):
         p = sub.add_parser(cmd)
         p.add_argument("--path", type=Path, default=Path.cwd())
         if cmd != "run":
@@ -127,6 +169,10 @@ def main(argv=None):
                         + (" " + c["version"] if "version" in c else "")
                     )
                 print("Candidate dependencies are pinned; registry releases remain pending.")
+            return 0 if result["ok"] else 2
+        if args.cmd == "receipts":
+            result = State(root).verify_receipts()
+            print(json.dumps(result, indent=2) if args.json else render_receipts(result))
             return 0 if result["ok"] else 2
         if args.cmd == "run":
             from .broker import launch
@@ -183,7 +229,7 @@ def main(argv=None):
                 if not args.json:
                     print(
                         f"\nApproved {len(current['powers'])} powers. Unresolved powers remain blocked;"
-                        " their calls are denied at runtime with receipts."
+                        " their calls are denied at runtime with signed receipts."
                     )
             elif not args.json:
                 print("\nReview these powers, then run airlock init --approve to activate them.")

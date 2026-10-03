@@ -3,12 +3,14 @@
 from __future__ import annotations
 
 import base64
+import hashlib
 import json
 import os
 import subprocess
 from datetime import UTC, datetime
 from pathlib import Path
 
+from actenon.proof.signers.base import b64url_decode, b64url_encode
 from actenon_permit.ed25519_signer import (
     generate_ed25519_keypair,
     load_ed25519_keypair,
@@ -17,6 +19,10 @@ from actenon_permit.ed25519_signer import (
 from cryptography.hazmat.primitives.asymmetric.ed25519 import Ed25519PrivateKey, Ed25519PublicKey
 
 from .common import AirlockError, canonical
+
+RECEIPT_SCHEMA = "actenon-airlock/receipt/v1"
+# Domain separation: a receipt signature can never verify as an approval signature.
+RECEIPT_DOMAIN = b"actenon-airlock/receipt/v1\n"
 
 
 def atomic_json(path: Path, data: dict, mode: int = 0o600) -> None:
@@ -120,9 +126,90 @@ class State:
         return self.local / "receipts.jsonl"
 
     def receipt(self, value: dict) -> dict:
+        """Append one Ed25519-signed receipt, chained to the previous line by SHA-256."""
         self.local.mkdir(parents=True, exist_ok=True, mode=0o700)
-        with self.receipts_path.open("a", encoding="utf-8") as stream:
-            stream.write(canonical(value).decode() + "\n")
+        if not hasattr(self, "_receipt_key"):
+            self._receipt_key = load_ed25519_keypair(self.key_path)
+            self._receipt_prev = _last_line_digest(self.receipts_path)
+        key = self._receipt_key
+        row = {**value, "schema": RECEIPT_SCHEMA, "prev": self._receipt_prev}
+        signature = Ed25519PrivateKey.from_private_bytes(key.private_key_bytes).sign(
+            RECEIPT_DOMAIN + canonical(row)
+        )
+        row["signature"] = {
+            "algorithm": "EdDSA",
+            "key_id": key.key_id,
+            "encoding": "base64url",
+            "value": b64url_encode(signature),
+        }
+        line = canonical(row)
+        with self.receipts_path.open("ab") as stream:
+            stream.write(line + b"\n")
             stream.flush()
             os.fsync(stream.fileno())
-        return value
+        self._receipt_prev = hashlib.sha256(line).hexdigest()
+        return row
+
+    def verify_receipts(self) -> dict:
+        """Check every receipt against the project's committed public key and the hash chain."""
+        try:
+            public = json.loads((self.path / "public-key.json").read_text())["key"]
+            verifier = Ed25519PublicKey.from_public_bytes(base64.b64decode(public, validate=True))
+        except (OSError, ValueError, KeyError) as exc:
+            raise AirlockError("Project public key is missing or invalid") from exc
+        try:
+            lines = self.receipts_path.read_bytes().splitlines()
+        except FileNotFoundError:
+            lines = []
+        rows, prev = [], None
+        for number, line in enumerate(lines, 1):
+            problem, row = None, {}
+            try:
+                row = json.loads(line)
+                signature = row["signature"]
+                if not isinstance(signature, dict):
+                    raise TypeError("signature")
+            except (ValueError, KeyError, TypeError):
+                problem = "unreadable or unsigned receipt"
+            if problem is None:
+                unsigned = {k: v for k, v in row.items() if k != "signature"}
+                if row.get("schema") != RECEIPT_SCHEMA or signature.get("algorithm") != "EdDSA":
+                    problem = "unsupported receipt schema or algorithm"
+                elif row.get("prev") != prev:
+                    problem = "hash chain broken (a receipt was removed, reordered, or edited)"
+                else:
+                    try:
+                        verifier.verify(
+                            b64url_decode(signature["value"]), RECEIPT_DOMAIN + canonical(unsigned)
+                        )
+                    except Exception:
+                        problem = "signature does not verify against public-key.json"
+            prev = hashlib.sha256(line).hexdigest()
+            rows.append(
+                {"line": number, "row": row, "verified": problem is None, "problem": problem}
+            )
+        return {
+            "schema": "actenon-airlock/receipt-verification/v1",
+            "receipts": len(rows),
+            "verified": sum(r["verified"] for r in rows),
+            "ok": all(r["verified"] for r in rows),
+            "rows": rows,
+        }
+
+
+def _last_line_digest(path: Path) -> str | None:
+    try:
+        with path.open("rb") as stream:
+            stream.seek(0, os.SEEK_END)
+            end = stream.tell()
+            size = min(end, 1 << 20)
+            while True:
+                stream.seek(end - size)
+                tail = stream.read(size).rstrip(b"\n")
+                if b"\n" in tail or size == end:
+                    break
+                size = min(end, size * 2)
+    except FileNotFoundError:
+        return None
+    last = tail.rsplit(b"\n", 1)[-1]
+    return hashlib.sha256(last).hexdigest() if last else None
