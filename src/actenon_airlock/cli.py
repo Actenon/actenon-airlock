@@ -23,16 +23,24 @@ EXPECTED = {
 
 
 def render(diff: dict) -> str:
+    def safe(value):
+        return json.dumps(str(value), ensure_ascii=False)[1:-1]
+
     lines = ["AIRLOCK AUTHORITY DIFF", ""]
     for sign, name in [("+", "added"), ("-", "removed")]:
         for p in diff[name]:
             lines.extend(
-                [f"{sign} {p['action']} @ {p['resource']}", f"  Transport: {p['transport']}"]
+                [
+                    f"{sign} {safe(p['action'])} @ {safe(p['resource'])}",
+                    f"  Transport: {safe(p['transport'])}",
+                ]
             )
     for row in diff["blocked"]:
-        lines.append(f"! {row['action']} ({row['file']}:{row['line']}): {row['reason']}")
+        lines.append(
+            f"! {safe(row['action'])} ({safe(row['file'])}:{row['line']}): {safe(row['reason'])}"
+        )
     for row in diff["parse_errors"]:
-        lines.append(f"! {row['file']}: {row['reason']}")
+        lines.append(f"! {safe(row['file'])}: {safe(row['reason'])}")
     if not any(diff[k] for k in ("added", "removed", "blocked", "parse_errors")):
         lines.append("No authority changes.")
     lines.extend(["", "Runtime: " + diff["runtime_status"]])

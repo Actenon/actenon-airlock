@@ -18,7 +18,7 @@ def message(url, line=2, method="POST"):
         "url": url,
         "headers": {},
         "body": base64.b64encode(b"hello").decode(),
-        "locations": [{"file": "main.py", "line": line}],
+        "locations": [{"file": "main.py", "line": line, "col": 1}],
     }
 
 
@@ -122,7 +122,9 @@ def test_kernel_rejects_target_mutation_and_replay(project, server):
     current = discover(state.root)
     broker = Broker(state, current)
     try:
-        cap, _ = request_capability(current, "POST", url + "/a", [{"file": "main.py", "line": 2}])
+        cap, _ = request_capability(
+            current, "POST", url + "/a", [{"file": "main.py", "line": 2, "col": 1}]
+        )
         action = Action(grant_id=broker.grant.id, type=cap, target=url + "/a", params={})
         _, intent, proof = broker.pdp.decide_and_mint_pccb(broker.grant, action)
         actual = intent.to_dict()
@@ -184,5 +186,35 @@ def test_attenuation_cannot_change_target_scope(project):
             broker.grant.attenuate(scopes_allow=[other])
         child = broker.grant.attenuate(expires_at=datetime.now(UTC) + timedelta(minutes=1))
         assert child.scopes.allow == broker.grant.scopes.allow and child.verify()
+    finally:
+        broker.close()
+
+
+def test_timeout_after_dispatch_keeps_allow_and_unknown_execution(project, monkeypatch):
+    monkeypatch.setenv("GITHUB_TOKEN", "offline-timeout-secret")
+    url = "https://api.github.com/repos/acme/support/issues"
+    state = project(f'import requests\nrequests.post("{url}")\n')
+    broker = Broker(state, discover(state.root))
+    observed = []
+
+    def timeout(req):
+        observed.append(req.headers["Authorization"])
+        raise httpx.ReadTimeout("offline response timeout", request=req)
+
+    broker.http.close()
+    broker.http = httpx.Client(transport=httpx.MockTransport(timeout), trust_env=False)
+    try:
+        msg = message(url)
+        msg["headers"] = {"Authorization": "Bearer " + broker.markers["GITHUB_TOKEN"]}
+        result = broker.handle(msg)
+        assert not result["ok"]
+        row = json.loads((state.local / "receipts.jsonl").read_text().splitlines()[-1])
+        assert row["decision"] == "ALLOW" and row["stage"] == "execution-error"
+        assert row["execution_attempted"] and row["execution_occurred"] is None
+        assert row["credential_released"] is True
+        assert row["kernel"]["reason_code"] == "EXECUTION_FAILED"
+        assert broker.denials == 0 and broker.execution_errors == 1
+        assert observed == ["Bearer offline-timeout-secret"]
+        assert "offline-timeout-secret" not in (state.local / "receipts.jsonl").read_text()
     finally:
         broker.close()

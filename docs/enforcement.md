@@ -11,7 +11,9 @@ is generated. Empty authority uses allow=[], deny=["*"] because legacy Permit in
 an empty allow-list permissively. Attenuation cannot add a different compiled capability.
 
 The runtime translator uses Scan's classify_http vocabulary, the exact transport, and a project
-callsite with resolved evidence. An unresolved call translates into an identifier outside the grant,
+callsite with resolved evidence. Runtime bytecode positions bind source columns as well as lines.
+Ambiguous await spans or callsites shared with unresolved evidence remain blocked. An unresolved
+call translates into an identifier outside the grant,
 so **Permit itself** denies it. The translator is an adapter, not a second ALLOW/DENY policy engine.
 GitHub capabilities intentionally authorize an action at a repository (e.g. creating issues), not
 only one item identifier. Generic URLs are exact, including scheme and query; templates are withheld.

@@ -96,6 +96,8 @@ Scan location, Permit decision/grant, proof identifier, Kernel receipt or refusa
 and credential/execution flags. Authorization is recorded before the effect; execution gets a
 linked completion record. A transport failure after dispatch records an unknown execution result.
 Request and response bodies, raw headers, and credential values are not recorded.
+If the agent handles an error itself, Airlock still exits nonzero for a broker denial (3) or
+an uncertain/failed dispatch (4). Discovery and approval-check failures exit 2.
 
 Commit .airlock/approved.json and .airlock/public-key.json for CI review.
 Keep .airlock/local/ private; it contains the approval signing key and local runtime evidence.
@@ -121,6 +123,8 @@ See [the reusable action](action.yml) and [workflow example](docs/github-action.
 - Requests and responses are buffered, limited to 4 MiB. Redirects are returned without being followed.
 - Runtime HTTP must trace to resolved Scan evidence in the project. Unresolved calls cannot inherit
   the authority of a resolved call to the same URL.
+- Source lines and columns distinguish callsites. Ambiguous async expressions or source sites
+  shared with unresolved evidence remain blocked.
 - Unsupported filesystem writes/deletes, subprocess execution, raw sockets, ambiguous/encoded URLs,
   URL templates, dynamic HTTP methods, and GraphQL mutations fail closed.
 

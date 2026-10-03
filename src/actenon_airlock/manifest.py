@@ -100,7 +100,7 @@ def discover(root: Path, env: dict | None = None) -> dict:
     report = extract_authority(root, env=dict(os.environ if env is None else env))
     entries, blocked, config_names = [], [], set()
     for ev in report.evidence:
-        location = {"file": ev.file, "line": ev.line, "end_line": ev.end_line}
+        location = {"file": ev.file, "line": ev.line, "end_line": ev.end_line, "col": ev.col}
         for src in ev.sources:
             if src.kind == "env" and not SECRET_NAME.search(src.name):
                 config_names.add(src.name)
@@ -178,12 +178,33 @@ def request_capability(
         raise AirlockError("Runtime authority could not be resolved")
     transport = origin(url) if http.action.startswith("github.") else url
     entry = power(http.action, http.resource, transport)
-    seen = {(p["file"], p["line"]) for p in locations}
+    blocked_sites = {(p["file"], p["line"], p["col"]) for p in current["blocked"]}
+    sites = [e["evidence"] for e in current["entries"]] + current["blocked"]
+
+    def contains(position, loc):
+        if position["file"] != loc["file"] or position.get("col", -1) < 0:
+            return False
+        end_line = position.get("end_line", position["line"])
+        end_col = position.get("end_col", position["col"] + 1)
+        return (
+            position["line"] <= loc["line"] <= end_line
+            and (loc["line"] != position["line"] or loc["col"] >= position["col"])
+            and (loc["line"] != end_line or loc["col"] < end_col)
+        )
+
     for ev in current["entries"]:
         loc = ev["evidence"]
         if power(ev["action"], ev["resource"], ev["transport"]) != entry:
             continue
-        if any((loc["file"], n) in seen for n in range(loc["line"], loc["end_line"] + 1)):
-            return capability(entry), {**entry, "evidence": loc}
+        if (loc["file"], loc["line"], loc["col"]) in blocked_sites:
+            continue
+        for position in locations:
+            if not contains(position, loc):
+                continue
+            # Await bytecode can span a whole await expression. Accept it only
+            # when the span identifies one effect callsite, including unresolved sites.
+            candidates = {(s["file"], s["line"], s["col"]) for s in sites if contains(position, s)}
+            if len(candidates) == 1:
+                return capability(entry), {**entry, "evidence": loc}
     # A dynamic/unscanned call cannot inherit the authority of a static call.
     return "airlock.unresolved." + digest(entry), {**entry, "evidence": None}

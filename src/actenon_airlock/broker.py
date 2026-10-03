@@ -102,6 +102,7 @@ class Broker:
         )
         self.http = httpx.Client(trust_env=False, follow_redirects=False)
         self.denials = 0
+        self.execution_errors = 0
 
     def close(self):
         self.http.close()
@@ -260,6 +261,7 @@ class Broker:
             try:
                 outcome = self.edge.protect(intent, proof, execute)
             except Exception as exc:
+                self.execution_errors += 1
                 row = self._receipt(
                     action_name,
                     target,
@@ -274,6 +276,22 @@ class Broker:
                 )
                 return {"ok": False, "reason": row["reason"], "receipt_id": row["id"]}
             if not outcome.ok:
+                if attempted:
+                    self.execution_errors += 1
+                    row = self._receipt(
+                        action_name,
+                        target,
+                        "Authorized dispatch failed: " + (outcome.reason_code or "unknown"),
+                        decision="ALLOW",
+                        stage="execution-error",
+                        proof_id=proof.pccb_id,
+                        kernel=outcome.to_dict(),
+                        credential_released=credential_released,
+                        execution_attempted=True,
+                        execution_occurred=None,
+                        parent_receipt_id=pending["id"],
+                    )
+                    return {"ok": False, "reason": row["reason"], "receipt_id": row["id"]}
                 return self._deny(
                     action_name,
                     target,
@@ -370,7 +388,9 @@ def launch(root: Path, command: list[str], bindings: dict | None = None) -> int:
         thread.join(timeout=35)
         if thread.is_alive() or errors:
             raise AirlockError("Broker connection failed closed")
-        return result if result else (3 if broker.denials else 0)
+        return (
+            result if result else (3 if broker.denials else (4 if broker.execution_errors else 0))
+        )
     finally:
         child.close()
         if process is not None and process.poll() is None:
