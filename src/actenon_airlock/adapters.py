@@ -21,8 +21,10 @@ from pathlib import Path
 
 from actenon_scan.authority import ResourceState, classify_http, sdk
 
-# Pinned Scan exports no runtime path classifier; this is the normaliser its extractor uses.
-from actenon_scan.authority.python import _normalise_path
+try:
+    from actenon_scan.authority import normalise_path
+except ImportError:  # Scan 1.6.0 exports no runtime path classifier; this is the one it uses.
+    from actenon_scan.authority.python import _normalise_path as normalise_path
 
 from .common import AirlockError, digest, origin, power, validate_url
 
@@ -264,8 +266,8 @@ def _spellings(absolute: str, cwd: str, home: Path) -> list[str]:
     for base, prefix in ((cwd, ""), (str(home), "~/")):
         rel = os.path.relpath(absolute, base)
         if rel != "." and not rel.startswith(".."):
-            out.append(_normalise_path(prefix + rel))
-    out.append(_normalise_path(absolute))
+            out.append(normalise_path(prefix + rel))
+    out.append(normalise_path(absolute))
     return list(dict.fromkeys(s for s in out if s))
 
 
