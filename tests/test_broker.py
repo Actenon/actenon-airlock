@@ -254,3 +254,42 @@ def test_timeout_after_dispatch_keeps_allow_and_unknown_execution(project, monke
         assert "offline-timeout-secret" not in (state.local / "receipts.jsonl").read_text()
     finally:
         broker.close()
+
+
+def test_stored_budget_remaining_updates_allow_repeated_real_calls(project, server):
+    url, calls = server
+    state = project(f'import requests\nrequests.post("{url}/a")\n')
+    broker = Broker(state, discover(state.root))
+    try:
+        assert broker.handle(message(url + "/a"))["ok"]
+        stored = broker.store.get_grant(broker.grant.id)
+        stored.budget.remaining -= 1
+        assert stored.verify()
+        broker.store.put_grant(stored)
+        assert broker.handle(message(url + "/a"))["ok"]
+        assert len(calls) == 2
+    finally:
+        broker.close()
+
+
+@pytest.mark.parametrize("field", ["limit", "currency"])
+def test_stored_budget_authority_tampering_blocks_execution(project, server, field):
+    url, calls = server
+    state = project(f'import requests\nrequests.post("{url}/a")\n')
+    broker = Broker(state, discover(state.root))
+    try:
+        stored = broker.store.get_grant(broker.grant.id)
+        if field == "limit":
+            stored.budget.limit += 1
+        else:
+            stored.budget.currency = "EUR"
+        broker.store.put_grant(stored)
+        result = broker.handle(message(url + "/a"))
+        assert not result["ok"] and "Signed Permit grant" in result["reason"]
+        assert not calls
+        refusal = json.loads(state.receipts_path.read_text().splitlines()[-1])
+        assert refusal["decision"] == "DENY"
+        assert refusal["execution_occurred"] is False
+        assert refusal["credential_released"] is False
+    finally:
+        broker.close()

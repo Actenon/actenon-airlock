@@ -23,7 +23,7 @@ from actenon.replay import ReplayProtector, SqliteReplayStore
 from actenon_permit.boundary.proofs import Ed25519PublicKeyVerifier
 from actenon_permit.ed25519_signer import load_ed25519_keypair
 from actenon_permit.ledger import Ledger
-from actenon_permit.model import Action, Budget, DecisionOutcome, Grant, Scopes
+from actenon_permit.model import Action, Budget, DecisionOutcome, Grant, Scopes, authority_payload
 from actenon_permit.pdp import PDP
 from actenon_permit.revocation import StoreRevocationChecker
 from actenon_permit.state import SQLiteStore
@@ -52,7 +52,6 @@ WELL_KNOWN = {
     "ANTHROPIC_API_KEY": "https://api.anthropic.com",
 }
 MARKER = re.compile(r"airlock_credential_[a-f0-9]{32}")
-MUTABLE_GRANT_FIELDS = {"status", "budget"}
 
 
 class HttpDispatch:
@@ -290,14 +289,15 @@ class Broker:
                 },
                 est_cost=0,
             )
-            # Permit rewrites status and budget in the stored body, so the stored
-            # copy only re-verifies through the signed in-memory grant.
+            # Permit owns the immutable authority signature boundary. Compare
+            # that same payload to the launch grant; live state stays in its store.
             grant = self.store.get_grant(self.grant.id)
             if (
                 grant is None
                 or not self.grant.verify()
-                or grant.model_dump(exclude=MUTABLE_GRANT_FIELDS)
-                != self.grant.model_dump(exclude=MUTABLE_GRANT_FIELDS)
+                or not grant.verify()
+                or authority_payload(grant.model_dump(mode="json"))
+                != authority_payload(self.grant.model_dump(mode="json"))
             ):
                 raise AirlockError("Signed Permit grant could not be verified")
             decision, intent, proof = self.pdp.decide_and_mint_pccb(grant, action)

@@ -1,8 +1,8 @@
 {
-  "actenon-scan": "a9de0ffed2ed67aa1565ab5382898468ca998ff8",
-  "actenon-protocol": "e988c4d43f8b59d459628a306cd0117109e59d70",
-  "actenon-kernel": "533c029d63b5ce070a1eb8d8513e8e57a75ec703",
-  "actenon-permit": "a0d2b8dae74972a06f5774e4667774df26fbad97",
-  "preserved-sdk-go-pr-2": "0198ef597e67a31de778c38628d10d99a5c60d8e",
-  "preserved-sdk-rust-pr-4": "c149ab681be437b68f699b4f734a1a18ed7ad0e7"
+  "actenon-scan": "ee971b43c78ed8b58f5f7fb59382ab20ce9b8a5c",
+  "actenon-protocol": "4cbd8f04e0db331b2ffd490d50c0a7aede2d35ff",
+  "actenon-kernel": "5ca02e10bf329bfa090530d77301686e5995de3a",
+  "actenon-permit": "2a429d5b2de2f0ba3ecc1c91996ae25c8d84ff61",
+  "canonical-sdk-go": "12d27356935c7081c36c0b918fda7f5029c14529",
+  "canonical-sdk-rust": "dca4bd51c00c07abfd792cef8c8afffc9392e467"
 }

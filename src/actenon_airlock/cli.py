@@ -19,7 +19,7 @@ EXPECTED = {
     "actenon-scan": "1.6.0",
     "actenon-permit": "2.0.0rc1",
     "actenon-kernel": "1.3.0",
-    "actenon-protocol": "1.4.0",
+    "actenon-protocol": "1.5.0",
 }
 
 

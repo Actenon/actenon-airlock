@@ -4,7 +4,7 @@ Scan PR #100 already supplies structured evidence. Airlock consumes its action, 
 state, HTTP URL, provenance, and source location. It does not duplicate that extractor or parse call text.
 Discovery parse errors prevent runtime launch and approval.
 
-The preserved Permit candidate has action scopes, not a native signed target-scope field.
+The unified Permit candidate has action scopes, not a native signed target-scope field.
 Airlock compiles a capability as airlock.sha256(canonical(action,resource,transport)).
 The compiled identifiers enter Permit's existing signed Grant.scopes.allow. No wildcard scope
 is generated. Empty authority uses allow=[], deny=["*"] because legacy Permit interprets
@@ -101,7 +101,8 @@ execution result. For agent-executed effects the final stage is `released`, with
 call. Each receipt line is Ed25519-signed with the local approval key under the
 `actenon-airlock/receipt/v1` domain prefix and carries the SHA-256 of the previous line.
 `airlock receipts` verifies the log against the committed `.airlock/public-key.json`, so edits,
-removals, and reordering are detected. Whoever holds the local private key can still rewrite the whole
+internal removals, and reordering are detected. Detecting truncation to a valid signed prefix
+requires an externally anchored receipt head. Whoever holds the local private key can still rewrite the whole
 log; anchor receipts externally if that matters.
 
 ## What fails closed today
@@ -110,8 +111,8 @@ log; anchor receipts externally if that matters.
   cannot name them, so each such call is denied with a receipt.
 - Effects inside third-party dependencies with no agent callsite that Scan names, such as litellm's
   import-time price map or a formatter's cache directory.
-- With pinned Scan 1.6.0, tiktoken's encoding download and query-only URLs (`https://host?query`).
-  The coordinated Scan change in `docs/scan-pr/` names both; Airlock needs no code change for it.
+- Dynamic tiktoken model or encoding choices remain unresolved. The current Scan pin includes #101,
+  so statically resolved encoding downloads and query-only URL hosts use its corrected vocabulary.
 - aiohttp: it is not intercepted, and its raw socket connection is refused.
 
 Source files are fingerprinted at launch. An agent that edits, removes, or replaces a scanned file

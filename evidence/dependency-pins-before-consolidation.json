@@ -1,0 +1,8 @@
+{
+  "actenon-scan": "a9de0ffed2ed67aa1565ab5382898468ca998ff8",
+  "actenon-protocol": "e988c4d43f8b59d459628a306cd0117109e59d70",
+  "actenon-kernel": "533c029d63b5ce070a1eb8d8513e8e57a75ec703",
+  "actenon-permit": "a0d2b8dae74972a06f5774e4667774df26fbad97",
+  "preserved-sdk-go-pr-2": "0198ef597e67a31de778c38628d10d99a5c60d8e",
+  "preserved-sdk-rust-pr-4": "c149ab681be437b68f699b4f734a1a18ed7ad0e7"
+}

@@ -7,7 +7,8 @@ and brokers supported HTTP calls through Actenon Permit and Kernel. A new or unr
 cannot execute through that broker until its resolved authority is explicitly approved.
 
 This is an installable development product, version 0.1.0.dev0. Its dependencies are pinned to the
-preserved ecosystem candidates. No Airlock package, tag, or release has been published.
+merged, unified ecosystem line. These are staging source pins; public registry dependencies are still
+a release gate. No Airlock package, tag, or release has been published.
 
 ## Install
 

@@ -1,3 +1,5 @@
+> Historical patch evidence: [Scan #101](https://github.com/Actenon/actenon-scan/pull/101) is merged at `ee971b43c78ed8b58f5f7fb59382ab20ce9b8a5c` and is now pinned by Airlock. Do not apply this patch or open another PR. The original proposal below is retained to preserve the recovery and external-agent evidence. Airlock now imports the public `normalise_path` API directly.
+
 # Coordinated Scan change (to open on Actenon/actenon-scan)
 
 Patch: `0001-Name-tiktoken-encoding-downloads-fix-query-only-URL-.patch`. It is based on Scan

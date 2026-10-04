@@ -19,12 +19,7 @@ import shutil
 from dataclasses import dataclass
 from pathlib import Path
 
-from actenon_scan.authority import ResourceState, classify_http, sdk
-
-try:
-    from actenon_scan.authority import normalise_path
-except ImportError:  # Scan 1.6.0 exports no runtime path classifier; this is the one it uses.
-    from actenon_scan.authority.python import _normalise_path as normalise_path
+from actenon_scan.authority import ResourceState, classify_http, normalise_path, sdk
 
 from .common import AirlockError, digest, origin, power, validate_url
 
