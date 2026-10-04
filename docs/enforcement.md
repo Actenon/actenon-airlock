@@ -24,7 +24,26 @@ The parent broker obtains PDP.decide_and_mint_pccb, then runs ActenonGate.protec
 - exact declared capabilities and the actual intent/target;
 - request body and header-handle hashes bound as action parameters;
 - durable SQLite single-use replay protection;
-- StoreRevocationChecker consulting the real Permit store.
+- StoreRevocationChecker consulting the real Permit store;
+- for consequential HTTP, Protocol effect identity and Permit's durable reservation,
+  independently recomputed and atomically claimed by Kernel's EffectProtector.
+
+Scan's read_only classification selects the repeatable HTTP path. Consequential
+HTTP fingerprints method, exact target, body and caller headers. Header credential
+references use typed stable names/origins, so random handle rotation cannot reset
+ownership and a literal string cannot impersonate a credential reference. Proof,
+source and grant IDs do not define the effect. SQLite ownership is shared across
+local processes. It is not a cross-host production store.
+
+A generic response establishes transport completion, not remote COMMITTED state.
+The response reaches the agent with a signed AMBIGUOUS observation and ownership
+held. Lost responses produce OUTCOME_UNKNOWN / AMBIGUOUS, and a new run cannot
+blindly repeat the same fingerprint. Post-dispatch settlement failures also keep
+ownership held; they never become a pre-execution DENY with false non-execution.
+API-specific identities, authenticated provider/operator reconciliation and
+cumulative production budgets remain required work. The reconcile CLI is not yet
+available. Query/IPv6 mutation targets rejected by the current effect contract
+remain fail closed pending portable canonical-target support.
 
 Only the verified gate callback resolves credentials and performs the HTTP request.
 The actual request is captured before minting and reused in the callback. No child-selected adapter
@@ -97,8 +116,8 @@ races or replace immutable deployment artifacts.
 Receipts record an authorization stage before dispatch and an execution stage after it.
 DENY records show no credential release or execution. A failed transport after dispatch has an unknown
 execution result. For agent-executed effects the final stage is `released`, with
-`execution_occurred: null`: the Kernel verified the proof and the agent's process then performed the
-call. Each receipt line is Ed25519-signed with the local approval key under the
+`execution_occurred: null`: the Kernel verified the proof and released the operation;
+its actual execution by the agent is unobserved. Each receipt line is Ed25519-signed with the local approval key under the
 `actenon-airlock/receipt/v1` domain prefix and carries the SHA-256 of the previous line.
 `airlock receipts` verifies the log against the committed `.airlock/public-key.json`, so edits,
 internal removals, and reordering are detected. Detecting truncation to a valid signed prefix

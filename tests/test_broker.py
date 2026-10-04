@@ -11,13 +11,13 @@ from actenon_airlock.broker import Broker
 from actenon_airlock.manifest import capability, discover, request_capability
 
 
-def message(url, line=2, method="POST", file="main.py"):
+def message(url, line=2, method="POST", file="main.py", body=b"hello"):
     return {
         "kind": "http",
         "method": method,
         "url": url,
         "headers": {},
-        "body": base64.b64encode(b"hello").decode(),
+        "body": base64.b64encode(body).decode(),
         "locations": [{"file": file, "line": line, "col": 1}],
     }
 
@@ -33,10 +33,12 @@ def test_real_permit_kernel_allow_and_deny(project, server):
         rows = [
             json.loads(line) for line in (state.local / "receipts.jsonl").read_text().splitlines()
         ]
-        allow = next(r for r in rows if r.get("stage") == "executed")
+        allow = next(r for r in rows if r.get("stage") == "response-received")
         deny = rows[-1]
-        assert allow["kernel"]["receipt"]["outcome"] == "executed"
-        assert allow["execution_occurred"] is True
+        assert allow["kernel"]["reason_code"] == "OUTCOME_UNKNOWN"
+        assert allow["outcome"] == "AMBIGUOUS"
+        assert allow["transport_completed"] is True
+        assert allow["execution_occurred"] is None
         assert deny["decision"] == "DENY"
         assert not deny["credential_released"] and not deny["execution_occurred"]
         proof = next(r["proof"] for r in rows if "proof" in r)
@@ -98,7 +100,7 @@ def test_revocation_denies_before_transport(project, server):
     broker = Broker(state, discover(state.root))
     try:
         assert broker.handle(message(url + "/a"))["ok"]
-        assert broker.handle(message(url + "/a"))["ok"]
+        assert broker.handle(message(url + "/a", body=b"distinct legitimate effect"))["ok"]
         broker.store.set_status(broker.grant.id, GrantStatus.REVOKED)
         out = broker.handle(message(url + "/a"))
         assert not out["ok"] and "revoked" in out["reason"]
@@ -248,7 +250,8 @@ def test_timeout_after_dispatch_keeps_allow_and_unknown_execution(project, monke
         assert row["decision"] == "ALLOW" and row["stage"] == "execution-error"
         assert row["execution_attempted"] and row["execution_occurred"] is None
         assert row["credential_released"] is True
-        assert row["kernel"]["reason_code"] == "EXECUTION_FAILED"
+        assert row["kernel"]["reason_code"] == "OUTCOME_UNKNOWN"
+        assert row["outcome"] == "AMBIGUOUS"
         assert broker.denials == 0 and broker.execution_errors == 1
         assert observed == ["Bearer offline-timeout-secret"]
         assert "offline-timeout-secret" not in (state.local / "receipts.jsonl").read_text()
@@ -266,7 +269,7 @@ def test_stored_budget_remaining_updates_allow_repeated_real_calls(project, serv
         stored.budget.remaining -= 1
         assert stored.verify()
         broker.store.put_grant(stored)
-        assert broker.handle(message(url + "/a"))["ok"]
+        assert broker.handle(message(url + "/a", body=b"distinct legitimate effect"))["ok"]
         assert len(calls) == 2
     finally:
         broker.close()
