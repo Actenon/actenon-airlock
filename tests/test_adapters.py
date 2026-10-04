@@ -51,7 +51,96 @@ def test_plain_and_shell_process_requests_name_scan_programs(tmp_path):
     assert names(adapter.classify(shell, context(tmp_path))) == ["touch", "sh"]
     for text in ["touch a; rm b", "touch $HOME", "touch a | cat", "X=1 touch a", "touch *"]:
         effect = adapter.classify(proc(["/bin/sh", "-c", text]), context(tmp_path))
-        assert names(effect) == ["sh"], text
+        assert names(effect) == ["<shell-syntax>"], text
+        assert effect.detail["program"] == "sh"
+    for argv in (
+        ["/bin/bash", "-c", "echo a; echo b"],
+        ["/bin/bash", "-s"],
+        ["/bin/bash", "payload.sh"],
+        ["/bin/sh", "-c", ". ./payload.sh"],
+        ["/bin/bash", "-c", "source ./payload.sh"],
+        ["/bin/bash", "-c", "exec /bin/bash ./payload.sh"],
+        ["/bin/sh", "-c", "/bin/bash ./payload.sh"],
+        ["/bin/sh", "-lc", "true"],
+        ["/bin/sh", "-l", "-c", "echo a; echo b"],
+        ["/bin/bash", "--rcfile", "/dev/null", "-c", "echo a; echo b"],
+        ["/bin/sh", "-lc", "touch 'a b'"],
+        ["/bin/bash", "--rcfile", "payload.sh", "-ic", "true"],
+    ):
+        effect = adapter.classify(proc(argv), context(tmp_path))
+        assert names(effect) == ["<shell-syntax>"], argv
+    startup = proc(["/bin/bash", "-c", "true"])
+    startup["startup_env"] = ["BASH_ENV"]
+    assert names(adapter.classify(startup, context(tmp_path))) == ["<shell-syntax>"]
+    for argv in (
+        ["/bin/sh", "-c", "python3 -c import os"],
+        ["/bin/sh", "-c", "perl -e print"],
+        ["/bin/sh", "-c", "env /bin/bash -c true"],
+        ["/bin/sh", "-c", "ssh -o ProxyCommand=touch /tmp/x host"],
+    ):
+        effect = adapter.classify(proc(argv), context(tmp_path))
+        assert names(effect) == ["<shell-syntax>"], argv
+
+
+def test_interpreters_and_wrappers_require_one_plain_program(tmp_path, monkeypatch):
+    # Exercise every command grammar on macOS as well as Linux; this unit test
+    # does not execute these programs. Separate tests use actual PATH identities
+    # and real subprocesses, including denied shells/interpreters/wrappers.
+    monkeypatch.setattr(
+        "actenon_airlock.adapters.shutil.which",
+        lambda name, path=None: "/usr/bin/" + os.path.basename(name),
+    )
+    adapter = REGISTRY["process"]
+    ctx = context(tmp_path)
+    denied = [
+        ["python3", "-c", "open('marker.txt','w').write('pwned')"],
+        ["perl", "-e", "print 'pwned'"],
+        ["node", "-e", "require('fs').writeFileSync('marker.txt','pwned')"],
+        ["awk", 'BEGIN{print "pwned" > "marker.txt"}'],
+        ["env", "bash", "-c", "echo pwned > marker.txt"],
+        ["nice", "bash", "-c", "echo pwned > marker.txt"],
+        ["timeout", "5", "bash", "-c", "echo pwned > marker.txt"],
+        ["xargs", "-0", "/bin/sh", "-c", "echo pwned > marker.txt"],
+        ["stdbuf", "-o0", "bash", "-c", "echo pwned > marker.txt"],
+        ["setsid", "bash", "-c", "echo pwned > marker.txt"],
+        ["flock", "lock", "/bin/bash", "-c", "echo pwned > marker.txt"],
+        ["nohup", "bash", "-c", "echo pwned > marker.txt"],
+        ["find", "tree", "-exec", "/bin/sh", "-c", "echo pwned > marker.txt", ";"],
+        ["git", "-c", "alias.p=!echo pwned > marker.txt", "p"],
+        ["ssh", "-o", "ProxyCommand=echo pwned > marker.txt", "-o", "BatchMode=yes", "127.0.0.1"],
+        ["env", "-S", "bash -c true"],
+        ["flock", "-c", "echo pwned", "lock"],
+        ["watch", "touch", "marker.txt"],
+        ["ionice", "bash", "-c", "true"],
+        ["unshare", "-r"],
+    ]
+    for argv in denied:
+        effect = adapter.classify(proc(argv), ctx)
+        assert names(effect) == ["<shell-syntax>"], argv
+    allowed = {
+        ("touch", "made.txt"): ["touch"],
+        ("env", "touch", "made.txt"): ["touch", "env"],
+        ("nice", "-n", "5", "touch", "made.txt"): ["touch", "nice"],
+        ("timeout", "5", "touch", "made.txt"): ["touch", "timeout"],
+        ("xargs", "touch"): ["touch", "xargs"],
+        ("stdbuf", "-o0", "touch", "made.txt"): ["touch", "stdbuf"],
+        ("setsid", "touch", "made.txt"): ["touch", "setsid"],
+        ("flock", "lock", "touch", "made.txt"): ["touch", "flock"],
+        ("nohup", "touch", "made.txt"): ["touch", "nohup"],
+        ("find", "tree", "-name", "x"): ["find"],
+        ("find", "tree", "-exec", "touch", "{}", ";"): ["touch", "find"],
+        ("git", "status"): ["git"],
+        ("git", "commit", "-m", "fix!"): ["git"],
+        ("ssh", "-o", "BatchMode=yes", "127.0.0.1"): ["ssh"],
+        ("ionice", "-c", "3", "touch", "made.txt"): ["touch", "ionice"],
+        ("watch", "-x", "touch", "made.txt"): ["touch", "watch"],
+        ("taskset", "ff", "touch", "made.txt"): ["touch", "taskset"],
+        ("chrt", "--other", "0", "touch", "made.txt"): ["touch", "chrt"],
+        ("prlimit", "touch", "made.txt"): ["touch", "prlimit"],
+        ("unshare", "-r", "touch", "made.txt"): ["touch", "unshare"],
+    }
+    for argv, expected in allowed.items():
+        assert names(adapter.classify(proc(list(argv)), ctx)) == expected, argv
 
 
 def test_process_identity_must_match_the_broker_path(tmp_path):
@@ -108,9 +197,9 @@ def test_http_candidates_include_method_agnostic_scan_spelling():
 
 
 def test_scope_text_is_buyer_readable():
-    assert "any arguments" in scope(
-        {"action": "process.exec", "resource": "git", "transport": "local-process"}
-    )
+    text = scope({"action": "process.exec", "resource": "git", "transport": "local-process"})
+    assert "plain program" in text
+    assert "does not parse a script" in text
     assert "GraphQL" in scope(
         {
             "action": "github.graphql",
@@ -156,15 +245,16 @@ def test_github_graphql_is_an_approvable_scan_power(project):
         broker.close()
 
 
-def test_dynamic_method_binds_scan_http_request_power(project, server):
+def test_dynamic_method_cannot_widen_to_destructive_http_request_power(project, server):
     url, calls = server
     state = project(f'import requests, sys\nrequests.request(sys.argv[1], "{url}/a")\n')
     current = discover(state.root)
-    assert current["powers"][0]["action"] == "http.request"
+    assert current["powers"] == []
+    assert current["blocked"][0]["action"] == "http.request"
     broker = Broker(state, current)
     try:
-        assert broker.handle(http_message(url + "/a", method="DELETE"))["ok"]
+        assert not broker.handle(http_message(url + "/a", method="DELETE"))["ok"]
         assert not broker.handle(http_message(url + "/b", method="DELETE"))["ok"]
-        assert [c[0] for c in calls] == ["/a"]
+        assert calls == []
     finally:
         broker.close()

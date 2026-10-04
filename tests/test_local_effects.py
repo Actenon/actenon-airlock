@@ -1,6 +1,10 @@
 import json
+import os
+import shutil
 import subprocess
 import sys
+
+import pytest
 
 from actenon_airlock import adapters
 from actenon_airlock.cli import main
@@ -61,6 +65,164 @@ def test_plain_shell_text_binds_to_the_program_scan_named(project):
     assert result.returncode == 0, result.stderr
     [row] = final(receipts(state), "process.")
     assert row["detail"]["shell"] is True and row["detail"]["program"] == "touch"
+
+
+@pytest.mark.parametrize("shell", ["/bin/sh", "/bin/bash"])
+def test_approved_shell_cannot_execute_shell_syntax(project, shell):
+    state = project(
+        "import subprocess\n"
+        f'subprocess.run(["{shell}", "-c", "echo pwned; echo injected"], check=False)\n'
+        'print("RAN")\n'
+    )
+    powers = State(state.root).approved()["powers"]
+    assert any(p["resource"] == os.path.basename(shell) for p in powers)
+    result = run(state)
+    assert result.returncode == 3, result.stderr
+    assert "pwned" not in result.stdout
+    assert "injected" not in result.stdout
+    assert "RAN" not in result.stdout
+    row = final(receipts(state), "process.")[-1]
+    assert row["decision"] == "DENY"
+    assert row["detail"]["program"] == os.path.basename(shell)
+    assert row["credential_released"] is False and row["execution_occurred"] is False
+
+
+@pytest.mark.parametrize(
+    "source,prepare",
+    [
+        (
+            'import subprocess\nsubprocess.run(["/bin/bash", "-s"], input=b"echo pwned; echo injected\\n", check=False)\n',
+            None,
+        ),
+        (
+            'import subprocess\nsubprocess.run(["/bin/sh", "payload.sh"], check=False)\n',
+            "script",
+        ),
+        (
+            'import subprocess\nsubprocess.run(["/bin/sh", "-c", ". ./payload.sh"], check=False)\n',
+            "script",
+        ),
+        (
+            'import os, subprocess\nenv = dict(os.environ)\nenv["BASH_ENV"] = "payload.sh"\nsubprocess.run(["/bin/bash", "-c", "true"], env=env, check=False)\n',
+            "script",
+        ),
+        (
+            'import os, subprocess\nhome = os.getcwd() + "/home"\nenv = {"PATH": os.environ["PATH"], "HOME": home}\nsubprocess.run(["/bin/sh", "-lc", "true"], env=env, check=False)\n',
+            "profile",
+        ),
+    ],
+)
+def test_shell_grant_cannot_execute_a_hidden_script(project, source, prepare):
+    state = project(source)
+    if prepare == "script":
+        (state.root / "payload.sh").write_text("echo pwned; echo injected\n")
+    if prepare == "profile":
+        home = state.root / "home"
+        home.mkdir()
+        (home / ".profile").write_text("echo pwned; echo injected\n")
+    result = run(state)
+    assert result.returncode == 3, result.stderr
+    assert "pwned" not in result.stdout and "injected" not in result.stdout
+    row = receipts(state)[-1]
+    assert row["decision"] == "DENY"
+    assert row["credential_released"] is False and row["execution_occurred"] is False
+
+
+def test_direct_fork_exec_is_denied_without_a_grant(project):
+    state = project(
+        "import os\n"
+        "from _posixsubprocess import fork_exec\n"
+        "err_r, err_w = os.pipe()\n"
+        "pid = fork_exec(\n"
+        '    [b"/bin/echo", b"pwned"], (b"/bin/echo",),\n'
+        "    True, (err_w,), None, None,\n"
+        "    -1, -1, -1, -1, -1, -1, err_r, err_w,\n"
+        "    1, 0, -1, None, None, None, -1, None, False,\n"
+        ")\n"
+        "os.close(err_w)\n"
+        "os.read(err_r, 64)\n"
+        "os.close(err_r)\n"
+        "os.waitpid(pid, 0)\n"
+        'print("fork_exec_returned", pid)\n'
+    )
+    assert State(state.root).approved()["powers"] == []
+    result = run(state)
+    assert result.returncode == 3, result.stderr
+    assert "pwned" not in result.stdout
+    assert "fork_exec_returned" not in result.stdout
+    row = receipts(state)[-1]
+    assert row["decision"] == "DENY" and row["action"] == "process.exec"
+    assert row["credential_released"] is False and row["execution_occurred"] is False
+
+
+def test_parent_symlink_cannot_redirect_an_approved_write(project, tmp_path_factory):
+    outside = tmp_path_factory.mktemp("outside")
+    state = project('open("link/pwned.txt", "w").write("pwned\\n")\n')
+    (state.root / "link").symlink_to(outside, target_is_directory=True)
+    assert any(p["resource"] == "./link/pwned.txt" for p in State(state.root).approved()["powers"])
+    result = run(state)
+    assert result.returncode == 3, result.stderr
+    assert not (outside / "pwned.txt").exists()
+    row = receipts(state)[-1]
+    assert row["decision"] == "DENY"
+    assert row["reason"] == "Writing through a symbolic link is unsupported"
+    assert row["credential_released"] is False and row["execution_occurred"] is False
+
+
+@pytest.mark.parametrize(
+    "source",
+    [
+        "import subprocess\nsubprocess.run([\"python3\", \"-c\", \"open('marker.txt','w').write('pwned')\"])\n",
+        'import subprocess\nsubprocess.run(["perl", "-e", "open(F,\'>marker.txt\');print F \'pwned\'"])\n',
+        "import subprocess\nsubprocess.run([\"node\", \"-e\", \"require('fs').writeFileSync('marker.txt','pwned')\"])\n",
+        'import subprocess\nsubprocess.run(["awk", "BEGIN{print \\"pwned\\" > \\"marker.txt\\"}"])\n',
+        'import subprocess\nsubprocess.run(["env", "/bin/bash", "-c", "echo pwned > marker.txt"])\n',
+        'import subprocess\nsubprocess.run(["nice", "/bin/bash", "-c", "echo pwned > marker.txt"])\n',
+        'import subprocess\nsubprocess.run(["timeout", "5", "/bin/bash", "-c", "echo pwned > marker.txt"])\n',
+        'import subprocess\nsubprocess.run(["xargs", "-0", "/bin/sh", "-c", "echo pwned > marker.txt"])\n',
+        'import subprocess\nsubprocess.run(["stdbuf", "-o0", "/bin/bash", "-c", "echo pwned > marker.txt"])\n',
+        'import subprocess\nsubprocess.run(["setsid", "/bin/bash", "-c", "echo pwned > marker.txt"])\n',
+        'import subprocess\nsubprocess.run(["flock", "lock", "/bin/bash", "-c", "echo pwned > marker.txt"])\n',
+        'import subprocess\nsubprocess.run(["nohup", "/bin/bash", "-c", "echo pwned > marker.txt"])\n',
+        'import subprocess\nsubprocess.run(["find", "tree", "-exec", "/bin/sh", "-c", "echo pwned > marker.txt", ";"])\n',
+        'import subprocess\nsubprocess.run(["git", "-c", "alias.p=!echo pwned > marker.txt", "p"])\n',
+        'import subprocess\nsubprocess.run(["ssh", "-o", "ProxyCommand=echo pwned > marker.txt", "-o", "BatchMode=yes", "-p", "1", "127.0.0.1"])\n',
+    ],
+)
+def test_interpreter_or_wrapper_grant_cannot_run_a_script(project, source):
+    state = project(source)
+    (state.root / "tree").mkdir()
+    result = run(state)
+    assert result.returncode == 3, result.stderr
+    assert "pwned" not in result.stdout
+    assert not (state.root / "marker.txt").exists()
+    row = receipts(state)[-1]
+    assert row["decision"] == "DENY" and row["action"] == "process.exec"
+    assert row["credential_released"] is False and row["execution_occurred"] is False
+
+
+def test_plain_wrapper_still_runs_one_external_program(project):
+    # timeout is a GNU utility; use the real POSIX nice wrapper on macOS.
+    # Command-grammar coverage still exercises timeout on every platform.
+    wrapper = (
+        '["timeout", "5", "touch", "other.txt"]'
+        if shutil.which("timeout")
+        else '["nice", "touch", "other.txt"]'
+    )
+    state = project(
+        'import subprocess\nsubprocess.run(["env", "touch", "made.txt"], check=True)\n'
+        f"subprocess.run({wrapper}, check=True)\n"
+        'subprocess.run(["git", "--version"], check=True)\n'
+    )
+    result = run(state)
+    assert result.returncode == 0, result.stderr
+    assert (state.root / "made.txt").exists() and (state.root / "other.txt").exists()
+    rows = final(receipts(state), "process.")
+    assert [row["decision"] for row in rows] == ["ALLOW", "ALLOW", "ALLOW"]
+    assert [row["detail"]["program"] for row in rows] == ["touch", "touch", "git"]
+    assert all(
+        row["credential_released"] is False and row["execution_occurred"] is None for row in rows
+    )
 
 
 def test_shell_syntax_fails_closed_even_when_scan_names_the_first_program(project):

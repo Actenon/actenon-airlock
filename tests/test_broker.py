@@ -6,6 +6,7 @@ import httpx
 import pytest
 from actenon.models import ActionIntent
 from actenon_permit.model import Action, GrantStatus
+from actenon_permit.state import StateError
 
 from actenon_airlock.broker import Broker
 from actenon_airlock.manifest import capability, discover, request_capability
@@ -116,7 +117,13 @@ def test_stored_grant_scope_tampering_is_refused(project, server):
     try:
         tampered = broker.store.get_grant(broker.grant.id)
         tampered.scopes.allow.append("*")
-        broker.store.put_grant(tampered)
+        with pytest.raises(StateError, match="new grant identity"):
+            broker.store.put_grant(tampered)
+        # Also test hostile storage corruption past the now-immutable import API.
+        broker.store._conn.execute(
+            "UPDATE grants SET body = ? WHERE id = ?", (tampered.model_dump_json(), tampered.id)
+        )
+        broker.store._conn.commit()
         out = broker.handle(message(url + "/a"))
         assert not out["ok"] and out["reason"] == "Signed Permit grant could not be verified"
         assert not calls
@@ -265,10 +272,13 @@ def test_stored_budget_remaining_updates_allow_repeated_real_calls(project, serv
     broker = Broker(state, discover(state.root))
     try:
         assert broker.handle(message(url + "/a"))["ok"]
+        bearer = broker.store.get_grant(broker.grant.id)
+        ok, _, _ = broker.store.reserve(bearer.id, "independent-charge", 1, 0, 0)
+        assert ok
         stored = broker.store.get_grant(broker.grant.id)
-        stored.budget.remaining -= 1
         assert stored.verify()
-        broker.store.put_grant(stored)
+        broker.store.put_grant(bearer)  # Stale mutable fields cannot restore live state.
+        assert broker.store.get_grant(stored.id).budget.remaining == 999999
         assert broker.handle(message(url + "/a", body=b"distinct legitimate effect"))["ok"]
         assert len(calls) == 2
     finally:
@@ -286,7 +296,12 @@ def test_stored_budget_authority_tampering_blocks_execution(project, server, fie
             stored.budget.limit += 1
         else:
             stored.budget.currency = "EUR"
-        broker.store.put_grant(stored)
+        with pytest.raises(StateError, match="new grant identity"):
+            broker.store.put_grant(stored)
+        broker.store._conn.execute(
+            "UPDATE grants SET body = ? WHERE id = ?", (stored.model_dump_json(), stored.id)
+        )
+        broker.store._conn.commit()
         result = broker.handle(message(url + "/a"))
         assert not result["ok"] and "Signed Permit grant" in result["reason"]
         assert not calls
