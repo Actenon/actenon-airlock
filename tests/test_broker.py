@@ -11,14 +11,14 @@ from actenon_airlock.broker import Broker
 from actenon_airlock.manifest import capability, discover, request_capability
 
 
-def message(url, line=2, method="POST"):
+def message(url, line=2, method="POST", file="main.py"):
     return {
         "kind": "http",
         "method": method,
         "url": url,
         "headers": {},
         "body": base64.b64encode(b"hello").decode(),
-        "locations": [{"file": "main.py", "line": line, "col": 1}],
+        "locations": [{"file": file, "line": line, "col": 1}],
     }
 
 
@@ -130,6 +130,24 @@ def test_source_mutation_during_run_refuses(project, server):
         (state.root / "main.py").write_text("# mutated\n")
         assert not broker.handle(message(url + "/a"))["ok"]
         assert not calls
+    finally:
+        broker.close()
+
+
+def test_new_source_file_keeps_session_but_carries_no_authority(project, server):
+    url, calls = server
+    state = project(f'import requests\nrequests.post("{url}/a")\n')
+    broker = Broker(state, discover(state.root))
+    try:
+        (state.root / "generated.py").write_text(f'import requests\nrequests.post("{url}/a")\n')
+        assert broker.handle(message(url + "/a"))["ok"]
+        out = broker.handle(message(url + "/a", file="generated.py", line=2))
+        assert not out["ok"] and out["reason"] == "out of scope"
+        (state.root / "main.py").unlink()
+        assert (
+            broker.handle(message(url + "/a"))["reason"] == "Scanned source was removed or replaced"
+        )
+        assert len(calls) == 1
     finally:
         broker.close()
 

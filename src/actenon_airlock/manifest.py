@@ -31,6 +31,7 @@ __all__ = [
     "origin",
     "power",
     "request_capability",
+    "source_files",
     "source_fingerprint",
     "unadapted",
     "validate_url",
@@ -61,14 +62,24 @@ def capability(entry: dict) -> str:
     return "airlock." + digest(power(entry["action"], entry["resource"], entry["transport"]))
 
 
-def source_fingerprint(root: Path) -> str:
-    rows = []
+def source_files(root: Path) -> list[Path]:
+    files = []
     for path in sorted(root.rglob("*.py")):
         rel = path.relative_to(root)
         if any(p in EXCLUDED for p in rel.parts):
             continue
         if path.is_symlink() or not path.resolve().is_relative_to(root):
             raise AirlockError("Source symlinks are unsupported")
+        files.append(rel)
+    return files
+
+
+def source_fingerprint(root: Path, files: list[Path] | None = None) -> str:
+    rows = []
+    for rel in source_files(root) if files is None else files:
+        path = root / rel
+        if path.is_symlink() or not path.is_file():
+            raise AirlockError("Scanned source was removed or replaced")
         rows.append([str(rel), hashlib.sha256(path.read_bytes()).hexdigest()])
     return digest(rows)
 

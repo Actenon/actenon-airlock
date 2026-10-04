@@ -38,6 +38,7 @@ from .manifest import (
     digest,
     discover,
     origin,
+    source_files,
     source_fingerprint,
     unadapted,
 )
@@ -164,6 +165,8 @@ class Broker:
         os.environ["ACTENON_ED25519_KEY_FILE"] = str(state.key_path)
         self.store = SQLiteStore(str(state.local / "permit.sqlite3"))
         self.pdp = PDP(self.store, Ledger(self.store))
+        # New files carry no Scan evidence, so only the scanned files can change authority.
+        self.source_files = source_files(state.root)
         self.grant = Grant(
             agent_id="airlock:" + current["source_digest"],
             expires_at=datetime.now(UTC) + timedelta(hours=1),
@@ -263,7 +266,9 @@ class Broker:
             effect = adapter.classify(message, self.context)
             target = effect.target
             labels.update(executor=adapter.executor, detail=effect.detail)
-            if self.current["source_digest"] != source_fingerprint(self.state.root):
+            if self.current["source_digest"] != source_fingerprint(
+                self.state.root, self.source_files
+            ):
                 raise AirlockError("Source changed after runtime discovery")
             cap, entry = bind_runtime(self.current, effect.candidates, message["locations"])
             action_name = entry["action"]
