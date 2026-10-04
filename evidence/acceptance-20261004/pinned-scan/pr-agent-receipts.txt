@@ -1,0 +1,13 @@
+AIRLOCK RECEIPTS
+5 of 5 verified against .airlock/public-key.json
+
+2026-10-04T00:16:32.239404+00:00  DENY                  http.get @ https://raw.githubusercontent.com/BerriAI/litellm/main/model_prices_and_context_window.json
+    reason: out of scope | no credential released | not executed  [receipt_abbaa9b262194a64bf16be635a55f4b5]
+2026-10-04T00:16:37.345226+00:00  DENY                  http.get @ https://raw.githubusercontent.com/BerriAI/litellm/main/model_prices_and_context_window.json
+    reason: out of scope | no credential released | not executed  [receipt_bb323944c0a1437e8c15db8389b21b8e]
+2026-10-04T00:16:39.096754+00:00  DENY                  filesystem.read.outside-project @ /home/ubuntu/.config/gcloud/application_default_credentials.json
+    reason: Unsupported runtime effect | no credential released | not executed  [receipt_478485e2e58f453093f3f09169861b95]
+2026-10-04T00:16:39.134084+00:00  DENY                  http.get @ https://openaipublic.blob.core.windows.net/encodings/o200k_base.tiktoken
+    reason: out of scope | no credential released | not executed  [receipt_33ae773872ff4bc4bac7cd2ee0e69353]
+2026-10-04T00:16:39.156495+00:00  DENY                  http.get @ https://openaipublic.blob.core.windows.net/encodings/o200k_base.tiktoken
+    reason: out of scope | no credential released | not executed  [receipt_716d02f13a5c4c70ba43b74d5cf05b94]

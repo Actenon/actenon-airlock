@@ -1,0 +1,24 @@
+{
+  "root": "/tmp/agents/gpt-engineer",
+  "source_digest": "8855f27b344be61cfbc3f0f630dac33cfb09d67a1066c109e9f02e5f74f09594",
+  "files": null,
+  "parse_errors": 0,
+  "entries": 13,
+  "powers": 7,
+  "powers_by_kind": {
+    "filesystem": 3,
+    "http": 2,
+    "process": 2
+  },
+  "blocked": 20,
+  "blocked_by_reason": {
+    "Unresolved or template authority remains blocked": 20
+  },
+  "blocked_by_action": {
+    "filesystem.write": 11,
+    "process.exec": 5,
+    "filesystem.delete": 3,
+    "http.post": 1
+  },
+  "unadapted_kinds": []
+}

@@ -11,14 +11,14 @@ from actenon_airlock.broker import Broker
 from actenon_airlock.manifest import capability, discover, request_capability
 
 
-def message(url, line=2, method="POST"):
+def message(url, line=2, method="POST", file="main.py"):
     return {
         "kind": "http",
         "method": method,
         "url": url,
         "headers": {},
         "body": base64.b64encode(b"hello").decode(),
-        "locations": [{"file": "main.py", "line": line, "col": 1}],
+        "locations": [{"file": file, "line": line, "col": 1}],
     }
 
 
@@ -97,8 +97,26 @@ def test_revocation_denies_before_transport(project, server):
     state = project(f'import requests\nrequests.post("{url}/a")\n')
     broker = Broker(state, discover(state.root))
     try:
+        assert broker.handle(message(url + "/a"))["ok"]
+        assert broker.handle(message(url + "/a"))["ok"]
         broker.store.set_status(broker.grant.id, GrantStatus.REVOKED)
-        assert not broker.handle(message(url + "/a"))["ok"]
+        out = broker.handle(message(url + "/a"))
+        assert not out["ok"] and "revoked" in out["reason"]
+        assert len(calls) == 2
+    finally:
+        broker.close()
+
+
+def test_stored_grant_scope_tampering_is_refused(project, server):
+    url, calls = server
+    state = project(f'import requests\nrequests.post("{url}/a")\n')
+    broker = Broker(state, discover(state.root))
+    try:
+        tampered = broker.store.get_grant(broker.grant.id)
+        tampered.scopes.allow.append("*")
+        broker.store.put_grant(tampered)
+        out = broker.handle(message(url + "/a"))
+        assert not out["ok"] and out["reason"] == "Signed Permit grant could not be verified"
         assert not calls
     finally:
         broker.close()
@@ -112,6 +130,24 @@ def test_source_mutation_during_run_refuses(project, server):
         (state.root / "main.py").write_text("# mutated\n")
         assert not broker.handle(message(url + "/a"))["ok"]
         assert not calls
+    finally:
+        broker.close()
+
+
+def test_new_source_file_keeps_session_but_carries_no_authority(project, server):
+    url, calls = server
+    state = project(f'import requests\nrequests.post("{url}/a")\n')
+    broker = Broker(state, discover(state.root))
+    try:
+        (state.root / "generated.py").write_text(f'import requests\nrequests.post("{url}/a")\n')
+        assert broker.handle(message(url + "/a"))["ok"]
+        out = broker.handle(message(url + "/a", file="generated.py", line=2))
+        assert not out["ok"] and out["reason"] == "out of scope"
+        (state.root / "main.py").unlink()
+        assert (
+            broker.handle(message(url + "/a"))["reason"] == "Scanned source was removed or replaced"
+        )
+        assert len(calls) == 1
     finally:
         broker.close()
 
@@ -216,5 +252,44 @@ def test_timeout_after_dispatch_keeps_allow_and_unknown_execution(project, monke
         assert broker.denials == 0 and broker.execution_errors == 1
         assert observed == ["Bearer offline-timeout-secret"]
         assert "offline-timeout-secret" not in (state.local / "receipts.jsonl").read_text()
+    finally:
+        broker.close()
+
+
+def test_stored_budget_remaining_updates_allow_repeated_real_calls(project, server):
+    url, calls = server
+    state = project(f'import requests\nrequests.post("{url}/a")\n')
+    broker = Broker(state, discover(state.root))
+    try:
+        assert broker.handle(message(url + "/a"))["ok"]
+        stored = broker.store.get_grant(broker.grant.id)
+        stored.budget.remaining -= 1
+        assert stored.verify()
+        broker.store.put_grant(stored)
+        assert broker.handle(message(url + "/a"))["ok"]
+        assert len(calls) == 2
+    finally:
+        broker.close()
+
+
+@pytest.mark.parametrize("field", ["limit", "currency"])
+def test_stored_budget_authority_tampering_blocks_execution(project, server, field):
+    url, calls = server
+    state = project(f'import requests\nrequests.post("{url}/a")\n')
+    broker = Broker(state, discover(state.root))
+    try:
+        stored = broker.store.get_grant(broker.grant.id)
+        if field == "limit":
+            stored.budget.limit += 1
+        else:
+            stored.budget.currency = "EUR"
+        broker.store.put_grant(stored)
+        result = broker.handle(message(url + "/a"))
+        assert not result["ok"] and "Signed Permit grant" in result["reason"]
+        assert not calls
+        refusal = json.loads(state.receipts_path.read_text().splitlines()[-1])
+        assert refusal["decision"] == "DENY"
+        assert refusal["execution_occurred"] is False
+        assert refusal["credential_released"] is False
     finally:
         broker.close()

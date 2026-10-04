@@ -11,6 +11,7 @@ import sys
 from pathlib import Path
 
 from . import __version__
+from .adapters import scope
 from .manifest import AirlockError, authority_diff, discover, origin
 from .state import State, atomic_json
 
@@ -18,7 +19,7 @@ EXPECTED = {
     "actenon-scan": "1.6.0",
     "actenon-permit": "2.0.0rc1",
     "actenon-kernel": "1.3.0",
-    "actenon-protocol": "1.4.0",
+    "actenon-protocol": "1.5.0",
 }
 
 
@@ -33,6 +34,7 @@ def render(diff: dict) -> str:
                 [
                     f"{sign} {safe(p['action'])} @ {safe(p['resource'])}",
                     f"  Transport: {safe(p['transport'])}",
+                    f"  Scope: {safe(scope(p))}",
                 ]
             )
     for row in diff["blocked"]:
@@ -44,6 +46,48 @@ def render(diff: dict) -> str:
     if not any(diff[k] for k in ("added", "removed", "blocked", "parse_errors")):
         lines.append("No authority changes.")
     lines.extend(["", "Runtime: " + diff["runtime_status"]])
+    return "\n".join(lines)
+
+
+def render_receipts(result: dict) -> str:
+    def safe(value):
+        return json.dumps(str(value), ensure_ascii=False)[1:-1]
+
+    lines = [
+        "AIRLOCK RECEIPTS",
+        f"{result['verified']} of {result['receipts']} verified against .airlock/public-key.json"
+        + ("" if result["ok"] else " - VERIFICATION FAILED"),
+        "",
+    ]
+    for item in result["rows"]:
+        row = item["row"] if isinstance(item["row"], dict) else {}
+        decision = row.get("decision", "?")
+        stage = row.get("stage", "")
+        head = f"{safe(row.get('timestamp', '?'))}  {decision:<5} {stage:<16}"
+        lines.append(f"{head}{safe(row.get('action', '?'))} @ {safe(row.get('target', '?'))}")
+        facts = []
+        evidence = row.get("evidence")
+        if isinstance(evidence, dict):
+            facts.append(f"{safe(evidence.get('file'))}:{evidence.get('line')}")
+        if decision == "DENY" or stage == "execution-error":
+            facts.append("reason: " + safe(row.get("reason", "")))
+        facts.append(
+            "credential released" if row.get("credential_released") else "no credential released"
+        )
+        executed = row.get("execution_occurred")
+        facts.append(
+            {True: "executed", False: "not executed"}.get(
+                executed,
+                "performed by the agent after release"
+                if stage == "released"
+                else "execution result unknown",
+            )
+        )
+        if not item["verified"]:
+            facts.append("UNVERIFIED: " + safe(item["problem"]))
+        lines.append("    " + " | ".join(facts) + f"  [{safe(row.get('id', '?'))}]")
+    if not result["rows"]:
+        lines.append("No receipts yet.")
     return "\n".join(lines)
 
 
@@ -85,7 +129,7 @@ def main(argv=None):
     )
     parser.add_argument("--version", action="version", version=__version__)
     sub = parser.add_subparsers(dest="cmd", required=True)
-    for cmd in ("init", "diff", "check", "doctor", "run"):
+    for cmd in ("init", "diff", "check", "doctor", "run", "receipts"):
         p = sub.add_parser(cmd)
         p.add_argument("--path", type=Path, default=Path.cwd())
         if cmd != "run":
@@ -125,6 +169,10 @@ def main(argv=None):
                         + (" " + c["version"] if "version" in c else "")
                     )
                 print("Candidate dependencies are pinned; registry releases remain pending.")
+            return 0 if result["ok"] else 2
+        if args.cmd == "receipts":
+            result = State(root).verify_receipts()
+            print(json.dumps(result, indent=2) if args.json else render_receipts(result))
             return 0 if result["ok"] else 2
         if args.cmd == "run":
             from .broker import launch
@@ -180,7 +228,8 @@ def main(argv=None):
                 state.approve(current)
                 if not args.json:
                     print(
-                        f"\nApproved {len(current['powers'])} powers. Unresolved powers remain blocked."
+                        f"\nApproved {len(current['powers'])} powers. Unresolved powers remain blocked;"
+                        " their calls are denied at runtime with signed receipts."
                     )
             elif not args.json:
                 print("\nReview these powers, then run airlock init --approve to activate them.")

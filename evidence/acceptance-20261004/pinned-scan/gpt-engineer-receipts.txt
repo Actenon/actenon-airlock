@@ -1,0 +1,15 @@
+AIRLOCK RECEIPTS
+6 of 6 verified against .airlock/public-key.json
+
+2026-10-04T00:16:41.974905+00:00  DENY                  filesystem.write @ /home/ubuntu/.cache/black/23.3.0
+    reason: out of scope | no credential released | not executed  [receipt_e8c64aad06cb45369143e4899b76802f]
+2026-10-04T00:16:42.016905+00:00  DENY                  filesystem.write @ /home/ubuntu/.cache/black/23.3.0
+    reason: out of scope | no credential released | not executed  [receipt_2a5e60c6bf0d4cd69384a9a39cea499f]
+2026-10-04T00:16:42.080434+00:00  DENY                  process.exec @ /usr/bin/python3.12
+    reason: out of scope | no credential released | not executed  [receipt_7e898f528c4d4a3bb5ade7e2196cf247]
+2026-10-04T00:16:44.811733+00:00  DENY                  filesystem.write @ /home/ubuntu/.cache/black/23.3.0
+    reason: out of scope | no credential released | not executed  [receipt_0cc1c7a82e444c329ebf82e234cee900]
+2026-10-04T00:16:44.855879+00:00  DENY                  filesystem.write @ /home/ubuntu/.cache/black/23.3.0
+    reason: out of scope | no credential released | not executed  [receipt_28be559c28ed4044a07bc463bd83ca40]
+2026-10-04T00:16:44.920986+00:00  DENY                  http.get @ https://openaipublic.blob.core.windows.net/encodings/cl100k_base.tiktoken
+    reason: out of scope | no credential released | not executed  [receipt_3798822713594ec4bc0f5cffd8e5326a]

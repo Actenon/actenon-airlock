@@ -1,0 +1,21 @@
+AIRLOCK RECEIPTS
+9 of 9 verified against .airlock/public-key.json
+
+2026-10-04T00:19:24.435397+00:00  DENY                  filesystem.write @ /home/ubuntu/.cache/black/23.3.0
+    reason: out of scope | no credential released | not executed  [receipt_b38b8be9ad82451c986ec647d1680846]
+2026-10-04T00:19:24.478885+00:00  DENY                  filesystem.write @ /home/ubuntu/.cache/black/23.3.0
+    reason: out of scope | no credential released | not executed  [receipt_e7cd24e1d1d045c69af4e933796f8467]
+2026-10-04T00:19:24.544095+00:00  DENY                  process.exec @ /usr/bin/python3.12
+    reason: out of scope | no credential released | not executed  [receipt_8316c44973c54d9988fe2fb5675f52cc]
+2026-10-04T00:19:27.426519+00:00  DENY                  filesystem.write @ /home/ubuntu/.cache/black/23.3.0
+    reason: out of scope | no credential released | not executed  [receipt_f812cd15098745e1bd340731362391ff]
+2026-10-04T00:19:27.472679+00:00  DENY                  filesystem.write @ /home/ubuntu/.cache/black/23.3.0
+    reason: out of scope | no credential released | not executed  [receipt_a32d35f17f294f43a67bb5000d14ae78]
+2026-10-04T00:19:27.546880+00:00  ALLOW authorized      http.get @ https://openaipublic.blob.core.windows.net/encodings/cl100k_base.tiktoken
+    gpt_engineer/core/token_usage.py:77 | no credential released | not executed  [receipt_b56d59f2c1fb474c9984c26db1e348b4]
+2026-10-04T00:19:28.050866+00:00  ALLOW executed        http.get @ https://openaipublic.blob.core.windows.net/encodings/cl100k_base.tiktoken
+    gpt_engineer/core/token_usage.py:77 | no credential released | executed  [receipt_f7277330f05b4e9ab28e4908633baf4b]
+2026-10-04T00:19:28.087232+00:00  DENY                  filesystem.write @ /tmp/data-gym-cache
+    reason: out of scope | no credential released | not executed  [receipt_c01eee7a70924f5ca434206a59789785]
+2026-10-04T00:19:28.202536+00:00  DENY                  filesystem.write @ /tmp/agents/gpt-engineer/projects/example
+    reason: out of scope | no credential released | not executed  [receipt_a18978b581a3421bba5edcefd02ca19b]

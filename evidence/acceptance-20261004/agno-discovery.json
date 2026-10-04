@@ -1,0 +1,47 @@
+{
+  "root": "/tmp/agents/agno",
+  "source_digest": "6eba2e3eb4c39ac9869732c05f61be94bed6d9c18b6d66913ca086f5d66e9cd5",
+  "files": null,
+  "parse_errors": 0,
+  "entries": 241,
+  "powers": 137,
+  "powers_by_kind": {
+    "filesystem": 31,
+    "github": 1,
+    "http": 104,
+    "process": 1
+  },
+  "blocked": 571,
+  "blocked_by_reason": {
+    "Unresolved or template authority remains blocked": 569,
+    "No execution adapter: email.send calls are denied at runtime": 1,
+    "Scan evidence and transport disagree": 1
+  },
+  "blocked_by_action": {
+    "filesystem.write": 171,
+    "http.get": 151,
+    "http.post": 80,
+    "github.repo.read": 75,
+    "filesystem.delete": 33,
+    "process.exec": 20,
+    "http.delete": 14,
+    "github.issue.update": 5,
+    "http.patch": 3,
+    "http.head": 3,
+    "http.put": 2,
+    "github.contents.write": 2,
+    "http.request": 1,
+    "email.send": 1,
+    "github.repo.create": 1,
+    "github.issue.create": 1,
+    "github.issue.comment": 1,
+    "github.repo.delete": 1,
+    "github.pull.comment": 1,
+    "github.pull.create": 1,
+    "github.pull.request_review": 1,
+    "github.contents.delete": 1,
+    "github.ref.create": 1,
+    "github.repo.update": 1
+  },
+  "unadapted_kinds": []
+}

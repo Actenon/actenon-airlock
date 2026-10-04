@@ -1,0 +1,169 @@
+From c94d1d0ee1c9a6fbb555b118a2bc8ef28e79f848 Mon Sep 17 00:00:00 2001
+From: Cursor Agent <cursoragent@cursor.com>
+Date: Sun, 4 Oct 2026 00:17:50 +0000
+Subject: [PATCH] Name tiktoken encoding downloads; fix query-only URL hosts;
+ export normalise_path
+
+- tiktoken.get_encoding / encoding_for_model download the encoding's ranks
+  from openaipublic.blob.core.windows.net on first use. Name that http.get:
+  resolved for a literal encoding or a known model prefix, unresolved
+  otherwise.
+- classify_http ended the host at '/', so 'https://h?q' was named 'h?q'
+  while the same request with a path was named 'h'. The authority now ends
+  at the first '/', '?' or '#'.
+- Export normalise_path so runtime enforcement can spell filesystem
+  resources exactly as the extractor does without a private import.
+---
+ actenon_scan/authority/__init__.py |  3 ++-
+ actenon_scan/authority/python.py   | 12 ++++++++++
+ actenon_scan/authority/routes.py   |  6 +++--
+ actenon_scan/authority/sdk.py      | 21 +++++++++++++++++
+ tests/test_authority_evidence.py   | 36 ++++++++++++++++++++++++++++++
+ 5 files changed, 75 insertions(+), 3 deletions(-)
+
+diff --git a/actenon_scan/authority/__init__.py b/actenon_scan/authority/__init__.py
+index f07e582..871d43d 100644
+--- a/actenon_scan/authority/__init__.py
++++ b/actenon_scan/authority/__init__.py
+@@ -10,7 +10,7 @@ enforcement.
+ """
+ 
+ from .model import AuthorityEvidence, AuthorityReport, ResourceState, ValueSource
+-from .python import extract_authority, load_env_files
++from .python import extract_authority, load_env_files, normalise_path
+ from .routes import HOLE, HttpAuthority, classify_http, resource_matches
+ 
+ __all__ = [
+@@ -23,5 +23,6 @@ __all__ = [
+     "classify_http",
+     "extract_authority",
+     "load_env_files",
++    "normalise_path",
+     "resource_matches",
+ ]
+diff --git a/actenon_scan/authority/python.py b/actenon_scan/authority/python.py
+index 838b6c0..532e093 100644
+--- a/actenon_scan/authority/python.py
++++ b/actenon_scan/authority/python.py
+@@ -624,6 +624,11 @@ class Extractor:
+                                  template_params=tuple(u.name or "value" for u in unknowns), sources=tuple(sources), **common)
+ 
+ 
++def normalise_path(path: str) -> str | None:
++    """The filesystem resource Scan names for ``path``; runtime enforcement uses the same spelling."""
++    return _normalise_path(path)
++
++
+ def _normalise_path(tmpl: str) -> str | None:
+     """Project-relative paths become ``./x/y``; absolute (``/``) and home (``~/``) paths keep their root.
+     An unknown part may be a whole directory segment or any part of the final segment, never part of a
+@@ -1014,6 +1019,13 @@ class _Ctx:
+                 path = "/embeddings" if canon in sdk.LITELLM_EMBED_FUNCS else "/chat/completions"
+                 return _Effect("http", "", _join_url(_as_str(self.eval(base)), path), "post", canon)
+             return _Effect("llm", "embed" if canon in sdk.LITELLM_EMBED_FUNCS else "chat", model, "post", canon)
++        if canon in sdk.TIKTOKEN_GET_ENCODING or canon in sdk.TIKTOKEN_FOR_MODEL:
++            v = self.eval(arg(0, "encoding_name" if canon in sdk.TIKTOKEN_GET_ENCODING else "model_name"))
++            name = v.known() if isinstance(v, Str) else None
++            if name is not None and canon in sdk.TIKTOKEN_FOR_MODEL:
++                name = next((enc for prefix, enc in sdk.TIKTOKEN_MODEL_PREFIXES if name.startswith(prefix)), None)
++            url = sdk.TIKTOKEN_ENCODINGS.get(name or "")
++            return _Effect("http", "", Str.lit(url) if url else Str((Unknown("tiktoken encoding"),)), "get", canon)
+         if canon in ("builtins.open", "io.open", "codecs.open"):
+             mode = self.eval(arg(1, "mode"))
+             mode_s = mode.known() if isinstance(mode, Str) else None
+diff --git a/actenon_scan/authority/routes.py b/actenon_scan/authority/routes.py
+index 2745a5e..e0ce6a3 100644
+--- a/actenon_scan/authority/routes.py
++++ b/actenon_scan/authority/routes.py
+@@ -101,8 +101,10 @@ def _split_url(url: str) -> tuple[str, str, str, str]:
+     if "://" not in url:
+         return "", "", url, ""
+     scheme, rest = url.split("://", 1)
+-    host, sep, path = rest.partition("/")
+-    path = "/" + path if sep else "/"
++    # The authority ends at the first "/", "?" or "#" (RFC 3986), so "https://h?q" names host "h".
++    end = min([i for i in (rest.find("/"), rest.find("?"), rest.find("#")) if i >= 0] or [len(rest)])
++    host, path = rest[:end], rest[end:]
++    path = path if path.startswith("/") else "/" + path
+     path, _, query = path.partition("?")
+     path = path.split("#", 1)[0]
+     return scheme.lower(), host.lower(), path, query
+diff --git a/actenon_scan/authority/sdk.py b/actenon_scan/authority/sdk.py
+index 2b4506d..f45d1ae 100644
+--- a/actenon_scan/authority/sdk.py
++++ b/actenon_scan/authority/sdk.py
+@@ -154,6 +154,27 @@ PROCESS_FUNCS = {
+ }
+ 
+ SMTP_CONSTRUCTORS = ("smtplib.SMTP", "smtplib.SMTP_SSL")
++
++# tiktoken downloads an encoding's ranks on first use (cached afterwards). Encoding -> URL fetched.
++_TIKTOKEN_BLOB = "https://openaipublic.blob.core.windows.net/encodings/"
++TIKTOKEN_ENCODINGS: dict[str, str] = {
++    "r50k_base": _TIKTOKEN_BLOB + "r50k_base.tiktoken",
++    "p50k_base": _TIKTOKEN_BLOB + "p50k_base.tiktoken",
++    "p50k_edit": _TIKTOKEN_BLOB + "p50k_base.tiktoken",
++    "cl100k_base": _TIKTOKEN_BLOB + "cl100k_base.tiktoken",
++    "o200k_base": _TIKTOKEN_BLOB + "o200k_base.tiktoken",
++    "o200k_harmony": _TIKTOKEN_BLOB + "o200k_base.tiktoken",
++}
++TIKTOKEN_GET_ENCODING = {"tiktoken.get_encoding", "tiktoken.registry.get_encoding"}
++TIKTOKEN_FOR_MODEL = {"tiktoken.encoding_for_model", "tiktoken.model.encoding_for_model"}
++# encoding_for_model: model prefix -> encoding (most specific first; mirrors tiktoken.model).
++TIKTOKEN_MODEL_PREFIXES: tuple[tuple[str, str], ...] = (
++    ("gpt-oss-", "o200k_harmony"),
++    ("gpt-5", "o200k_base"), ("gpt-4.5", "o200k_base"), ("gpt-4.1", "o200k_base"), ("gpt-4o", "o200k_base"),
++    ("chatgpt-4o", "o200k_base"), ("o1", "o200k_base"), ("o3", "o200k_base"), ("o4", "o200k_base"),
++    ("gpt-4", "cl100k_base"), ("gpt-3.5-turbo", "cl100k_base"), ("gpt-35-turbo", "cl100k_base"),
++    ("text-embedding-3", "cl100k_base"), ("text-embedding-ada-002", "cl100k_base"),
++)
+ SMTP_SEND_METHODS = ("sendmail", "send_message")
+ 
+ TOOL_DECORATOR_HINTS = ("tool", "function_tool", "action", "kernel_function", "skill")
+diff --git a/tests/test_authority_evidence.py b/tests/test_authority_evidence.py
+index 46e6fdb..8cf58a5 100644
+--- a/tests/test_authority_evidence.py
++++ b/tests/test_authority_evidence.py
+@@ -454,3 +454,39 @@ def test_factory_returning_different_model_clients_has_each_alternative(tmp_path
+     assert ("http.post", "api.openai.com/v1/chat/completions", "RESOLVED") in got
+     assert ("http.post", "api.anthropic.com/v1/messages", "RESOLVED") in got
+     assert ("http.post", None, "UNRESOLVED") in got  # Azure: the customer's endpoint is not configured
++
++
++def test_tiktoken_encoding_download_is_named_and_unknown_model_stays_unresolved(tmp_path):
++    r = scan(tmp_path, {"a.py": """
++        import tiktoken
++        from tiktoken import encoding_for_model, get_encoding
++        def go(model):
++            tiktoken.get_encoding("cl100k_base")
++            get_encoding("o200k_base")
++            encoding_for_model("gpt-4o-mini")
++            encoding_for_model(model)
++    """})
++    blob = "openaipublic.blob.core.windows.net/encodings/"
++    assert entries(r) == {
++        ("http.get", blob + "cl100k_base.tiktoken", "RESOLVED"),
++        ("http.get", blob + "o200k_base.tiktoken", "RESOLVED"),
++        ("http.get", None, "UNRESOLVED"),
++    }
++    assert {e.url for e in r.evidence if e.resource} == {"https://" + blob + "cl100k_base.tiktoken",
++                                                         "https://" + blob + "o200k_base.tiktoken"}
++
++
++def test_query_without_path_names_the_host():
++    a = classify_http("GET", "https://api.ipify.org?format=json")
++    assert (a.action, a.resource) == ("http.get", "api.ipify.org")
++    assert classify_http("GET", "https://api.ipify.org/?format=json").resource == "api.ipify.org"
++    assert classify_http("GET", "https://h.example#frag").resource == "h.example"
++
++
++def test_normalise_path_is_the_runtime_spelling():
++    from actenon_scan.authority import normalise_path
++
++    assert normalise_path("out/report.txt") == "./out/report.txt"
++    assert normalise_path("~/notes.md") == "~/notes.md"
++    assert normalise_path("/var/log/x") == "/var/log/x"
++    assert normalise_path("../escape") is None
+-- 
+2.43.0
+

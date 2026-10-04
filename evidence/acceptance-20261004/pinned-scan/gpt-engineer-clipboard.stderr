@@ -1,0 +1,5 @@
+AIRLOCK: 20 unresolved or unadapted call sites will be denied if reached
+AIRLOCK DENY filesystem.write @ /home/ubuntu/.cache/black/23.3.0: out of scope [receipt_0cc1c7a82e444c329ebf82e234cee900]
+AIRLOCK DENY filesystem.write @ /home/ubuntu/.cache/black/23.3.0: out of scope [receipt_28be559c28ed4044a07bc463bd83ca40]
+AIRLOCK DENY http.get @ https://openaipublic.blob.core.windows.net/encodings/cl100k_base.tiktoken: out of scope [receipt_3798822713594ec4bc0f5cffd8e5326a]
+AIRLOCK BLOCKED: out of scope

@@ -7,7 +7,8 @@ and brokers supported HTTP calls through Actenon Permit and Kernel. A new or unr
 cannot execute through that broker until its resolved authority is explicitly approved.
 
 This is an installable development product, version 0.1.0.dev0. Its dependencies are pinned to the
-preserved ecosystem candidates. No Airlock package, tag, or release has been published.
+merged, unified ecosystem line. These are staging source pins; public registry dependencies are still
+a release gate. No Airlock package, tag, or release has been published.
 
 ## Install
 
@@ -125,8 +126,13 @@ See [the reusable action](action.yml) and [workflow example](docs/github-action.
   the authority of a resolved call to the same URL.
 - Source lines and columns distinguish callsites. Ambiguous async expressions or source sites
   shared with unresolved evidence remain blocked.
-- Unsupported filesystem writes/deletes, subprocess execution, raw sockets, ambiguous/encoded URLs,
-  URL templates, dynamic HTTP methods, and GraphQL mutations fail closed.
+- Adapters are registered by Scan power kind: HTTP and GitHub (including GraphQL and dynamic
+  methods) are executed by the broker, while process and filesystem effects are released to the
+  agent after Permit and the Kernel verify them. `email.send` is intercepted and always denied.
+- Unresolved, template, and unscanned calls are denied one call at a time with a signed receipt;
+  they no longer block launch. Launch is refused only for a Scan power kind with no adapter.
+- Receipts are Ed25519-signed and hash-chained; `airlock receipts` verifies them.
+- Raw sockets, forks, native library loading, aiohttp, and reads outside the project fail closed.
 
 Airlock's Python adapter and audit hooks protect cooperative Python agents from unintended powers.
 They are **not an OS sandbox for hostile code**, native extensions, or an attacker controlling the
