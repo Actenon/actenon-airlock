@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import argparse
+import hashlib
 import importlib.metadata
 import json
 import os
@@ -79,10 +80,12 @@ def render_receipts(result: dict) -> str:
             facts.append("effect: " + safe(row["outcome"]))
         if row.get("effect_id"):
             facts.append(safe(row["effect_id"]))
+        if row.get("operator_action") == "reconcile":
+            facts.append("observer attestation; no redispatch")
         facts.append(
             {True: "executed", False: "not executed"}.get(
                 executed,
-                "performed by the agent after release"
+                "released; execution unobserved"
                 if stage == "released"
                 else "execution result unknown",
             )
@@ -133,7 +136,7 @@ def main(argv=None):
     )
     parser.add_argument("--version", action="version", version=__version__)
     sub = parser.add_subparsers(dest="cmd", required=True)
-    for cmd in ("init", "diff", "check", "doctor", "run", "receipts"):
+    for cmd in ("init", "diff", "check", "doctor", "run", "receipts", "reconcile"):
         p = sub.add_parser(cmd)
         p.add_argument("--path", type=Path, default=Path.cwd())
         if cmd != "run":
@@ -152,6 +155,32 @@ def main(argv=None):
             )
             p.add_argument("--command", help='Python script and arguments, or "-m module"')
             p.add_argument("--credential", action="append", default=[], metavar="NAME=HTTPS_ORIGIN")
+            p.add_argument(
+                "--reconciler-key",
+                type=Path,
+                help="Create/load an external operator key; --approve trusts its public key",
+            )
+        if cmd == "reconcile":
+            p.add_argument("effect_id")
+            outcome = p.add_mutually_exclusive_group()
+            outcome.add_argument("--committed", action="store_true")
+            outcome.add_argument("--not-executed", action="store_true")
+            p.add_argument(
+                "--operator-key", type=Path, help="External approved operator private key"
+            )
+            p.add_argument(
+                "--evidence",
+                type=Path,
+                help="Provider/operator evidence file (only its hash is recorded)",
+            )
+            p.add_argument(
+                "--approval", type=Path, help="Apply a detached signed reconciliation observation"
+            )
+            p.add_argument(
+                "--output",
+                type=Path,
+                help="Write a signed observation for review without changing the ledger",
+            )
         if cmd == "run":
             p.add_argument(
                 "command", nargs=argparse.REMAINDER, help="Python script and arguments after --"
@@ -178,6 +207,80 @@ def main(argv=None):
             result = State(root).verify_receipts()
             print(json.dumps(result, indent=2) if args.json else render_receipts(result))
             return 0 if result["ok"] else 2
+        if args.cmd == "reconcile":
+            from .reconciliation import (
+                apply_reconciliation,
+                load_operator_key,
+                operator_identity,
+                prepare_reconciliation,
+                sign_reconciliation,
+            )
+
+            state = State(root)
+            request = prepare_reconciliation(state, args.effect_id)
+            if args.approval:
+                if (
+                    args.committed
+                    or args.not_executed
+                    or args.operator_key
+                    or args.evidence
+                    or args.output
+                ):
+                    raise AirlockError("Detached approval cannot be combined with signing options")
+                envelope = json.loads(args.approval.read_text())
+                if (
+                    envelope.get("payload", {}).get("reference", {}).get("effect_id")
+                    != args.effect_id
+                ):
+                    raise AirlockError("Detached approval refers to a different effect")
+                result = apply_reconciliation(state, envelope)
+            elif args.committed or args.not_executed:
+                if not args.operator_key or not args.evidence:
+                    raise AirlockError(
+                        "Outcome requires an approved --operator-key and --evidence file"
+                    )
+                private = load_operator_key(state, args.operator_key)
+                kid, public = operator_identity(private)
+                if state.approved().get("reconciliation_keys", {}).get(kid) != public:
+                    raise AirlockError("Operator key is not approved for this project")
+                with args.evidence.open("rb") as stream:
+                    evidence_hash = hashlib.file_digest(stream, "sha256").hexdigest()
+                envelope = sign_reconciliation(
+                    request,
+                    private,
+                    outcome="COMMITTED" if args.committed else "NOT_EXECUTED",
+                    evidence_hash=evidence_hash,
+                )
+                if args.output:
+                    atomic_json(args.output, envelope)
+                    result = {
+                        "signed": True,
+                        "applied": False,
+                        "effect_id": args.effect_id,
+                        "output": str(args.output),
+                    }
+                else:
+                    result = apply_reconciliation(state, envelope)
+            else:
+                if args.operator_key or args.evidence or args.output:
+                    raise AirlockError("Signing options require --committed or --not-executed")
+                result = request
+            if args.json:
+                print(json.dumps(result, indent=2))
+            elif result.get("applied"):
+                print(f"AIRLOCK RECONCILED {args.effect_id}: {result['outcome']}")
+                print("Evidence: authorized observer attestation. No request was redispatched.")
+                print("Receipt: " + result["receipt_id"])
+                if result.get("receipt_warning"):
+                    print(result["receipt_warning"])
+            elif result.get("signed"):
+                print(
+                    "Signed observation saved for review; effect remains held: " + result["output"]
+                )
+            else:
+                print("AIRLOCK EFFECT\n" + json.dumps(result, indent=2))
+                print("No state changed. Confirm provider state before selecting an outcome.")
+            return 0
         if args.cmd == "run":
             from .broker import launch
 
@@ -210,6 +313,14 @@ def main(argv=None):
                     raise AirlockError("Credential binding must be NAME=HTTPS_ORIGIN")
                 bindings[name] = origin(url)
             current["credential_bindings"] = bindings
+            current["reconciliation_keys"] = dict(before.get("reconciliation_keys", {}))
+            if args.reconciler_key:
+                from .reconciliation import load_operator_key, operator_identity
+
+                kid, public = operator_identity(
+                    load_operator_key(state, args.reconciler_key, create=True)
+                )
+                current["reconciliation_keys"][kid] = public
             if args.command:
                 current["command"] = shlex.split(args.command)
             else:
@@ -226,6 +337,10 @@ def main(argv=None):
                 print("\nCredential origin bindings:")
                 for name, url in sorted(bindings.items()):
                     print(f"  {name} -> {url}")
+            if not args.json and current["reconciliation_keys"]:
+                print("\nReconciliation observer keys (trusted only with --approve):")
+                for kid in sorted(current["reconciliation_keys"]):
+                    print("  " + kid)
             if current["parse_errors"]:
                 raise AirlockError("Parse errors prevent approval")
             if args.approve:

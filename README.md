@@ -108,7 +108,10 @@ fingerprint binds method, exact URL, body and caller headers, with stable parent
 references instead of random credential handles. Source/proof/grant changes do not reset it.
 API-specific logical identities and trusted provider reconciliation are still required for
 stronger semantic consequence claims; generic byte identity cannot infer every remote effect.
-The operator reconciliation CLI is not yet available. This development build does not claim
+Use `airlock reconcile <effect-id>` to inspect a held effect. An explicitly approved,
+separate observer key can attest `--committed` or `--not-executed`, with evidence bound to
+the exact original attempt and the ledger state reviewed. See [reconciliation](docs/reconciliation.md)
+for local signing, detached review and the authenticated provider hook. This build does not claim
 COMMITTED from HTTP status, cross-host ownership, or complete G1–G40 acceptance.
 Request and response bodies, raw headers, and credential values are not recorded.
 If the agent handles an error itself, Airlock still exits nonzero for a broker denial (3) or

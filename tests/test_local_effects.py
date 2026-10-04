@@ -170,9 +170,10 @@ def test_receipts_are_signed_chained_and_tamper_evident(project, capsys):
     assert main(["receipts", "--path", str(state.root)]) == 0
     out = capsys.readouterr().out
     assert "2 of 2 verified against .airlock/public-key.json" in out
-    assert "filesystem.write" in out and "performed by the agent after release" in out
+    assert "filesystem.write" in out and "released; execution unobserved" in out
     lines = state.receipts_path.read_text().splitlines()
     rows = [json.loads(line) for line in lines]
+    assert rows[-1]["execution_occurred"] is None
     assert rows[0]["prev"] is None and rows[1]["prev"] is not None
     assert rows[1]["signature"]["algorithm"] == "EdDSA"
 
@@ -185,3 +186,20 @@ def test_receipts_are_signed_chained_and_tamper_evident(project, capsys):
     state.receipts_path.write_text(lines[1] + "\n")
     assert main(["receipts", "--path", str(state.root), "--json"]) == 2
     assert json.loads(capsys.readouterr().out)["rows"][0]["problem"].startswith("hash chain")
+
+
+def test_legitimate_in_project_rename_remains_usable(project):
+    state = project(
+        "import os\nos.rename('source.txt', 'out.txt')\nassert open('out.txt').read() == 'ordinary data'\n"
+    )
+    (state.root / "source.txt").write_text("ordinary data")
+    assert run(state).returncode == 0
+    assert (state.root / "out.txt").read_text() == "ordinary data"
+
+
+def test_private_file_cannot_be_renamed_to_a_readable_alias(project):
+    state = project("import os\nos.rename('.env', 'out.txt')\nprint(open('out.txt').read())\n")
+    (state.root / ".env").write_text("PRIVATE_TEST_VALUE=not-a-real-secret\n")
+    assert run(state).returncode == 3
+    assert (state.root / ".env").exists()
+    assert not (state.root / "out.txt").exists()
