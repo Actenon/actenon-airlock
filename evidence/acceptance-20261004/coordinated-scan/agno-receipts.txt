@@ -1,0 +1,59 @@
+AIRLOCK RECEIPTS
+28 of 28 verified against .airlock/public-key.json
+
+2026-10-04T00:19:43.587459+00:00  ALLOW authorized      filesystem.write @ /tmp/agents/agno/tmp/file_tools_exclusions
+    cookbook/91_tools/file_tools.py:19 | no credential released | not executed  [receipt_f6f9cbe6cfeb4161bd43c6c0cff5b9aa]
+2026-10-04T00:19:43.597790+00:00  ALLOW released        filesystem.write @ /tmp/agents/agno/tmp/file_tools_exclusions
+    cookbook/91_tools/file_tools.py:19 | no credential released | performed by the agent after release  [receipt_f1e01dd9effe4904bb973a7bd16e237f]
+2026-10-04T00:19:43.713379+00:00  ALLOW authorized      filesystem.write @ /tmp/agents/agno/tmp/file_tools_exclusions/main.py
+    cookbook/91_tools/file_tools.py:21 | no credential released | not executed  [receipt_b3203467ef3d414bbae77a9d59ff7b00]
+2026-10-04T00:19:43.725073+00:00  ALLOW released        filesystem.write @ /tmp/agents/agno/tmp/file_tools_exclusions/main.py
+    cookbook/91_tools/file_tools.py:21 | no credential released | performed by the agent after release  [receipt_279493e3499c40448b178768a77321d8]
+2026-10-04T00:19:43.838592+00:00  ALLOW authorized      filesystem.write @ /tmp/agents/agno/tmp/file_tools_exclusions/README.md
+    cookbook/91_tools/file_tools.py:22 | no credential released | not executed  [receipt_2607d058d3a6485e9f79ff1deaee255b]
+2026-10-04T00:19:43.850902+00:00  ALLOW released        filesystem.write @ /tmp/agents/agno/tmp/file_tools_exclusions/README.md
+    cookbook/91_tools/file_tools.py:22 | no credential released | performed by the agent after release  [receipt_cd39c99b23c54a6086d13098a9d14902]
+2026-10-04T00:19:43.961986+00:00  ALLOW authorized      filesystem.write @ /tmp/agents/agno/tmp/file_tools_exclusions/.venv/lib/python3.12/site-packages/requests
+    cookbook/91_tools/file_tools.py:32 | no credential released | not executed  [receipt_34d047fd64ed4c3da569245955be8faf]
+2026-10-04T00:19:43.968968+00:00  ALLOW released        filesystem.write @ /tmp/agents/agno/tmp/file_tools_exclusions/.venv/lib/python3.12/site-packages/requests
+    cookbook/91_tools/file_tools.py:32 | no credential released | performed by the agent after release  [receipt_d14bf72ab04144b3b7d8230f99f71087]
+2026-10-04T00:19:44.080684+00:00  ALLOW authorized      filesystem.write @ /tmp/agents/agno/tmp/file_tools_exclusions/.venv/lib/python3.12/site-packages/requests/__init__.py
+    cookbook/91_tools/file_tools.py:33 | no credential released | not executed  [receipt_167c518f72874e0e81987ccbb5b34684]
+2026-10-04T00:19:44.095803+00:00  ALLOW released        filesystem.write @ /tmp/agents/agno/tmp/file_tools_exclusions/.venv/lib/python3.12/site-packages/requests/__init__.py
+    cookbook/91_tools/file_tools.py:33 | no credential released | performed by the agent after release  [receipt_c2d7f007fff144beba918a9eee977180]
+2026-10-04T00:19:44.204130+00:00  ALLOW authorized      filesystem.write @ /tmp/agents/agno/tmp/file_tools_exclusions/.venv/lib/python3.12/site-packages/requests/api.py
+    cookbook/91_tools/file_tools.py:34 | no credential released | not executed  [receipt_24642e9ce5ad4702b23d36510a8a71b2]
+2026-10-04T00:19:44.218566+00:00  ALLOW released        filesystem.write @ /tmp/agents/agno/tmp/file_tools_exclusions/.venv/lib/python3.12/site-packages/requests/api.py
+    cookbook/91_tools/file_tools.py:34 | no credential released | performed by the agent after release  [receipt_f987252371844b57941a935a161e9c67]
+2026-10-04T00:19:44.334373+00:00  ALLOW authorized      filesystem.write @ /tmp/agents/agno/tmp/file_tools_exclusions/.git
+    cookbook/91_tools/file_tools.py:37 | no credential released | not executed  [receipt_e7b250ce8aac4f93a8ff3a6a29ce7096]
+2026-10-04T00:19:44.340872+00:00  ALLOW released        filesystem.write @ /tmp/agents/agno/tmp/file_tools_exclusions/.git
+    cookbook/91_tools/file_tools.py:37 | no credential released | performed by the agent after release  [receipt_fbd200eb1c43403c9016e30eaa2bae77]
+2026-10-04T00:19:44.451761+00:00  ALLOW authorized      filesystem.write @ /tmp/agents/agno/tmp/file_tools_exclusions/.git/HEAD
+    cookbook/91_tools/file_tools.py:38 | no credential released | not executed  [receipt_9b09d3cb93e24c3db8869d093d1592f0]
+2026-10-04T00:19:44.463890+00:00  ALLOW released        filesystem.write @ /tmp/agents/agno/tmp/file_tools_exclusions/.git/HEAD
+    cookbook/91_tools/file_tools.py:38 | no credential released | performed by the agent after release  [receipt_cadfd44702f74ffa8737806aa1fc6a32]
+2026-10-04T00:19:44.634250+00:00  ALLOW authorized      filesystem.write @ /tmp/agents/agno/tmp/file_tools_subdirs
+    cookbook/91_tools/file_tools.py:45 | no credential released | not executed  [receipt_43b1c530d9494eee94b23d59aed8883a]
+2026-10-04T00:19:44.645942+00:00  ALLOW released        filesystem.write @ /tmp/agents/agno/tmp/file_tools_subdirs
+    cookbook/91_tools/file_tools.py:45 | no credential released | performed by the agent after release  [receipt_467e8450a63240898079bc0b75bac703]
+2026-10-04T00:19:44.758405+00:00  ALLOW authorized      filesystem.write @ /tmp/agents/agno/tmp/file_tools_subdirs/root_notes.txt
+    cookbook/91_tools/file_tools.py:47 | no credential released | not executed  [receipt_efd86fcf476c49a885b537aa58473908]
+2026-10-04T00:19:44.770784+00:00  ALLOW released        filesystem.write @ /tmp/agents/agno/tmp/file_tools_subdirs/root_notes.txt
+    cookbook/91_tools/file_tools.py:47 | no credential released | performed by the agent after release  [receipt_b4199736a4054c979ff9cf04e9065acd]
+2026-10-04T00:19:44.877518+00:00  ALLOW authorized      filesystem.write @ /tmp/agents/agno/tmp/file_tools_subdirs/reports
+    cookbook/91_tools/file_tools.py:50 | no credential released | not executed  [receipt_2a7e94e95432491f9aed0c41fb8583c6]
+2026-10-04T00:19:44.887196+00:00  ALLOW released        filesystem.write @ /tmp/agents/agno/tmp/file_tools_subdirs/reports
+    cookbook/91_tools/file_tools.py:50 | no credential released | performed by the agent after release  [receipt_f83a834859354bcbba7b9cfe61b00bda]
+2026-10-04T00:19:44.995208+00:00  ALLOW authorized      filesystem.write @ /tmp/agents/agno/tmp/file_tools_subdirs/reports/q1.csv
+    cookbook/91_tools/file_tools.py:51 | no credential released | not executed  [receipt_14c63d534ff247b5bd7bd16432954048]
+2026-10-04T00:19:45.010776+00:00  ALLOW released        filesystem.write @ /tmp/agents/agno/tmp/file_tools_subdirs/reports/q1.csv
+    cookbook/91_tools/file_tools.py:51 | no credential released | performed by the agent after release  [receipt_7aac6a17687443258847a6c8d5a246fc]
+2026-10-04T00:19:45.120819+00:00  ALLOW authorized      filesystem.write @ /tmp/agents/agno/tmp/file_tools_subdirs/reports/q2.csv
+    cookbook/91_tools/file_tools.py:52 | no credential released | not executed  [receipt_24b6bdb68ede4e8d812a48372be5bad2]
+2026-10-04T00:19:45.129920+00:00  ALLOW released        filesystem.write @ /tmp/agents/agno/tmp/file_tools_subdirs/reports/q2.csv
+    cookbook/91_tools/file_tools.py:52 | no credential released | performed by the agent after release  [receipt_63cfef6266b54caeb5fbfa40670e640e]
+2026-10-04T00:19:45.237493+00:00  ALLOW authorized      filesystem.write @ /tmp/agents/agno/tmp/file_tools_subdirs/reports/summary.md
+    cookbook/91_tools/file_tools.py:53 | no credential released | not executed  [receipt_a8eb0db803d14e8ebb70ea06b62fe1ed]
+2026-10-04T00:19:45.248915+00:00  ALLOW released        filesystem.write @ /tmp/agents/agno/tmp/file_tools_subdirs/reports/summary.md
+    cookbook/91_tools/file_tools.py:53 | no credential released | performed by the agent after release  [receipt_a08141a7b8874b8a8b5c55684054ec88]

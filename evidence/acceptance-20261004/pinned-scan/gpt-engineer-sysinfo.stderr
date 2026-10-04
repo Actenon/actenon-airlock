@@ -1,0 +1,40 @@
+AIRLOCK: 20 unresolved or unadapted call sites will be denied if reached
+AIRLOCK DENY filesystem.write @ /home/ubuntu/.cache/black/23.3.0: out of scope [receipt_e8c64aad06cb45369143e4899b76802f]
+AIRLOCK DENY filesystem.write @ /home/ubuntu/.cache/black/23.3.0: out of scope [receipt_2a5e60c6bf0d4cd69384a9a39cea499f]
+AIRLOCK DENY process.exec @ /usr/bin/python3.12: out of scope [receipt_7e898f528c4d4a3bb5ade7e2196cf247]
+╭───────────────────── Traceback (most recent call last) ──────────────────────╮
+│ /tmp/agents/gpt-engineer/gpt_engineer/applications/cli/main.py:437 in main   │
+│                                                                              │
+│   434 │   │   sys.excepthook = lambda *_: pdb.pm()                           │
+│   435 │                                                                      │
+│   436 │   if sysinfo:                                                        │
+│ ❱ 437 │   │   sys_info = get_system_info()                                   │
+│   438 │   │   for key, value in sys_info.items():                            │
+│   439 │   │   │   print(f"{key}: {value}")                                   │
+│   440 │   │   raise typer.Exit()                                             │
+│                                                                              │
+│ /tmp/agents/gpt-engineer/gpt_engineer/applications/cli/main.py:249 in        │
+│ get_system_info                                                              │
+│                                                                              │
+│   246 │   │   "os_version": platform.version(),                              │
+│   247 │   │   "architecture": platform.machine(),                            │
+│   248 │   │   "python_version": sys.version,                                 │
+│ ❱ 249 │   │   "packages":                                                    │
+│       format_installed_packages(get_installed_packages()),                   │
+│   250 │   }                                                                  │
+│   251 │   return system_info                                                 │
+│   252                                                                        │
+│                                                                              │
+│ /tmp/agents/gpt-engineer/gpt_engineer/applications/cli/main.py:268 in        │
+│ format_installed_packages                                                    │
+│                                                                              │
+│   265                                                                        │
+│   266                                                                        │
+│   267 def format_installed_packages(packages):                               │
+│ ❱ 268 │   return "\n".join([f"{name}: {version}" for name, version in        │
+│       packages.items()])                                                     │
+│   269                                                                        │
+│   270                                                                        │
+│   271 @app.command(                                                          │
+╰──────────────────────────────────────────────────────────────────────────────╯
+AttributeError: 'str' object has no attribute 'items'

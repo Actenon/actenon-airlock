@@ -1,0 +1,47 @@
+AIRLOCK RECEIPTS
+22 of 22 verified against .airlock/public-key.json
+
+2026-10-04T00:19:07.749157+00:00  DENY                  http.get @ https://raw.githubusercontent.com/BerriAI/litellm/main/model_prices_and_context_window.json
+    reason: out of scope | no credential released | not executed  [receipt_4fa955e3e29e495a84c31cb36865f06f]
+2026-10-04T00:19:12.810852+00:00  DENY                  http.get @ https://raw.githubusercontent.com/BerriAI/litellm/main/model_prices_and_context_window.json
+    reason: out of scope | no credential released | not executed  [receipt_ad0550cc3b2b4d9fa34cc037ce8733a9]
+2026-10-04T00:19:14.518618+00:00  DENY                  filesystem.read.outside-project @ /home/ubuntu/.config/gcloud/application_default_credentials.json
+    reason: Unsupported runtime effect | no credential released | not executed  [receipt_caeaf6f8b2614e358a85075540b4cec1]
+2026-10-04T00:19:14.553752+00:00  DENY                  http.get @ https://openaipublic.blob.core.windows.net/encodings/o200k_base.tiktoken
+    reason: out of scope | no credential released | not executed  [receipt_1d18f1c342a647ff94294645b48f44a6]
+2026-10-04T00:19:14.577691+00:00  ALLOW authorized      http.get @ https://openaipublic.blob.core.windows.net/encodings/o200k_base.tiktoken
+    pr_agent/algo/token_handler.py:80 | no credential released | not executed  [receipt_65e9fff3ee6442ac8533ebf4dbd98293]
+2026-10-04T00:19:14.962941+00:00  ALLOW executed        http.get @ https://openaipublic.blob.core.windows.net/encodings/o200k_base.tiktoken
+    pr_agent/algo/token_handler.py:80 | no credential released | executed  [receipt_47edfab35ea3463cab3ed98800df94cc]
+2026-10-04T00:19:15.024881+00:00  DENY                  filesystem.write @ /tmp/data-gym-cache
+    reason: out of scope | no credential released | not executed  [receipt_67bc5f812f8743bdb2d04287873dcd38]
+2026-10-04T00:19:15.428964+00:00  DENY                  http.get @ https://raw.githubusercontent.com/BerriAI/litellm/main/model_prices_and_context_window.json
+    reason: out of scope | no credential released | not executed  [receipt_7b5c3794fe134ee690f834db1ee07c66]
+2026-10-04T00:19:15.665831+00:00  DENY                  http.post @ https://api.openai.com/v1/chat/completions
+    reason: out of scope | no credential released | not executed  [receipt_e0cf1f9c5d9e4d8d8d970cbc8867b884]
+2026-10-04T00:19:16.122380+00:00  DENY                  http.post @ https://api.openai.com/v1/chat/completions
+    reason: out of scope | no credential released | not executed  [receipt_6ff29721186c42cd8b2ca4086248b5e4]
+2026-10-04T00:19:16.909055+00:00  DENY                  http.post @ https://api.openai.com/v1/chat/completions
+    reason: out of scope | no credential released | not executed  [receipt_71cf61104ca24491b153ad4efbc5d418]
+2026-10-04T00:19:16.954392+00:00  DENY                  http.post @ https://api.openai.com/v1/chat/completions
+    reason: out of scope | no credential released | not executed  [receipt_e69431e619bd4c2395552c22280b8a61]
+2026-10-04T00:19:17.457723+00:00  DENY                  http.post @ https://api.openai.com/v1/chat/completions
+    reason: out of scope | no credential released | not executed  [receipt_8811987f417a4529ad6fc4d81a5a9a59]
+2026-10-04T00:19:18.328880+00:00  DENY                  http.post @ https://api.openai.com/v1/chat/completions
+    reason: out of scope | no credential released | not executed  [receipt_19590d50a4b84c788a11d0bae7f9027a]
+2026-10-04T00:19:18.385621+00:00  DENY                  http.post @ https://api.openai.com/v1/chat/completions
+    reason: out of scope | no credential released | not executed  [receipt_5b105522e60444f39670155cfb369ff2]
+2026-10-04T00:19:18.850756+00:00  DENY                  http.post @ https://api.openai.com/v1/chat/completions
+    reason: out of scope | no credential released | not executed  [receipt_df50588696b943f987dee9abd35df872]
+2026-10-04T00:19:19.550643+00:00  DENY                  http.get @ https://raw.githubusercontent.com/BerriAI/litellm/main/model_prices_and_context_window.json
+    reason: out of scope | no credential released | not executed  [receipt_4353e75aa5164ae095c744cfe3f6de95]
+2026-10-04T00:19:19.775388+00:00  DENY                  http.post @ https://api.openai.com/v1/chat/completions
+    reason: out of scope | no credential released | not executed  [receipt_abaa0a6dd12b41c99a7ddb2fd8f137db]
+2026-10-04T00:19:19.812089+00:00  DENY                  http.post @ https://api.openai.com/v1/chat/completions
+    reason: out of scope | no credential released | not executed  [receipt_48453a3df39b4e5988384bd4159a8f46]
+2026-10-04T00:19:20.301246+00:00  DENY                  http.post @ https://api.openai.com/v1/chat/completions
+    reason: out of scope | no credential released | not executed  [receipt_def0d8d43d6d4a10bf60769184ef9502]
+2026-10-04T00:19:21.221662+00:00  DENY                  http.post @ https://api.openai.com/v1/chat/completions
+    reason: out of scope | no credential released | not executed  [receipt_b54b02fc61754168b1ab592f29107d95]
+2026-10-04T00:19:21.253073+00:00  DENY                  filesystem.write @ /tmp/agents/pr-agent/review.md
+    reason: out of scope | no credential released | not executed  [receipt_345e69d23aa44aa3b489037999bef302]

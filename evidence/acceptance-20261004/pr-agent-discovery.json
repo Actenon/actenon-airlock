@@ -1,0 +1,36 @@
+{
+  "root": "/tmp/agents/pr-agent",
+  "source_digest": "6c6faf6b9b941ac0024ac306d4c10f4050a0fbe959705bad02c537aa8314c8ef",
+  "files": null,
+  "parse_errors": 0,
+  "entries": 21,
+  "powers": 7,
+  "powers_by_kind": {
+    "filesystem": 1,
+    "github": 1,
+    "http": 3,
+    "process": 2
+  },
+  "blocked": 83,
+  "blocked_by_reason": {
+    "Unresolved or template authority remains blocked": 83
+  },
+  "blocked_by_action": {
+    "github.repo.read": 27,
+    "http.get": 12,
+    "http.post": 10,
+    "filesystem.delete": 9,
+    "filesystem.write": 8,
+    "github.pull.review": 5,
+    "github.pull.update": 2,
+    "github.issue.comment": 2,
+    "github.contents.write": 2,
+    "http.put": 1,
+    "process.exec": 1,
+    "http.patch": 1,
+    "github.pull.comment": 1,
+    "http.delete": 1,
+    "github.issue.label": 1
+  },
+  "unadapted_kinds": []
+}

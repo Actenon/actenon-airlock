@@ -1,0 +1,6 @@
+AIRLOCK: 84 unresolved or unadapted call sites will be denied if reached
+AIRLOCK DENY http.get @ https://raw.githubusercontent.com/BerriAI/litellm/main/model_prices_and_context_window.json: out of scope [receipt_4fa955e3e29e495a84c31cb36865f06f]
+00:19:07 - LiteLLM:WARNING: get_model_cost_map.py:300 - LiteLLM: model cost map fetch attempt 1/3 failed (HttpxDenied fetching https://raw.githubusercontent.com/BerriAI/litellm/main/model_prices_and_context_window.json: AIRLOCK BLOCKED: out of scope); retrying in 2.1s
+00:19:07 - LiteLLM:WARNING: get_model_cost_map.py:655 - LiteLLM: Failed to fetch remote model cost map from https://raw.githubusercontent.com/BerriAI/litellm/main/model_prices_and_context_window.json: HttpxDenied fetching https://raw.githubusercontent.com/BerriAI/litellm/main/model_prices_and_context_window.json: AIRLOCK BLOCKED: out of scope. Falling back to local backup.
+2026-10-04 00:19:09.263 | WARNING  | pr_agent.custom_merge_loader:load:67 - Settings file not found: /tmp/agents/pr-agent/pr_agent/settings/.secrets.toml. Skipping it.
+2026-10-04 00:19:09.263 | WARNING  | pr_agent.custom_merge_loader:load:67 - Settings file not found: /tmp/agents/pr-agent/pr_agent/settings_prod/.secrets.toml. Skipping it.

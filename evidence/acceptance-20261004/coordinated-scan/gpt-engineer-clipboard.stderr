@@ -1,0 +1,7 @@
+AIRLOCK: 21 unresolved or unadapted call sites will be denied if reached
+AIRLOCK DENY filesystem.write @ /home/ubuntu/.cache/black/23.3.0: out of scope [receipt_f812cd15098745e1bd340731362391ff]
+AIRLOCK DENY filesystem.write @ /home/ubuntu/.cache/black/23.3.0: out of scope [receipt_a32d35f17f294f43a67bb5000d14ae78]
+AIRLOCK ALLOW http.get @ https://openaipublic.blob.core.windows.net/encodings/cl100k_base.tiktoken [receipt_f7277330f05b4e9ab28e4908633baf4b]
+AIRLOCK DENY filesystem.write @ /tmp/data-gym-cache: out of scope [receipt_c01eee7a70924f5ca434206a59789785]
+AIRLOCK DENY filesystem.write @ /tmp/agents/gpt-engineer/projects/example: out of scope [receipt_a18978b581a3421bba5edcefd02ca19b]
+AIRLOCK BLOCKED: out of scope

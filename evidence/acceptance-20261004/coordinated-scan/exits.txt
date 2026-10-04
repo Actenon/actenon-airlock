@@ -1,0 +1,12 @@
+pr-agent-init exit=0
+gpt-engineer-init exit=0
+agno-init exit=0
+pr-agent-help exit=3
+pr-agent-review exit=3
+gpt-engineer-sysinfo exit=1
+gpt-engineer-clipboard exit=3
+agno-file-tools exit=0
+pr-agent-receipts exit=0
+gpt-engineer-receipts exit=0
+agno-receipts exit=0
+DONE

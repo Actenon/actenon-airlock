@@ -1,0 +1,27 @@
+AIRLOCK: 84 unresolved or unadapted call sites will be denied if reached
+AIRLOCK DENY http.get @ https://raw.githubusercontent.com/BerriAI/litellm/main/model_prices_and_context_window.json: out of scope [receipt_ad0550cc3b2b4d9fa34cc037ce8733a9]
+00:19:12 - LiteLLM:WARNING: get_model_cost_map.py:300 - LiteLLM: model cost map fetch attempt 1/3 failed (HttpxDenied fetching https://raw.githubusercontent.com/BerriAI/litellm/main/model_prices_and_context_window.json: AIRLOCK BLOCKED: out of scope); retrying in 2.6s
+00:19:12 - LiteLLM:WARNING: get_model_cost_map.py:655 - LiteLLM: Failed to fetch remote model cost map from https://raw.githubusercontent.com/BerriAI/litellm/main/model_prices_and_context_window.json: HttpxDenied fetching https://raw.githubusercontent.com/BerriAI/litellm/main/model_prices_and_context_window.json: AIRLOCK BLOCKED: out of scope. Falling back to local backup.
+2026-10-04 00:19:14.267 | WARNING  | pr_agent.custom_merge_loader:load:67 - Settings file not found: /tmp/agents/pr-agent/pr_agent/settings/.secrets.toml. Skipping it.
+2026-10-04 00:19:14.267 | WARNING  | pr_agent.custom_merge_loader:load:67 - Settings file not found: /tmp/agents/pr-agent/pr_agent/settings_prod/.secrets.toml. Skipping it.
+AIRLOCK DENY filesystem.read.outside-project @ /home/ubuntu/.config/gcloud/application_default_credentials.json: Unsupported runtime effect [receipt_caeaf6f8b2614e358a85075540b4cec1]
+AIRLOCK DENY http.get @ https://openaipublic.blob.core.windows.net/encodings/o200k_base.tiktoken: out of scope [receipt_1d18f1c342a647ff94294645b48f44a6]
+AIRLOCK ALLOW http.get @ https://openaipublic.blob.core.windows.net/encodings/o200k_base.tiktoken [receipt_47edfab35ea3463cab3ed98800df94cc]
+AIRLOCK DENY filesystem.write @ /tmp/data-gym-cache: out of scope [receipt_67bc5f812f8743bdb2d04287873dcd38]
+AIRLOCK DENY http.get @ https://raw.githubusercontent.com/BerriAI/litellm/main/model_prices_and_context_window.json: out of scope [receipt_7b5c3794fe134ee690f834db1ee07c66]
+00:19:15 - LiteLLM:WARNING: get_model_cost_map.py:300 - LiteLLM: model cost map fetch attempt 2/3 failed (HttpxDenied fetching https://raw.githubusercontent.com/BerriAI/litellm/main/model_prices_and_context_window.json: AIRLOCK BLOCKED: out of scope); retrying in 4.1s
+AIRLOCK DENY http.post @ https://api.openai.com/v1/chat/completions: out of scope [receipt_e0cf1f9c5d9e4d8d8d970cbc8867b884]
+AIRLOCK DENY http.post @ https://api.openai.com/v1/chat/completions: out of scope [receipt_6ff29721186c42cd8b2ca4086248b5e4]
+AIRLOCK DENY http.post @ https://api.openai.com/v1/chat/completions: out of scope [receipt_71cf61104ca24491b153ad4efbc5d418]
+AIRLOCK DENY http.post @ https://api.openai.com/v1/chat/completions: out of scope [receipt_e69431e619bd4c2395552c22280b8a61]
+AIRLOCK DENY http.post @ https://api.openai.com/v1/chat/completions: out of scope [receipt_8811987f417a4529ad6fc4d81a5a9a59]
+AIRLOCK DENY http.post @ https://api.openai.com/v1/chat/completions: out of scope [receipt_19590d50a4b84c788a11d0bae7f9027a]
+AIRLOCK DENY http.post @ https://api.openai.com/v1/chat/completions: out of scope [receipt_5b105522e60444f39670155cfb369ff2]
+AIRLOCK DENY http.post @ https://api.openai.com/v1/chat/completions: out of scope [receipt_df50588696b943f987dee9abd35df872]
+AIRLOCK DENY http.get @ https://raw.githubusercontent.com/BerriAI/litellm/main/model_prices_and_context_window.json: out of scope [receipt_4353e75aa5164ae095c744cfe3f6de95]
+00:19:19 - LiteLLM:WARNING: get_model_cost_map.py:576 - LiteLLM: Failed to fetch remote model cost map from https://raw.githubusercontent.com/BerriAI/litellm/main/model_prices_and_context_window.json after 3 attempts; keeping local backup
+AIRLOCK DENY http.post @ https://api.openai.com/v1/chat/completions: out of scope [receipt_abaa0a6dd12b41c99a7ddb2fd8f137db]
+AIRLOCK DENY http.post @ https://api.openai.com/v1/chat/completions: out of scope [receipt_48453a3df39b4e5988384bd4159a8f46]
+AIRLOCK DENY http.post @ https://api.openai.com/v1/chat/completions: out of scope [receipt_def0d8d43d6d4a10bf60769184ef9502]
+AIRLOCK DENY http.post @ https://api.openai.com/v1/chat/completions: out of scope [receipt_b54b02fc61754168b1ab592f29107d95]
+AIRLOCK DENY filesystem.write @ /tmp/agents/pr-agent/review.md: out of scope [receipt_345e69d23aa44aa3b489037999bef302]
