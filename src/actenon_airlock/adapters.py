@@ -26,6 +26,9 @@ from .common import AirlockError, digest, origin, power, validate_url
 PROCESS_TRANSPORT = "local-process"
 FILESYSTEM_TRANSPORT = "local-filesystem"
 SHELL_SYNTAX = frozenset("|&;<>()$`\\*?[]#~{}!\n\r")
+SHELLS = frozenset({"sh", "bash", "dash", "zsh", "ksh", "ash", "busybox"})
+# Not a Scan program name, so a grant for the shell itself cannot satisfy it.
+SHELL_SYNTAX_RESOURCE = "<shell-syntax>"
 
 FS_WRITE = frozenset(
     {
@@ -178,6 +181,36 @@ def _program(name: str, cwd: str, search_path: str, context: Context) -> tuple[s
     return program, expected
 
 
+def _command_option(argv: list[str]) -> int | None:
+    """Index of the script after `shell -c` or a short cluster such as `-lc`."""
+    for index, flag in enumerate(argv):
+        if index == 0:
+            continue
+        combined = (
+            len(flag) > 2 and flag.startswith("-") and not flag.startswith("--") and "c" in flag[1:]
+        )
+        if flag == "-c" or combined:
+            return index + 1
+    return None
+
+
+def _shell_script(executable: str, argv: list[str]) -> str | None:
+    """The command string of a shell `-c` invocation, including options before `-c`.
+
+    A grant for the shell must not satisfy this when the command is not one plain program.
+    Options before `-c` (`-l`, `--norc`, `--rcfile FILE`) still select the command string, so
+    they cannot fall through to an ordinary exec of the approved shell.
+    """
+    if os.path.basename(executable) not in SHELLS:
+        return None
+    script_at = _command_option(argv)
+    if script_at is None:
+        return None
+    if script_at != len(argv) - 1:
+        raise AirlockError("Shell positional parameters are unsupported")
+    return argv[script_at]
+
+
 def _plain_command(command: str) -> list[str] | None:
     """Shell text the shell would run as one plain command, or None."""
     if not command.strip() or any(c in SHELL_SYNTAX for c in command):
@@ -230,19 +263,26 @@ class ProcessAdapter(Adapter):
             "argv_sha256": digest(argv),
             "cwd": cwd,
         }
-        if len(argv) >= 2 and argv[1] == "-c" and os.path.basename(executable) == "sh":
-            if len(argv) != 3:
-                raise AirlockError("Shell positional parameters are unsupported")
+        script = _shell_script(executable, argv)
+        if script is not None:
             shell, resolved_shell = _program(executable, cwd, search_path, context)
             candidates = []
-            words = _plain_command(argv[2])
-            if words is not None:
-                try:
-                    program, resolved = _program(words[0], cwd, search_path, context)
-                    candidates.append(power("process.exec", program, PROCESS_TRANSPORT))
-                    detail.update(program=program, executable=resolved)
-                except AirlockError:
-                    pass
+            words = _plain_command(script)
+            if words is None:
+                # Approving the shell must not execute operators, pipelines, or expansion.
+                detail.update(program=shell, executable=resolved_shell, shell=True)
+                return Effect(
+                    (power("process.exec", SHELL_SYNTAX_RESOURCE, PROCESS_TRANSPORT),),
+                    resolved_shell,
+                    dict(detail),
+                    detail,
+                )
+            try:
+                program, resolved = _program(words[0], cwd, search_path, context)
+                candidates.append(power("process.exec", program, PROCESS_TRANSPORT))
+                detail.update(program=program, executable=resolved)
+            except AirlockError:
+                pass
             candidates.append(power("process.exec", shell, PROCESS_TRANSPORT))
             detail.setdefault("program", shell)
             detail.setdefault("executable", resolved_shell)

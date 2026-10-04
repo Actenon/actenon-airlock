@@ -1,6 +1,9 @@
 import json
+import os
 import subprocess
 import sys
+
+import pytest
 
 from actenon_airlock import adapters
 from actenon_airlock.cli import main
@@ -61,6 +64,26 @@ def test_plain_shell_text_binds_to_the_program_scan_named(project):
     assert result.returncode == 0, result.stderr
     [row] = final(receipts(state), "process.")
     assert row["detail"]["shell"] is True and row["detail"]["program"] == "touch"
+
+
+@pytest.mark.parametrize("shell", ["/bin/sh", "/bin/bash"])
+def test_approved_shell_cannot_execute_shell_syntax(project, shell):
+    state = project(
+        "import subprocess\n"
+        f'subprocess.run(["{shell}", "-c", "echo pwned; echo injected"], check=False)\n'
+        'print("RAN")\n'
+    )
+    powers = State(state.root).approved()["powers"]
+    assert any(p["resource"] == os.path.basename(shell) for p in powers)
+    result = run(state)
+    assert result.returncode == 3, result.stderr
+    assert "pwned" not in result.stdout
+    assert "injected" not in result.stdout
+    assert "RAN" not in result.stdout
+    row = final(receipts(state), "process.")[-1]
+    assert row["decision"] == "DENY"
+    assert row["detail"]["program"] == os.path.basename(shell)
+    assert row["credential_released"] is False and row["execution_occurred"] is False
 
 
 def test_shell_syntax_fails_closed_even_when_scan_names_the_first_program(project):
