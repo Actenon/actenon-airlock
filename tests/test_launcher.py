@@ -90,7 +90,7 @@ def test_unscanned_bypass_is_blocked_at_runtime(project, server, source):
 
 
 def test_importing_ctypes_is_not_a_native_call(project):
-    result = run(project('import ctypes\nprint(ctypes.sizeof(ctypes.c_int))\n'))
+    result = run(project("import ctypes\nprint(ctypes.sizeof(ctypes.c_int))\n"))
     assert result.returncode == 0, result.stderr
 
 
