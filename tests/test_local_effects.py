@@ -147,6 +147,55 @@ def test_parent_symlink_cannot_redirect_an_approved_write(project, tmp_path_fact
     assert row["credential_released"] is False and row["execution_occurred"] is False
 
 
+@pytest.mark.parametrize(
+    "source",
+    [
+        "import subprocess\nsubprocess.run([\"python3\", \"-c\", \"open('marker.txt','w').write('pwned')\"])\n",
+        'import subprocess\nsubprocess.run(["perl", "-e", "open(F,\'>marker.txt\');print F \'pwned\'"])\n',
+        "import subprocess\nsubprocess.run([\"node\", \"-e\", \"require('fs').writeFileSync('marker.txt','pwned')\"])\n",
+        'import subprocess\nsubprocess.run(["awk", "BEGIN{print \\"pwned\\" > \\"marker.txt\\"}"])\n',
+        'import subprocess\nsubprocess.run(["env", "/bin/bash", "-c", "echo pwned > marker.txt"])\n',
+        'import subprocess\nsubprocess.run(["nice", "/bin/bash", "-c", "echo pwned > marker.txt"])\n',
+        'import subprocess\nsubprocess.run(["timeout", "5", "/bin/bash", "-c", "echo pwned > marker.txt"])\n',
+        'import subprocess\nsubprocess.run(["xargs", "-0", "/bin/sh", "-c", "echo pwned > marker.txt"])\n',
+        'import subprocess\nsubprocess.run(["stdbuf", "-o0", "/bin/bash", "-c", "echo pwned > marker.txt"])\n',
+        'import subprocess\nsubprocess.run(["setsid", "/bin/bash", "-c", "echo pwned > marker.txt"])\n',
+        'import subprocess\nsubprocess.run(["flock", "lock", "/bin/bash", "-c", "echo pwned > marker.txt"])\n',
+        'import subprocess\nsubprocess.run(["nohup", "/bin/bash", "-c", "echo pwned > marker.txt"])\n',
+        'import subprocess\nsubprocess.run(["find", "tree", "-exec", "/bin/sh", "-c", "echo pwned > marker.txt", ";"])\n',
+        'import subprocess\nsubprocess.run(["git", "-c", "alias.p=!echo pwned > marker.txt", "p"])\n',
+        'import subprocess\nsubprocess.run(["ssh", "-o", "ProxyCommand=echo pwned > marker.txt", "-o", "BatchMode=yes", "-p", "1", "127.0.0.1"])\n',
+    ],
+)
+def test_interpreter_or_wrapper_grant_cannot_run_a_script(project, source):
+    state = project(source)
+    (state.root / "tree").mkdir()
+    result = run(state)
+    assert result.returncode == 3, result.stderr
+    assert "pwned" not in result.stdout
+    assert not (state.root / "marker.txt").exists()
+    row = receipts(state)[-1]
+    assert row["decision"] == "DENY" and row["action"] == "process.exec"
+    assert row["credential_released"] is False and row["execution_occurred"] is False
+
+
+def test_plain_wrapper_still_runs_one_external_program(project):
+    state = project(
+        'import subprocess\nsubprocess.run(["env", "touch", "made.txt"], check=True)\n'
+        'subprocess.run(["timeout", "5", "touch", "other.txt"], check=True)\n'
+        'subprocess.run(["git", "--version"], check=True)\n'
+    )
+    result = run(state)
+    assert result.returncode == 0, result.stderr
+    assert (state.root / "made.txt").exists() and (state.root / "other.txt").exists()
+    rows = final(receipts(state), "process.")
+    assert [row["decision"] for row in rows] == ["ALLOW", "ALLOW", "ALLOW"]
+    assert [row["detail"]["program"] for row in rows] == ["touch", "touch", "git"]
+    assert all(
+        row["credential_released"] is False and row["execution_occurred"] is None for row in rows
+    )
+
+
 def test_shell_syntax_fails_closed_even_when_scan_names_the_first_program(project):
     state = project('import os\nos.system("touch a.txt; touch b.txt")\n')
     assert LOCAL_TOUCH in State(state.root).approved()["powers"]

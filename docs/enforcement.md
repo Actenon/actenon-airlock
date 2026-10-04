@@ -101,11 +101,19 @@ call was denied.
 What a grant means for local effects (shown as "Scope" at approval):
 
 - `process.exec <prog>`: run that program, resolved on the broker's PATH to the same file the agent
-  would exec, with any arguments and no shell syntax. `sh -c` is accepted only for a plain command
-  whose first word is one ordinary program on `PATH` — not a shell builtin, another shell, a script
-  file, stdin, or a login/interactive startup file (`BASH_ENV`, `ENV`, `ZDOTDIR`, `--rcfile`).
-  **The program itself runs outside Airlock**: whatever it does (for example `git clone` networking)
-  is not mediated.
+  would exec, only when the invocation is one plain external program that does not parse a script.
+  `sh -c` is accepted only for a plain command whose first word is one ordinary program on `PATH`
+  — not a shell builtin, another shell, an interpreter (`python`, `perl`, `node`, `awk`, `ruby`,
+  `php`), a script file, stdin, or a login/interactive startup file (`BASH_ENV`, `ENV`, `ZDOTDIR`,
+  `--rcfile`). Wrappers (`env`, `nice`, `nohup`, `timeout`, `xargs`, `stdbuf`, `setsid`, `flock`,
+  `find -exec`, and the same kind of exec wrapper such as `ionice`, `chrt`, `taskset`, `prlimit`,
+  `watch`, `unshare`, and `nsenter`) are accepted only when they exec that same kind of plain
+  program. A wrapper around a shell or interpreter is refused. `watch` and `unshare`/`nsenter`
+  with no command start a shell, and `watch` uses `sh -c` unless `--exec`. `git` config that runs
+  a shell (`alias.*` values starting with `!`, `core.pager`, `pager.*`, `sshCommand`, `fsmonitor`)
+  and `ssh` options that run a local command (`ProxyCommand`, `LocalCommand`, `RemoteCommand`,
+  `KnownHostsCommand`, `PermitLocalCommand`) are refused. **The program itself runs outside
+  Airlock**: whatever a plain program does (for example `git status` or `touch`) is not mediated.
 - `filesystem.write|delete <path>`: create, modify, or remove exactly that path, with Scan's
   `./`, `~/`, or absolute spelling. A Scan-named tree operation (`shutil.rmtree`, `copytree`,
   `mkdir(parents=True)`) is one effect covering its contents and needed ancestors. Writes into
