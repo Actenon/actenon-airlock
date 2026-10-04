@@ -94,8 +94,22 @@ as environment variables, so use os.environ rather than reopening .env from the 
 The terminal prints ALLOW/DENY receipts. Durable evidence is at
 .airlock/local/receipts.jsonl, including action, exact target, source and manifest digests,
 Scan location, Permit decision/grant, proof identifier, Kernel receipt or refusal, timestamp,
-and credential/execution flags. Authorization is recorded before the effect; execution gets a
-linked completion record. A transport failure after dispatch records an unknown execution result.
+and credential/execution flags. Authorization is recorded before the effect; observation gets a
+linked completion record. Consequential HTTP uses Permit's durable effect reservation, verified
+and claimed independently by Kernel before credential release. Lost responses leave AMBIGUOUS
+ownership held, and identical retries remain blocked across new runs and grants. Read-only
+classification comes from Scan; those requests remain repeatable.
+
+A generic HTTP response is returned to the agent, but does not prove the remote consequence
+committed. Its signed receipt says `response-received`, `transport_completed: true`,
+`outcome: AMBIGUOUS`, and `execution_occurred: null`. The effect remains held. A timeout also
+records AMBIGUOUS / OUTCOME_UNKNOWN, never a false statement of non-execution. The local
+fingerprint binds method, exact URL, body and caller headers, with stable parent credential
+references instead of random credential handles. Source/proof/grant changes do not reset it.
+API-specific logical identities and trusted provider reconciliation are still required for
+stronger semantic consequence claims; generic byte identity cannot infer every remote effect.
+The operator reconciliation CLI is not yet available. This development build does not claim
+COMMITTED from HTTP status, cross-host ownership, or complete G1–G40 acceptance.
 Request and response bodies, raw headers, and credential values are not recorded.
 If the agent handles an error itself, Airlock still exits nonzero for a broker denial (3) or
 an uncertain/failed dispatch (4). Discovery and approval-check failures exit 2.

@@ -75,6 +75,10 @@ def render_receipts(result: dict) -> str:
             "credential released" if row.get("credential_released") else "no credential released"
         )
         executed = row.get("execution_occurred")
+        if row.get("outcome"):
+            facts.append("effect: " + safe(row["outcome"]))
+        if row.get("effect_id"):
+            facts.append(safe(row["effect_id"]))
         facts.append(
             {True: "executed", False: "not executed"}.get(
                 executed,

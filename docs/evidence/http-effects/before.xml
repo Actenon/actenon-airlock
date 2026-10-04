@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="0" failures="2" skipped="0" tests="3" time="1.171" timestamp="2026-10-04T18:02:13.568247+01:00" hostname="Rosss-MacBook-Air.local"><testcase classname="tests.test_http_effects" name="test_lost_response_retry_is_refused_after_restart_and_credential_rotation" time="0.050"><failure message="KeyError: 'outcome'">project = &lt;function project.&lt;locals&gt;.create at 0x109f98860&gt;
+monkeypatch = &lt;_pytest.monkeypatch.MonkeyPatch object at 0x109f7bbf0&gt;
+
+    def test_lost_response_retry_is_refused_after_restart_and_credential_rotation(project, monkeypatch):
+        url = "https://api.github.com/repos/acme/support/issues"
+        monkeypatch.setenv("GITHUB_TOKEN", "offline-secret")
+        state = project(f'import requests\nrequests.post("{url}")\n')
+        calls = []
+    
+        def provider(request):
+            calls.append(request)
+            raise httpx.ReadTimeout("effect may have committed", request=request)
+    
+        broker = Broker(state, discover(state.root))
+        broker.http.close()
+        broker.http = httpx.Client(transport=httpx.MockTransport(provider))
+        first_message = message(url)
+        first_message["headers"] = {"Authorization": "Bearer " + broker.markers["GITHUB_TOKEN"]}
+        try:
+            assert not broker.handle(first_message)["ok"]
+            row = json.loads(state.receipts_path.read_text().splitlines()[-1])
+&gt;           assert row["outcome"] == "AMBIGUOUS"
+                   ^^^^^^^^^^^^^^
+E           KeyError: 'outcome'
+
+tests/test_http_effects.py:30: KeyError</failure></testcase><testcase classname="tests.test_http_effects" name="test_generic_http_response_is_not_proof_of_committed_consequence" time="0.514"><failure message="KeyError: 'outcome'">project = &lt;function project.&lt;locals&gt;.create at 0x10a0f9e40&gt;
+server = ('http://127.0.0.1:63961', [('/a', b'hello', {'Host': '127.0.0.1:63961', 'Accept': '*/*', 'Accept-Encoding': 'gzip, deflate', 'Connection': 'keep-alive', ...})])
+
+    def test_generic_http_response_is_not_proof_of_committed_consequence(project, server):
+        url, calls = server
+        state = project(f'import requests\nrequests.post("{url}/a")\n')
+        broker = Broker(state, discover(state.root))
+        try:
+            response = broker.handle(message(url + "/a"))
+            assert response["ok"] and response["response"]["status"] == 200
+            row = json.loads(state.receipts_path.read_text().splitlines()[-1])
+&gt;           assert row["outcome"] == "AMBIGUOUS"
+                   ^^^^^^^^^^^^^^
+E           KeyError: 'outcome'
+
+tests/test_http_effects.py:68: KeyError</failure></testcase><testcase classname="tests.test_http_effects" name="test_scan_read_only_http_operations_remain_repeatable" time="0.541" /></testsuite></testsuites>

@@ -18,15 +18,19 @@ from urllib.parse import urlsplit
 from uuid import uuid4
 
 import httpx
+from actenon.execution.effects import EffectProtector
 from actenon.gate import ActenonGate
 from actenon.replay import ReplayProtector, SqliteReplayStore
 from actenon_permit.boundary.proofs import Ed25519PublicKeyVerifier
 from actenon_permit.ed25519_signer import load_ed25519_keypair
+from actenon_permit.kernel_bridge import claim_effect_at_edge
 from actenon_permit.ledger import Ledger
 from actenon_permit.model import Action, Budget, DecisionOutcome, Grant, Scopes, authority_payload
 from actenon_permit.pdp import PDP
 from actenon_permit.revocation import StoreRevocationChecker
 from actenon_permit.state import SQLiteStore
+from actenon_protocol.effects import EFFECT_PROFILE
+from actenon_scan.authority import classify_http
 
 from .adapters import CHANNELS, Context, scope
 from .manifest import (
@@ -69,10 +73,16 @@ class HttpDispatch:
         ):
             raise AirlockError("Credential handles are forbidden in URLs and request bodies")
         self.headers, _ = broker._headers(message.get("headers", {}), self.url, materialize=False)
+        for name, value in self.headers.items():
+            if name.lower() == "content-length" and value != str(len(self.body)):
+                raise AirlockError("Content-Length differs from the exact approved body")
         self.params = {
             "body_sha256": hashlib.sha256(self.body).hexdigest(),
             "headers_sha256": digest(self.headers),
+            "headers_effect_sha256": digest(broker._effect_headers(self.headers)),
         }
+        self.consequential = not classify_http(self.method, self.url).read_only
+        self.effect_reference = None
         self.response = {}
         self.credential_released = False
         self.attempted = False
@@ -104,7 +114,17 @@ class HttpDispatch:
                 body=base64.b64encode(content).decode(),
                 url=str(response.url),
             )
-        return {"http_status": self.response["status"]}
+        payload = {"http_status": self.response["status"]}
+        if self.effect_reference is not None:
+            # A transport response does not establish the remote consequence.
+            # Preserve the response for the agent while keeping ownership held.
+            payload["effect_evidence"] = {
+                **self.effect_reference,
+                "outcome": "AMBIGUOUS",
+                "execution_occurred": None,
+                "evidence_hash": digest(self.response),
+            }
+        return payload
 
     def reply(self) -> dict:
         return {"response": self.response}
@@ -184,6 +204,22 @@ class Broker:
             replay_protector=ReplayProtector(SqliteReplayStore(state.local / "replay.sqlite3")),
             revocation_checker=StoreRevocationChecker(self.store),
         )
+        self.effect_namespace = "airlock-local:" + hashlib.sha256(key.public_key_bytes).hexdigest()
+        self.effect_edge = ActenonGate(
+            verifier=Ed25519PublicKeyVerifier([key.public_key_jwk]),
+            audience="service:actenon-permit-gateway",
+            issuer="service:actenon-permit",
+            capabilities=tuple(sorted(self.allowed)) or ("airlock.none",),
+            replay_protector=ReplayProtector(SqliteReplayStore(state.local / "replay.sqlite3")),
+            revocation_checker=StoreRevocationChecker(self.store),
+            effect_protector=EffectProtector(
+                self.effect_namespace,
+                lambda reference, request: claim_effect_at_edge(
+                    reference, request, store=self.store
+                ),
+                lambda request: self._http_effect_descriptor(request.intent),
+            ),
+        )
         self.http = httpx.Client(trust_env=False, follow_redirects=False)
         self.denials = 0
         self.execution_errors = 0
@@ -249,6 +285,77 @@ class Broker:
             out[name] = value
         return out, released
 
+    def _effect_headers(self, headers: dict) -> dict:
+        """Stable parent credential references; never raw secrets or random handles."""
+        out = {}
+        names = {marker: name for name, marker in self.markers.items()}
+        for name, value in headers.items():
+            normalized = name.lower()
+            if normalized in out:
+                raise AirlockError("Duplicate case-insensitive HTTP header names are unsupported")
+            parts, position = [], 0
+            for match in MARKER.finditer(value):
+                if match.start() > position:
+                    parts.append({"literal": value[position : match.start()]})
+                marker = match.group()
+                if marker not in names:
+                    raise AirlockError("Unknown credential handle")
+                parts.append({"credential": names[marker], "origin": self.credentials[marker][1]})
+                position = match.end()
+            if position < len(value):
+                parts.append({"literal": value[position:]})
+            out[normalized] = parts
+        return out
+
+    def _http_effect_descriptor(self, intent) -> dict:
+        """Trusted HTTP byte identity, independent of code/proof/run metadata."""
+        return {
+            "profile": EFFECT_PROFILE,
+            "namespace": self.effect_namespace,
+            "kind": "semantic",
+            "action_type": intent.action.capability,
+            "target": {"type": intent.target.resource_type, "id": intent.target.resource_id},
+            "semantic_key": {
+                name: intent.action.parameters[name]
+                for name in ("method", "body_sha256", "headers_effect_sha256")
+            },
+        }
+
+    def _settle_http_effect(self, intent, proof, outcome, dispatch):
+        reference = proof.extensions["effect"]
+        evidence = outcome.receipt.extensions.get("effect") if outcome.receipt else None
+        if evidence is None:
+            if dispatch.attempted:
+                # No returned receipt can turn a possible dispatch into non-execution.
+                evidence = {
+                    **reference,
+                    "outcome": "AMBIGUOUS",
+                    "execution_occurred": None,
+                    "evidence_hash": digest(
+                        {"proof_id": proof.pccb_id, "observation": "dispatch outcome unavailable"}
+                    ),
+                }
+            else:
+                evidence = {
+                    **reference,
+                    "outcome": "NOT_EXECUTED",
+                    "execution_occurred": False,
+                    "evidence_hash": digest(
+                        {"proof_id": proof.pccb_id, "observation": "parent dispatch not entered"}
+                    ),
+                }
+        self.store.settle_effect(
+            reference=reference,
+            grant_id=self.grant.id,
+            principal=intent.requester.id,
+            action_hash=proof.action_hash.value,
+            outcome=evidence["outcome"],
+            execution_occurred=evidence["execution_occurred"],
+            evidence_hash=evidence["evidence_hash"],
+            observer="airlock-parent-http",
+        )
+        return evidence
+
     def handle(self, message: dict) -> dict:
         if message.get("kind") == "audit-deny":
             return self._deny(
@@ -259,6 +366,9 @@ class Broker:
         adapter = CHANNELS.get(message.get("kind"))
         action_name = adapter.default_action if adapter else "unsupported"
         target, labels = "<unresolved>", {"adapter": adapter.channel if adapter else None}
+        dispatch = None
+        proof = None
+        protected_effect = False
         try:
             if adapter is None:
                 raise AirlockError("No Airlock adapter for this runtime effect")
@@ -300,17 +410,36 @@ class Broker:
                 != authority_payload(self.grant.model_dump(mode="json"))
             ):
                 raise AirlockError("Signed Permit grant could not be verified")
-            decision, intent, proof = self.pdp.decide_and_mint_pccb(grant, action)
+            protected_effect = isinstance(dispatch, HttpDispatch) and dispatch.consequential
+            decision, intent, proof = self.pdp.decide_and_mint_pccb(
+                grant,
+                action,
+                **(
+                    {
+                        "effect_namespace": self.effect_namespace,
+                        "effect_descriptor_builder": self._http_effect_descriptor,
+                    }
+                    if protected_effect
+                    else {}
+                ),
+            )
             if decision.outcome != DecisionOutcome.ALLOW:
                 return self._deny(
                     action_name,
                     target,
                     decision.reason,
                     permit_decision=decision.model_dump(mode="json"),
+                    **(
+                        {"effect_id": decision.state_delta["effect_id"]}
+                        if "effect_id" in decision.state_delta
+                        else {}
+                    ),
                     **labels,
                 )
             if dispatch is None:
                 raise AirlockError("No execution adapter for " + action_name)
+            if protected_effect:
+                dispatch.effect_reference = proof.extensions["effect"]
             pending = self._receipt(
                 action_name,
                 target,
@@ -324,31 +453,53 @@ class Broker:
                 scope=scope(entry),
                 **labels,
             )
-            try:
-                outcome = self.edge.protect(intent, proof, dispatch.run)
-            except Exception as exc:
-                self.execution_errors += 1
+            edge = self.effect_edge if protected_effect else self.edge
+            outcome = edge.protect(intent, proof, dispatch.run)
+            effect_evidence = (
+                self._settle_http_effect(intent, proof, outcome, dispatch)
+                if protected_effect
+                else None
+            )
+            if protected_effect and dispatch.response:
                 row = self._receipt(
                     action_name,
                     target,
-                    "Transport failed: " + type(exc).__name__,
+                    "HTTP response received; remote consequence remains unconfirmed",
                     decision="ALLOW",
-                    stage="execution-error",
+                    stage="response-received",
+                    outcome=effect_evidence["outcome"],
+                    effect_id=effect_evidence["effect_id"],
+                    effect=effect_evidence,
+                    transport_completed=True,
+                    execution_occurred=effect_evidence["execution_occurred"],
                     proof_id=proof.pccb_id,
+                    kernel=outcome.to_dict(),
                     credential_released=dispatch.credential_released,
-                    execution_attempted=dispatch.attempted,
-                    execution_occurred=None if dispatch.attempted else False,
                     parent_receipt_id=pending["id"],
+                    evidence=entry["evidence"],
+                    scope=scope(entry),
                     **labels,
                 )
-                return {"ok": False, "reason": row["reason"], "receipt_id": row["id"]}
+                print(
+                    f"AIRLOCK ALLOW {action_name} @ {target}: HTTP response received; remote effect AMBIGUOUS, blind retries blocked [{row['id']}]",
+                    file=sys.stderr,
+                )
+                return {
+                    "ok": True,
+                    **dispatch.reply(),
+                    "receipt_id": row["id"],
+                    "effect_id": effect_evidence["effect_id"],
+                    "outcome": effect_evidence["outcome"],
+                }
             if not outcome.ok:
                 if dispatch.attempted:
                     self.execution_errors += 1
                     row = self._receipt(
                         action_name,
                         target,
-                        "Authorized dispatch failed: " + (outcome.reason_code or "unknown"),
+                        "Execution outcome is unknown; effect remains held"
+                        if effect_evidence and effect_evidence["outcome"] == "AMBIGUOUS"
+                        else "Authorized dispatch failed: " + (outcome.reason_code or "unknown"),
                         decision="ALLOW",
                         stage="execution-error",
                         proof_id=proof.pccb_id,
@@ -357,6 +508,15 @@ class Broker:
                         execution_attempted=True,
                         execution_occurred=None,
                         parent_receipt_id=pending["id"],
+                        **(
+                            {
+                                "outcome": effect_evidence["outcome"],
+                                "effect_id": effect_evidence["effect_id"],
+                                "effect": effect_evidence,
+                            }
+                            if effect_evidence
+                            else {}
+                        ),
                         **labels,
                     )
                     return {"ok": False, "reason": row["reason"], "receipt_id": row["id"]}
@@ -389,6 +549,32 @@ class Broker:
             print(f"AIRLOCK ALLOW {action_name} @ {target} [{row['id']}]", file=sys.stderr)
             return {"ok": True, **dispatch.reply(), "receipt_id": row["id"]}
         except Exception as exc:
+            if dispatch is not None and dispatch.attempted:
+                # Settlement/receipt/transport failures after dispatch cannot
+                # truthfully become a pre-execution DENY or release ownership.
+                self.execution_errors += 1
+                row = self._receipt(
+                    action_name,
+                    target,
+                    "Execution observation unavailable; effect remains held",
+                    decision="ALLOW",
+                    stage="execution-error",
+                    execution_occurred=None,
+                    execution_attempted=True,
+                    credential_released=dispatch.credential_released,
+                    proof_id=proof.pccb_id if proof else None,
+                    parent_receipt_id=pending["id"],
+                    **(
+                        {
+                            "outcome": "AMBIGUOUS",
+                            "effect_id": proof.extensions["effect"]["effect_id"],
+                        }
+                        if protected_effect and proof
+                        else {}
+                    ),
+                    **labels,
+                )
+                return {"ok": False, "reason": row["reason"], "receipt_id": row["id"]}
             reason = (
                 str(exc)
                 if isinstance(exc, AirlockError)
