@@ -51,7 +51,16 @@ def test_plain_and_shell_process_requests_name_scan_programs(tmp_path):
     assert names(adapter.classify(shell, context(tmp_path))) == ["touch", "sh"]
     for text in ["touch a; rm b", "touch $HOME", "touch a | cat", "X=1 touch a", "touch *"]:
         effect = adapter.classify(proc(["/bin/sh", "-c", text]), context(tmp_path))
-        assert names(effect) == ["sh"], text
+        assert names(effect) == ["<shell-syntax>"], text
+        assert effect.detail["program"] == "sh"
+    bash = adapter.classify(proc(["/bin/bash", "-c", "echo a; echo b"]), context(tmp_path))
+    assert names(bash) == ["<shell-syntax>"] and bash.detail["program"] == "bash"
+    split = proc(["/bin/sh", "-l", "-c", "echo a; echo b"])
+    assert names(adapter.classify(split, context(tmp_path))) == ["<shell-syntax>"]
+    rcfile = proc(["/bin/bash", "--rcfile", "/dev/null", "-c", "echo a; echo b"])
+    assert names(adapter.classify(rcfile, context(tmp_path))) == ["<shell-syntax>"]
+    plain_login = proc(["/bin/sh", "-lc", "touch 'a b'"])
+    assert names(adapter.classify(plain_login, context(tmp_path))) == ["touch", "sh"]
 
 
 def test_process_identity_must_match_the_broker_path(tmp_path):
