@@ -1,0 +1,123 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="0" failures="6" skipped="0" tests="6" time="1.803" timestamp="2026-10-04T23:56:55.176960+01:00" hostname="Rosss-MacBook-Air.local"><testcase classname="tests.test_model_endpoints" name="test_custom_endpoint_cannot_bypass_signed_model_constraints[body0]" time="0.352"><failure message="assert not True">tmp_path = PosixPath('/private/var/folders/tz/y04t4d0900xdbmz96jp608180000gn/T/pytest-of-ross/pytest-369/test_custom_endpoint_cannot_by0')
+body = {'model': 'unapproved'}
+
+    @pytest.mark.parametrize("body", [{"model": "unapproved"}, {"max_tokens": 129}, {"tools": []}])
+    def test_custom_endpoint_cannot_bypass_signed_model_constraints(tmp_path, body):
+        state = setup(tmp_path)
+        broker = ProtectedBroker(state, discover(tmp_path, env={}))
+        calls = []
+        broker.http.close()
+        broker.http = httpx.Client(
+            transport=httpx.MockTransport(lambda req: calls.append(req) or httpx.Response(200, json={}))
+        )
+        try:
+&gt;           assert not broker.handle(message(**body))["ok"]
+E           assert not True
+
+tests/test_model_endpoints.py:57: AssertionError</failure></testcase><testcase classname="tests.test_model_endpoints" name="test_custom_endpoint_cannot_bypass_signed_model_constraints[body1]" time="0.133"><failure message="assert not True">tmp_path = PosixPath('/private/var/folders/tz/y04t4d0900xdbmz96jp608180000gn/T/pytest-of-ross/pytest-369/test_custom_endpoint_cannot_by1')
+body = {'max_tokens': 129}
+
+    @pytest.mark.parametrize("body", [{"model": "unapproved"}, {"max_tokens": 129}, {"tools": []}])
+    def test_custom_endpoint_cannot_bypass_signed_model_constraints(tmp_path, body):
+        state = setup(tmp_path)
+        broker = ProtectedBroker(state, discover(tmp_path, env={}))
+        calls = []
+        broker.http.close()
+        broker.http = httpx.Client(
+            transport=httpx.MockTransport(lambda req: calls.append(req) or httpx.Response(200, json={}))
+        )
+        try:
+&gt;           assert not broker.handle(message(**body))["ok"]
+E           assert not True
+
+tests/test_model_endpoints.py:57: AssertionError</failure></testcase><testcase classname="tests.test_model_endpoints" name="test_custom_endpoint_cannot_bypass_signed_model_constraints[body2]" time="0.109"><failure message="assert not True">tmp_path = PosixPath('/private/var/folders/tz/y04t4d0900xdbmz96jp608180000gn/T/pytest-of-ross/pytest-369/test_custom_endpoint_cannot_by2')
+body = {'tools': []}
+
+    @pytest.mark.parametrize("body", [{"model": "unapproved"}, {"max_tokens": 129}, {"tools": []}])
+    def test_custom_endpoint_cannot_bypass_signed_model_constraints(tmp_path, body):
+        state = setup(tmp_path)
+        broker = ProtectedBroker(state, discover(tmp_path, env={}))
+        calls = []
+        broker.http.close()
+        broker.http = httpx.Client(
+            transport=httpx.MockTransport(lambda req: calls.append(req) or httpx.Response(200, json={}))
+        )
+        try:
+&gt;           assert not broker.handle(message(**body))["ok"]
+E           assert not True
+
+tests/test_model_endpoints.py:57: AssertionError</failure></testcase><testcase classname="tests.test_model_endpoints" name="test_custom_model_endpoint_keeps_scan_target_proof_and_transport_identical" time="0.118"><failure message="KeyError: 'max_tokens'">tmp_path = PosixPath('/private/var/folders/tz/y04t4d0900xdbmz96jp608180000gn/T/pytest-of-ross/pytest-369/test_custom_model_endpoint_kee0')
+
+    def test_custom_model_endpoint_keeps_scan_target_proof_and_transport_identical(tmp_path):
+        state = setup(tmp_path)
+        current = discover(tmp_path, env={})
+        assert current["powers"] == [
+            {"action": "http.post", "resource": "127.0.0.1:11434/v1/chat/completions", "transport": ENDPOINT}
+        ]
+        broker = ProtectedBroker(state, current)
+        calls = []
+    
+        def provider(req):
+            calls.append(req)
+            return httpx.Response(
+                200,
+                json={
+                    "model": "test-model",
+                    "choices": [{"finish_reason": "stop", "message": {"role": "assistant", "content": "fixed"}}],
+                    "usage": {"prompt_tokens": 12, "completion_tokens": 2},
+                },
+            )
+    
+        broker.http.close()
+        broker.http = httpx.Client(transport=httpx.MockTransport(provider))
+        try:
+            value = broker.handle(message())
+            assert value["ok"], value
+            assert str(calls[0].url) == ENDPOINT
+&gt;           assert json.loads(calls[0].content)["max_tokens"] == 128
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E           KeyError: 'max_tokens'
+
+tests/test_model_endpoints.py:93: KeyError</failure></testcase><testcase classname="tests.test_model_endpoints" name="test_endpoint_change_is_authority_expansion_even_with_identical_code_powers" time="0.001"><failure message="assert False">def test_endpoint_change_is_authority_expansion_even_with_identical_code_powers():
+        before = {"powers": [], "protected_model": PROFILE}
+        after = {
+            "powers": [],
+            "protected_model": {**PROFILE, "endpoint": "https://model.example/v1/chat/completions"},
+        }
+        result = authority_diff(before, after)
+&gt;       assert result["model_constraints"]["expanded"]
+E       assert False
+
+tests/test_model_endpoints.py:112: AssertionError</failure></testcase><testcase classname="tests.test_model_endpoints" name="test_cli_reviews_and_signs_custom_endpoint_without_creating_source_authority" time="0.034"><failure message="SystemExit: 2">tmp_path = PosixPath('/private/var/folders/tz/y04t4d0900xdbmz96jp608180000gn/T/pytest-of-ross/pytest-369/test_cli_reviews_and_signs_cus0')
+
+    def test_cli_reviews_and_signs_custom_endpoint_without_creating_source_authority(tmp_path):
+        state = setup(tmp_path)
+&gt;       assert main(
+            [
+                "init", "--path", str(tmp_path), "--approve", "--model", "test-model",
+                "--model-endpoint", ENDPOINT, "--model-max-tokens", "128",
+            ]
+        ) == 0
+
+tests/test_model_endpoints.py:118: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+src/actenon_airlock/cli.py:211: in main
+    args = parser.parse_args(argv)
+           ^^^^^^^^^^^^^^^^^^^^^^^
+/Users/ross/.local/share/uv/python/cpython-3.12.13-macos-aarch64-none/lib/python3.12/argparse.py:1908: in parse_args
+    self.error(msg)
+/Users/ross/.local/share/uv/python/cpython-3.12.13-macos-aarch64-none/lib/python3.12/argparse.py:2650: in error
+    self.exit(2, _('%(prog)s: error: %(message)s\n') % args)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = ArgumentParser(prog='__main__.py', usage=None, description='See and control the powers of your Python AI agent.', formatter_class=&lt;class 'argparse.HelpFormatter'&gt;, conflict_handler='error', add_help=True)
+status = 2
+message = '__main__.py: error: unrecognized arguments: --model-endpoint http://127.0.0.1:11434/v1/chat/completions\n'
+
+    def exit(self, status=0, message=None):
+        if message:
+            self._print_message(message, _sys.stderr)
+&gt;       _sys.exit(status)
+E       SystemExit: 2
+
+/Users/ross/.local/share/uv/python/cpython-3.12.13-macos-aarch64-none/lib/python3.12/argparse.py:2637: SystemExit</failure></testcase></testsuite></testsuites>

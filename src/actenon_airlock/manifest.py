@@ -18,6 +18,7 @@ from .common import (
     power,
     validate_url,
 )
+from .model_constraints import endpoint as model_endpoint
 
 __all__ = [
     "SECRET_NAME",
@@ -146,10 +147,11 @@ def authority_diff(before: dict, after: dict) -> dict:
         model_expanded = bool(new_model) and (
             not old_model
             or new_model["provider"] != old_model["provider"]
+            or model_endpoint(new_model) != model_endpoint(old_model)
             or not set(new_model["models"]).issubset(old_model["models"])
             or new_model["max_output_tokens"] > old_model["max_output_tokens"]
         )
-    except (KeyError, TypeError):
+    except (AirlockError, KeyError, TypeError):
         model_expanded = True
     return {
         "schema": "actenon-airlock/diff/v1",

@@ -27,14 +27,12 @@ from actenon_scan.authority import classify_http
 from .broker import Broker
 from .common import AirlockError, canonical, power, validate_url
 from .manifest import EXCLUDED, authority_diff, capability, digest, discover, source_fingerprint
+from .model_constraints import DEFAULT_ENDPOINTS, endpoint, scan_transports, validate_profile
 from .state import State, atomic_json
 from .wire import LIMIT
 
 DEFAULT_IMAGE = "actenon-airlock-compute:dev"
-MODEL_ENDPOINTS = {
-    "https://api.openai.com/v1/chat/completions": "openai",
-    "https://api.anthropic.com/v1/messages": "anthropic",
-}
+MODEL_ENDPOINTS = {url: provider for provider, url in DEFAULT_ENDPOINTS.items()}
 EXCLUDED_INPUT = EXCLUDED | {".ssh", ".aws", ".azure", ".config", ".gnupg", ".docker"}
 
 
@@ -184,6 +182,18 @@ class ProtectedBroker(Broker):
         self.approval_envelope = json.loads((state.path / "approved.json").read_text())
         if self.approval_envelope.get("payload") != self.approval:
             raise AirlockError("Approval changed during protected initialization")
+        if self.approval.get("protected_model"):
+            validate_profile(self.approval["protected_model"])
+        self.model_transports = {**MODEL_ENDPOINTS, **scan_transports(current)}
+        if self.approval.get("protected_model"):
+            selected = self.approval["protected_model"]
+            target = endpoint(selected)
+            if (
+                target in self.model_transports
+                and self.model_transports[target] != selected["provider"]
+            ):
+                raise AirlockError("Selected model format disagrees with native Scan transport")
+            self.model_transports[target] = selected["provider"]
         super().__init__(state, current, bindings)
 
     def grant_principal(self):
@@ -224,11 +234,17 @@ class ProtectedBroker(Broker):
         return "airlock.unresolved." + digest(first), {**first, "evidence": None}
 
     def model_body(self, url, body):
-        provider = MODEL_ENDPOINTS.get(url)
+        provider = self.model_transports.get(url)
         if not provider:
             return body
+        if provider == "unsupported":
+            raise AirlockError("No protected executor for this Scan SDK operation")
         profile = self.approval.get("protected_model", {})
-        if profile.get("provider") != provider or not profile.get("models"):
+        if (
+            profile.get("provider") != provider
+            or not profile.get("models")
+            or endpoint(profile) != url
+        ):
             raise AirlockError("Model access requires an explicitly approved model constraint")
         request = json.loads(body)
         if not isinstance(request, dict) or request.get("model") not in profile["models"]:
@@ -277,13 +293,13 @@ class ProtectedBroker(Broker):
         return canonical(request)
 
     def http_outcome(self, dispatch):
-        if dispatch.url not in MODEL_ENDPOINTS or dispatch.response.get("status") != 200:
+        if dispatch.url not in self.model_transports or dispatch.response.get("status") != 200:
             return super().http_outcome(dispatch)
         try:
             response = json.loads(base64.b64decode(dispatch.response["body"], validate=True))
             request = json.loads(dispatch.body)
             usage = response["usage"]
-            if MODEL_ENDPOINTS[dispatch.url] == "openai":
+            if self.model_transports[dispatch.url] == "openai":
                 counts = [usage["prompt_tokens"], usage["completion_tokens"]]
                 output = response["choices"][0]
                 valid_output = (
@@ -328,7 +344,7 @@ class ProtectedBroker(Broker):
                 raise AirlockError("Unsupported HTTP method")
             action_name, target = classify_http(method, url).action, url
             body = base64.b64decode(message.get("body", ""), validate=True)
-            if url in MODEL_ENDPOINTS:
+            if url in self.model_transports:
                 if method != "POST":
                     raise AirlockError("Model inference requires POST")
                 body = self.model_body(url, body)
@@ -487,6 +503,17 @@ def launch_protected(root, command, *, image=DEFAULT_IMAGE):
         for name in ("contained_bridge.py", "contained_agent.py"):
             shutil.copyfile(Path(__file__).with_name(name), control / name)
             os.chmod(control / name, 0o444)
+        # Convenience routing only. The supervisor independently checks the same
+        # exact target; replacing this public mapping cannot create authority.
+        model_targets = {
+            "/v1/chat/completions": DEFAULT_ENDPOINTS["openai"],
+            "/v1/messages": DEFAULT_ENDPOINTS["anthropic"],
+        }
+        profile = approved.get("protected_model", {})
+        if profile:
+            path = "/v1/chat/completions" if profile["provider"] == "openai" else "/v1/messages"
+            model_targets[path] = endpoint(profile)
+        atomic_json(control / "model-targets.json", model_targets, 0o444)
         docker.call(["volume", "create", volume])
         fixed = [
             "create",
@@ -526,6 +553,8 @@ def launch_protected(root, command, *, image=DEFAULT_IMAGE):
             "TMPDIR=/workspace/.tmp",
             "--env",
             "PYTHONDONTWRITEBYTECODE=1",
+            "--env",
+            "TIKTOKEN_CACHE_DIR=/opt/airlock/tiktoken",
         ]
         bridge_id = docker.call(
             [
