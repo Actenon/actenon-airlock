@@ -217,11 +217,55 @@ class State:
                     problem = "hash chain broken (a receipt was removed, reordered, or edited)"
                 else:
                     try:
+                        checking_observer = False
                         verifier.verify(
                             b64url_decode(signature["value"]), RECEIPT_DOMAIN + canonical(unsigned)
                         )
+                        if row.get("stage") in {"reconciliation-requested", "reconciled"}:
+                            checking_observer = True
+                            from .reconciliation import verify_observation
+
+                            observation = verify_observation(
+                                row["reconciliation"],
+                                row["authority_approval"],
+                                public,
+                                at=datetime.fromisoformat(
+                                    row["settled_at"]
+                                    if row["stage"] == "reconciled"
+                                    else row["timestamp"]
+                                ),
+                            )
+                            if (
+                                any(
+                                    row.get(name) != observation[name]
+                                    for name in (
+                                        "action",
+                                        "target",
+                                        "grant_id",
+                                        "proof_id",
+                                        "source_digest",
+                                        "manifest_digest",
+                                    )
+                                )
+                                or row.get("effect_id") != observation["reference"]["effect_id"]
+                            ):
+                                raise ValueError(
+                                    "reconciliation receipt differs from its signed observation"
+                                )
+                            if row["stage"] == "reconciled" and (
+                                row.get("outcome") != observation["outcome"]
+                                or row.get("execution_occurred")
+                                is not observation["execution_occurred"]
+                            ):
+                                raise ValueError(
+                                    "reconciliation receipt contradicts its observation"
+                                )
                     except Exception:
-                        problem = "signature does not verify against public-key.json"
+                        problem = (
+                            "observer evidence does not verify against public-key.json"
+                            if checking_observer
+                            else "signature does not verify against public-key.json"
+                        )
             prev = hashlib.sha256(line).hexdigest()
             rows.append(
                 {"line": number, "row": row, "verified": problem is None, "problem": problem}

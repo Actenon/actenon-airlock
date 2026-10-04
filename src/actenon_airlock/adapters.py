@@ -283,6 +283,8 @@ class FilesystemAdapter(Adapter):
 
     def classify(self, message, context):
         operation, path, cwd = message["operation"], message["path"], message["cwd"]
+        if operation in {"os.link", "os.symlink"}:
+            raise AirlockError("Link creation requires protected filesystem object binding")
         if operation in FS_WRITE:
             action = "filesystem.write"
         elif operation in FS_DELETE:
@@ -304,6 +306,17 @@ class FilesystemAdapter(Adapter):
             if not isinstance(src, str) or "\x00" in src:
                 raise AirlockError("Malformed filesystem request")
             detail["src"] = os.path.normpath(os.path.join(cwd, src))
+            source = Path(detail["src"]).resolve()
+            if (
+                not source.is_relative_to(context.root)
+                or (context.root / ".airlock").is_relative_to(source)
+                or ".airlock" in source.parts
+                or source.name.startswith(".env")
+                or source.suffix in {".pem", ".key", ".p12"}
+            ):
+                raise AirlockError(
+                    "Consumed filesystem source is outside the project or private, including Airlock state"
+                )
             paths.append(detail["src"])
         if any(p == state or p.startswith(state + os.sep) for p in paths):
             raise AirlockError("Airlock state is not writable by the agent")

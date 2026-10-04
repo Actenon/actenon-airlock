@@ -40,9 +40,12 @@ The response reaches the agent with a signed AMBIGUOUS observation and ownership
 held. Lost responses produce OUTCOME_UNKNOWN / AMBIGUOUS, and a new run cannot
 blindly repeat the same fingerprint. Post-dispatch settlement failures also keep
 ownership held; they never become a pre-execution DENY with false non-execution.
-API-specific identities, authenticated provider/operator reconciliation and
-cumulative production budgets remain required work. The reconcile CLI is not yet
-available. Query/IPv6 mutation targets rejected by the current effect contract
+The reconcile CLI and signed provider observation hook authenticate a separately
+approved observer, bind its assertion to the original reservation, and use Permit
+to check the reviewed event and expiry inside the settlement transaction. They do
+not independently prove that an observer's assertion about remote state is true.
+API-specific identities, provider-specific finality observers and cumulative
+production budgets remain required work. Query/IPv6 mutation targets rejected by the current effect contract
 remain fail closed pending portable canonical-target support.
 
 Only the verified gate callback resolves credentials and performs the HTTP request.
@@ -105,6 +108,10 @@ What a grant means for local effects (shown as "Scope" at approval):
   `./`, `~/`, or absolute spelling. A Scan-named tree operation (`shutil.rmtree`, `copytree`,
   `mkdir(parents=True)`) is one effect covering its contents and needed ancestors. Writes into
   `.airlock`, `dir_fd`-relative calls, and writes that follow a symlinked leaf fail closed.
+  Link creation is refused in cooperative mode, including inside an approved tree operation.
+  Consumed move/rename sources must remain inside the project and cannot expose private
+  files or Airlock state under another name. These checks do not establish OS object identity
+  against external races, native code or an uncontained delegated process.
 - `github.graphql`: any query or mutation the bound credential permits. Scan has no GraphQL operation
   vocabulary yet.
 

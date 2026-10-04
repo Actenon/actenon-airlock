@@ -36,6 +36,8 @@ UNSUPPORTED = {
     "os.forkpty",
     "ctypes.dlopen",
     "ctypes.dlsym",
+    "os.link",
+    "os.symlink",
 }
 # audit event -> (path argument, dir_fd argument or None, consumed source argument or None)
 FS_EVENTS = {
@@ -239,6 +241,16 @@ def install(sock, root: Path):
         return False
 
     def filesystem(operation, path, src=None, dir_fd=False):
+        if src is not None:
+            source = Path(lexical(src)).resolve()
+            if (
+                not source.is_relative_to(root)
+                or (root / ".airlock").is_relative_to(source)
+                or ".airlock" in source.parts
+                or source.name.startswith(".env")
+                or source.suffix in {".pem", ".key", ".p12"}
+            ):
+                refuse("credential.move", str(source))
         absolute = None if dir_fd else lexical(path)
         if in_scope(operation, absolute, dir_fd):
             return

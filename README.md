@@ -1,10 +1,11 @@
 # Actenon Airlock
 
-**See what new powers your AI agent gained before it uses them.**
+**See what new powers your AI agent gained—and block them until approved.**
 
-Airlock discovers authority from Python source with Actenon Scan, shows new and removed powers,
-and brokers supported HTTP calls through Actenon Permit and Kernel. A new or unresolved power
-cannot execute through that broker until its resolved authority is explicitly approved.
+Airlock scans Python source, shows new and removed powers, and checks supported HTTP calls
+before they execute. New and unresolved powers stay blocked. Consequential requests reserve
+their effect before dispatch; duplicates and blind retries of uncertain outcomes are refused.
+Signed receipts preserve each decision and its evidence.
 
 This is an installable development product, version 0.1.0.dev0. Its dependencies are pinned to the
 merged, unified ecosystem line. These are staging source pins; public registry dependencies are still
@@ -108,7 +109,10 @@ fingerprint binds method, exact URL, body and caller headers, with stable parent
 references instead of random credential handles. Source/proof/grant changes do not reset it.
 API-specific logical identities and trusted provider reconciliation are still required for
 stronger semantic consequence claims; generic byte identity cannot infer every remote effect.
-The operator reconciliation CLI is not yet available. This development build does not claim
+Use `airlock reconcile <effect-id>` to inspect a held effect. An explicitly approved,
+separate observer key can attest `--committed` or `--not-executed`, with evidence bound to
+the exact original attempt and the ledger state reviewed. See [reconciliation](docs/reconciliation.md)
+for local signing, detached review and the authenticated provider hook. This build does not claim
 COMMITTED from HTTP status, cross-host ownership, or complete G1–G40 acceptance.
 Request and response bodies, raw headers, and credential values are not recorded.
 If the agent handles an error itself, Airlock still exits nonzero for a broker denial (3) or

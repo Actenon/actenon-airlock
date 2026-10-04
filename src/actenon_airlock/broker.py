@@ -660,9 +660,10 @@ def launch(root: Path, command: list[str], bindings: dict | None = None) -> int:
         thread.join(timeout=35)
         if thread.is_alive() or errors:
             raise AirlockError("Broker connection failed closed")
-        return (
-            result if result else (3 if broker.denials else (4 if broker.execution_errors else 0))
-        )
+        # Libraries can wrap a RuntimeDenied exception (e.g. shutil.Error).
+        # The broker's recorded refusal/uncertainty determines Airlock's exit
+        # status even when that wrapper makes the agent itself exit nonzero.
+        return 3 if broker.denials else (4 if broker.execution_errors else result)
     finally:
         child.close()
         if process is not None and process.poll() is None:

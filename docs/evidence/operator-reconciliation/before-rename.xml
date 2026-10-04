@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="0" failures="1" skipped="0" tests="3" time="1.011" timestamp="2026-10-04T18:58:58.360408+01:00" hostname="Rosss-MacBook-Air.local"><testcase classname="tests.test_reconciliation" name="test_cooperative_agent_cannot_alias_external_operator_key[link]" time="0.366" /><testcase classname="tests.test_reconciliation" name="test_cooperative_agent_cannot_alias_external_operator_key[symlink]" time="0.277" /><testcase classname="tests.test_reconciliation" name="test_cooperative_agent_cannot_alias_external_operator_key[rename]" time="0.282"><failure message="AssertionError: assert 0 == 3&#10; +  where 0 = main(['run', '--path', '/private/var/folders/tz/y04t4d0900xdbmz96jp608180000gn/T/pytest-of-ross/pytest-323/test_cooperative_agent_cannot_2'])">tmp_path = PosixPath('/private/var/folders/tz/y04t4d0900xdbmz96jp608180000gn/T/pytest-of-ross/pytest-323/test_cooperative_agent_cannot_2')
+operation = 'rename'
+
+    @pytest.mark.parametrize("operation", ["link", "symlink", "rename"])
+    def test_cooperative_agent_cannot_alias_external_operator_key(tmp_path, operation):
+        key_path = tmp_path.parent / (tmp_path.name + "-operator.key")
+        (tmp_path / "main.py").write_text(f"import os\nfrom pathlib import Path\nos.{operation}({str(key_path)!r}, 'alias.txt')\nPath('alias.txt').read_text()\n")
+        assert main(["init", "--path", str(tmp_path), "--approve", "--reconciler-key", str(key_path)]) == 0
+&gt;       assert main(["run", "--path", str(tmp_path)]) == 3
+E       AssertionError: assert 0 == 3
+E        +  where 0 = main(['run', '--path', '/private/var/folders/tz/y04t4d0900xdbmz96jp608180000gn/T/pytest-of-ross/pytest-323/test_cooperative_agent_cannot_2'])
+
+tests/test_reconciliation.py:332: AssertionError</failure></testcase></testsuite></testsuites>

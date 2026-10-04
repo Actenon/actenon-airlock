@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="0" failures="1" skipped="0" tests="1" time="0.445" timestamp="2026-10-04T19:07:35.929630+01:00" hostname="Rosss-MacBook-Air.local"><testcase classname="tests.test_reconciliation" name="test_approved_tree_copy_cannot_hardlink_private_key_instead_of_source" time="0.362"><failure message="AssertionError: assert 0 == 3&#10; +  where 0 = main(['run', '--path', '/private/var/folders/tz/y04t4d0900xdbmz96jp608180000gn/T/pytest-of-ross/pytest-327/test_approved_tree_copy_cannot0'])">tmp_path = PosixPath('/private/var/folders/tz/y04t4d0900xdbmz96jp608180000gn/T/pytest-of-ross/pytest-327/test_approved_tree_copy_cannot0')
+
+    def test_approved_tree_copy_cannot_hardlink_private_key_instead_of_source(tmp_path):
+        key_path = tmp_path.parent / (tmp_path.name + "-operator.key")
+        (tmp_path / "main.py").write_text(
+            "import os, shutil\nfrom pathlib import Path\n"
+            f"def copy(src, dst):\n    os.link({str(key_path)!r}, dst)\n    return dst\n"
+            "shutil.copytree('inputs', 'out', copy_function=copy)\n"
+            "Path('out/data.txt').read_text()\n"
+        )
+        (tmp_path / "inputs").mkdir()
+        (tmp_path / "inputs/data.txt").write_text("ordinary input")
+        assert main(["init", "--path", str(tmp_path), "--approve", "--reconciler-key", str(key_path)]) == 0
+&gt;       assert main(["run", "--path", str(tmp_path)]) == 3
+E       AssertionError: assert 0 == 3
+E        +  where 0 = main(['run', '--path', '/private/var/folders/tz/y04t4d0900xdbmz96jp608180000gn/T/pytest-of-ross/pytest-327/test_approved_tree_copy_cannot0'])
+
+tests/test_reconciliation.py:368: AssertionError</failure></testcase></testsuite></testsuites>
