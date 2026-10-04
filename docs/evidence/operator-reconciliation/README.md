@@ -1,9 +1,16 @@
 # Authenticated operator reconciliation
 
 The real Permit ledger and Kernel-backed HTTP broker are under test. Airlock
-consumes merged Permit ca2c6e85 (state and expiry binding), Kernel 9dd6af89,
+consumes merged Permit 2074cde4 (state/expiry binding and atomic ledger migration), Kernel 9dd6af89,
 Protocol 3442bf3c and Scan ee971b43. Final validation uses these immutable pins,
 not the temporary editable Permit candidate used for early falsification.
+
+The first PR CI exposed a real concurrent schema migration race: Python 3.11
+failed with `duplicate column name: failure_code` in the existing two-process
+effect test. Permit PR #31 serializes inspection and schema changes in one
+write transaction, with rollback on failure. Its preserved CI log and regression
+evidence are in Permit `docs/evidence/atomic-ledger-migration`. This pin consumes
+that merged repair; the Airlock concurrent test remains unchanged.
 
 `before-contract.xml` records the previously missing product workflow (module
 unavailable), not an execution attack. `before-rename.xml` records an actual

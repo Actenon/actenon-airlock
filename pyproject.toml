@@ -13,7 +13,7 @@ dependencies = [
   "actenon-scan @ git+https://github.com/Actenon/actenon-scan.git@ee971b43c78ed8b58f5f7fb59382ab20ce9b8a5c",
   "actenon-protocol @ git+https://github.com/Actenon/actenon-protocol.git@3442bf3cffe0b55ac7d531e66ca0355d2c0784e5",
   "actenon-kernel @ git+https://github.com/Actenon/actenon-kernel.git@9dd6af89622f070e3131c39d335be44e3f30149d",
-  "actenon-permit @ git+https://github.com/Actenon/actenon-permit.git@ca2c6e85f128c22ae3fba705ac72553f720666aa",
+  "actenon-permit @ git+https://github.com/Actenon/actenon-permit.git@2074cde4b0fb8fa15b3e7a303ef9b1281a1a089c",
   "requests>=2.32,<3",
   "httpx>=0.27,<1",
 ]

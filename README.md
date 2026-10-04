@@ -1,10 +1,11 @@
 # Actenon Airlock
 
-**See what new powers your AI agent gained before it uses them.**
+**See what new powers your AI agent gained—and block them until approved.**
 
-Airlock discovers authority from Python source with Actenon Scan, shows new and removed powers,
-and brokers supported HTTP calls through Actenon Permit and Kernel. A new or unresolved power
-cannot execute through that broker until its resolved authority is explicitly approved.
+Airlock scans Python source, shows new and removed powers, and checks supported HTTP calls
+before they execute. New and unresolved powers stay blocked. Consequential requests reserve
+their effect before dispatch; duplicates and blind retries of uncertain outcomes are refused.
+Signed receipts preserve each decision and its evidence.
 
 This is an installable development product, version 0.1.0.dev0. Its dependencies are pinned to the
 merged, unified ecosystem line. These are staging source pins; public registry dependencies are still
