@@ -163,6 +163,9 @@ def main(argv=None):
             p.add_argument("--model-provider", choices=("openai", "anthropic"), default="openai")
             p.add_argument("--model-max-tokens", type=int, default=2048)
             p.add_argument(
+                "--model-endpoint", help="Exact full inference endpoint also discovered by Scan"
+            )
+            p.add_argument(
                 "--approve",
                 action="store_true",
                 help="Explicitly approve the displayed resolved powers",
@@ -351,7 +354,11 @@ def main(argv=None):
                 bindings[name] = origin(url)
             current["credential_bindings"] = bindings
             current["protected_model"] = dict(before.get("protected_model", {}))
+            if args.model_endpoint and not args.model:
+                raise AirlockError("--model-endpoint requires --model and a fresh review")
             if args.model:
+                from .model_constraints import endpoint, validate_profile
+
                 if not 1 <= args.model_max_tokens <= 4096 or any(
                     not model.strip() for model in args.model
                 ):
@@ -361,6 +368,21 @@ def main(argv=None):
                     "models": sorted(set(args.model)),
                     "max_output_tokens": args.model_max_tokens,
                 }
+                if args.model_endpoint:
+                    current["protected_model"]["endpoint"] = args.model_endpoint
+                elif before.get("protected_model", {}).get(
+                    "provider"
+                ) == args.model_provider and before["protected_model"].get("endpoint"):
+                    current["protected_model"]["endpoint"] = before["protected_model"]["endpoint"]
+                validate_profile(current["protected_model"])
+                target = endpoint(current["protected_model"])
+                if not any(
+                    p["action"] == "http.post" and p["transport"] == target
+                    for p in current["powers"]
+                ):
+                    raise AirlockError(
+                        "Model endpoint must be discovered as an exact Scan POST power"
+                    )
             current["reconciliation_keys"] = dict(before.get("reconciliation_keys", {}))
             if args.reconciler_key:
                 from .reconciliation import load_operator_key, operator_identity

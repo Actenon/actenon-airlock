@@ -26,7 +26,9 @@ def rpc(value):
     if len(data) > LIMIT:
         raise ValueError("Request too large")
     with socket.socket(socket.AF_UNIX) as connection:
-        connection.settimeout(40)
+        # Cold starts and bounded text inference may take longer than frame transfer.
+        # The supervisor still owns authorization, reservations and transport limits.
+        connection.settimeout(180)
         connection.connect("/ipc/broker.sock")
         connection.sendall(struct.pack("!I", len(data)) + data)
         with connection.makefile("rb") as stream:
@@ -92,6 +94,9 @@ class Relay(BaseHTTPRequestHandler):
 def main():
     os.makedirs("/workspace/.home", exist_ok=True)
     os.makedirs("/workspace/.tmp", exist_ok=True)
+    global MODEL_TARGETS
+    with open("/airlock/model-targets.json", encoding="utf-8") as stream:
+        MODEL_TARGETS = json.load(stream)
     relay = ThreadingHTTPServer(("127.0.0.1", 0), Relay)
     thread = threading.Thread(target=relay.serve_forever, daemon=True)
     thread.start()
