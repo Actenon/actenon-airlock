@@ -43,11 +43,21 @@ class Docker:
         self.binary = shutil.which("docker")
         if not self.binary:
             raise AirlockError("Protected Mode requires a running local Linux Docker engine")
+        self.environment = {
+            name: os.environ[name]
+            for name in ("HOME", "PATH", "TMPDIR", "DOCKER_CONFIG", "DOCKER_CONTEXT", "DOCKER_HOST")
+            if name in os.environ
+        }
 
     def call(self, args, *, timeout=45):
         try:
             result = subprocess.run(
-                [self.binary, *args], capture_output=True, text=True, timeout=timeout, check=False
+                [self.binary, *args],
+                capture_output=True,
+                text=True,
+                timeout=timeout,
+                check=False,
+                env=self.environment,
             )
         except (OSError, subprocess.TimeoutExpired) as exc:
             raise AirlockError("Protected Mode isolation engine unavailable") from exc
@@ -62,7 +72,8 @@ class Docker:
     def verify_engine(self, timeout=30):
         context = self.json(["context", "inspect"], timeout=5)[0]
         endpoint = context["Endpoints"]["docker"]["Host"]
-        endpoint = os.environ.get("DOCKER_HOST") or endpoint
+        if not self.environment.get("DOCKER_CONTEXT"):
+            endpoint = self.environment.get("DOCKER_HOST") or endpoint
         if not endpoint.startswith("unix://"):
             raise AirlockError(
                 "Protected Mode currently requires a local Unix-socket Docker engine"
@@ -551,6 +562,7 @@ def launch_protected(root, command, *, image=DEFAULT_IMAGE):
             stdout=subprocess.PIPE,
             stderr=subprocess.PIPE,
             bufsize=0,
+            env=docker.environment,
         )
         if _receive_pipe(bridge.stdout) != {"bridge": "ready", "version": 1}:
             raise AirlockError("Protected bridge readiness failed")
@@ -621,7 +633,9 @@ def launch_protected(root, command, *, image=DEFAULT_IMAGE):
             "AIRLOCK PROTECTED MODE: compute inside; external consequences cross the supervisor",
             flush=True,
         )
-        agent_process = subprocess.Popen([docker.binary, "start", "-a", agent_id])
+        agent_process = subprocess.Popen(
+            [docker.binary, "start", "-a", agent_id], env=docker.environment
+        )
         attach_result = agent_process.wait()
         observed_state = docker.json(["inspect", agent_id])[0]["State"]
         if (

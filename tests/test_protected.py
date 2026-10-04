@@ -123,6 +123,24 @@ def test_required_protection_never_launches_cooperative_fallback(project, monkey
     assert calls == []
 
 
+def test_docker_helper_never_inherits_production_or_signing_credentials(monkeypatch):
+    monkeypatch.setattr("actenon_airlock.protected.shutil.which", lambda name: "/usr/bin/docker")
+    for name in (
+        "OPENAI_API_KEY",
+        "GITHUB_TOKEN",
+        "ACTENON_SIGNING_KEY",
+        "ACTENON_ED25519_KEY_FILE",
+        "AWS_SECRET_ACCESS_KEY",
+        "PGPASSWORD",
+    ):
+        monkeypatch.setenv(name, "host-private-value")
+    docker = Docker()
+    assert not any("host-private-value" in value for value in docker.environment.values())
+    assert set(docker.environment).issubset(
+        {"HOME", "PATH", "TMPDIR", "DOCKER_CONFIG", "DOCKER_CONTEXT", "DOCKER_HOST"}
+    )
+
+
 def test_snapshot_never_copies_state_env_or_git_credentials(tmp_path):
     root, destination = tmp_path / "source", tmp_path / "copy"
     root.mkdir()
