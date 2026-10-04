@@ -271,6 +271,16 @@ def install(sock, root: Path):
                 return os.fsdecode(env[key])
         return os.defpath
 
+    def startup_env(env):
+        """Names of shell startup variables in the environment the child would exec, not values."""
+        source = os.environ if env is None else env
+        found = []
+        for key in source:
+            name = os.fsdecode(key)
+            if name in {"BASH_ENV", "ENV", "ZDOTDIR"} and name not in found:
+                found.append(name)
+        return found
+
     def process(operation, executable, argv, cwd, env):
         effect(
             "process",
@@ -279,6 +289,7 @@ def install(sock, root: Path):
             argv=[os.fsdecode(os.fspath(a)) for a in argv],
             cwd=lexical(cwd) if cwd is not None else os.getcwd(),
             search_path=search_path(env),
+            startup_env=startup_env(env),
         )
 
     def wrap(owner, attr, operation, index, name):
@@ -401,6 +412,41 @@ def install(sock, root: Path):
                 refuse("filesystem.read.outside-project", str(target))
 
     sys.addaudithook(audit)
+
+    import _posixsubprocess
+    import subprocess
+
+    real_fork_exec = _posixsubprocess.fork_exec
+
+    def fork_exec(args, executable_list, *rest):
+        # subprocess.Popen already authorized this spawn. Consume the one-shot flag
+        # so a later direct fork_exec on this thread is checked on its own.
+        if getattr(local, "spawn", None):
+            local.spawn = None
+            return real_fork_exec(args, executable_list, *rest)
+        argv = [os.fsdecode(item) for item in args] if args else []
+        if not argv:
+            refuse("subprocess.Popen")
+        executable = argv[0]
+        cwd = rest[2] if len(rest) > 2 else None
+        env_list = rest[3] if len(rest) > 3 else None
+        env = None
+        if env_list:
+            env = {}
+            for item in env_list:
+                key, _, value = os.fsdecode(item).partition("=")
+                env[key] = value
+        process(
+            "subprocess.Popen",
+            executable,
+            argv,
+            os.fsdecode(cwd) if isinstance(cwd, (str, bytes, os.PathLike)) else None,
+            env,
+        )
+        return real_fork_exec(args, executable_list, *rest)
+
+    _posixsubprocess.fork_exec = fork_exec
+    subprocess._fork_exec = fork_exec
     return rpc
 
 

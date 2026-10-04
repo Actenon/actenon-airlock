@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="0" failures="1" skipped="0" tests="3" time="0.174" timestamp="2026-10-04T23:39:18.916054+01:00" hostname="Rosss-MacBook-Air.local"><testcase classname="tests.test_adapters" name="test_registry_covers_every_power_kind_scan_emits" time="0.000" /><testcase classname="tests.test_adapters" name="test_plain_and_shell_process_requests_name_scan_programs" time="0.008" /><testcase classname="tests.test_adapters" name="test_interpreters_and_wrappers_require_one_plain_program" time="0.002"><failure message="actenon_airlock.common.AirlockError: Program 'timeout' is not on the broker PATH">tmp_path = PosixPath('/private/var/folders/tz/y04t4d0900xdbmz96jp608180000gn/T/pytest-of-ross/pytest-365/test_interpreters_and_wrappers0')
+
+    def test_interpreters_and_wrappers_require_one_plain_program(tmp_path):
+        adapter = REGISTRY["process"]
+        ctx = context(tmp_path)
+        denied = [
+            ["python3", "-c", "open('marker.txt','w').write('pwned')"],
+            ["perl", "-e", "print 'pwned'"],
+            ["node", "-e", "require('fs').writeFileSync('marker.txt','pwned')"],
+            ["awk", 'BEGIN{print "pwned" &gt; "marker.txt"}'],
+            ["env", "bash", "-c", "echo pwned &gt; marker.txt"],
+            ["nice", "bash", "-c", "echo pwned &gt; marker.txt"],
+            ["timeout", "5", "bash", "-c", "echo pwned &gt; marker.txt"],
+            ["xargs", "-0", "/bin/sh", "-c", "echo pwned &gt; marker.txt"],
+            ["stdbuf", "-o0", "bash", "-c", "echo pwned &gt; marker.txt"],
+            ["setsid", "bash", "-c", "echo pwned &gt; marker.txt"],
+            ["flock", "lock", "/bin/bash", "-c", "echo pwned &gt; marker.txt"],
+            ["nohup", "bash", "-c", "echo pwned &gt; marker.txt"],
+            ["find", "tree", "-exec", "/bin/sh", "-c", "echo pwned &gt; marker.txt", ";"],
+            ["git", "-c", "alias.p=!echo pwned &gt; marker.txt", "p"],
+            ["ssh", "-o", "ProxyCommand=echo pwned &gt; marker.txt", "-o", "BatchMode=yes", "127.0.0.1"],
+            ["env", "-S", "bash -c true"],
+            ["flock", "-c", "echo pwned", "lock"],
+            ["watch", "touch", "marker.txt"],
+            ["ionice", "bash", "-c", "true"],
+            ["unshare", "-r"],
+        ]
+        for argv in denied:
+&gt;           effect = adapter.classify(proc(argv), ctx)
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/test_adapters.py:111: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+src/actenon_airlock/adapters.py:1097: in classify
+    program, resolved = _program(executable, cwd, search_path, context)
+                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+name = 'timeout', cwd = '/'
+search_path = '/Users/ross/.rbenv/shims:/opt/homebrew/bin:/opt/homebrew/sbin:/usr/local/bin:/System/Cryptexes/App/usr/bin:/usr/bin:/...ions/ChatGPT.app/Contents/Resources:/Applications/ChatGPT.app/Contents/Resources/codex-cli/CodexCLI.app/Contents/MacOS'
+context = Context(root=PosixPath('/private/var/folders/tz/y04t4d0900xdbmz96jp608180000gn/T/pytest-of-ross/pytest-365/test_interp...ons/ChatGPT.app/Contents/Resources:/Applications/ChatGPT.app/Contents/Resources/codex-cli/CodexCLI.app/Contents/MacOS')
+
+    def _program(name: str, cwd: str, search_path: str, context: Context) -&gt; tuple[str, str]:
+        program = os.path.basename(name)
+        if not program or program in {".", ".."}:
+            raise AirlockError("Empty program name")
+        expected = shutil.which(program, path=context.search_path)
+        if expected is None:
+&gt;           raise AirlockError(f"Program '{program}' is not on the broker PATH")
+E           actenon_airlock.common.AirlockError: Program 'timeout' is not on the broker PATH
+
+src/actenon_airlock/adapters.py:174: AirlockError</failure></testcase></testsuite></testsuites>

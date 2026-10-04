@@ -25,6 +25,26 @@ complete-write framing and newline-terminated JSON payloads were added. That
 transport repair must pass the actual container acceptance job; unit framing
 checks alone do not establish the OS boundary.
 
+The actual clean Linux container job subsequently passed on PR #11 at
+`d13ec770ebc87ccef51655581937a554c769d050` and again at
+`619338ba6548abab854a96938553f1ca93b78dec`. Run
+[`37239985495`](https://github.com/Actenon/actenon-airlock/actions/runs/37239985495)
+uploaded artifact `11316741859` (ZIP SHA-256
+`279f594b96e38c04647fe5c66e775db83e80d9d33a488e7d4b6670cf6518ea7c`).
+Its public contents are preserved in `clean-linux/`: child exit zero, original
+source unchanged, thirteen bypass checks blocked, eight signed receipts verified,
+five broker DENYs. Both Python versions, packaging/lint and Protected container
+acceptance were green on the second exact head before consolidation.
+
+PR #9 and #10 are preserved as merge parents in this candidate. PR #10's
+stricter denial of login/startup scripts supersedes #9's allowance of a plain
+login-shell command. The real sh/bash syntax attack tests from #9 remain,
+alongside all #10 interpreter/wrapper, direct fork-exec and parent-symlink tests.
+Parser unit tests use a deterministic PATH mapping for Linux-only utilities on
+macOS; separate identity and real subprocess tests retain actual executables.
+The positive wrapper test uses real GNU timeout where present, otherwise POSIX
+nice. No command is marked executed by these unit-only mappings.
+
 The required `Protected container acceptance` CI job builds a fresh credential-free
 image and performs a coding fixture (model SDK, edit, pytest, shell/compile and
 local git commit), then attempts thirteen alternate routes in the same container.
