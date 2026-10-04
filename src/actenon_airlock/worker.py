@@ -16,6 +16,7 @@ import socket
 import sys
 import tempfile
 import threading
+import urllib.error
 import urllib.request
 from pathlib import Path
 
@@ -59,6 +60,23 @@ CONSUMES_SOURCE = {"shutil.move"}
 
 class RuntimeDenied(PermissionError):
     pass
+
+
+# A denied request surfaces as the client library's own connection failure, so the
+# agent's existing transport error handling treats it as one failed call.
+class RequestsDenied(RuntimeDenied, requests.exceptions.ConnectionError):
+    def __init__(self, message, *, request):
+        requests.exceptions.ConnectionError.__init__(self, message, request=request)
+
+
+class HttpxDenied(RuntimeDenied, httpx.ConnectError):
+    def __init__(self, message, *, request):
+        httpx.ConnectError.__init__(self, message, request=request)
+
+
+class UrllibDenied(RuntimeDenied, urllib.error.URLError):
+    def __init__(self, message):
+        urllib.error.URLError.__init__(self, message)
 
 
 def install(sock, root: Path):
@@ -125,9 +143,12 @@ def install(sock, root: Path):
         return response, base64.b64decode(response["body"], validate=True)
 
     def requests_send(self, prepared, **kwargs):
-        if kwargs.get("verify") is False or kwargs.get("cert") or kwargs.get("proxies"):
-            raise RuntimeDenied("AIRLOCK BLOCKED: TLS or proxy overrides are unsupported")
-        value, content = request(prepared.method, prepared.url, prepared.headers, prepared.body)
+        try:
+            if kwargs.get("verify") is False or kwargs.get("cert") or kwargs.get("proxies"):
+                raise RuntimeDenied("AIRLOCK BLOCKED: TLS or proxy overrides are unsupported")
+            value, content = request(prepared.method, prepared.url, prepared.headers, prepared.body)
+        except RuntimeDenied as exc:
+            raise RequestsDenied(str(exc), request=prepared) from None
         response = requests.Response()
         response.status_code = value["status"]
         response.headers.update(value["headers"])
@@ -139,14 +160,20 @@ def install(sock, root: Path):
         return response
 
     def httpx_send(self, req, **kwargs):
-        value, content = request(req.method, req.url, req.headers, req.read())
+        try:
+            value, content = request(req.method, req.url, req.headers, req.read())
+        except RuntimeDenied as exc:
+            raise HttpxDenied(str(exc), request=req) from None
         return httpx.Response(
             value["status"], headers=value["headers"], content=content, request=req
         )
 
     async def async_httpx_send(self, req, **kwargs):
         body = await req.aread()
-        value, content = request(req.method, req.url, req.headers, body)
+        try:
+            value, content = request(req.method, req.url, req.headers, body)
+        except RuntimeDenied as exc:
+            raise HttpxDenied(str(exc), request=req) from None
         return httpx.Response(
             value["status"], headers=value["headers"], content=content, request=req
         )
@@ -154,7 +181,10 @@ def install(sock, root: Path):
     def urlopen(self, req, data=None, timeout=30, **kwargs):
         if not isinstance(req, urllib.request.Request):
             req = urllib.request.Request(req, data=data)
-        value, content = request(req.get_method(), req.full_url, req.header_items(), req.data)
+        try:
+            value, content = request(req.get_method(), req.full_url, req.header_items(), req.data)
+        except RuntimeDenied as exc:
+            raise UrllibDenied(str(exc)) from None
         from email.message import Message
         from urllib.response import addinfourl
 

@@ -46,6 +46,30 @@ def test_new_power_is_blocked_even_if_agent_catches_error(project, server):
 
 
 @pytest.mark.parametrize(
+    "denied, error",
+    [
+        ('requests.get("".join(["{url}/b"]))', "requests.RequestException"),
+        ('httpx.get("".join(["{url}/b"]))', "httpx.HTTPError"),
+        ('urllib.request.urlopen("".join(["{url}/b"]))', "urllib.error.URLError"),
+    ],
+)
+def test_denied_request_fails_like_the_client_library_and_the_agent_continues(
+    project, server, denied, error
+):
+    url, calls = server
+    state = project(
+        "import httpx, requests, urllib.error, urllib.request\n"
+        f"try:\n {denied.format(url=url)}\n"
+        f"except {error} as exc:\n assert isinstance(exc, PermissionError)\n"
+        f'requests.post("{url}/a")\n'
+    )
+    result = run(state)
+    assert result.returncode == 3, result.stderr
+    assert [c[0] for c in calls] == ["/a"]
+    assert "AIRLOCK DENY http.get" in result.stderr and "AIRLOCK ALLOW http.post" in result.stderr
+
+
+@pytest.mark.parametrize(
     "source",
     [
         'import socket\nsocket.socket().connect(("127.0.0.1", {port}))\n',
