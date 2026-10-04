@@ -20,3 +20,9 @@ This remains **0.1.0.dev0**, a source integration candidate. Dependencies are no
 - The three historical external-agent traces expose real denials and usability failures. They do not establish complete legitimate workflows or the final three-agent acceptance PASS.
 - The original launch-wide unsupported-kind refusal is still needed for effects without a runtime adapter. It must be removed only when the actual boundary can fail closed per effect.
 - Registry-based single installation, trusted deployment approvals, exact final release graph, public-artifact consumption and the finished demo remain mandatory gates.
+
+## Dependency-lock repair follow-up
+
+After consolidation, Kernel #45 repaired its stale lock and enforced cryptography >=50; Permit #25 consumed that main commit and regenerated and audited its installed lock. The current Airlock inputs are Kernel `8f5ab060874057e60253edd801b905e95b75d84e` and Permit `72a33de169394a1f437268af95da8abf5b26ae5a`. Protocol and Scan remain the merged commits above. `dependency-pins.json` records the current build, while the earlier values above describe the initial consolidation.
+
+Airlock integration CI installs into an isolated environment and audits its actual installed dependencies separately. Its Python, broker and runtime source behavior is unchanged by this pin repair. The complete real-component integration suite and installed development wheel are checked again against these inputs. These source and wheel checks remain development evidence; they do not satisfy public registry fresh-install acceptance.
