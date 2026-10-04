@@ -75,6 +75,9 @@ def test_denied_request_fails_like_the_client_library_and_the_agent_continues(
         'import socket\nsocket.socket().connect(("127.0.0.1", {port}))\n',
         'import os\ngetattr(os, "sys" + "tem")("touch output.txt")\n',
         'import os\nfd=os.open("output.txt", os.O_WRONLY|os.O_CREAT)\n',
+        'import ctypes\nctypes.CDLL(None).system(b"touch output.txt")\n',
+        'import ctypes\nctypes.pythonapi.Py_IsInitialized()\nopen("output.txt", "w")\n',
+        'import ctypes\nctypes.CDLL("libc.so.6")\nopen("output.txt", "w")\n',
     ],
 )
 def test_unscanned_bypass_is_blocked_at_runtime(project, server, source):
@@ -84,6 +87,11 @@ def test_unscanned_bypass_is_blocked_at_runtime(project, server, source):
     assert result.returncode != 0
     assert calls == []
     assert not (state.root / "output.txt").exists()
+
+
+def test_importing_ctypes_is_not_a_native_call(project):
+    result = run(project('import ctypes\nprint(ctypes.sizeof(ctypes.c_int))\n'))
+    assert result.returncode == 0, result.stderr
 
 
 def test_child_cannot_read_approval_key(project):

@@ -329,7 +329,10 @@ def install(sock, root: Path):
         if getattr(local, "busy", False):
             return
         if event in UNSUPPORTED:
-            refuse(event)
+            # "import ctypes" opens the already-loaded process image; nothing in it is
+            # callable without ctypes.dlsym, which stays refused.
+            if not (event == "ctypes.dlopen" and args[0] is None):
+                refuse(event)
         if event == "subprocess.Popen":
             executable, argv, cwd, env = args
             argv = list(argv)
