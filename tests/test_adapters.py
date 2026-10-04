@@ -51,7 +51,24 @@ def test_plain_and_shell_process_requests_name_scan_programs(tmp_path):
     assert names(adapter.classify(shell, context(tmp_path))) == ["touch", "sh"]
     for text in ["touch a; rm b", "touch $HOME", "touch a | cat", "X=1 touch a", "touch *"]:
         effect = adapter.classify(proc(["/bin/sh", "-c", text]), context(tmp_path))
-        assert names(effect) == ["sh"], text
+        assert names(effect) == ["<shell-syntax>"], text
+        assert effect.detail["program"] == "sh"
+    for argv in (
+        ["/bin/bash", "-c", "echo a; echo b"],
+        ["/bin/bash", "-s"],
+        ["/bin/bash", "payload.sh"],
+        ["/bin/sh", "-c", ". ./payload.sh"],
+        ["/bin/bash", "-c", "source ./payload.sh"],
+        ["/bin/bash", "-c", "exec /bin/bash ./payload.sh"],
+        ["/bin/sh", "-c", "/bin/bash ./payload.sh"],
+        ["/bin/sh", "-lc", "true"],
+        ["/bin/bash", "--rcfile", "payload.sh", "-ic", "true"],
+    ):
+        effect = adapter.classify(proc(argv), context(tmp_path))
+        assert names(effect) == ["<shell-syntax>"], argv
+    startup = proc(["/bin/bash", "-c", "true"])
+    startup["startup_env"] = ["BASH_ENV"]
+    assert names(adapter.classify(startup, context(tmp_path))) == ["<shell-syntax>"]
 
 
 def test_process_identity_must_match_the_broker_path(tmp_path):

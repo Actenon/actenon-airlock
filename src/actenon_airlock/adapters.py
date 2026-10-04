@@ -26,6 +26,13 @@ from .common import AirlockError, digest, origin, power, validate_url
 PROCESS_TRANSPORT = "local-process"
 FILESYSTEM_TRANSPORT = "local-filesystem"
 SHELL_SYNTAX = frozenset("|&;<>()$`\\*?[]#~{}!\n\r")
+SHELLS = frozenset({"sh", "bash", "dash", "zsh", "ksh", "ash", "busybox", "rbash", "mksh", "fish"})
+# Not a Scan program name, so a grant for the shell itself cannot satisfy it.
+SHELL_SYNTAX_RESOURCE = "<shell-syntax>"
+# Builtins that read or replace the shell command, so a "plain" word list is still a script.
+SHELL_BUILTINS = frozenset({".", "source", "eval", "exec", "command", "builtin"})
+SHELL_STARTUP_ENV = frozenset({"BASH_ENV", "ENV", "ZDOTDIR"})
+HARMLESS_LONG_OPTIONS = frozenset({"--noprofile", "--norc", "--posix"})
 
 FS_WRITE = frozenset(
     {
@@ -50,20 +57,6 @@ FS_DELETE = frozenset(
         *(f"pathlib.Path.{m}" for m in sdk.PATH_DELETE_METHODS),
         "os.remove",
         "os.rmdir",
-    }
-)
-FS_FOLLOWS_LINKS = frozenset(
-    {
-        "open",
-        "os.chmod",
-        "os.chown",
-        "os.utime",
-        "os.truncate",
-        "os.setxattr",
-        "os.removexattr",
-        "pathlib.Path.write_text",
-        "pathlib.Path.write_bytes",
-        "pathlib.Path.touch",
     }
 )
 PROCESS_OPERATIONS = frozenset(
@@ -187,6 +180,64 @@ def _plain_command(command: str) -> list[str] | None:
     return words if words and "=" not in words[0] else None
 
 
+def _startup_env(message: dict) -> list[str]:
+    raw = message.get("startup_env") or []
+    if not isinstance(raw, list) or not all(isinstance(item, str) for item in raw):
+        raise AirlockError("Malformed process request")
+    return [item for item in raw if item in SHELL_STARTUP_ENV]
+
+
+def _shell_command_text(argv: list[str]) -> str | None:
+    """The operand of a non-interactive `shell -c`, or None when a script can be read elsewhere.
+
+    Stdin (`-s`), a script argument, login/interactive startup, and `--rcfile`/`--init-file`
+    execute shell syntax that is not the `-c` string. Those invocations are not a plain command.
+    """
+    index = 1
+    command_at = None
+    while index < len(argv):
+        flag = argv[index]
+        if flag == "--" or flag.startswith("--") and flag not in HARMLESS_LONG_OPTIONS:
+            return None
+        if flag in HARMLESS_LONG_OPTIONS:
+            index += 1
+            continue
+        if flag.startswith("-") and flag != "-":
+            body = flag[1:]
+            if any(char in body for char in "ils"):
+                return None
+            if "c" in body:
+                command_at = index + 1
+                break
+            index += 1
+            continue
+        return None
+    if command_at is None or command_at >= len(argv):
+        return None
+    if command_at != len(argv) - 1:
+        raise AirlockError("Shell positional parameters are unsupported")
+    return argv[command_at]
+
+
+def _direct_program(words: list[str]) -> bool:
+    """True when every word is an ordinary program argument, not another shell or builtin."""
+    if words[0] in SHELL_BUILTINS or os.path.basename(words[0]) in SHELLS:
+        return False
+    return all(os.path.basename(word) not in SHELLS for word in words)
+
+
+def _follows_symlink(path: str) -> bool:
+    """True when any lexical component of `path` is a symbolic link."""
+    current = path
+    while True:
+        if os.path.islink(current):
+            return True
+        parent = os.path.dirname(current)
+        if parent == current:
+            return False
+        current = parent
+
+
 class ProcessAdapter(Adapter):
     kinds = ("process",)
     channel = "process"
@@ -228,24 +279,38 @@ class ProcessAdapter(Adapter):
             "argv_sha256": digest(argv),
             "cwd": cwd,
         }
-        if len(argv) >= 2 and argv[1] == "-c" and os.path.basename(executable) == "sh":
-            if len(argv) != 3:
-                raise AirlockError("Shell positional parameters are unsupported")
+        if os.path.basename(executable) in SHELLS:
             shell, resolved_shell = _program(executable, cwd, search_path, context)
+            if os.path.basename(argv[0]) != shell:
+                raise AirlockError("argv[0] does not name the executed program")
+            startup = _startup_env(message)
+            text = None if startup else _shell_command_text(argv)
+            words = _plain_command(text) if text is not None else None
             candidates = []
-            words = _plain_command(argv[2])
-            if words is not None:
+            if words is not None and _direct_program(words):
                 try:
                     program, resolved = _program(words[0], cwd, search_path, context)
                     candidates.append(power("process.exec", program, PROCESS_TRANSPORT))
                     detail.update(program=program, executable=resolved)
                 except AirlockError:
-                    pass
-            candidates.append(power("process.exec", shell, PROCESS_TRANSPORT))
-            detail.setdefault("program", shell)
-            detail.setdefault("executable", resolved_shell)
-            detail["shell"] = True
-            return Effect(tuple(candidates), detail["executable"], dict(detail), detail)
+                    candidates = []
+            if candidates:
+                candidates.append(power("process.exec", shell, PROCESS_TRANSPORT))
+                detail.setdefault("program", shell)
+                detail.setdefault("executable", resolved_shell)
+                detail["shell"] = True
+                return Effect(tuple(candidates), detail["executable"], dict(detail), detail)
+            # A shell grant must not execute operators, a script file, stdin, startup files,
+            # or another shell hidden in an otherwise plain command.
+            detail.update(program=shell, executable=resolved_shell, shell=True)
+            if startup:
+                detail["startup_env"] = startup
+            return Effect(
+                (power("process.exec", SHELL_SYNTAX_RESOURCE, PROCESS_TRANSPORT),),
+                resolved_shell,
+                dict(detail),
+                detail,
+            )
         program, resolved = _program(executable, cwd, search_path, context)
         if os.path.basename(argv[0]) != program:
             raise AirlockError("argv[0] does not name the executed program")
@@ -320,7 +385,7 @@ class FilesystemAdapter(Adapter):
             paths.append(detail["src"])
         if any(p == state or p.startswith(state + os.sep) for p in paths):
             raise AirlockError("Airlock state is not writable by the agent")
-        if operation in FS_FOLLOWS_LINKS and os.path.islink(absolute):
+        if any(_follows_symlink(p) for p in paths):
             raise AirlockError("Writing through a symbolic link is unsupported")
         candidates = tuple(
             power(action, s, FILESYSTEM_TRANSPORT) for s in _spellings(absolute, cwd, context.home)

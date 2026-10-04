@@ -2,6 +2,8 @@ import json
 import subprocess
 import sys
 
+import pytest
+
 from actenon_airlock import adapters
 from actenon_airlock.cli import main
 from actenon_airlock.state import State
@@ -61,6 +63,88 @@ def test_plain_shell_text_binds_to_the_program_scan_named(project):
     assert result.returncode == 0, result.stderr
     [row] = final(receipts(state), "process.")
     assert row["detail"]["shell"] is True and row["detail"]["program"] == "touch"
+
+
+@pytest.mark.parametrize(
+    "source,prepare",
+    [
+        (
+            'import subprocess\nsubprocess.run(["/bin/bash", "-s"], input=b"echo pwned; echo injected\\n", check=False)\n',
+            None,
+        ),
+        (
+            'import subprocess\nsubprocess.run(["/bin/sh", "payload.sh"], check=False)\n',
+            "script",
+        ),
+        (
+            'import subprocess\nsubprocess.run(["/bin/sh", "-c", ". ./payload.sh"], check=False)\n',
+            "script",
+        ),
+        (
+            'import os, subprocess\nenv = dict(os.environ)\nenv["BASH_ENV"] = "payload.sh"\nsubprocess.run(["/bin/bash", "-c", "true"], env=env, check=False)\n',
+            "script",
+        ),
+        (
+            'import os, subprocess\nhome = os.getcwd() + "/home"\nenv = {"PATH": os.environ["PATH"], "HOME": home}\nsubprocess.run(["/bin/sh", "-lc", "true"], env=env, check=False)\n',
+            "profile",
+        ),
+    ],
+)
+def test_shell_grant_cannot_execute_a_hidden_script(project, source, prepare):
+    state = project(source)
+    if prepare == "script":
+        (state.root / "payload.sh").write_text("echo pwned; echo injected\n")
+    if prepare == "profile":
+        home = state.root / "home"
+        home.mkdir()
+        (home / ".profile").write_text("echo pwned; echo injected\n")
+    result = run(state)
+    assert result.returncode == 3, result.stderr
+    assert "pwned" not in result.stdout and "injected" not in result.stdout
+    row = receipts(state)[-1]
+    assert row["decision"] == "DENY"
+    assert row["credential_released"] is False and row["execution_occurred"] is False
+
+
+def test_direct_fork_exec_is_denied_without_a_grant(project):
+    state = project(
+        "import os\n"
+        "from _posixsubprocess import fork_exec\n"
+        "err_r, err_w = os.pipe()\n"
+        "pid = fork_exec(\n"
+        '    [b"/bin/echo", b"pwned"], (b"/bin/echo",),\n'
+        "    True, (err_w,), None, None,\n"
+        "    -1, -1, -1, -1, -1, -1, err_r, err_w,\n"
+        "    1, 0, -1, None, None, None, -1, None, False,\n"
+        ")\n"
+        "os.close(err_w)\n"
+        "os.read(err_r, 64)\n"
+        "os.close(err_r)\n"
+        "os.waitpid(pid, 0)\n"
+        'print("fork_exec_returned", pid)\n'
+    )
+    assert State(state.root).approved()["powers"] == []
+    result = run(state)
+    assert result.returncode == 3, result.stderr
+    assert "pwned" not in result.stdout
+    assert "fork_exec_returned" not in result.stdout
+    row = receipts(state)[-1]
+    assert row["decision"] == "DENY" and row["action"] == "process.exec"
+    assert row["credential_released"] is False and row["execution_occurred"] is False
+
+
+def test_parent_symlink_cannot_redirect_an_approved_write(project, tmp_path_factory):
+    outside = tmp_path_factory.mktemp("outside")
+    state = project('open("link/pwned.txt", "w").write("pwned\\n")\n')
+    (state.root / "link").symlink_to(outside, target_is_directory=True)
+    assert any(p["resource"] == "./link/pwned.txt" for p in State(state.root).approved()["powers"])
+    result = run(state)
+    assert result.returncode == 3, result.stderr
+    assert not (outside / "pwned.txt").exists()
+    row = receipts(state)[-1]
+    assert row["decision"] == "DENY"
+    assert row["reason"] == "Writing through a symbolic link is unsupported"
+    assert row["credential_released"] is False and row["execution_occurred"] is False
 
 
 def test_shell_syntax_fails_closed_even_when_scan_names_the_first_program(project):

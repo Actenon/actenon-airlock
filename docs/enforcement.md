@@ -102,12 +102,15 @@ What a grant means for local effects (shown as "Scope" at approval):
 
 - `process.exec <prog>`: run that program, resolved on the broker's PATH to the same file the agent
   would exec, with any arguments and no shell syntax. `sh -c` is accepted only for a plain command
-  whose first word is the approved program. **The program itself runs outside Airlock**: whatever it
-  does (for example `git clone` networking) is not mediated.
+  whose first word is one ordinary program on `PATH` — not a shell builtin, another shell, a script
+  file, stdin, or a login/interactive startup file (`BASH_ENV`, `ENV`, `ZDOTDIR`, `--rcfile`).
+  **The program itself runs outside Airlock**: whatever it does (for example `git clone` networking)
+  is not mediated.
 - `filesystem.write|delete <path>`: create, modify, or remove exactly that path, with Scan's
   `./`, `~/`, or absolute spelling. A Scan-named tree operation (`shutil.rmtree`, `copytree`,
   `mkdir(parents=True)`) is one effect covering its contents and needed ancestors. Writes into
-  `.airlock`, `dir_fd`-relative calls, and writes that follow a symlinked leaf fail closed.
+  `.airlock`, `dir_fd`-relative calls, and writes that follow a symbolic link in any path
+  component fail closed.
   Link creation is refused in cooperative mode, including inside an approved tree operation.
   Consumed move/rename sources must remain inside the project and cannot expose private
   files or Airlock state under another name. These checks do not establish OS object identity
