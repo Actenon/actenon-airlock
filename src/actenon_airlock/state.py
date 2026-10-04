@@ -124,6 +124,17 @@ class State:
 
         return verify(read("approved.json"), read("public-key.json")["key"])
 
+    def checked_in_approval(self) -> dict:
+        """Verify public checkout data for CI comparison, without private keys.
+
+        The trusted base remains the comparison authority. A self-signed PR
+        manifest cannot approve additions to its model or source-derived powers.
+        """
+        return verify(
+            json.loads((self.path / "approved.json").read_text()),
+            json.loads((self.path / "public-key.json").read_text())["key"],
+        )
+
     @property
     def receipts_path(self) -> Path:
         return self.local / "receipts.jsonl"

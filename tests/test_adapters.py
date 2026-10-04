@@ -156,15 +156,16 @@ def test_github_graphql_is_an_approvable_scan_power(project):
         broker.close()
 
 
-def test_dynamic_method_binds_scan_http_request_power(project, server):
+def test_dynamic_method_cannot_widen_to_destructive_http_request_power(project, server):
     url, calls = server
     state = project(f'import requests, sys\nrequests.request(sys.argv[1], "{url}/a")\n')
     current = discover(state.root)
-    assert current["powers"][0]["action"] == "http.request"
+    assert current["powers"] == []
+    assert current["blocked"][0]["action"] == "http.request"
     broker = Broker(state, current)
     try:
-        assert broker.handle(http_message(url + "/a", method="DELETE"))["ok"]
+        assert not broker.handle(http_message(url + "/a", method="DELETE"))["ok"]
         assert not broker.handle(http_message(url + "/b", method="DELETE"))["ok"]
-        assert [c[0] for c in calls] == ["/a"]
+        assert calls == []
     finally:
         broker.close()

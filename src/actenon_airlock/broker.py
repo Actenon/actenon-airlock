@@ -118,10 +118,11 @@ class HttpDispatch:
         if self.effect_reference is not None:
             # A transport response does not establish the remote consequence.
             # Preserve the response for the agent while keeping ownership held.
+            finality, occurred = broker.http_outcome(self)
             payload["effect_evidence"] = {
                 **self.effect_reference,
-                "outcome": "AMBIGUOUS",
-                "execution_occurred": None,
+                "outcome": finality,
+                "execution_occurred": occurred,
                 "evidence_hash": digest(self.response),
             }
         return payload
@@ -187,10 +188,10 @@ class Broker:
         # New files carry no Scan evidence, so only the scanned files can change authority.
         self.source_files = source_files(state.root)
         self.grant = Grant(
-            agent_id="airlock:" + current["source_digest"],
+            agent_id=self.grant_principal(),
             expires_at=datetime.now(UTC) + timedelta(hours=1),
             scopes=Scopes(allow=sorted(self.allowed), deny=[] if self.allowed else ["*"]),
-            budget=Budget(limit=1000000, remaining=1000000),
+            budget=self.grant_budget(),
         ).sign()
         if not self.grant.verify():
             raise AirlockError("Permit grant signature failed")
@@ -356,6 +357,22 @@ class Broker:
         )
         return evidence
 
+    def bind_authority(self, effect, message: dict):
+        return bind_runtime(self.current, effect.candidates, message["locations"])
+
+    def grant_budget(self):
+        return Budget(limit=1000000, remaining=1000000)
+
+    def grant_principal(self):
+        return "airlock:" + self.current["source_digest"]
+
+    def action_cost(self, effect):
+        return 0
+
+    def http_outcome(self, dispatch):
+        # Generic HTTP does not establish the remote consequence.
+        return "AMBIGUOUS", None
+
     def handle(self, message: dict) -> dict:
         if message.get("kind") == "audit-deny":
             return self._deny(
@@ -379,7 +396,7 @@ class Broker:
                 self.state.root, self.source_files
             ):
                 raise AirlockError("Source changed after runtime discovery")
-            cap, entry = bind_runtime(self.current, effect.candidates, message["locations"])
+            cap, entry = self.bind_authority(effect, message)
             action_name = entry["action"]
             if entry["evidence"] is None:
                 labels["callsite"] = (message["locations"] or [None])[0]
@@ -397,7 +414,7 @@ class Broker:
                     "authority_resource": entry["resource"],
                     "source_digest": self.current["source_digest"],
                 },
-                est_cost=0,
+                est_cost=self.action_cost(effect),
             )
             # Permit owns the immutable authority signature boundary. Compare
             # that same payload to the launch grant; live state stays in its store.
@@ -464,7 +481,9 @@ class Broker:
                 row = self._receipt(
                     action_name,
                     target,
-                    "HTTP response received; remote consequence remains unconfirmed",
+                    "Model inference observed at the protected boundary"
+                    if effect_evidence["outcome"] == "COMMITTED"
+                    else "HTTP response received; remote consequence remains unconfirmed",
                     decision="ALLOW",
                     stage="response-received",
                     outcome=effect_evidence["outcome"],
@@ -481,7 +500,7 @@ class Broker:
                     **labels,
                 )
                 print(
-                    f"AIRLOCK ALLOW {action_name} @ {target}: HTTP response received; remote effect AMBIGUOUS, blind retries blocked [{row['id']}]",
+                    f"AIRLOCK ALLOW {action_name} @ {target}: effect {effect_evidence['outcome']}; duplicate dispatch blocked [{row['id']}]",
                     file=sys.stderr,
                 )
                 return {

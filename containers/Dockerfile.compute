@@ -1,0 +1,4 @@
+FROM python@sha256:cdbd05fb6f457ca275ff51ce00d93d865ca0b6a25f5ffb08262d94f6835771e5
+ENV DEBIAN_FRONTEND=noninteractive
+RUN apt-get update && apt-get install -y --no-install-recommends git ca-certificates && rm -rf /var/lib/apt/lists/*
+RUN python -m pip install --no-cache-dir 'pytest==8.4.2' 'openai==1.109.1'

@@ -128,6 +128,8 @@ class HttpAdapter(Adapter):
     default_action = "http.request"
 
     def bind(self, ev):
+        if ev.action == "http.request":
+            return "", "Unresolved HTTP method remains blocked"
         if ev.url:
             try:
                 url = validate_url(ev.url)

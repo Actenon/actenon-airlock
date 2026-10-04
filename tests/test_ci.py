@@ -104,3 +104,34 @@ def test_reapproval_preserves_command_and_bindings(tmp_path):
     approved = State(tmp_path).approved()
     assert approved["command"] == ["main.py", "custom-argument"]
     assert approved["credential_bindings"] == {"SERVICE_TOKEN": "https://api.example.com"}
+
+
+def test_pr_cannot_self_approve_model_expansion(project, capsys):
+    state = project(
+        "from openai import OpenAI\nOpenAI().chat.completions.create(model='first', messages=[])\n"
+    )
+    initial = {
+        **discover(state.root),
+        "protected_model": {"provider": "openai", "models": ["first"], "max_output_tokens": 100},
+    }
+    state.approve(initial)
+    git(state.root, "init")
+    git(state.root, "config", "user.email", "tests@example.invalid")
+    git(state.root, "config", "user.name", "Airlock tests")
+    git(state.root, "add", "main.py", ".airlock/approved.json", ".airlock/public-key.json")
+    git(state.root, "-c", "commit.gpgsign=false", "commit", "-m", "trusted model constraint")
+    baseline = git(state.root, "rev-parse", "HEAD")
+    state.approve(
+        {
+            **initial,
+            "protected_model": {
+                **initial["protected_model"],
+                "models": ["first", "unapproved"],
+                "max_output_tokens": 200,
+            },
+        }
+    )
+    assert main(["check", "--path", str(state.root), "--base", baseline, "--json"]) == 2
+    result = json.loads(capsys.readouterr().out)
+    assert result["added"] == []
+    assert result["model_constraints"]["expanded"]

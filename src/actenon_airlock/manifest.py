@@ -140,14 +140,26 @@ def unadapted(current: dict) -> list[str]:
 def authority_diff(before: dict, after: dict) -> dict:
     old = {canonical(p): p for p in before.get("powers", [])}
     new = {canonical(p): p for p in after.get("powers", [])}
+    old_model = before.get("protected_model", {})
+    new_model = after.get("protected_model", old_model)
+    try:
+        model_expanded = bool(new_model) and (
+            not old_model
+            or new_model["provider"] != old_model["provider"]
+            or not set(new_model["models"]).issubset(old_model["models"])
+            or new_model["max_output_tokens"] > old_model["max_output_tokens"]
+        )
+    except (KeyError, TypeError):
+        model_expanded = True
     return {
         "schema": "actenon-airlock/diff/v1",
         "added": [new[k] for k in sorted(new.keys() - old.keys())],
         "removed": [old[k] for k in sorted(old.keys() - new.keys())],
         "blocked": after.get("blocked", []),
         "parse_errors": after.get("parse_errors", []),
+        "model_constraints": {"before": old_model, "after": new_model, "expanded": model_expanded},
         "runtime_status": "BLOCKED UNTIL APPROVED"
-        if new.keys() - old.keys()
+        if new.keys() - old.keys() or model_expanded
         else "APPROVED POWERS ONLY",
     }
 

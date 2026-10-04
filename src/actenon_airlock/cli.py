@@ -44,7 +44,12 @@ def render(diff: dict) -> str:
         )
     for row in diff["parse_errors"]:
         lines.append(f"! {safe(row['file'])}: {safe(row['reason'])}")
-    if not any(diff[k] for k in ("added", "removed", "blocked", "parse_errors")):
+    model = diff.get("model_constraints", {})
+    if model.get("expanded"):
+        lines.append("+ Model authority expanded: " + json.dumps(model["after"], sort_keys=True))
+    if not any(diff[k] for k in ("added", "removed", "blocked", "parse_errors")) and not model.get(
+        "expanded"
+    ):
         lines.append("No authority changes.")
     lines.extend(["", "Runtime: " + diff["runtime_status"]])
     return "\n".join(lines)
@@ -99,6 +104,8 @@ def render_receipts(result: dict) -> str:
 
 
 def doctor(root: Path):
+    from .protected import availability
+
     checks = []
     for name, expected in EXPECTED.items():
         try:
@@ -123,9 +130,11 @@ def doctor(root: Path):
             checks.append({"component": "local approval signature", "ok": True})
         except AirlockError:
             checks.append({"component": "local approval signature", "ok": False})
+    protected = availability()
     return {
         "schema": "actenon-airlock/doctor/v1",
         "checks": checks,
+        "guarantees": {"local": "cooperative Python interception", "protected": protected},
         "ok": all(c["ok"] for c in checks),
     }
 
@@ -148,6 +157,11 @@ def main(argv=None):
                 "--github", action="store_true", help="Write GitHub job summary and annotations"
             )
         if cmd == "init":
+            p.add_argument(
+                "--model", action="append", default=[], help="Approve this exact inference model"
+            )
+            p.add_argument("--model-provider", choices=("openai", "anthropic"), default="openai")
+            p.add_argument("--model-max-tokens", type=int, default=2048)
             p.add_argument(
                 "--approve",
                 action="store_true",
@@ -183,6 +197,15 @@ def main(argv=None):
             )
         if cmd == "run":
             p.add_argument(
+                "--protected",
+                action="store_true",
+                help="Require outside-process containment; never downgrade",
+            )
+            p.add_argument(
+                "--image",
+                help="Trusted, credential-free local compute image (resolved to immutable ID)",
+            )
+            p.add_argument(
                 "command", nargs=argparse.REMAINDER, help="Python script and arguments after --"
             )
     args = parser.parse_args(argv)
@@ -202,6 +225,12 @@ def main(argv=None):
                         + (" " + c["version"] if "version" in c else "")
                     )
                 print("Candidate dependencies are pinned; registry releases remain pending.")
+                print("LOCAL MODE: cooperative Python protection")
+                print(
+                    "PROTECTED MODE AVAILABLE"
+                    if result["guarantees"]["protected"]["available"]
+                    else "COOPERATIVE MODE ONLY: " + result["guarantees"]["protected"]["reason"]
+                )
             return 0 if result["ok"] else 2
         if args.cmd == "receipts":
             result = State(root).verify_receipts()
@@ -293,6 +322,14 @@ def main(argv=None):
                 raise AirlockError(
                     "Set a Python command with airlock init --command 'main.py', or airlock run -- main.py"
                 )
+            if args.protected:
+                from .protected import DEFAULT_IMAGE, launch_protected
+
+                if command[0].endswith(".py") or command[0] == "-m":
+                    command = ["python3", *command]
+                return launch_protected(root, command, image=args.image or DEFAULT_IMAGE)
+            if args.image:
+                raise AirlockError("--image requires --protected")
             if command[0] in {"python", "python3", Path(sys.executable).name}:
                 command = command[1:]
             return launch(root, command, approved.get("credential_bindings", {}))
@@ -313,6 +350,17 @@ def main(argv=None):
                     raise AirlockError("Credential binding must be NAME=HTTPS_ORIGIN")
                 bindings[name] = origin(url)
             current["credential_bindings"] = bindings
+            current["protected_model"] = dict(before.get("protected_model", {}))
+            if args.model:
+                if not 1 <= args.model_max_tokens <= 4096 or any(
+                    not model.strip() for model in args.model
+                ):
+                    raise AirlockError("Models require names and a token bound between 1 and 4096")
+                current["protected_model"] = {
+                    "provider": args.model_provider,
+                    "models": sorted(set(args.model)),
+                    "max_output_tokens": args.model_max_tokens,
+                }
             current["reconciliation_keys"] = dict(before.get("reconciliation_keys", {}))
             if args.reconciler_key:
                 from .reconciliation import load_operator_key, operator_identity
@@ -341,6 +389,9 @@ def main(argv=None):
                 print("\nReconciliation observer keys (trusted only with --approve):")
                 for kid in sorted(current["reconciliation_keys"]):
                     print("  " + kid)
+            if not args.json and current["protected_model"]:
+                print("\nProtected inference constraint (trusted only with --approve):")
+                print(json.dumps(current["protected_model"], sort_keys=True))
             if current["parse_errors"]:
                 raise AirlockError("Parse errors prevent approval")
             if args.approve:
@@ -354,6 +405,8 @@ def main(argv=None):
                 print("\nReview these powers, then run airlock init --approve to activate them.")
             return 0
         before = state.from_git(args.base) if args.base else state.approved()
+        if (state.path / "approved.json").exists():
+            current["protected_model"] = state.checked_in_approval().get("protected_model", {})
         diff = authority_diff(before, current)
         if args.output:
             atomic_json(args.output, diff, 0o644)
@@ -368,13 +421,22 @@ def main(argv=None):
                     stream.write(
                         "### Airlock / Authority Review\n\n<pre>" + html.escape(text) + "</pre>\n"
                     )
-            if diff["added"] or diff["blocked"] or diff["parse_errors"]:
+            if (
+                diff["added"]
+                or diff["blocked"]
+                or diff["parse_errors"]
+                or diff["model_constraints"]["expanded"]
+            ):
                 print(
                     "::error title=Airlock Authority Review::New or unresolved powers remain blocked"
                 )
         return (
             2
-            if args.cmd == "check" and any(diff[k] for k in ("added", "blocked", "parse_errors"))
+            if args.cmd == "check"
+            and (
+                any(diff[k] for k in ("added", "blocked", "parse_errors"))
+                or diff["model_constraints"]["expanded"]
+            )
             else 0
         )
     except (AirlockError, OSError, ValueError, KeyError) as exc:

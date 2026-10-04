@@ -134,7 +134,16 @@ Missing/invalid baselines, parse errors, authority expansions, and unresolved au
 GitHub job summaries show the human-readable diff; JSON is suitable for other CI systems.
 See [the reusable action](action.yml) and [workflow example](docs/github-action.md).
 
-## Supported boundary
+## Execution modes
+
+`airlock run` uses Local Mode: cooperative Python interception.
+`airlock run --protected -- python3 main.py` requires the outside-process
+container boundary and fails closed when it is unavailable. Protected Mode allows
+shell, tests/builds and local git in a copied workspace while the external supervisor
+retains credentials, keys and effect state. See [Protected Mode](docs/protected-mode.md)
+for the candidate image setup, model constraints, evidence and remaining gates.
+
+## Local Mode supported boundary
 
 - Python requests (including PyGithub), httpx sync/async, and urllib.request.
 - Generic HTTP authority binds the scheme, host, port, exact path, and query.
@@ -144,8 +153,8 @@ See [the reusable action](action.yml) and [workflow example](docs/github-action.
   the authority of a resolved call to the same URL.
 - Source lines and columns distinguish callsites. Ambiguous async expressions or source sites
   shared with unresolved evidence remain blocked.
-- Adapters are registered by Scan power kind: HTTP and GitHub (including GraphQL and dynamic
-  methods) are executed by the broker, while process and filesystem effects are released to the
+- Adapters are registered by Scan power kind: HTTP and GitHub are executed by the broker.
+  Unresolved HTTP methods remain blocked. Process and filesystem effects are released to the
   agent after Permit and the Kernel verify them. `email.send` is intercepted and always denied.
 - Unresolved, template, and unscanned calls are denied one call at a time with a signed receipt;
   they no longer block launch. Launch is refused only for a Scan power kind with no adapter.
