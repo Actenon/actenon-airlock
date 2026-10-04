@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="0" failures="4" skipped="0" tests="4" time="0.271" timestamp="2026-10-04T17:23:12.767880+01:00" hostname="Rosss-MacBook-Air.local"><testcase classname="tests.test_receipt_concurrency" name="test_two_writers_do_not_reuse_a_stale_chain_head" time="0.028"><failure message="assert (False)">project = &lt;function project.&lt;locals&gt;.create at 0x10c550f40&gt;
+
+    def test_two_writers_do_not_reuse_a_stale_chain_head(project):
+        state = project("print('ready')\n")
+        other = State(state.root)
+        state.receipt(row(1))
+        other.receipt(row(2))
+        state.receipt(row(3))
+        result = state.verify_receipts()
+&gt;       assert result["ok"] and result["receipts"] == 3
+E       assert (False)
+
+tests/test_receipt_concurrency.py:22: AssertionError</failure></testcase><testcase classname="tests.test_receipt_concurrency" name="test_parallel_instances_append_one_verified_chain" time="0.011"><failure message="assert (False)">project = &lt;function project.&lt;locals&gt;.create at 0x10c66c900&gt;
+
+    def test_parallel_instances_append_one_verified_chain(project):
+        state = project("print('ready')\n")
+        def append(index): return State(state.root).receipt(row(index))
+        with ThreadPoolExecutor(max_workers=8) as pool:
+            assert len(list(pool.map(append, range(32)))) == 32
+        result = state.verify_receipts()
+&gt;       assert result["ok"] and result["receipts"] == 32
+E       assert (False)
+
+tests/test_receipt_concurrency.py:31: AssertionError</failure></testcase><testcase classname="tests.test_receipt_concurrency" name="test_two_processes_append_one_verified_chain" time="0.183"><failure message="assert (False)">project = &lt;function project.&lt;locals&gt;.create at 0x10c66d260&gt;
+
+    def test_two_processes_append_one_verified_chain(project):
+        state = project("print('ready')\n")
+        ctx = mp.get_context("spawn")
+        ready, start, results = ctx.Queue(), ctx.Event(), ctx.Queue()
+        workers = [ctx.Process(target=_writer, args=(state.root, number, ready, start, results)) for number in range(2)]
+        try:
+            for worker in workers: worker.start()
+            assert ready.get(timeout=10) and ready.get(timeout=10)
+            start.set()
+            assert results.get(timeout=10) and results.get(timeout=10)
+            for worker in workers:
+                worker.join(10)
+                assert worker.exitcode == 0
+        finally:
+            start.set()
+            for worker in workers:
+                if worker.is_alive(): worker.kill(); worker.join(5)
+        result = state.verify_receipts()
+&gt;       assert result["ok"] and result["receipts"] == 16
+E       assert (False)
+
+tests/test_receipt_concurrency.py:60: AssertionError</failure></testcase><testcase classname="tests.test_receipt_concurrency" name="test_incomplete_previous_append_refuses_to_extend_the_journal" time="0.002"><failure message="Failed: DID NOT RAISE AirlockError">project = &lt;function project.&lt;locals&gt;.create at 0x10c63f560&gt;
+
+    def test_incomplete_previous_append_refuses_to_extend_the_journal(project):
+        state = project("print('ready')\n")
+        state.receipt(row(1))
+        with state.receipts_path.open("ab") as stream: stream.write(b'{"partial":')
+        before = state.receipts_path.read_bytes()
+&gt;       with pytest.raises(AirlockError, match="incomplete"):
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       Failed: DID NOT RAISE AirlockError
+
+tests/test_receipt_concurrency.py:68: Failed</failure></testcase></testsuite></testsuites>
