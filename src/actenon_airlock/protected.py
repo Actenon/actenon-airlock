@@ -16,6 +16,7 @@ import shutil
 import stat
 import struct
 import subprocess
+import sys
 import threading
 import time
 from pathlib import Path
@@ -46,6 +47,7 @@ class Docker:
             for name in ("HOME", "PATH", "TMPDIR", "DOCKER_CONFIG", "DOCKER_CONTEXT", "DOCKER_HOST")
             if name in os.environ
         }
+        self.host_path_prefix = None
 
     def call(self, args, *, timeout=45):
         try:
@@ -68,6 +70,7 @@ class Docker:
         return json.loads(self.call(args, timeout=timeout))
 
     def verify_engine(self, timeout=30):
+        self.host_path_prefix = None
         context = self.json(["context", "inspect"], timeout=5)[0]
         endpoint = context["Endpoints"]["docker"]["Host"]
         if not self.environment.get("DOCKER_CONTEXT"):
@@ -82,6 +85,11 @@ class Docker:
             for value in info.get("SecurityOptions", [])
         ):
             raise AirlockError("Protected Mode requires Linux with Docker's seccomp protection")
+        # Docker Desktop's local macOS file-sharing mount is reported with this
+        # prefix for some writable binds. Do not accept it on Linux or a remote
+        # daemon, or normalize arbitrary paths/symlinks into reviewed mounts.
+        if sys.platform == "darwin" and info.get("OperatingSystem") == "Docker Desktop":
+            self.host_path_prefix = "/host_mnt"
         return {"server_version": info["ServerVersion"], "os": "linux", "seccomp": True}
 
     def image(self, name):
@@ -445,6 +453,17 @@ def _verify_container(docker, identity, *, agent, mounts):
         }
         for row in config["Mounts"]
     }
+    matching_mounts = dict(actual_mounts)
+    prefix = getattr(docker, "host_path_prefix", None)
+    if prefix:
+        for destination, row in actual_mounts.items():
+            expected = mounts.get(destination)
+            if (
+                expected
+                and row["type"] == expected["type"] == "bind"
+                and row["source"] == prefix + expected["source"]
+            ):
+                matching_mounts[destination] = {**row, "source": expected["source"]}
     if not (
         host["NetworkMode"] == "none"
         and host["ReadonlyRootfs"] is True
@@ -461,8 +480,9 @@ def _verify_container(docker, identity, *, agent, mounts):
         and host["IpcMode"] == "private"
         and host["PidsLimit"] == 128
         and host["Memory"] == 1024 * 1024 * 1024
+        and host.get("NanoCpus") == 2_000_000_000
         and image["User"] == ("10000:10000" if agent else "0:0")
-        and actual_mounts == mounts
+        and matching_mounts == mounts
     ):
         raise AirlockError(
             "Protected container isolation configuration differs from the required boundary"
