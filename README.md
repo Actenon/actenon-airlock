@@ -153,3 +153,7 @@ python -m build
 The tests use real pinned Scan, Permit, and Kernel components, real HTTP clients and loopback servers.
 They exercise target changes, approvals, empty/unresolved authority, credential release, revocation,
 proof mutation/replay, JSON/CI output, and attempted runtime bypasses.
+
+The local signed receipt journal serializes appends across threads and broker
+processes. An interrupted partial record stops further appends until recovery;
+evidence is preserved. See [the journal attack evidence and guarantees](docs/evidence/receipt-journal/README.md).

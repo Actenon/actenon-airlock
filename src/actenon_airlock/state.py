@@ -7,6 +7,8 @@ import hashlib
 import json
 import os
 import subprocess
+import threading
+from contextlib import contextmanager
 from datetime import UTC, datetime
 from pathlib import Path
 
@@ -23,6 +25,7 @@ from .common import AirlockError, canonical
 RECEIPT_SCHEMA = "actenon-airlock/receipt/v1"
 # Domain separation: a receipt signature can never verify as an approval signature.
 RECEIPT_DOMAIN = b"actenon-airlock/receipt/v1\n"
+_RECEIPT_THREAD_LOCK = threading.RLock()
 
 
 def atomic_json(path: Path, data: dict, mode: int = 0o600) -> None:
@@ -125,30 +128,60 @@ class State:
     def receipts_path(self) -> Path:
         return self.local / "receipts.jsonl"
 
-    def receipt(self, value: dict) -> dict:
-        """Append one Ed25519-signed receipt, chained to the previous line by SHA-256."""
+    @contextmanager
+    def _receipt_journal_lock(self, *, exclusive: bool):
+        """Thread and process lock for the supported POSIX local runtime."""
+        if os.name != "posix":
+            raise AirlockError("The local receipt journal currently requires Linux or macOS")
+        import fcntl
+
         self.local.mkdir(parents=True, exist_ok=True, mode=0o700)
-        if not hasattr(self, "_receipt_key"):
-            self._receipt_key = load_ed25519_keypair(self.key_path)
-            self._receipt_prev = _last_line_digest(self.receipts_path)
-        key = self._receipt_key
-        row = {**value, "schema": RECEIPT_SCHEMA, "prev": self._receipt_prev}
-        signature = Ed25519PrivateKey.from_private_bytes(key.private_key_bytes).sign(
-            RECEIPT_DOMAIN + canonical(row)
-        )
-        row["signature"] = {
-            "algorithm": "EdDSA",
-            "key_id": key.key_id,
-            "encoding": "base64url",
-            "value": b64url_encode(signature),
-        }
-        line = canonical(row)
-        with self.receipts_path.open("ab") as stream:
-            stream.write(line + b"\n")
-            stream.flush()
-            os.fsync(stream.fileno())
-        self._receipt_prev = hashlib.sha256(line).hexdigest()
-        return row
+        with _RECEIPT_THREAD_LOCK:
+            flags = os.O_CREAT | os.O_RDWR | os.O_CLOEXEC | os.O_NOFOLLOW
+            fd = os.open(self.local / "receipts.lock", flags, 0o600)
+            try:
+                fcntl.flock(fd, fcntl.LOCK_EX if exclusive else fcntl.LOCK_SH)
+                yield
+            finally:
+                os.close(fd)  # releasing the lock also works after process death
+
+    def receipt(self, value: dict) -> dict:
+        """Append one signed receipt using the current durable journal head.
+
+        Key caching is safe; chain-head caching is not. Both signing and append
+        occur under one process-shared lock, with fsync before release. An
+        interrupted partial write is preserved and blocks further append.
+        """
+        with self._receipt_journal_lock(exclusive=True):
+            if not hasattr(self, "_receipt_key"):
+                self._receipt_key = load_ed25519_keypair(self.key_path)
+            key = self._receipt_key
+            row = {
+                **value,
+                "schema": RECEIPT_SCHEMA,
+                "signer_key_id": key.key_id,
+                "prev": _last_line_digest(self.receipts_path),
+            }
+            signature = Ed25519PrivateKey.from_private_bytes(key.private_key_bytes).sign(
+                RECEIPT_DOMAIN + canonical(row)
+            )
+            row["signature"] = {
+                "algorithm": "EdDSA",
+                "key_id": key.key_id,
+                "encoding": "base64url",
+                "value": b64url_encode(signature),
+            }
+            line = canonical(row)
+            with self.receipts_path.open("ab") as stream:
+                stream.write(line + b"\n")
+                stream.flush()
+                os.fsync(stream.fileno())
+            directory_fd = os.open(self.local, os.O_RDONLY | os.O_DIRECTORY)
+            try:
+                os.fsync(directory_fd)
+            finally:
+                os.close(directory_fd)
+            return row
 
     def verify_receipts(self) -> dict:
         """Check every receipt against the project's committed public key and the hash chain."""
@@ -157,10 +190,11 @@ class State:
             verifier = Ed25519PublicKey.from_public_bytes(base64.b64decode(public, validate=True))
         except (OSError, ValueError, KeyError) as exc:
             raise AirlockError("Project public key is missing or invalid") from exc
-        try:
-            lines = self.receipts_path.read_bytes().splitlines()
-        except FileNotFoundError:
-            lines = []
+        with self._receipt_journal_lock(exclusive=False):
+            try:
+                lines = self.receipts_path.read_bytes().splitlines()
+            except FileNotFoundError:
+                lines = []
         rows, prev = [], None
         for number, line in enumerate(lines, 1):
             problem, row = None, {}
@@ -175,6 +209,10 @@ class State:
                 unsigned = {k: v for k, v in row.items() if k != "signature"}
                 if row.get("schema") != RECEIPT_SCHEMA or signature.get("algorithm") != "EdDSA":
                     problem = "unsupported receipt schema or algorithm"
+                elif signature.get("encoding") != "base64url":
+                    problem = "unsupported receipt signature encoding"
+                elif "signer_key_id" in row and row["signer_key_id"] != signature.get("key_id"):
+                    problem = "signature key identifier differs from the signed receipt"
                 elif row.get("prev") != prev:
                     problem = "hash chain broken (a receipt was removed, reordered, or edited)"
                 else:
@@ -205,7 +243,12 @@ def _last_line_digest(path: Path) -> str | None:
             size = min(end, 1 << 20)
             while True:
                 stream.seek(end - size)
-                tail = stream.read(size).rstrip(b"\n")
+                raw_tail = stream.read(size)
+                if raw_tail and not raw_tail.endswith(b"\n"):
+                    raise AirlockError(
+                        "Receipt journal has an incomplete append; preserve it for recovery"
+                    )
+                tail = raw_tail.rstrip(b"\n")
                 if b"\n" in tail or size == end:
                     break
                 size = min(end, size * 2)
