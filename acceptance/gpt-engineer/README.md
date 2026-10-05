@@ -64,6 +64,10 @@ Those require their separate acceptance evidence.
 The fifth run completed three real requests but produced an indentation error and
 repeated irrelevant edits. None of those historical protected runs had a matched
 unprotected baseline, so they do not establish whether protection changed task
-utility. The first matched 7b baseline also failed. The next configuration changes only model capacity to the pinned 14b model, with actual memory/disk admission recorded before its baseline. Task, system prompts, tools, tests and all other limits stay frozen.
+utility. Both matched baselines failed: 7b completed three model calls; 14b
+completed seven without timeout or truncation, but produced invalid diffs and
+Python indentation errors. All test assertions remain unchanged. Neither baseline
+reached compile, shell computation or a local commit; both protected phases were
+skipped. Selected raw results and transcripts are preserved with the failure ledger.
 Model completion is not engineering success. These are candidate artifacts, not
 an Airlock v1 release.
