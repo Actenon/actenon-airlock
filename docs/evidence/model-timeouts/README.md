@@ -117,3 +117,18 @@ plus 3 GiB disk remain available. This is capacity admission, not proof that the
 model will solve the task or meet the unchanged timeout. The source, task, system
 prompts, tools, tests, temperature, token bound, attempt count and phase limits
 are unchanged. Baseline must pass before protection is scored.
+
+[Second matched baseline 37295234658](https://github.com/Actenon/actenon-airlock/actions/runs/37295234658)
+at `3da414c6719c406ad44dd91d115a6d289484a072` failed after 30 minutes and
+31 seconds. The runner admitted the pinned 14b model with 13.68 GiB available
+memory and 82.97 GiB free disk. Seven real responses completed within the existing
+timeout, without observed context or output truncation. The first response
+invented prior code and inconsistent indentation; the unchanged external diff
+salvager applied some hunks, then refinements repeatedly inserted statements into
+incorrect locations. All three unchanged-test attempts failed collection with
+`IndentationError`. Compile, shell computation and local commit were not reached.
+The protected phase was correctly skipped. Capacity and model completion do not
+establish useful task execution. The complete selected transcript, diff errors,
+generated source, actual capacity, preregistration and results are preserved in
+`second-matched-baseline-failure/`, with a file checksum manifest. Configuration:
+`63d5ac827920707a1935317d65ece1b784b39c32f3c354cfdf0483357b84f2dd`.
