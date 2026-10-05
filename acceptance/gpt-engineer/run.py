@@ -90,6 +90,13 @@ finally:
         ):
             if (workspace / name).exists():
                 shutil.copyfile(workspace / name, evidence / name)
+        # The external agent's own public logs contain only the supplied source,
+        # test task, model responses and diff diagnostics in this credential-free
+        # acceptance. Export explicit filenames, never the entire state/workspace.
+        for name in ("improve.txt", "diff_errors.txt"):
+            log = workspace / "agent-memory/.gpteng/memory/logs" / name
+            if log.exists():
+                shutil.copyfile(log, evidence / ("agent-" + name))
         if (workspace / target).exists():
             shutil.copyfile(workspace / target, evidence / "workspace-disk-execution-env.py")
     verification = state.verify_receipts()

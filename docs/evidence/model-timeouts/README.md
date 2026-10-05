@@ -59,3 +59,21 @@ code, each unchanged-test result and receipts are preserved in a separate folder
 The next acceptance configuration uses official `qwen2.5-coder:7b`, manifest
 `dae161e27b0e90dd1856c8bb3209201fd6736d8eb66298e75ed87571486f4364`,
 with the same 1536-token bound, public agent API, regressions and containment.
+
+
+[Fourth run 37287365835](https://github.com/Actenon/actenon-airlock/actions/runs/37287365835)
+at head `f656a30501ee7ebdfccb838149989edebeac8119` completed five real requests
+with the pinned 7b model. Eleven signed receipts verify. The model repaired pipe
+draining and tail output, but timeout still raised `subprocess.TimeoutExpired`
+instead of the required built-in `TimeoutError`; invalid diff hunks left
+unreachable copies of the old code. The last 1536-token response produced no
+further applied change. The engineering gate failed and no PASS is claimed.
+Selected original evidence is preserved in `fourth-real-agent-failure/`.
+
+The next run keeps the same model, output bound, full external source, public
+agent API and every regression assertion. The task now includes the actual
+unchanged tests and requires diff context copied from the current source.
+A no-change response is recorded as an unsuccessful attempt instead of aborting
+before its diagnostics can be preserved. Only the external agent's explicit
+`improve.txt` and `diff_errors.txt` public transcript files are exported to explain
+edit failures; no complete workspace, private authority state or secrets are exported.

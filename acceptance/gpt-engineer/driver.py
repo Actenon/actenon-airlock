@@ -47,32 +47,38 @@ ai.llm.max_tokens = 1536
 agent = SimpleAgent.with_default_config("agent-memory", ai=ai)
 files = FilesDict({target: original})
 task = (
-    "Fix DiskExecutionEnv.run in the supplied existing repository. It currently reads "
-    "stdout and stderr sequentially, so a full stderr pipe can deadlock and timeout "
-    "cannot interrupt a blocking readline. It can also miss tail output when a child "
-    "exits. Preserve the public signature and return tuple, shell=True and cwd. "
-    "Replace the entire old readline/poll loop with communicate(timeout=timeout); do not keep blocking readline calls. On expiry, terminate and "
-    "reap the shell's entire process group so descendants cannot keep the pipes open, "
-    "and raise built-in TimeoutError when the timeout expires. Return complete stdout, "
-    "stderr and the final exit status otherwise. Change only this file. "
-    "Use the unified diff format requested in the system prompt. Output only the diff."
+    "Repair DiskExecutionEnv.run so it passes the unchanged regression tests below. "
+    "Preserve its public signature, tuple result, shell=True and working directory. "
+    "Drain both pipes without deadlock, preserve all tail output and exit status, "
+    "and enforce the timeout promptly with built-in TimeoutError. Terminate and reap "
+    "the entire process group on timeout so descendants cannot keep pipes open. "
+    "Change only the supplied implementation file. Do not change the tests. "
+    "Replace the old method completely; do not leave an unreachable copy behind. "
+    "Output one fenced diff for this file. Copy removed/context lines exactly "
+    "from the supplied current source, without the displayed line numbers. "
+    "Never invent previous code or use ellipses for removed lines. "
+    "Include all needed import changes in that same diff. No prose is needed.\n\n"
+    "UNCHANGED REGRESSION TESTS:\n" + Path("test_airlock_execution_regression.py").read_text()
 )
 attempts = []
 feedback = ""
 for attempt in range(1, 4):
     updated = agent.improve(files, Prompt(task + feedback))
     assert set(updated) == {target}, "The task must not replace tests or unrelated source"
-    assert updated[target] != files[target], "The actual model/agent must edit the implementation"
+    changed = updated[target] != files[target]
     FileStore(Path.cwd()).push(updated)
     code = regressions("regression-after")
-    attempts.append({"attempt": attempt, "regression_exit": code})
+    attempts.append({"attempt": attempt, "changed": changed, "regression_exit": code})
     Path(f"regression-attempt-{attempt}.log").write_text(Path("regression-after.log").read_text())
     Path("agent-attempts.json").write_text(json.dumps(attempts, indent=2) + "\n")
     if code == 0:
+        assert updated[target] != original, "The actual model/agent must repair the implementation"
         break
     files = updated
     feedback = (
-        "\nThe current edit failed these unchanged tests. Fix the implementation:\n"
+        f"\nAttempt {attempt} did not pass. The current source above is authoritative. "
+        "Use exact context from that source to repair the remaining failures. "
+        "These are actual results from the unchanged tests:\n"
         + Path("regression-after.log").read_text()[-5000:]
     )
 else:
