@@ -2,7 +2,7 @@
 
 This harness uses the public Python API of gpt-engineer 0.3.1, frozen at
 `a90fcd543eedcc0ff2c34561bc0785d2ba83c47e`, and a real local
-`qwen2.5-coder:7b` model. The complete external repository and hash-locked
+`qwen2.5-coder:14b` model. The complete external repository and hash-locked
 dependencies are available inside the contained workspace. Its application logic,
 prompts, diff parser and model client are unchanged.
 
@@ -31,7 +31,7 @@ gh run list --repo YOUR_ACCOUNT/actenon-airlock --workflow real-coding-acceptanc
 
 The workflow installs the exact candidate engine dependencies, builds both compute
 images, verifies the official Ollama 0.32.9 archive hash, and verifies the model
-manifest `dae161e27b0e90dd1856c8bb3209201fd6736d8eb66298e75ed87571486f4364`.
+manifest `9ec8897f747e246e970bc5cfdda85d22f1123dc2e3d34978a010a75968716849`.
 It uses a local CPU model, no paid provider, production credential or repository
 write permission. Allow time for the full dependency build and real inference;
 the two-phase job has a 90-minute limit, with the same 40-minute phase limit for each workload. The model uses the reviewed 1536-token output bound
@@ -64,6 +64,6 @@ Those require their separate acceptance evidence.
 The fifth run completed three real requests but produced an indentation error and
 repeated irrelevant edits. None of those historical protected runs had a matched
 unprotected baseline, so they do not establish whether protection changed task
-utility. The next candidate establishes and preserves that baseline first.
+utility. The first matched 7b baseline also failed. The next configuration changes only model capacity to the pinned 14b model, with actual memory/disk admission recorded before its baseline. Task, system prompts, tools, tests and all other limits stay frozen.
 Model completion is not engineering success. These are candidate artifacts, not
 an Airlock v1 release.

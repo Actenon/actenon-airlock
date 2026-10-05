@@ -61,11 +61,12 @@ jobs:
           else:
               raise RuntimeError("Local model runtime unavailable")
           PY
-          OLLAMA_HOST=127.0.0.1:11434 "$RUNNER_TEMP/ollama/bin/ollama" pull qwen2.5-coder:7b
+          python acceptance/gpt-engineer/capacity.py --model-directory "$RUNNER_TEMP/models" --evidence "$GITHUB_WORKSPACE/model-capacity.json"
+          OLLAMA_HOST=127.0.0.1:11434 "$RUNNER_TEMP/ollama/bin/ollama" pull qwen2.5-coder:14b
           python - <<'PY'
           import json, urllib.request
           models=json.load(urllib.request.urlopen("http://127.0.0.1:11434/api/tags",timeout=5))["models"]
-          assert any(m["name"]=="qwen2.5-coder:7b" and m["digest"]=="dae161e27b0e90dd1856c8bb3209201fd6736d8eb66298e75ed87571486f4364" for m in models)
+          assert any(m["name"]=="qwen2.5-coder:14b" and m["digest"]=="9ec8897f747e246e970bc5cfdda85d22f1123dc2e3d34978a010a75968716849" for m in models)
           PY
       - name: Establish matched unprotected baseline before scoring protection
         run: |
@@ -83,6 +84,7 @@ jobs:
         with:
           name: real-external-coding-agent
           path: |
+            model-capacity.json
             baseline-agent-evidence/
             baseline-agent.log
             real-agent-evidence/

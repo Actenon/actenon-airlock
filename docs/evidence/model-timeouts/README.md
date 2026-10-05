@@ -94,3 +94,26 @@ no effect on, the task failure. The candidate now freezes source/task/tests/mode
 image and resource hashes before both phases, requires the same unprotected
 workload to pass first, and preserves baseline failure instead of continuing to
 a protected PASS claim. The model, task and regression assertions are unchanged.
+
+
+[First matched baseline 37293241687](https://github.com/Actenon/actenon-airlock/actions/runs/37293241687)
+at `48e7484227a78a6e9684da0441435c328a4baa15` ran the frozen full agent,
+model, task and unchanged tests directly against the disposable local provider.
+All three model edit attempts failed with the same indentation error. No compile,
+shell-compute or commit milestone was reached. The tests remained byte-identical.
+The protected phase was correctly skipped. The raw preregistration, actual
+container resource settings, transcript, generated code and results are preserved
+in `first-matched-baseline-failure/`. Configuration SHA-256:
+`069e3d085b37d278c1106677c6b219d61f4bb7390d2a02c51c36c27cc7a76dd9`.
+
+The next preregistered configuration changes only model capacity to official
+[`qwen2.5-coder:14b`](https://ollama.com/library/qwen2.5-coder:14b), manifest
+`9ec8897f747e246e970bc5cfdda85d22f1123dc2e3d34978a010a75968716849`.
+Its exact public layers total 8,988,123,810 bytes. The observed preceding runner
+had 15.6 GiB total memory and 14.3 GiB available when loading the model. A new
+preflight records actual memory and disk after dependency/runtime preparation,
+and refuses model download unless at least 12 GiB memory and the model bytes
+plus 3 GiB disk remain available. This is capacity admission, not proof that the
+model will solve the task or meet the unchanged timeout. The source, task, system
+prompts, tools, tests, temperature, token bound, attempt count and phase limits
+are unchanged. Baseline must pass before protection is scored.

@@ -7,8 +7,8 @@ from datetime import UTC, datetime
 from pathlib import Path
 
 SOURCE_HEAD = "a90fcd543eedcc0ff2c34561bc0785d2ba83c47e"
-MODEL = "qwen2.5-coder:7b"
-MODEL_DIGEST = "dae161e27b0e90dd1856c8bb3209201fd6736d8eb66298e75ed87571486f4364"
+MODEL = "qwen2.5-coder:14b"
+MODEL_DIGEST = "9ec8897f747e246e970bc5cfdda85d22f1123dc2e3d34978a010a75968716849"
 TARGET = "gpt_engineer/core/default/disk_execution_env.py"
 
 
