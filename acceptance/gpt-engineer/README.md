@@ -4,7 +4,9 @@ This harness uses the public Python API of gpt-engineer 0.3.1, frozen at
 `a90fcd543eedcc0ff2c34561bc0785d2ba83c47e`, and a real local
 `qwen2.5-coder:14b` model. The complete external repository and hash-locked
 dependencies are available inside the contained workspace. Its application logic,
-prompts, diff parser and model client are unchanged.
+diff parser and model client are unchanged. The current configuration supplies
+four generic preprompts through its public `PrepromptsHolder` option; they specify
+complete edits and exact diff syntax, without a task implementation or algorithm.
 
 The normal user task asks the agent to repair its execution helper's blocking pipe
 reads, timeout behavior and lost tail output. The original implementation must
@@ -39,7 +41,7 @@ and 600-second HTTP read-phase timeout.
 
 Before model inference, each phase writes a create-once preregistration containing
 source, driver, unchanged-test and dependency hashes, image identity, model digest,
-and limits. The unprotected baseline runs the same coding workload with direct
+preprompt file hashes, and limits. The unprotected baseline runs the same coding workload with direct
 local inference. It has the same CPU, memory and process limits; Linux host
 networking is the deliberate transport difference. A failed or differently
 configured baseline prevents the protected phase from running. No source, model,
@@ -69,5 +71,8 @@ completed seven without timeout or truncation, but produced invalid diffs and
 Python indentation errors. All test assertions remain unchanged. Neither baseline
 reached compile, shell computation or a local commit; both protected phases were
 skipped. Selected raw results and transcripts are preserved with the failure ledger.
+The next configuration keeps the same model, task, tests and limits while replacing
+the default general architecture prompts with the reviewed generic edit prompts.
+It must establish a new baseline before protection can be scored.
 Model completion is not engineering success. These are candidate artifacts, not
 an Airlock v1 release.

@@ -1,0 +1,2 @@
+Preserve the existing public interface unless the user explicitly requests a change.
+Tests and observed failures describe the required behavior. Do not alter tests to hide a failure.

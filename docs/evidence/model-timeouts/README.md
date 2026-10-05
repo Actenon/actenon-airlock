@@ -132,3 +132,14 @@ establish useful task execution. The complete selected transcript, diff errors,
 generated source, actual capacity, preregistration and results are preserved in
 `second-matched-baseline-failure/`, with a file checksum manifest. Configuration:
 `63d5ac827920707a1935317d65ece1b784b39c32f3c354cfdf0483357b84f2dd`.
+
+The next configuration changes only the public preprompt setting. The default
+prompts demand a long architecture response and extra package files; the reviewed
+replacement gives generic existing-code and precise unified-diff instructions.
+It supplies no solution code or repair algorithm. `SimpleAgent.with_default_config`
+accepts the `PrepromptsHolder` object directly; both upstream fallback sites retain
+that truthy object, and the original prompt renderer substitutes `FILE_FORMAT`
+exactly once. All four files are hashed in the matched preregistration and copied
+identically to both phases. The task expression, full source revision, regression
+SHA, model and resource limits remain unchanged. This setting still requires a
+new successful baseline and protected result at the integrated candidate revision.
