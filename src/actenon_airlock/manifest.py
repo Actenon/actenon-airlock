@@ -150,6 +150,7 @@ def authority_diff(before: dict, after: dict) -> dict:
             or model_endpoint(new_model) != model_endpoint(old_model)
             or not set(new_model["models"]).issubset(old_model["models"])
             or new_model["max_output_tokens"] > old_model["max_output_tokens"]
+            or new_model.get("read_timeout_seconds", 30) > old_model.get("read_timeout_seconds", 30)
         )
     except (AirlockError, KeyError, TypeError):
         model_expanded = True

@@ -48,6 +48,8 @@ assert (
             endpoint,
             "--model-max-tokens",
             "4096",
+            "--model-read-timeout",
+            "600",
         ]
     )
     == 0

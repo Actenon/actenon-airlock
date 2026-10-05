@@ -231,6 +231,14 @@ class ProtectedBroker(Broker):
     def action_cost(self, effect):
         return 1
 
+    def http_timeout(self, url):
+        profile = self.approval.get("protected_model", {})
+        if profile and endpoint(profile) == url:
+            # The signed supervisor profile controls this phase timeout, never
+            # an agent request/header. This is not an overall execution deadline.
+            return profile.get("read_timeout_seconds", 30)
+        return super().http_timeout(url)
+
     def bind_authority(self, effect, message):
         for candidate in effect.candidates:
             if candidate["action"] == "github.graphql":

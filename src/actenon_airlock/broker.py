@@ -95,7 +95,11 @@ class HttpDispatch:
         self.attempted = True
         # The exact URL/body/header handles used to mint the proof are used here.
         with broker.http.stream(
-            self.method, self.url, headers=actual_headers, content=self.body, timeout=30
+            self.method,
+            self.url,
+            headers=actual_headers,
+            content=self.body,
+            timeout=broker.http_timeout(self.url),
         ) as response:
             content = bytearray()
             for part in response.iter_bytes():
@@ -224,6 +228,9 @@ class Broker:
         self.http = httpx.Client(trust_env=False, follow_redirects=False)
         self.denials = 0
         self.execution_errors = 0
+
+    def http_timeout(self, url):
+        return 30
 
     def close(self):
         self.http.close()

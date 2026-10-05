@@ -166,6 +166,11 @@ def main(argv=None):
                 "--model-endpoint", help="Exact full inference endpoint also discovered by Scan"
             )
             p.add_argument(
+                "--model-read-timeout",
+                type=int,
+                help="Review a model read-phase timeout of 1–600 seconds (default 30)",
+            )
+            p.add_argument(
                 "--approve",
                 action="store_true",
                 help="Explicitly approve the displayed resolved powers",
@@ -356,6 +361,8 @@ def main(argv=None):
             current["protected_model"] = dict(before.get("protected_model", {}))
             if args.model_endpoint and not args.model:
                 raise AirlockError("--model-endpoint requires --model and a fresh review")
+            if args.model_read_timeout is not None and not args.model:
+                raise AirlockError("--model-read-timeout requires --model and a fresh review")
             if args.model:
                 from .model_constraints import endpoint, validate_profile
 
@@ -374,6 +381,12 @@ def main(argv=None):
                     "provider"
                 ) == args.model_provider and before["protected_model"].get("endpoint"):
                     current["protected_model"]["endpoint"] = before["protected_model"]["endpoint"]
+                if args.model_read_timeout is not None:
+                    current["protected_model"]["read_timeout_seconds"] = args.model_read_timeout
+                elif before.get("protected_model", {}).get("read_timeout_seconds") is not None:
+                    current["protected_model"]["read_timeout_seconds"] = before["protected_model"][
+                        "read_timeout_seconds"
+                    ]
                 validate_profile(current["protected_model"])
                 target = endpoint(current["protected_model"])
                 if not any(
