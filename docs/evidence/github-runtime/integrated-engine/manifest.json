@@ -1,0 +1,86 @@
+{
+  "schema": "actenon-github-engine-integration-fixture/v1",
+  "recorded_at": "2026-10-05T10:36:05.504808+00:00",
+  "head": "8aa06ba67e23cc7ae258467df0796d88986dc8a5",
+  "working_tree_candidate": true,
+  "python": "3.12.13 (main, Jun 23 2026, 15:44:24) [Clang 22.1.3 ]",
+  "platform": "macOS-26.4.1-arm64-arm-64bit",
+  "scope": "Actual installed Permit/Kernel/Scan/Protocol; httpx.MockTransport provider fixtures, no live GitHub or Docker boundary",
+  "command": "PYTHONPATH=src .venv/bin/python -m pytest -q tests/test_github_protected_integration.py",
+  "result": {
+    "passed": 23,
+    "exit_code": 0
+  },
+  "source_sha256": {
+    "src/actenon_airlock/broker.py": "49b64acf3a7a96c722aa012d94723be15d8e3992d5694d666f6fd7ed9edd5ea7",
+    "src/actenon_airlock/protected.py": "c22138e7962c0c51a7ac285029c553a710291825e014e1734d77bbd950c2d3ee",
+    "src/actenon_airlock/github_runtime.py": "9e311bdaf6b62d9c9efd84ab8b70a8d0bea7abd2d72a50778f7ecfca5594a844",
+    "src/actenon_airlock/github_consequence.py": "3915f908f372e36593ea5b802fa35cafda3ac336cc2f8daacf6d305b529591e2",
+    "tests/test_github_protected_integration.py": "cd06db65ef58d52e01aac3dd9e0b4920bd376e5605f80a09511c6bb4a10c9154"
+  },
+  "dependencies": {
+    "actenon-protocol": {
+      "version": "1.6.0",
+      "direct_url": {
+        "url": "https://github.com/Actenon/actenon-protocol",
+        "vcs_info": {
+          "vcs": "git",
+          "commit_id": "8e5bc9e342f694767508bae9a392749c6a8df2cc",
+          "requested_revision": "8e5bc9e342f694767508bae9a392749c6a8df2cc"
+        }
+      }
+    },
+    "actenon-kernel": {
+      "version": "1.3.0",
+      "direct_url": {
+        "url": "https://github.com/Actenon/actenon-kernel",
+        "vcs_info": {
+          "vcs": "git",
+          "commit_id": "66052b20941f908634c9fbac24f1ae7cead78e46",
+          "requested_revision": "66052b20941f908634c9fbac24f1ae7cead78e46"
+        }
+      }
+    },
+    "actenon-permit": {
+      "version": "2.0.0rc1",
+      "direct_url": {
+        "url": "https://github.com/Actenon/actenon-permit.git",
+        "vcs_info": {
+          "vcs": "git",
+          "commit_id": "fd120449e74bb8050cbf58d4b3488eef770239fc",
+          "requested_revision": "fd120449e74bb8050cbf58d4b3488eef770239fc"
+        }
+      }
+    },
+    "actenon-scan": {
+      "version": "1.6.0",
+      "direct_url": {
+        "url": "https://github.com/Actenon/actenon-scan.git",
+        "vcs_info": {
+          "vcs": "git",
+          "commit_id": "ee971b43c78ed8b58f5f7fb59382ab20ce9b8a5c",
+          "requested_revision": "ee971b43c78ed8b58f5f7fb59382ab20ce9b8a5c"
+        }
+      }
+    }
+  },
+  "evidence_sha256": {
+    "after-integration.log": "5554d7f19ac4af73e1c9afb2c5ffa67feff64d7fedca46c5de2ca3953b124695",
+    "after-integration.xml": "ebcd0b6442ce2129b211ae987efb9b39a60d7f0c2175087b926af3a3eb695ed6",
+    "after-root.log": "ff536cfe35447d0faa0742840914c09c3d53775df0a034f6db67d4493f8ee627",
+    "after-root.xml": "03767bbbb8c8f966406d3ce1a3bde7c87013eb5b1636275f5954bedec8a78442",
+    "before-integration.log": "f819d0b0a61bea15a048190731584ab0f9e8101d8488a636459d283c3a4a5937",
+    "before-integration.xml": "39d8e63296b335031888d8b97bffd4d4929768cc0db4e2b635934b8772577421",
+    "before-preflight.log": "a599bc96d3bae161a215c89ee0a800125b6de61fe6bc524b03fbdc5eb71a56aa",
+    "before-preflight.xml": "e870bb8b85a89e95c4a4b7b97e6a06b77022df7c9b74c5645cdf96461fd7f925",
+    "fixture-receipts/allow-ambiguous/approved.json": "d980bcfcd7b303c2c124deeef66e15004613aa12abdc3807ef0dbd34054b2ec9",
+    "fixture-receipts/allow-ambiguous/public-key.json": "854e1acff4b1309e173356a934af549f411156ead4ca2fcaf95148c30e858ea8",
+    "fixture-receipts/allow-ambiguous/receipts.jsonl": "8c208c8193c0916eec008b46b1fced91de300fa554a4ca4d7f767628dc4446c0",
+    "fixture-receipts/expansion-refusal/approved.json": "8537cef10959453abbd3a1f77f425b19e4b712c825b99c744e311556d6ed326d",
+    "fixture-receipts/expansion-refusal/public-key.json": "dd0833898c1a05b3754580a37c2211b5a01f53bf33ad90ad39060002c3a2f185",
+    "fixture-receipts/expansion-refusal/receipts.jsonl": "2734b70d7eac06976794b2663b07cf6fdb60127f919baeb385e9d3e5386858bb",
+    "fixture-receipts/preflight-refusal/approved.json": "e5ef5f11acda63894b971a550742f916ca65375af1352c0d5118a49bcaa744f3",
+    "fixture-receipts/preflight-refusal/public-key.json": "79315ba7de6f1f1841a1fa50b4b3a99d9f0fa9efded6d8ea863a18483926e3d5",
+    "fixture-receipts/preflight-refusal/receipts.jsonl": "b557f2c1d0c5582bb7c0fee13dc6ff7ea8658e2cdd2f33d53cd5604b5b9ae2f6"
+  }
+}

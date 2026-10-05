@@ -194,7 +194,7 @@ class Broker:
         self.grant = Grant(
             agent_id=self.grant_principal(),
             expires_at=datetime.now(UTC) + timedelta(hours=1),
-            scopes=Scopes(allow=sorted(self.allowed), deny=[] if self.allowed else ["*"]),
+            scopes=self.grant_scopes(),
             budget=self.grant_budget(),
         ).sign()
         if not self.grant.verify():
@@ -329,7 +329,7 @@ class Broker:
             },
         }
 
-    def _settle_http_effect(self, intent, proof, outcome, dispatch):
+    def _settle_http_effect(self, intent, proof, outcome, dispatch, grant):
         reference = proof.extensions["effect"]
         evidence = outcome.receipt.extensions.get("effect") if outcome.receipt else None
         if evidence is None:
@@ -354,7 +354,7 @@ class Broker:
                 }
         self.store.settle_effect(
             reference=reference,
-            grant_id=self.grant.id,
+            grant_id=grant.id,
             principal=intent.requester.id,
             action_hash=proof.action_hash.value,
             outcome=evidence["outcome"],
@@ -370,11 +370,20 @@ class Broker:
     def grant_budget(self):
         return Budget(limit=1000000, remaining=1000000)
 
+    def grant_scopes(self):
+        return Scopes(allow=sorted(self.allowed), deny=[] if self.allowed else ["*"])
+
     def grant_principal(self):
         return "airlock:" + self.current["source_digest"]
 
     def action_cost(self, effect):
         return 0
+
+    def execution_grant(self, capability_name, dispatch):
+        return self.grant
+
+    def make_dispatch(self, adapter, effect, message):
+        return DISPATCH[adapter.executor](self, effect, message) if adapter.executor else None
 
     def http_outcome(self, dispatch):
         # Generic HTTP does not establish the remote consequence.
@@ -407,11 +416,12 @@ class Broker:
             action_name = entry["action"]
             if entry["evidence"] is None:
                 labels["callsite"] = (message["locations"] or [None])[0]
-            dispatch = (
-                DISPATCH[adapter.executor](self, effect, message) if adapter.executor else None
-            )
+            dispatch = self.make_dispatch(adapter, effect, message)
+            labels.update(getattr(dispatch, "authority_fields", lambda: {})())
+            approved_grant = self.execution_grant(cap, dispatch)
+            labels["grant_id"] = approved_grant.id
             action = Action(
-                grant_id=self.grant.id,
+                grant_id=approved_grant.id,
                 type=cap,
                 target=target,
                 params={
@@ -425,13 +435,13 @@ class Broker:
             )
             # Permit owns the immutable authority signature boundary. Compare
             # that same payload to the launch grant; live state stays in its store.
-            grant = self.store.get_grant(self.grant.id)
+            grant = self.store.get_grant(approved_grant.id)
             if (
                 grant is None
-                or not self.grant.verify()
+                or not approved_grant.verify()
                 or not grant.verify()
                 or authority_payload(grant.model_dump(mode="json"))
-                != authority_payload(self.grant.model_dump(mode="json"))
+                != authority_payload(approved_grant.model_dump(mode="json"))
             ):
                 raise AirlockError("Signed Permit grant could not be verified")
             protected_effect = isinstance(dispatch, HttpDispatch) and dispatch.consequential
@@ -479,8 +489,9 @@ class Broker:
             )
             edge = self.effect_edge if protected_effect else self.edge
             outcome = edge.protect(intent, proof, dispatch.run)
+            labels.update(getattr(dispatch, "receipt_fields", lambda: {})())
             effect_evidence = (
-                self._settle_http_effect(intent, proof, outcome, dispatch)
+                self._settle_http_effect(intent, proof, outcome, dispatch, grant)
                 if protected_effect
                 else None
             )
@@ -551,6 +562,7 @@ class Broker:
                     target,
                     outcome.reason_code or "Kernel refused",
                     kernel=outcome.to_dict(),
+                    credential_released=dispatch.credential_released,
                     **labels,
                 )
             released = dispatch.stage == "released"
@@ -606,7 +618,13 @@ class Broker:
                 if isinstance(exc, AirlockError)
                 else "Invalid request: " + type(exc).__name__
             )
-            return self._deny(action_name, target, reason, **labels)
+            return self._deny(
+                action_name,
+                target,
+                reason,
+                credential_released=bool(dispatch and dispatch.credential_released),
+                **labels,
+            )
 
     def child_environment(self) -> dict:
         env = {"PYTHONDONTWRITEBYTECODE": "1", "PYTHONUNBUFFERED": "1"}

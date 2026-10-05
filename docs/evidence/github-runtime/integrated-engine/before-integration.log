@@ -1,0 +1,58 @@
+..........FF......                                                       [100%]
+=================================== FAILURES ===================================
+_ test_failed_authenticated_preflight_reports_credential_release_but_no_creation[repo] _
+
+tmp_path = PosixPath('/private/var/folders/tz/y04t4d0900xdbmz96jp608180000gn/T/pytest-of-ross/pytest-434/test_failed_authenticated_pref0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x10c584050>
+bad = 'repo'
+
+    @pytest.mark.parametrize("bad", ["repo", "parent"])
+    def test_failed_authenticated_preflight_reports_credential_release_but_no_creation(
+        tmp_path, monkeypatch, bad
+    ):
+        monkeypatch.setenv("GITHUB_TOKEN", SECRET)
+        r = reviewed()
+        state, current = approved_project(tmp_path, [r])
+        provider = ProviderFixture([r], wrong_repo=bad == "repo", wrong_parent=bad == "parent")
+        broker = captured_broker(state, current, provider)
+        try:
+            assert not broker.handle(protected_message(r))["ok"]
+            assert provider.calls and provider.mutations == []
+            assert all(q.headers["authorization"] == "Bearer " + SECRET for q in provider.calls)
+            row = last_receipt(state)
+>           assert row["credential_released"] is True
+E           assert False is True
+
+tests/test_github_protected_integration.py:275: AssertionError
+----------------------------- Captured stderr call -----------------------------
+AIRLOCK DENY github.contents.write @ https://api.github.com/repos/acme/disposable/contents/patches/fix.patch: OUTCOME_UNKNOWN [receipt_8472cde49eff4548980045f9ea8022e7]
+_ test_failed_authenticated_preflight_reports_credential_release_but_no_creation[parent] _
+
+tmp_path = PosixPath('/private/var/folders/tz/y04t4d0900xdbmz96jp608180000gn/T/pytest-of-ross/pytest-434/test_failed_authenticated_pref1')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x10c47e1b0>
+bad = 'parent'
+
+    @pytest.mark.parametrize("bad", ["repo", "parent"])
+    def test_failed_authenticated_preflight_reports_credential_release_but_no_creation(
+        tmp_path, monkeypatch, bad
+    ):
+        monkeypatch.setenv("GITHUB_TOKEN", SECRET)
+        r = reviewed()
+        state, current = approved_project(tmp_path, [r])
+        provider = ProviderFixture([r], wrong_repo=bad == "repo", wrong_parent=bad == "parent")
+        broker = captured_broker(state, current, provider)
+        try:
+            assert not broker.handle(protected_message(r))["ok"]
+            assert provider.calls and provider.mutations == []
+            assert all(q.headers["authorization"] == "Bearer " + SECRET for q in provider.calls)
+            row = last_receipt(state)
+>           assert row["credential_released"] is True
+E           assert False is True
+
+tests/test_github_protected_integration.py:275: AssertionError
+----------------------------- Captured stderr call -----------------------------
+AIRLOCK DENY github.contents.write @ https://api.github.com/repos/acme/disposable/contents/patches/fix.patch: OUTCOME_UNKNOWN [receipt_d5826bd84a944b09b46bc17eb2aa580a]
+=========================== short test summary info ============================
+FAILED tests/test_github_protected_integration.py::test_failed_authenticated_preflight_reports_credential_release_but_no_creation[repo]
+FAILED tests/test_github_protected_integration.py::test_failed_authenticated_preflight_reports_credential_release_but_no_creation[parent]
+2 failed, 16 passed in 0.78s

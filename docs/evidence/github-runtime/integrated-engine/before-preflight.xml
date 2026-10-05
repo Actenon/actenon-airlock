@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="0" failures="2" skipped="0" tests="2" time="0.274" timestamp="2026-10-05T11:32:29.144183+01:00" hostname="Rosss-MacBook-Air.local"><testcase classname="tests.test_github_protected_integration" name="test_failed_authenticated_preflight_reports_credential_release_but_no_creation[repo]" time="0.078"><failure message="assert False is True">tmp_path = PosixPath('/private/var/folders/tz/y04t4d0900xdbmz96jp608180000gn/T/pytest-of-ross/pytest-433/test_failed_authenticated_pref0')
+monkeypatch = &lt;_pytest.monkeypatch.MonkeyPatch object at 0x109ceff80&gt;
+bad = 'repo'
+
+    @pytest.mark.parametrize("bad", ["repo", "parent"])
+    def test_failed_authenticated_preflight_reports_credential_release_but_no_creation(tmp_path, monkeypatch, bad):
+        monkeypatch.setenv("GITHUB_TOKEN", SECRET)
+        r = reviewed(); state, current = approved_project(tmp_path, [r])
+        provider = ProviderFixture([r], wrong_repo=bad == "repo", wrong_parent=bad == "parent")
+        broker = captured_broker(state, current, provider)
+        try:
+            assert not broker.handle(protected_message(r))["ok"]
+            assert provider.calls and provider.mutations == []
+            assert all(q.headers["authorization"] == "Bearer " + SECRET for q in provider.calls)
+            row = last_receipt(state)
+&gt;           assert row["credential_released"] is True
+E           assert False is True
+
+tests/test_github_protected_integration.py:222: AssertionError</failure></testcase><testcase classname="tests.test_github_protected_integration" name="test_failed_authenticated_preflight_reports_credential_release_but_no_creation[parent]" time="0.022"><failure message="assert False is True">tmp_path = PosixPath('/private/var/folders/tz/y04t4d0900xdbmz96jp608180000gn/T/pytest-of-ross/pytest-433/test_failed_authenticated_pref1')
+monkeypatch = &lt;_pytest.monkeypatch.MonkeyPatch object at 0x109d9e960&gt;
+bad = 'parent'
+
+    @pytest.mark.parametrize("bad", ["repo", "parent"])
+    def test_failed_authenticated_preflight_reports_credential_release_but_no_creation(tmp_path, monkeypatch, bad):
+        monkeypatch.setenv("GITHUB_TOKEN", SECRET)
+        r = reviewed(); state, current = approved_project(tmp_path, [r])
+        provider = ProviderFixture([r], wrong_repo=bad == "repo", wrong_parent=bad == "parent")
+        broker = captured_broker(state, current, provider)
+        try:
+            assert not broker.handle(protected_message(r))["ok"]
+            assert provider.calls and provider.mutations == []
+            assert all(q.headers["authorization"] == "Bearer " + SECRET for q in provider.calls)
+            row = last_receipt(state)
+&gt;           assert row["credential_released"] is True
+E           assert False is True
+
+tests/test_github_protected_integration.py:222: AssertionError</failure></testcase></testsuite></testsuites>

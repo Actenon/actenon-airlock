@@ -22,11 +22,20 @@ import time
 from pathlib import Path
 from uuid import uuid4
 
-from actenon_permit.model import Budget
+from actenon_permit.model import Budget, Grant, Scopes
+from actenon_protocol.effects import effect_identity
 from actenon_scan.authority import classify_http
 
 from .broker import Broker
 from .common import AirlockError, canonical, power, validate_url
+from .github_runtime import (
+    GitHubCreateDispatch,
+    effect_descriptor,
+    project_intent,
+    review_for,
+    scan_power,
+    validate_profiles,
+)
 from .manifest import EXCLUDED, authority_diff, capability, digest, discover, source_fingerprint
 from .model_constraints import DEFAULT_ENDPOINTS, endpoint, scan_transports, validate_profile
 from .state import State, atomic_json
@@ -192,6 +201,8 @@ class ProtectedBroker(Broker):
             raise AirlockError("Approval changed during protected initialization")
         if self.approval.get("protected_model"):
             validate_profile(self.approval["protected_model"])
+        self.github_profiles = validate_profiles(self.approval.get("protected_github", []))
+        self.github_grants = {}
         self.model_transports = {**MODEL_ENDPOINTS, **scan_transports(current)}
         if self.approval.get("protected_model"):
             selected = self.approval["protected_model"]
@@ -203,6 +214,63 @@ class ProtectedBroker(Broker):
                 raise AirlockError("Selected model format disagrees with native Scan transport")
             self.model_transports[target] = selected["provider"]
         super().__init__(state, current, bindings)
+        for profile in self.github_profiles:
+            review = review_for(profile)
+            cap = capability(scan_power(review))
+            if cap not in self.allowed:
+                continue  # Source removal must remove effective authority too.
+            grant = Grant(
+                agent_id=self.grant.agent_id,
+                expires_at=self.grant.expires_at,
+                scopes=Scopes(allow=[cap]),
+                budget=Budget(limit=1, remaining=1, currency="calls"),
+                approved_effect_ids=[
+                    effect_identity(effect_descriptor(review, self.effect_namespace))
+                ],
+            ).sign()
+            self.store.put_grant(grant)
+            self.github_grants[digest(profile)] = grant
+
+    def grant_scopes(self):
+        # The model grant cannot authorize GitHub. Every GitHub grant is
+        # independently finite; no broader parent can be used at the edge.
+        profile = self.approval.get("protected_model", {})
+        target = endpoint(profile) if profile else None
+        allowed = sorted(
+            {
+                capability(p)
+                for p in self.current["powers"]
+                if p["action"] == "http.post"
+                and p["transport"] == target
+                and capability(p) in self.allowed
+            }
+        )
+        return Scopes(allow=allowed, deny=[] if allowed else ["*"])
+
+    def execution_grant(self, capability_name, dispatch):
+        if isinstance(dispatch, GitHubCreateDispatch):
+            grant = self.github_grants.get(digest(dispatch.profile))
+            if grant is None:
+                raise AirlockError("No finite approved grant for this GitHub consequence")
+            return grant
+        return super().execution_grant(capability_name, dispatch)
+
+    def make_dispatch(self, adapter, effect, message):
+        if effect.target in self.model_transports:
+            return super().make_dispatch(adapter, effect, message)
+        for profile in self.github_profiles:
+            if effect.target != review_for(profile).contents_url:
+                continue
+            try:
+                return GitHubCreateDispatch(self, effect, message, profile)
+            except ValueError:
+                continue
+        raise AirlockError("No exact reviewed GitHub creation matches this request")
+
+    def _http_effect_descriptor(self, intent):
+        if intent.target.resource_id in self.model_transports:
+            return super()._http_effect_descriptor(intent)
+        return project_intent(intent, self.github_profiles, self.effect_namespace)
 
     def grant_principal(self):
         return (
@@ -364,6 +432,11 @@ class ProtectedBroker(Broker):
                 if method != "POST":
                     raise AirlockError("Model inference requires POST")
                 body = self.model_body(url, body)
+            elif not any(url == review_for(p).contents_url for p in self.github_profiles):
+                # An HTTP verb does not establish provider semantics. This
+                # declared deployment supports reviewed inference and exact
+                # GitHub creation; other endpoints need a supported executor.
+                raise AirlockError("No reviewed protected consequence profile for this endpoint")
             headers = message.get("headers", {})
             if not isinstance(headers, dict) or any(
                 not isinstance(k, str) or not isinstance(v, str) for k, v in headers.items()
@@ -681,6 +754,8 @@ def launch_protected(root, command, *, image=DEFAULT_IMAGE):
                 "image_id": resolved["Id"],
                 "source_digest": current["source_digest"],
                 "grant_id": broker.grant.id,
+                "github_grant_ids": sorted(g.id for g in broker.github_grants.values()),
+                "budget_scope": "model calls per run; one creation per finite GitHub grant",
                 "new_powers_blocked": len(diff["added"]),
                 "bridge": boundary,
                 "agent": agent_boundary,

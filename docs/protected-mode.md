@@ -33,7 +33,10 @@ are filled with the approved bound **before** hashing, verification and dispatch
 Remote tools, stored state, attachments, extra outputs and unknown parameters
 are refused. A valid completed model response with usage establishes observed
 inference output; it does not establish billing settlement or downstream effects.
-Other consequential HTTP remains AMBIGUOUS after a transport response.
+The other supported external operation is an explicitly reviewed
+[GitHub create-only consequence](github-consequence.md). Its response remains AMBIGUOUS until
+trusted readback confirms the exact provider state. All other outbound HTTP is denied, including
+arbitrary GETs; a method name is not a sufficient consequence classification.
 
 Compute images must be trusted and credential-free. `--image` selects a local
 image; the supervisor resolves its immutable content ID, disables healthchecks,
@@ -64,11 +67,14 @@ Permit decides and Kernel verifies the exact action at the execution callback.
 Unknown methods do not become any-method grants. Undecomposed GitHub GraphQL
 remains blocked in Protected Mode until Scan supplies safe consequence semantics.
 
-All contained code shares one grant principal. The supervisor never trusts a
+All contained code shares one grant principal. Model calls use a model-only grant; each reviewed
+GitHub creation uses a separate finite grant that can authorize one exact effect. A broad parent
+grant cannot authorize those creations. There is no combined model/GitHub budget claim.
+The supervisor never trusts a
 caller-supplied filename as an attestation of origin. Provenance comes from the
 signed code manifest, whose digest is bound into the grant principal and included
 with signed receipts. New target/action/transport tuples remain outside the grant.
-CI compares model expansions as well as code powers against the trusted base.
+CI compares model and exact GitHub profile expansions as well as code powers against the trusted base.
 
 ## Results and honest evidence
 
@@ -91,7 +97,10 @@ refusals from one environment. Its model response is an explicit deterministic
 provider fixture using the real OpenAI SDK and real Scan/Permit/Kernel; it is
 not an external coding-agent acceptance run or a live model-quality demonstration.
 
-The useful external coding-agent workflow, three original and ten total agent
-cases, PostgreSQL/MCP/GraphQL boundaries, cumulative budgets, portable verifier
-parity and fresh public-artifact installation remain open G1–G40 gates. This
-candidate does not declare Airlock v1 finished or a universal OS jail.
+The amended programme prioritizes a useful unchanged external coding-agent task, an exactly
+reviewed real GitHub consequence, expansion refusals, ambiguity recovery and reproducible evidence.
+The matched real-model baseline must succeed before its protected counterpart is scored.
+The three original and ten total agent cases and fresh public-artifact installation remain required.
+Earlier G1–G40 evidence is preserved; additional PostgreSQL/MCP/GraphQL boundaries are deferred
+from this initial slice. Local tests and candidate wheels do not establish an independent operator
+result, a live GitHub result or a finished Airlock release.
