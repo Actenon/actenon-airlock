@@ -40,7 +40,7 @@ target = "gpt_engineer/core/default/disk_execution_env.py"
 original = Path(target).read_text()
 before = regressions("regression-before")
 assert before != 0, "The unchanged external implementation must demonstrate the bug"
-ai = AI(model_name="qwen2.5-coder:3b", temperature=0, streaming=False)
+ai = AI(model_name="qwen2.5-coder:7b", temperature=0, streaming=False)
 # Public LangChain configuration, without modifying the external agent or
 # replacing its inference implementation. Stay within the signed output bound.
 ai.llm.max_tokens = 1536
@@ -51,7 +51,7 @@ task = (
     "stdout and stderr sequentially, so a full stderr pipe can deadlock and timeout "
     "cannot interrupt a blocking readline. It can also miss tail output when a child "
     "exits. Preserve the public signature and return tuple, shell=True and cwd. "
-    "Drain both pipes with communicate(timeout=timeout). On expiry, terminate and "
+    "Replace the entire old readline/poll loop with communicate(timeout=timeout); do not keep blocking readline calls. On expiry, terminate and "
     "reap the shell's entire process group so descendants cannot keep the pipes open, "
     "and raise built-in TimeoutError when the timeout expires. Return complete stdout, "
     "stderr and the final exit status otherwise. Change only this file. "
@@ -193,7 +193,7 @@ Path("acceptance.json").write_text(
             "external_agent": "gpt-engineer",
             "version": "0.3.1",
             "interface": "public Python API",
-            "model": "qwen2.5-coder:3b",
+            "model": "qwen2.5-coder:7b",
             "model_fixture": False,
             "max_output_tokens": 1536,
             "attempts": attempts,

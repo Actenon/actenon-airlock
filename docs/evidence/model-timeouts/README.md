@@ -49,3 +49,13 @@ Sources: [Ollama API](https://docs.ollama.com/api/openai-compatibility),
 [pinned API implementation](https://github.com/ollama/ollama/blob/v0.32.9/openai/openai.go),
 [official coding model](https://ollama.com/library/qwen2.5-coder:3b).
 This configuration still requires a successful real CI run before merging #13.
+
+[Third run 37285768855](https://github.com/Actenon/actenon-airlock/actions/runs/37285768855)
+completed seven real model requests and independently verified 15 signed receipts.
+No inference timed out. The unchanged regression still failed after all three
+actual agent edit attempts: a deadlock remained, then indentation errors. Model
+completion is not engineering-task success; #13 remains unmerged. Public generated
+code, each unchanged-test result and receipts are preserved in a separate folder.
+The next acceptance configuration uses official `qwen2.5-coder:7b`, manifest
+`dae161e27b0e90dd1856c8bb3209201fd6736d8eb66298e75ed87571486f4364`,
+with the same 1536-token bound, public agent API, regressions and containment.
