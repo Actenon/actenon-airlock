@@ -77,3 +77,20 @@ A no-change response is recorded as an unsuccessful attempt instead of aborting
 before its diagnostics can be preserved. Only the external agent's explicit
 `improve.txt` and `diff_errors.txt` public transcript files are exported to explain
 edit failures; no complete workspace, private authority state or secrets are exported.
+
+
+[Fifth run 37290106747](https://github.com/Actenon/actenon-airlock/actions/runs/37290106747)
+at `c6721f6b6e0ddf898b22647119ef6cb7ed8ea817` completed three real requests,
+with seven verified signed receipts. The exported agent transcript shows an
+unindented `with` body, followed by two irrelevant repeated assertion edits.
+Every unchanged regression run failed collection. No model timeout or truncation
+caused this failure. The original transcript, generated source and test results
+are retained in `fifth-real-agent-failure/`.
+
+The amended evidence-defined goal requires a matched unprotected baseline before
+protected utility can be scored. None of these five historical runs had one.
+They remain failed protected runs; they do not prove that Airlock caused, or had
+no effect on, the task failure. The candidate now freezes source/task/tests/model,
+image and resource hashes before both phases, requires the same unprotected
+workload to pass first, and preserves baseline failure instead of continuing to
+a protected PASS claim. The model, task and regression assertions are unchanged.
