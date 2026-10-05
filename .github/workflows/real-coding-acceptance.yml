@@ -46,7 +46,7 @@ jobs:
           PY
           tar --zstd -xf "$RUNNER_TEMP/ollama.tar.zst" -C "$RUNNER_TEMP/ollama"
           rm "$RUNNER_TEMP/ollama.tar.zst"
-          env -i HOME="$RUNNER_TEMP/ollama-home" PATH=/usr/local/bin:/usr/bin:/bin OLLAMA_HOST=127.0.0.1:11434 OLLAMA_NO_CLOUD=1 OLLAMA_MODELS="$RUNNER_TEMP/models" "$RUNNER_TEMP/ollama/bin/ollama" serve > "$RUNNER_TEMP/ollama.log" 2>&1 &
+          env -i HOME="$RUNNER_TEMP/ollama-home" PATH=/usr/local/bin:/usr/bin:/bin OLLAMA_HOST=127.0.0.1:11434 OLLAMA_NO_CLOUD=1 OLLAMA_CONTEXT_LENGTH=8192 OLLAMA_MODELS="$RUNNER_TEMP/models" "$RUNNER_TEMP/ollama/bin/ollama" serve > "$RUNNER_TEMP/ollama.log" 2>&1 &
           echo "$!" > "$RUNNER_TEMP/ollama.pid"
           python - <<'PY'
           import time, urllib.request
@@ -59,11 +59,11 @@ jobs:
           else:
               raise RuntimeError("Local model runtime unavailable")
           PY
-          OLLAMA_HOST=127.0.0.1:11434 "$RUNNER_TEMP/ollama/bin/ollama" pull qwen3:4b
+          OLLAMA_HOST=127.0.0.1:11434 "$RUNNER_TEMP/ollama/bin/ollama" pull qwen2.5-coder:3b
           python - <<'PY'
           import json, urllib.request
           models=json.load(urllib.request.urlopen("http://127.0.0.1:11434/api/tags",timeout=5))["models"]
-          assert any(m["name"]=="qwen3:4b" and m["digest"]=="359d7dd4bcdab3d86b87d73ac27966f4dbb9f5efdfcc75d34a8764a09474fae7" for m in models)
+          assert any(m["name"]=="qwen2.5-coder:3b" and m["digest"]=="f72c60cabf6237b07f6e632b2c48d533cef25eda2efbd34bed21c5e9c01e6225" for m in models)
           PY
       - name: Run actual external engineering task and bypass attempts
         run: |

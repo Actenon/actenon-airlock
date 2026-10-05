@@ -20,3 +20,32 @@ reservation, budget hold, model/output limits, credentials and proof verificatio
 are unchanged. A simulated lost response after dispatch still records AMBIGUOUS
 and refuses a second transport call. Targeted tests: 50 passed, one documented
 separate-container skip. The real-model rerun remains required.
+
+## Second real failure and bounded coding configuration
+
+[Run 37282985403](https://github.com/Actenon/actenon-airlock/actions/runs/37282985403)
+at head `01e7de5961885d2018517ebf9b691b8242c6b93b` failed again after the
+reviewed 600-second read phase. Ollama generated 3023 tokens, shifted its 4096-token
+context, and was canceled before a completed response. The second signed public
+receipt set is retained here. It again reports AMBIGUOUS/null and holds the effect.
+Eight core checks passed; the useful external coding acceptance did not pass.
+
+A diagnostic against the same cached model also produced reasoning text with
+the documented `reasoning_effort: none` setting. Its pinned template prefills an
+open `<think>` block. This diagnostic is not Protected Mode acceptance evidence.
+No broader model API allowance is added for this failed configuration.
+
+The next real run uses official `qwen2.5-coder:3b`, manifest SHA-256
+`f72c60cabf6237b07f6e632b2c48d533cef25eda2efbd34bed21c5e9c01e6225`,
+1536 reviewed output tokens, and an 8192-token local server context. The unchanged
+gpt-engineer public API may receive at most three rounds of actual test feedback.
+No supplied answer, fixture model, paid provider, rewritten agent implementation,
+test weakening or extra execution authority is used. The task still fixes its
+real execution helper; original deadlock, timeout and output regressions remain.
+The same environment also attempts direct model access, protected host/key paths,
+fake policy/environment/cwd replacement and the existing bypass matrix.
+
+Sources: [Ollama API](https://docs.ollama.com/api/openai-compatibility),
+[pinned API implementation](https://github.com/ollama/ollama/blob/v0.32.9/openai/openai.go),
+[official coding model](https://ollama.com/library/qwen2.5-coder:3b).
+This configuration still requires a successful real CI run before merging #13.
