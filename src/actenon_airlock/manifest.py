@@ -150,9 +150,22 @@ def authority_diff(before: dict, after: dict) -> dict:
             or model_endpoint(new_model) != model_endpoint(old_model)
             or not set(new_model["models"]).issubset(old_model["models"])
             or new_model["max_output_tokens"] > old_model["max_output_tokens"]
+            or new_model.get("read_timeout_seconds", 30) > old_model.get("read_timeout_seconds", 30)
         )
     except (AirlockError, KeyError, TypeError):
         model_expanded = True
+    old_github = before.get("protected_github", [])
+    new_github = after.get("protected_github", old_github)
+    from .github_runtime import validate_profiles
+
+    try:
+        validated_old = validate_profiles(old_github)
+        validated_new = validate_profiles(new_github)
+        github_expanded = bool(
+            {canonical(p) for p in validated_new} - {canonical(p) for p in validated_old}
+        )
+    except (AirlockError, TypeError, ValueError):
+        github_expanded = True
     return {
         "schema": "actenon-airlock/diff/v1",
         "added": [new[k] for k in sorted(new.keys() - old.keys())],
@@ -160,8 +173,13 @@ def authority_diff(before: dict, after: dict) -> dict:
         "blocked": after.get("blocked", []),
         "parse_errors": after.get("parse_errors", []),
         "model_constraints": {"before": old_model, "after": new_model, "expanded": model_expanded},
+        "github_constraints": {
+            "before": old_github,
+            "after": new_github,
+            "expanded": github_expanded,
+        },
         "runtime_status": "BLOCKED UNTIL APPROVED"
-        if new.keys() - old.keys() or model_expanded
+        if new.keys() - old.keys() or model_expanded or github_expanded
         else "APPROVED POWERS ONLY",
     }
 

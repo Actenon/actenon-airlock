@@ -47,8 +47,13 @@ def render(diff: dict) -> str:
     model = diff.get("model_constraints", {})
     if model.get("expanded"):
         lines.append("+ Model authority expanded: " + json.dumps(model["after"], sort_keys=True))
-    if not any(diff[k] for k in ("added", "removed", "blocked", "parse_errors")) and not model.get(
-        "expanded"
+    github = diff.get("github_constraints", {})
+    if github.get("before") != github.get("after"):
+        lines.append("GitHub creations changed: " + json.dumps(github["after"], sort_keys=True))
+    if (
+        not any(diff[k] for k in ("added", "removed", "blocked", "parse_errors"))
+        and not model.get("expanded")
+        and github.get("before") == github.get("after")
     ):
         lines.append("No authority changes.")
     lines.extend(["", "Runtime: " + diff["runtime_status"]])
@@ -157,6 +162,16 @@ def main(argv=None):
                 "--github", action="store_true", help="Write GitHub job summary and annotations"
             )
         if cmd == "init":
+            github = p.add_mutually_exclusive_group()
+            github.add_argument(
+                "--github-create",
+                type=Path,
+                action="append",
+                help="Review an exact GitHub create-only profile file; --approve signs it",
+            )
+            github.add_argument(
+                "--clear-github", action="store_true", help="Remove all reviewed GitHub creations"
+            )
             p.add_argument(
                 "--model", action="append", default=[], help="Approve this exact inference model"
             )
@@ -164,6 +179,11 @@ def main(argv=None):
             p.add_argument("--model-max-tokens", type=int, default=2048)
             p.add_argument(
                 "--model-endpoint", help="Exact full inference endpoint also discovered by Scan"
+            )
+            p.add_argument(
+                "--model-read-timeout",
+                type=int,
+                help="Review a model read-phase timeout of 1–600 seconds (default 30)",
             )
             p.add_argument(
                 "--approve",
@@ -182,6 +202,11 @@ def main(argv=None):
             outcome = p.add_mutually_exclusive_group()
             outcome.add_argument("--committed", action="store_true")
             outcome.add_argument("--not-executed", action="store_true")
+            outcome.add_argument(
+                "--github-readback",
+                action="store_true",
+                help="Observe the exact reviewed GitHub creation; uncertainty remains held",
+            )
             p.add_argument(
                 "--operator-key", type=Path, help="External approved operator private key"
             )
@@ -254,6 +279,7 @@ def main(argv=None):
                 if (
                     args.committed
                     or args.not_executed
+                    or args.github_readback
                     or args.operator_key
                     or args.evidence
                     or args.output
@@ -266,6 +292,24 @@ def main(argv=None):
                 ):
                     raise AirlockError("Detached approval refers to a different effect")
                 result = apply_reconciliation(state, envelope)
+            elif args.github_readback:
+                from .github_observer import observe_github
+
+                if not args.operator_key or args.evidence:
+                    raise AirlockError(
+                        "GitHub readback requires --operator-key and obtains its own evidence"
+                    )
+                private = load_operator_key(state, args.operator_key)
+                result = observe_github(state, args.effect_id, private)
+                envelope = result.pop("envelope", None)
+                if envelope is not None:
+                    if args.output:
+                        atomic_json(args.output, envelope)
+                        result.update(signed=True, applied=False, output=str(args.output))
+                    else:
+                        result.update(apply_reconciliation(state, envelope))
+                else:
+                    result.update(signed=False, applied=False)
             elif args.committed or args.not_executed:
                 if not args.operator_key or not args.evidence:
                     raise AirlockError(
@@ -295,7 +339,9 @@ def main(argv=None):
                     result = apply_reconciliation(state, envelope)
             else:
                 if args.operator_key or args.evidence or args.output:
-                    raise AirlockError("Signing options require --committed or --not-executed")
+                    raise AirlockError(
+                        "Signing options require --committed, --not-executed or --github-readback"
+                    )
                 result = request
             if args.json:
                 print(json.dumps(result, indent=2))
@@ -312,7 +358,7 @@ def main(argv=None):
             else:
                 print("AIRLOCK EFFECT\n" + json.dumps(result, indent=2))
                 print("No state changed. Confirm provider state before selecting an outcome.")
-            return 0
+            return 4 if args.github_readback and result.get("outcome") == "AMBIGUOUS" else 0
         if args.cmd == "run":
             from .broker import launch
 
@@ -353,9 +399,26 @@ def main(argv=None):
                     raise AirlockError("Credential binding must be NAME=HTTPS_ORIGIN")
                 bindings[name] = origin(url)
             current["credential_bindings"] = bindings
+            from .github_runtime import read_profile_file, review_for, scan_power, validate_profiles
+
+            current["protected_github"] = validate_profiles(
+                []
+                if args.clear_github
+                else [read_profile_file(path) for path in args.github_create]
+                if args.github_create
+                else before.get("protected_github", [])
+            )
+            if args.github_create:
+                for profile in current["protected_github"]:
+                    if scan_power(review_for(profile)) not in current["powers"]:
+                        raise AirlockError(
+                            "GitHub creation requires the exact resolved Scan power in this project"
+                        )
             current["protected_model"] = dict(before.get("protected_model", {}))
             if args.model_endpoint and not args.model:
                 raise AirlockError("--model-endpoint requires --model and a fresh review")
+            if args.model_read_timeout is not None and not args.model:
+                raise AirlockError("--model-read-timeout requires --model and a fresh review")
             if args.model:
                 from .model_constraints import endpoint, validate_profile
 
@@ -374,6 +437,12 @@ def main(argv=None):
                     "provider"
                 ) == args.model_provider and before["protected_model"].get("endpoint"):
                     current["protected_model"]["endpoint"] = before["protected_model"]["endpoint"]
+                if args.model_read_timeout is not None:
+                    current["protected_model"]["read_timeout_seconds"] = args.model_read_timeout
+                elif before.get("protected_model", {}).get("read_timeout_seconds") is not None:
+                    current["protected_model"]["read_timeout_seconds"] = before["protected_model"][
+                        "read_timeout_seconds"
+                    ]
                 validate_profile(current["protected_model"])
                 target = endpoint(current["protected_model"])
                 if not any(
@@ -414,6 +483,9 @@ def main(argv=None):
             if not args.json and current["protected_model"]:
                 print("\nProtected inference constraint (trusted only with --approve):")
                 print(json.dumps(current["protected_model"], sort_keys=True))
+            if not args.json and current["protected_github"]:
+                print("\nExact GitHub creations (trusted only with --approve):")
+                print(json.dumps(current["protected_github"], sort_keys=True))
             if current["parse_errors"]:
                 raise AirlockError("Parse errors prevent approval")
             if args.approve:
@@ -428,7 +500,9 @@ def main(argv=None):
             return 0
         before = state.from_git(args.base) if args.base else state.approved()
         if (state.path / "approved.json").exists():
-            current["protected_model"] = state.checked_in_approval().get("protected_model", {})
+            checked_in = state.checked_in_approval()
+            current["protected_model"] = checked_in.get("protected_model", {})
+            current["protected_github"] = checked_in.get("protected_github", [])
         diff = authority_diff(before, current)
         if args.output:
             atomic_json(args.output, diff, 0o644)
@@ -448,6 +522,7 @@ def main(argv=None):
                 or diff["blocked"]
                 or diff["parse_errors"]
                 or diff["model_constraints"]["expanded"]
+                or diff["github_constraints"]["expanded"]
             ):
                 print(
                     "::error title=Airlock Authority Review::New or unresolved powers remain blocked"
@@ -458,6 +533,7 @@ def main(argv=None):
             and (
                 any(diff[k] for k in ("added", "blocked", "parse_errors"))
                 or diff["model_constraints"]["expanded"]
+                or diff["github_constraints"]["expanded"]
             )
             else 0
         )

@@ -34,7 +34,13 @@ def endpoint(profile):
 
 def validate_profile(profile):
     endpoint(profile)
-    if set(profile) - {"provider", "endpoint", "models", "max_output_tokens"}:
+    if set(profile) - {
+        "provider",
+        "endpoint",
+        "models",
+        "max_output_tokens",
+        "read_timeout_seconds",
+    }:
         raise AirlockError("Unknown model constraint")
     models = profile.get("models")
     if (
@@ -53,6 +59,9 @@ def validate_profile(profile):
     bound = profile.get("max_output_tokens")
     if type(bound) is not int or not 1 <= bound <= 4096:
         raise AirlockError("Invalid approved model output bound")
+    timeout = profile.get("read_timeout_seconds", 30)
+    if type(timeout) is not int or not 1 <= timeout <= 600:
+        raise AirlockError("Model read timeout must be between 1 and 600 seconds")
     return profile
 
 

@@ -11,9 +11,9 @@ requires-python = ">=3.11"
 license = "Apache-2.0"
 dependencies = [
   "actenon-scan @ git+https://github.com/Actenon/actenon-scan.git@ee971b43c78ed8b58f5f7fb59382ab20ce9b8a5c",
-  "actenon-protocol @ git+https://github.com/Actenon/actenon-protocol.git@3442bf3cffe0b55ac7d531e66ca0355d2c0784e5",
-  "actenon-kernel @ git+https://github.com/Actenon/actenon-kernel.git@9dd6af89622f070e3131c39d335be44e3f30149d",
-  "actenon-permit @ git+https://github.com/Actenon/actenon-permit.git@6bbf731125cdde97c1f7b48697c438356a2ccca4",
+  "actenon-protocol @ git+https://github.com/Actenon/actenon-protocol.git@8e5bc9e342f694767508bae9a392749c6a8df2cc",
+  "actenon-kernel @ git+https://github.com/Actenon/actenon-kernel.git@66052b20941f908634c9fbac24f1ae7cead78e46",
+  "actenon-permit @ git+https://github.com/Actenon/actenon-permit.git@1443e36d7a6224da055b2c3011ec248f4609d1eb",
   "requests>=2.32,<3",
   "httpx>=0.27,<1",
 ]

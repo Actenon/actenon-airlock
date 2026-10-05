@@ -1,0 +1,16 @@
+
+==================================== ERRORS ====================================
+______________ ERROR collecting tests/test_github_consequence.py _______________
+ImportError while importing test module '/Users/ross/Documents/Codex/2026-10-03/referenced-chatgpt-conversation-this-is-an/work/actenon-airlock-github-profile/tests/test_github_consequence.py'.
+Hint: make sure your test modules/packages have valid Python names.
+Traceback:
+/Users/ross/.local/share/uv/python/cpython-3.12.13-macos-aarch64-none/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/test_github_consequence.py:10: in <module>
+    from actenon_airlock.github_consequence import (
+E   ModuleNotFoundError: No module named 'actenon_airlock.github_consequence'
+=========================== short test summary info ============================
+ERROR tests/test_github_consequence.py
+!!!!!!!!!!!!!!!!!!!! Interrupted: 1 error during collection !!!!!!!!!!!!!!!!!!!!
+1 error in 0.11s

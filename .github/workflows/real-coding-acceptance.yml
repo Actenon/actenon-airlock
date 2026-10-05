@@ -1,0 +1,92 @@
+name: Real coding-agent acceptance
+on:
+  workflow_dispatch:
+  pull_request:
+    paths:
+      - acceptance/gpt-engineer/**
+      - .github/workflows/real-coding-acceptance.yml
+permissions:
+  contents: read
+defaults:
+  run:
+    shell: bash
+jobs:
+  real-agent:
+    name: External coding agent (real local model)
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          repository: gpt-engineer-org/gpt-engineer
+          ref: a90fcd543eedcc0ff2c34561bc0785d2ba83c47e
+          path: external-agent-source
+          persist-credentials: false
+      - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065
+        with:
+          python-version: "3.12"
+      - name: Install real pinned engine components
+        run: python -m pip install ".[test]"
+      - name: Check matched-baseline scoring rules
+        run: python -m pytest -q acceptance/gpt-engineer/test_configuration.py
+      - name: Build credential-free external-agent compute image
+        run: |
+          docker build -f containers/Dockerfile.compute -t actenon-airlock-compute:dev .
+          docker build -f acceptance/gpt-engineer/Dockerfile -t actenon-airlock-gpt-engineer:acceptance .
+      - name: Prepare hash-verified local model runtime
+        run: |
+          mkdir -p "$RUNNER_TEMP/ollama" "$RUNNER_TEMP/ollama-home" "$RUNNER_TEMP/models"
+          curl --fail --location --retry 3 --output "$RUNNER_TEMP/ollama.tar.zst" https://github.com/ollama/ollama/releases/download/v0.32.9/ollama-linux-amd64.tar.zst
+          python - <<'PY'
+          import hashlib, os
+          from pathlib import Path
+          archive=Path(os.environ["RUNNER_TEMP"])/"ollama.tar.zst"
+          assert hashlib.file_digest(archive.open("rb"),"sha256").hexdigest()=="5d747a43369f61e38f20b5a39fcc5c90647e562cdc61e2e56034f1c5b113d540"
+          PY
+          tar --zstd -xf "$RUNNER_TEMP/ollama.tar.zst" -C "$RUNNER_TEMP/ollama"
+          rm "$RUNNER_TEMP/ollama.tar.zst"
+          env -i HOME="$RUNNER_TEMP/ollama-home" PATH=/usr/local/bin:/usr/bin:/bin OLLAMA_HOST=127.0.0.1:11434 OLLAMA_NO_CLOUD=1 OLLAMA_CONTEXT_LENGTH=8192 OLLAMA_MODELS="$RUNNER_TEMP/models" "$RUNNER_TEMP/ollama/bin/ollama" serve > "$RUNNER_TEMP/ollama.log" 2>&1 &
+          echo "$!" > "$RUNNER_TEMP/ollama.pid"
+          python - <<'PY'
+          import time, urllib.request
+          for _ in range(60):
+              try:
+                  urllib.request.urlopen("http://127.0.0.1:11434/api/tags", timeout=2).close()
+                  break
+              except OSError:
+                  time.sleep(1)
+          else:
+              raise RuntimeError("Local model runtime unavailable")
+          PY
+          python acceptance/gpt-engineer/capacity.py --model-directory "$RUNNER_TEMP/models" --evidence "$GITHUB_WORKSPACE/model-capacity.json"
+          OLLAMA_HOST=127.0.0.1:11434 "$RUNNER_TEMP/ollama/bin/ollama" pull qwen2.5-coder:14b
+          python - <<'PY'
+          import json, urllib.request
+          models=json.load(urllib.request.urlopen("http://127.0.0.1:11434/api/tags",timeout=5))["models"]
+          assert any(m["name"]=="qwen2.5-coder:14b" and m["digest"]=="9ec8897f747e246e970bc5cfdda85d22f1123dc2e3d34978a010a75968716849" for m in models)
+          PY
+      - name: Establish matched unprotected baseline before scoring protection
+        run: |
+          python acceptance/gpt-engineer/baseline.py --source external-agent-source --case "$RUNNER_TEMP/baseline-agent-case" --evidence "$GITHUB_WORKSPACE/baseline-agent-evidence" 2>&1 | tee baseline-agent.log
+      - name: Run actual external engineering task and bypass attempts
+        run: |
+          python acceptance/gpt-engineer/run.py --source external-agent-source --case "$RUNNER_TEMP/real-agent-case" --evidence "$GITHUB_WORKSPACE/real-agent-evidence" --matched-baseline "$GITHUB_WORKSPACE/baseline-agent-evidence" 2>&1 | tee real-agent.log
+      - name: Stop only this job's model runtime
+        if: always()
+        run: |
+          if test -f "$RUNNER_TEMP/ollama.pid"; then kill "$(cat "$RUNNER_TEMP/ollama.pid")" || true; fi
+      - name: Preserve public evidence and failures
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: real-external-coding-agent
+          path: |
+            model-capacity.json
+            baseline-agent-evidence/
+            baseline-agent.log
+            real-agent-evidence/
+            real-agent.log
+            ${{ runner.temp }}/ollama.log

@@ -1,0 +1,57 @@
+{
+  "schema": "actenon-pure-host-module-evidence/v1",
+  "recorded_at": "2026-10-05T10:27:13.580791+00:00",
+  "base_airlock": "48e7484227a78a6e9684da0441435c328a4baa15",
+  "python": "3.12.13 (main, Jun 23 2026, 15:44:24) [Clang 22.1.3 ]",
+  "platform": "macOS-26.4.1-arm64-arm-64bit",
+  "scope": "pure projection/readback validation; no network/live provider or integrated broker execution",
+  "dependencies": {
+    "actenon-protocol": {
+      "version": "1.6.0",
+      "source": {
+        "url": "https://github.com/Actenon/actenon-protocol.git",
+        "vcs_info": {
+          "vcs": "git",
+          "commit_id": "8e5bc9e342f694767508bae9a392749c6a8df2cc",
+          "requested_revision": "8e5bc9e342f694767508bae9a392749c6a8df2cc"
+        }
+      }
+    },
+    "actenon-scan": {
+      "version": "1.6.0",
+      "source": {
+        "url": "https://github.com/Actenon/actenon-scan.git",
+        "vcs_info": {
+          "vcs": "git",
+          "commit_id": "ee971b43c78ed8b58f5f7fb59382ab20ce9b8a5c",
+          "requested_revision": "ee971b43c78ed8b58f5f7fb59382ab20ce9b8a5c"
+        }
+      }
+    },
+    "pytest": {
+      "version": "9.1.1",
+      "source": null
+    },
+    "ruff": {
+      "version": "0.16.10",
+      "source": null
+    }
+  },
+  "tests": {
+    "command": "PYTHONPATH=src .venv/bin/python -m pytest --noconftest -q tests/test_github_consequence.py",
+    "exit_code": 0,
+    "passed": 100
+  },
+  "files": {
+    "docs/evidence/github-contents-consequence/README.md": "07e0e8fa5691e6e967632f3f44ae6cfa0c1da92fbbde7f11833c349fab6514a4",
+    "docs/evidence/github-contents-consequence/after.log": "902bbd185f8256bfca4864357037fde2cd20fda5d854885bf4f1cb82173dba0d",
+    "docs/evidence/github-contents-consequence/after.xml": "90b576568bede00decd4739c2e9cb014d95e8dc02226bb42afe7e587fdc9e668",
+    "docs/evidence/github-contents-consequence/before-module.log": "d6224624262a92662c8bd57e4c6391bc9e3b8f12680e8f0c6d05cdebe69a54c7",
+    "docs/evidence/github-contents-consequence/before-projection.log": "3e5f46f6bf40db64e55e5fcbeb6e7ecf8718c09da15a310d100bd22a5916e414",
+    "docs/evidence/github-contents-consequence/before_projection.py": "334972f4cd7b19de4517e81c5f2fbf0697f174f133ab9de9178ae3ab3aa7dea9",
+    "docs/evidence/github-contents-consequence/final.log": "daf4623ee9c835120b5f0f6676f56c80c41b17e4d7e334f1caf6e96d05e6dc42",
+    "docs/evidence/github-contents-consequence/final.xml": "01f0dad044da6fdd7268fccf4aadb182b40fad2b6208307db666717959d3086c",
+    "src/actenon_airlock/github_consequence.py": "3915f908f372e36593ea5b802fa35cafda3ac336cc2f8daacf6d305b529591e2",
+    "tests/test_github_consequence.py": "73ce2891230abf040045298b9385be7b5a127652e302f7b43b6af9f9316f4ae3"
+  }
+}

@@ -1,0 +1,46 @@
+.F.                                                                      [100%]
+=================================== FAILURES ===================================
+_____________ test_timeout_is_enforced_without_waiting_for_output ______________
+
+tmp_path = PosixPath('/workspace/.tmp/pytest-of-unknown/pytest-2/test_timeout_is_enforced_witho0')
+
+    def test_timeout_is_enforced_without_waiting_for_output(tmp_path):
+        before = time.monotonic()
+        with pytest.raises(TimeoutError):
+>           DiskExecutionEnv(tmp_path).run(command("import time; time.sleep(10)"), timeout=1)
+
+test_airlock_execution_regression.py:26: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+gpt_engineer/core/default/disk_execution_env.py:83: in run
+    stdout_full, stderr_full = process.communicate(timeout=timeout)
+                               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/local/lib/python3.11/subprocess.py:1209: in communicate
+    stdout, stderr = self._communicate(input, endtime, timeout)
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/local/lib/python3.11/subprocess.py:2116: in _communicate
+    self._check_timeout(endtime, orig_timeout, stdout, stderr)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <Popen: returncode: None args: "/usr/local/bin/python3 -c 'import time; time...>
+endtime = 598.521647573, orig_timeout = 1, stdout_seq = [], stderr_seq = []
+skip_check_and_raise = False
+
+    def _check_timeout(self, endtime, orig_timeout, stdout_seq, stderr_seq,
+                       skip_check_and_raise=False):
+        """Convenience for checking if a timeout has expired."""
+        if endtime is None:
+            return
+        if skip_check_and_raise or _time() > endtime:
+>           raise TimeoutExpired(
+                    self.args, orig_timeout,
+                    output=b''.join(stdout_seq) if stdout_seq else None,
+                    stderr=b''.join(stderr_seq) if stderr_seq else None)
+E           subprocess.TimeoutExpired: Command '/usr/local/bin/python3 -c 'import time; time.sleep(10)'' timed out after 1 seconds
+
+/usr/local/lib/python3.11/subprocess.py:1253: TimeoutExpired
+----------------------------- Captured stdout call -----------------------------
+
+--- Start of run ---
+=========================== short test summary info ============================
+FAILED test_airlock_execution_regression.py::test_timeout_is_enforced_without_waiting_for_output
+1 failed, 2 passed in 1.18s
