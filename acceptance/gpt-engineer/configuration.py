@@ -32,6 +32,9 @@ def configuration(source, image):
         ).strip(),
         "target_sha256": sha(source / TARGET),
         "driver_sha256": sha(here / "driver.py"),
+        "agent_preprompts": {
+            path.name: sha(path) for path in sorted((here / "preprompts").iterdir())
+        },
         "unchanged_tests_sha256": sha(here / "regression.py"),
         "dependencies_sha256": sha(here / "requirements.txt"),
         "airlock_dependency_manifest_sha256": sha(repo / "pyproject.toml"),

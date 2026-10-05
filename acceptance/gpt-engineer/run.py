@@ -36,6 +36,7 @@ for src, dest in (
     ("regression.py", "test_airlock_execution_regression.py"),
 ):
     shutil.copyfile(Path(__file__).with_name(src), case / dest)
+shutil.copytree(Path(__file__).with_name("preprompts"), case / "airlock-agent-preprompts")
 sentinel = case.parent / (case.name + "-protected-host-sentinel")
 sentinel.write_text("public-test-only-host-data")
 (case / "protected-acceptance-paths.json").write_text(

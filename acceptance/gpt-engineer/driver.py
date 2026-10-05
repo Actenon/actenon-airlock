@@ -15,6 +15,7 @@ from gpt_engineer.core.ai import AI
 from gpt_engineer.core.default.file_store import FileStore
 from gpt_engineer.core.default.simple_agent import SimpleAgent
 from gpt_engineer.core.files_dict import FilesDict
+from gpt_engineer.core.preprompts_holder import PrepromptsHolder
 from gpt_engineer.core.prompt import Prompt
 
 
@@ -52,7 +53,11 @@ ai = AI(model_name="qwen2.5-coder:14b", temperature=0, streaming=False)
 # Public LangChain configuration, without modifying the external agent or
 # replacing its inference implementation. Stay within the signed output bound.
 ai.llm.max_tokens = 1536
-agent = SimpleAgent.with_default_config("agent-memory", ai=ai)
+agent = SimpleAgent.with_default_config(
+    "agent-memory",
+    ai=ai,
+    preprompts_holder=PrepromptsHolder(Path("airlock-agent-preprompts")),
+)
 files = FilesDict({target: original})
 task = (
     "Repair DiskExecutionEnv.run so it passes the unchanged regression tests below. "

@@ -12,6 +12,7 @@ def baseline(tmp_path):
     config = {
         "image_id": "sha256:fixed-image",
         "driver_sha256": "fixed-driver",
+        "agent_preprompts": {"improve": "fixed-preprompt"},
         "unchanged_tests_sha256": "fixed-tests",
         "model": "frozen-real-model",
         "resources": {"nano_cpus": 2_000_000_000},
@@ -39,7 +40,15 @@ def test_accepts_same_completed_configuration(baseline):
 
 
 @pytest.mark.parametrize(
-    "field", ["image_id", "driver_sha256", "unchanged_tests_sha256", "model", "resources"]
+    "field",
+    [
+        "image_id",
+        "driver_sha256",
+        "agent_preprompts",
+        "unchanged_tests_sha256",
+        "model",
+        "resources",
+    ],
 )
 def test_rejects_changed_configuration(baseline, field):
     path, config, _ = baseline

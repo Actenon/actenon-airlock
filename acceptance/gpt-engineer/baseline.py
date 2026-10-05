@@ -36,6 +36,7 @@ for name, destination in (
     ("regression.py", "test_airlock_execution_regression.py"),
 ):
     shutil.copyfile(Path(__file__).with_name(name), case / destination)
+shutil.copytree(Path(__file__).with_name("preprompts"), case / "airlock-agent-preprompts")
 workspace = case.parent / (case.name + "-workspace")
 snapshot(case, workspace)
 for name in (".home", ".tmp"):
