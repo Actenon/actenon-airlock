@@ -289,6 +289,66 @@ class State:
             "rows": rows,
         }
 
+    def verify_ledger(self) -> dict:
+        """Verify the tamper-evident, hash-chained cryptographic ledger of Receipts and Refusals."""
+        return self.verify_receipts()
+
+
+def verify_ledger(root_or_state: Path | str | State) -> dict:
+    """Verify the tamper-evident, hash-chained ledger of Receipts and Refusals for a project."""
+    state = root_or_state if isinstance(root_or_state, State) else State(Path(root_or_state))
+    return state.verify_receipts()
+
+
+def export_compliance_bundle(
+    root_or_state: Path | str | State,
+    output_path: Path | str | None = None,
+) -> dict:
+    """Export an insurer/enterprise compliance bundle (SOC2, ISO 42001, Cyber-Insurance)."""
+    state = root_or_state if isinstance(root_or_state, State) else State(Path(root_or_state))
+    verification = state.verify_receipts()
+    public_key = json.loads((state.path / "public-key.json").read_text())["key"]
+    try:
+        approved_manifest = state.checked_in_approval()
+    except Exception:
+        approved_manifest = None
+    allow_count = sum(
+        1
+        for r in verification["rows"]
+        if isinstance(r["row"], dict) and r["row"].get("decision") == "ALLOW"
+    )
+    deny_count = sum(
+        1
+        for r in verification["rows"]
+        if isinstance(r["row"], dict) and r["row"].get("decision") == "DENY"
+    )
+    bundle = {
+        "schema": "actenon-airlock/compliance-bundle/v1",
+        "public_key": public_key,
+        "approved_manifest": approved_manifest,
+        "ledger": {
+            "ok": verification["ok"],
+            "total_entries": verification["receipts"],
+            "verified_entries": verification["verified"],
+            "allow_receipts": allow_count,
+            "deny_refusals": deny_count,
+            "chain_head_sha256": _last_line_digest(state.receipts_path),
+            "rows": verification["rows"],
+        },
+        "controls": {
+            "soc2": ["CC6.1", "CC6.6", "CC7.2"],
+            "iso_42001": ["A.6.2.6", "A.8.4", "A.9.3"],
+            "cyber_insurance": [
+                "BOUNDED_AUTONOMY_PROOF",
+                "SERVER_SIDE_SECRET_BROKERAGE",
+                "TAMPER_EVIDENT_HASH_CHAIN",
+            ],
+        },
+    }
+    if output_path is not None:
+        atomic_json(Path(output_path), bundle, 0o644)
+    return bundle
+
 
 def _last_line_digest(path: Path) -> str | None:
     try:

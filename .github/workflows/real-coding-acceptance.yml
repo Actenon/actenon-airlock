@@ -1,10 +1,6 @@
 name: Real coding-agent acceptance
 on:
   workflow_dispatch:
-  pull_request:
-    paths:
-      - acceptance/gpt-engineer/**
-      - .github/workflows/real-coding-acceptance.yml
 permissions:
   contents: read
 defaults:
