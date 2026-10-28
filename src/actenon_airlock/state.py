@@ -286,6 +286,8 @@ class State:
             "receipts": len(rows),
             "verified": sum(r["verified"] for r in rows),
             "ok": all(r["verified"] for r in rows),
+            "chain_head_sha256": prev,
+            "completeness": "prefix_integrity_only_without_external_anchor",
             "rows": rows,
         }
 
@@ -303,15 +305,41 @@ def verify_ledger(root_or_state: Path | str | State) -> dict:
 def export_compliance_bundle(
     root_or_state: Path | str | State,
     output_path: Path | str | None = None,
+    *,
+    expected_head_sha256: str | None = None,
 ) -> dict:
-    """Export an insurer/enterprise compliance bundle (SOC2, ISO 42001, Cyber-Insurance)."""
+    """Export an audit/compliance evidence bundle from a single locked journal snapshot.
+
+    Note: Without an external ``expected_head_sha256`` checkpoint, hash-chain
+    verification establishes prefix integrity of present rows, not completeness
+    against tail truncation or whole-journal deletion.
+    """
     state = root_or_state if isinstance(root_or_state, State) else State(Path(root_or_state))
     verification = state.verify_receipts()
     public_key = json.loads((state.path / "public-key.json").read_text())["key"]
     try:
         approved_manifest = state.checked_in_approval()
-    except Exception:
+        approval_verified = True
+        approval_error: str | None = None
+    except Exception as exc:
         approved_manifest = None
+        approval_verified = False
+        approval_error = str(exc)
+
+    chain_head = verification["chain_head_sha256"]
+    if expected_head_sha256 is not None:
+        anchor_ok = chain_head == expected_head_sha256
+        completeness = "anchored" if anchor_ok else "truncated_or_mismatched"
+    else:
+        anchor_ok = True
+        completeness = "unknown_without_external_checkpoint"
+
+    ledger_ok = bool(
+        verification["ok"]
+        and verification["receipts"] > 0
+        and approval_verified
+        and anchor_ok
+    )
     allow_count = sum(
         1
         for r in verification["rows"]
@@ -324,18 +352,24 @@ def export_compliance_bundle(
     )
     bundle = {
         "schema": "actenon-airlock/compliance-bundle/v1",
+        "ok": ledger_ok,
         "public_key": public_key,
+        "approval_verified": approval_verified,
+        "approval_error": approval_error,
         "approved_manifest": approved_manifest,
         "ledger": {
-            "ok": verification["ok"],
+            "ok": ledger_ok,
+            "prefix_integrity_ok": verification["ok"],
+            "completeness": completeness,
             "total_entries": verification["receipts"],
             "verified_entries": verification["verified"],
             "allow_receipts": allow_count,
             "deny_refusals": deny_count,
-            "chain_head_sha256": _last_line_digest(state.receipts_path),
+            "chain_head_sha256": chain_head,
             "rows": verification["rows"],
         },
         "controls": {
+            "mapping_status": "draft_unvalidated_control_mapping",
             "soc2": ["CC6.1", "CC6.6", "CC7.2"],
             "iso_42001": ["A.6.2.6", "A.8.4", "A.9.3"],
             "cyber_insurance": [
