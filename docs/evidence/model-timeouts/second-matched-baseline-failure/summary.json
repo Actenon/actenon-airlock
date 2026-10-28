@@ -1,0 +1,29 @@
+{
+  "run": "https://github.com/Actenon/actenon-airlock/actions/runs/37295234658",
+  "head": "3da414c6719c406ad44dd91d115a6d289484a072",
+  "artifact_id": 11339983801,
+  "artifact_zip_sha256": "1701529a92c77e139c01415e51255d2e5777c83783f0bccf2d02caccbbeb9582",
+  "status": "FAIL",
+  "configuration_sha256": "63d5ac827920707a1935317d65ece1b784b39c32f3c354cfdf0483357b84f2dd",
+  "model_responses": 7,
+  "output_tokens": [
+    417,
+    268,
+    268,
+    271,
+    229,
+    229,
+    313
+  ],
+  "model_timeout": false,
+  "context_or_output_truncation_observed": false,
+  "task_attempts": 3,
+  "regression_outcome": "All three attempts failed collection with IndentationError",
+  "tests_unchanged": true,
+  "compile_reached": false,
+  "shell_compute_reached": false,
+  "local_commit_reached": false,
+  "protected_phase": "SKIPPED because baseline failed",
+  "cause_observation": "Model diffs contained invented prior code and inconsistent indentation; the unchanged external agent partially applied hunks and later refinements repeated misplaced insertions. More model capacity did not resolve patch quality.",
+  "scope": "No protected utility score, authority receipt or provider mutation is claimed for this unprotected baseline."
+}

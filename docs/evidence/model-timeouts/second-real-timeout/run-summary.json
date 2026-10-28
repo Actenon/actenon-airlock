@@ -1,0 +1,13 @@
+{
+  "repository": "https://github.com/gpt-engineer-org/gpt-engineer",
+  "source_head": "a90fcd543eedcc0ff2c34561bc0785d2ba83c47e",
+  "agent_version": "0.3.1",
+  "model": "qwen3:4b",
+  "model_fixture": false,
+  "model_digest": "359d7dd4bcdab3d86b87d73ac27966f4dbb9f5efdfcc75d34a8764a09474fae7",
+  "endpoint": "http://127.0.0.1:11434/v1/chat/completions",
+  "launch_result": 4,
+  "error": null,
+  "original_source_unchanged": true,
+  "full_product_pass": false
+}

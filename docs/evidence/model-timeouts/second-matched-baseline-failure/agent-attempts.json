@@ -1,0 +1,17 @@
+[
+  {
+    "attempt": 1,
+    "changed": true,
+    "regression_exit": 2
+  },
+  {
+    "attempt": 2,
+    "changed": true,
+    "regression_exit": 2
+  },
+  {
+    "attempt": 3,
+    "changed": true,
+    "regression_exit": 2
+  }
+]

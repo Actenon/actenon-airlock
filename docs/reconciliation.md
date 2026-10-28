@@ -112,7 +112,9 @@ event and lifetime before invoking Permit's real settlement operation. Unsigned
 claims are refused. Caller-owned mutable objects are frozen before verification.
 
 Configure hooks in trusted parent code; never load a provider hook chosen by
-agent input. No automatic provider-specific finality adapter is shipped here.
+agent input. The protected [GitHub creation profile](github-consequence.md) supplies a bounded
+host readback adapter, invoked explicitly with `--github-readback`. It can produce a COMMITTED
+observation under its reviewed assumptions; missing or conflicting state remains AMBIGUOUS.
 This interface does not authorize the agent to select a result.
 
 ## Verify evidence

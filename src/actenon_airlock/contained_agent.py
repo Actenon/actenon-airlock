@@ -28,7 +28,7 @@ def rpc(value):
     with socket.socket(socket.AF_UNIX) as connection:
         # Cold starts and bounded text inference may take longer than frame transfer.
         # The supervisor still owns authorization, reservations and transport limits.
-        connection.settimeout(180)
+        connection.settimeout(660)
         connection.connect("/ipc/broker.sock")
         connection.sendall(struct.pack("!I", len(data)) + data)
         with connection.makefile("rb") as stream:

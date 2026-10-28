@@ -1,0 +1,29 @@
+[
+  {
+    "fixture": "allow-ambiguous",
+    "receipts": 2,
+    "signature_and_chain_integrity": true,
+    "tail_sha256": "524bde144d8dd6283f4a103ea28634906b3b0c1dd42aa9dcb5ec7d7620fcd987",
+    "journal_completeness": "NOT_PROVEN_WITHOUT_EXTERNAL_HEAD",
+    "provider_truth": "SYNTHETIC_FIXTURE_ONLY",
+    "independent_operator": false
+  },
+  {
+    "fixture": "expansion-refusal",
+    "receipts": 1,
+    "signature_and_chain_integrity": true,
+    "tail_sha256": "28085e5c412787d51e2cddb901aaa573777e642acc2afae076b201364ceb7436",
+    "journal_completeness": "NOT_PROVEN_WITHOUT_EXTERNAL_HEAD",
+    "provider_truth": "SYNTHETIC_FIXTURE_ONLY",
+    "independent_operator": false
+  },
+  {
+    "fixture": "preflight-refusal",
+    "receipts": 2,
+    "signature_and_chain_integrity": true,
+    "tail_sha256": "171e5c4b39cb73aca2fd67261e149417b334ce2ca9be43ef453b4c746c7f9aca",
+    "journal_completeness": "NOT_PROVEN_WITHOUT_EXTERNAL_HEAD",
+    "provider_truth": "SYNTHETIC_FIXTURE_ONLY",
+    "independent_operator": false
+  }
+]

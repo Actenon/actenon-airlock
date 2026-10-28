@@ -1,0 +1,13 @@
+{
+  "same_reviewed_create": true,
+  "only_trace_changed": true,
+  "identities": [
+    "effect_6f2ffaea3c9f228feb2794c92e7e7e7cff7daff501e53e3869301bc4491c5326",
+    "effect_79962737380bc03fe217864a3df7e5b31ea886d7e4b483ede9b7e46e17cb7600"
+  ]
+}
+Traceback (most recent call last):
+  File "/Users/ross/Documents/Codex/2026-10-03/referenced-chatgpt-conversation-this-is-an/work/actenon-airlock-github-profile/docs/evidence/github-contents-consequence/before_projection.py", line 24, in <module>
+    assert identities[0] == identities[1], "generic header-byte projection resets identity for the same GitHub consequence"
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: generic header-byte projection resets identity for the same GitHub consequence

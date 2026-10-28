@@ -1,0 +1,20 @@
+{
+  "recorded_at": "2026-10-05T10:15:07.838968+00:00",
+  "platform": "Linux-6.17.0-1022-azure-x86_64-with-glibc2.39",
+  "cpu_count": 4,
+  "model": "qwen2.5-coder:14b",
+  "model_manifest_sha256": "9ec8897f747e246e970bc5cfdda85d22f1123dc2e3d34978a010a75968716849",
+  "model_archive_bytes": 8988123810,
+  "memory": {
+    "MemTotal": 16765366272,
+    "MemAvailable": 14688419840
+  },
+  "disk": {
+    "total_bytes": 154894188544,
+    "free_bytes": 89089073152
+  },
+  "required_available_memory_bytes": 12884901888,
+  "required_free_disk_bytes": 12209349282,
+  "admitted": true,
+  "scope": "Capacity admission only; successful model execution is still required"
+}

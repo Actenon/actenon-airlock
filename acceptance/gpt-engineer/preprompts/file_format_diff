@@ -1,0 +1,7 @@
+Return one fenced ```diff block per modified file.
+Use --- and +++ followed by the exact supplied relative filename, without a/ or b/ prefixes.
+Use unified hunk headers in the exact form @@ -old_start,old_count +new_start,new_count @@ with no trailing function name.
+Prefix every hunk line with a space for unchanged context, - for removed code, or + for added code.
+Removed and context lines must match the current source exactly, including blank lines and indentation. The displayed source line numbers are not part of the code.
+Include every changed region, including imports. Do not omit code with ellipses, invent prior code, or insert a partial replacement alongside an obsolete implementation.
+Before returning, check that applying the entire diff leaves syntactically valid code and implements all supplied requirements.

@@ -1,0 +1,15 @@
+{
+  "configuration_sha256": "63d5ac827920707a1935317d65ece1b784b39c32f3c354cfdf0483357b84f2dd",
+  "started_at": "2026-10-05T10:15:52.729240+00:00",
+  "status": "FAIL",
+  "phase": "unprotected-baseline",
+  "protected_acceptance": false,
+  "exit_status": 1,
+  "attach_exit_status": 1,
+  "regressions_unchanged": true,
+  "error": {
+    "type": "AssertionError",
+    "reason": "Matched baseline failed"
+  },
+  "finished_at": "2026-10-05T10:46:23.846694+00:00"
+}

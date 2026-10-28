@@ -8,7 +8,7 @@ their effect before dispatch; duplicates and blind retries of uncertain outcomes
 Signed receipts preserve each decision and its evidence.
 
 This is an installable development product, version 0.1.0.dev0. Its dependencies are pinned to the
-merged, unified ecosystem line. These are staging source pins; public registry dependencies are still
+coherent integration candidate, including unmerged Kernel and Permit candidates. These are staging source pins; public registry dependencies are still
 a release gate. No Airlock package, tag, or release has been published.
 
 ## Install
@@ -18,13 +18,15 @@ Python 3.11+ on Linux or macOS, with Git installed:
 ~~~sh
 python3 -m venv .venv
 . .venv/bin/activate
-python -m pip install "git+https://github.com/Actenon/actenon-airlock.git@main"
+python -m pip install "git+https://github.com/Actenon/actenon-airlock.git@feat/protected-acceptance"
 airlock doctor
 ~~~
 
 One Airlock installation includes Scan, Permit, Kernel, and Protocol at the exact commits in
 [dependency-pins.json](evidence/dependency-pins.json). Install your agent's own requirements
-in the same environment. For repeatable deployment, replace main with a reviewed Airlock commit.
+in the same environment. This command follows the development branch in
+[candidate PR #13](https://github.com/Actenon/actenon-airlock/pull/13). For repeatable testing,
+replace the branch with the exact reviewed Airlock commit. It is not a production release.
 
 ## Quickstart
 
@@ -74,12 +76,14 @@ Then change the POST to DELETE in main.py: diff shows the new power and run deni
 
 ## Credentials and receipts
 
-The parent broker retains credentials. The agent receives opaque handles for GITHUB_TOKEN,
+The parent broker retains credentials. In Local Mode, the agent receives opaque handles for GITHUB_TOKEN,
 GH_TOKEN, OPENAI_API_KEY, and ANTHROPIC_API_KEY, bound to their standard HTTPS API origins.
 Only a verified, authorized request can materialize a handle in an authorization/API-key header.
 Unknown environment variables are not inherited; nonsecret configuration inputs observed by
 Scan are forwarded. The broker ignores proxy environment variables.
 SDK credential-profile discovery is directed to a new, empty per-run directory.
+In Protected Mode, the contained agent receives a loopback bridge and dummy model keys;
+the supervisor selects the reviewed credential for each supported external operation.
 
 For a custom credential, bind it during approval:
 
@@ -98,8 +102,10 @@ Scan location, Permit decision/grant, proof identifier, Kernel receipt or refusa
 and credential/execution flags. Authorization is recorded before the effect; observation gets a
 linked completion record. Consequential HTTP uses Permit's durable effect reservation, verified
 and claimed independently by Kernel before credential release. Lost responses leave AMBIGUOUS
-ownership held, and identical retries remain blocked across new runs and grants. Read-only
-classification comes from Scan; those requests remain repeatable.
+ownership held, and identical retries remain blocked across new runs and grants. In Local Mode,
+read-only classification comes from Scan; those requests remain repeatable. Protected Mode
+supports reviewed text inference and exact GitHub file creation. Other outbound calls, including
+arbitrary GETs, are denied: an HTTP verb alone does not establish harmless consequences.
 
 A generic HTTP response is returned to the agent, but does not prove the remote consequence
 committed. Its signed receipt says `response-received`, `transport_completed: true`,
@@ -107,14 +113,20 @@ committed. Its signed receipt says `response-received`, `transport_completed: tr
 records AMBIGUOUS / OUTCOME_UNKNOWN, never a false statement of non-execution. The local
 fingerprint binds method, exact URL, body and caller headers, with stable parent credential
 references instead of random credential handles. Source/proof/grant changes do not reset it.
-API-specific logical identities and trusted provider reconciliation are still required for
-stronger semantic consequence claims; generic byte identity cannot infer every remote effect.
+The protected [GitHub create-only profile](docs/github-consequence.md) derives its effect identity
+from repository identity, branch, file, content and commit message; trace headers do not reset it.
+Its host readback validates exact provider state under a reviewed exclusive-writer assumption.
+Other APIs still require their own consequence projection and finality checks.
 Use `airlock reconcile <effect-id>` to inspect a held effect. An explicitly approved,
 separate observer key can attest `--committed` or `--not-executed`, with evidence bound to
 the exact original attempt and the ledger state reviewed. See [reconciliation](docs/reconciliation.md)
 for local signing, detached review and the authenticated provider hook. This build does not claim
 COMMITTED from HTTP status, cross-host ownership, or complete G1–G40 acceptance.
-Request and response bodies, raw headers, and credential values are not recorded.
+Generic HTTP receipts retain body hashes. The GitHub profile also retains the exact reviewed
+creation body inside the signed authorization receipt so it can be verified after a lost response.
+Its readback saves bounded provider bodies privately under `.airlock/local/`; these can contain
+private code and GitHub user metadata. Headers and credential values are excluded. Evidence is
+not uploaded automatically; review and redact an export before sharing it.
 If the agent handles an error itself, Airlock still exits nonzero for a broker denial (3) or
 an uncertain/failed dispatch (4). Discovery and approval-check failures exit 2.
 

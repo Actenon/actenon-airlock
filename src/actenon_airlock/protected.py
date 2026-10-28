@@ -16,16 +16,26 @@ import shutil
 import stat
 import struct
 import subprocess
+import sys
 import threading
 import time
 from pathlib import Path
 from uuid import uuid4
 
-from actenon_permit.model import Budget
+from actenon_permit.model import Budget, Grant, Scopes
+from actenon_protocol.effects import effect_identity
 from actenon_scan.authority import classify_http
 
 from .broker import Broker
 from .common import AirlockError, canonical, power, validate_url
+from .github_runtime import (
+    GitHubCreateDispatch,
+    effect_descriptor,
+    project_intent,
+    review_for,
+    scan_power,
+    validate_profiles,
+)
 from .manifest import EXCLUDED, authority_diff, capability, digest, discover, source_fingerprint
 from .model_constraints import DEFAULT_ENDPOINTS, endpoint, scan_transports, validate_profile
 from .state import State, atomic_json
@@ -46,6 +56,7 @@ class Docker:
             for name in ("HOME", "PATH", "TMPDIR", "DOCKER_CONFIG", "DOCKER_CONTEXT", "DOCKER_HOST")
             if name in os.environ
         }
+        self.host_path_prefix = None
 
     def call(self, args, *, timeout=45):
         try:
@@ -68,6 +79,7 @@ class Docker:
         return json.loads(self.call(args, timeout=timeout))
 
     def verify_engine(self, timeout=30):
+        self.host_path_prefix = None
         context = self.json(["context", "inspect"], timeout=5)[0]
         endpoint = context["Endpoints"]["docker"]["Host"]
         if not self.environment.get("DOCKER_CONTEXT"):
@@ -82,6 +94,11 @@ class Docker:
             for value in info.get("SecurityOptions", [])
         ):
             raise AirlockError("Protected Mode requires Linux with Docker's seccomp protection")
+        # Docker Desktop's local macOS file-sharing mount is reported with this
+        # prefix for some writable binds. Do not accept it on Linux or a remote
+        # daemon, or normalize arbitrary paths/symlinks into reviewed mounts.
+        if sys.platform == "darwin" and info.get("OperatingSystem") == "Docker Desktop":
+            self.host_path_prefix = "/host_mnt"
         return {"server_version": info["ServerVersion"], "os": "linux", "seccomp": True}
 
     def image(self, name):
@@ -184,6 +201,8 @@ class ProtectedBroker(Broker):
             raise AirlockError("Approval changed during protected initialization")
         if self.approval.get("protected_model"):
             validate_profile(self.approval["protected_model"])
+        self.github_profiles = validate_profiles(self.approval.get("protected_github", []))
+        self.github_grants = {}
         self.model_transports = {**MODEL_ENDPOINTS, **scan_transports(current)}
         if self.approval.get("protected_model"):
             selected = self.approval["protected_model"]
@@ -195,6 +214,63 @@ class ProtectedBroker(Broker):
                 raise AirlockError("Selected model format disagrees with native Scan transport")
             self.model_transports[target] = selected["provider"]
         super().__init__(state, current, bindings)
+        for profile in self.github_profiles:
+            review = review_for(profile)
+            cap = capability(scan_power(review))
+            if cap not in self.allowed:
+                continue  # Source removal must remove effective authority too.
+            grant = Grant(
+                agent_id=self.grant.agent_id,
+                expires_at=self.grant.expires_at,
+                scopes=Scopes(allow=[cap]),
+                budget=Budget(limit=1, remaining=1, currency="calls"),
+                approved_effect_ids=[
+                    effect_identity(effect_descriptor(review, self.effect_namespace))
+                ],
+            ).sign()
+            self.store.put_grant(grant)
+            self.github_grants[digest(profile)] = grant
+
+    def grant_scopes(self):
+        # The model grant cannot authorize GitHub. Every GitHub grant is
+        # independently finite; no broader parent can be used at the edge.
+        profile = self.approval.get("protected_model", {})
+        target = endpoint(profile) if profile else None
+        allowed = sorted(
+            {
+                capability(p)
+                for p in self.current["powers"]
+                if p["action"] == "http.post"
+                and p["transport"] == target
+                and capability(p) in self.allowed
+            }
+        )
+        return Scopes(allow=allowed, deny=[] if allowed else ["*"])
+
+    def execution_grant(self, capability_name, dispatch):
+        if isinstance(dispatch, GitHubCreateDispatch):
+            grant = self.github_grants.get(digest(dispatch.profile))
+            if grant is None:
+                raise AirlockError("No finite approved grant for this GitHub consequence")
+            return grant
+        return super().execution_grant(capability_name, dispatch)
+
+    def make_dispatch(self, adapter, effect, message):
+        if effect.target in self.model_transports:
+            return super().make_dispatch(adapter, effect, message)
+        for profile in self.github_profiles:
+            if effect.target != review_for(profile).contents_url:
+                continue
+            try:
+                return GitHubCreateDispatch(self, effect, message, profile)
+            except ValueError:
+                continue
+        raise AirlockError("No exact reviewed GitHub creation matches this request")
+
+    def _http_effect_descriptor(self, intent):
+        if intent.target.resource_id in self.model_transports:
+            return super()._http_effect_descriptor(intent)
+        return project_intent(intent, self.github_profiles, self.effect_namespace)
 
     def grant_principal(self):
         return (
@@ -222,6 +298,14 @@ class ProtectedBroker(Broker):
 
     def action_cost(self, effect):
         return 1
+
+    def http_timeout(self, url):
+        profile = self.approval.get("protected_model", {})
+        if profile and endpoint(profile) == url:
+            # The signed supervisor profile controls this phase timeout, never
+            # an agent request/header. This is not an overall execution deadline.
+            return profile.get("read_timeout_seconds", 30)
+        return super().http_timeout(url)
 
     def bind_authority(self, effect, message):
         for candidate in effect.candidates:
@@ -348,6 +432,11 @@ class ProtectedBroker(Broker):
                 if method != "POST":
                     raise AirlockError("Model inference requires POST")
                 body = self.model_body(url, body)
+            elif not any(url == review_for(p).contents_url for p in self.github_profiles):
+                # An HTTP verb does not establish provider semantics. This
+                # declared deployment supports reviewed inference and exact
+                # GitHub creation; other endpoints need a supported executor.
+                raise AirlockError("No reviewed protected consequence profile for this endpoint")
             headers = message.get("headers", {})
             if not isinstance(headers, dict) or any(
                 not isinstance(k, str) or not isinstance(v, str) for k, v in headers.items()
@@ -445,6 +534,17 @@ def _verify_container(docker, identity, *, agent, mounts):
         }
         for row in config["Mounts"]
     }
+    matching_mounts = dict(actual_mounts)
+    prefix = getattr(docker, "host_path_prefix", None)
+    if prefix:
+        for destination, row in actual_mounts.items():
+            expected = mounts.get(destination)
+            if (
+                expected
+                and row["type"] == expected["type"] == "bind"
+                and row["source"] == prefix + expected["source"]
+            ):
+                matching_mounts[destination] = {**row, "source": expected["source"]}
     if not (
         host["NetworkMode"] == "none"
         and host["ReadonlyRootfs"] is True
@@ -461,8 +561,9 @@ def _verify_container(docker, identity, *, agent, mounts):
         and host["IpcMode"] == "private"
         and host["PidsLimit"] == 128
         and host["Memory"] == 1024 * 1024 * 1024
+        and host.get("NanoCpus") == 2_000_000_000
         and image["User"] == ("10000:10000" if agent else "0:0")
-        and actual_mounts == mounts
+        and matching_mounts == mounts
     ):
         raise AirlockError(
             "Protected container isolation configuration differs from the required boundary"
@@ -653,6 +754,8 @@ def launch_protected(root, command, *, image=DEFAULT_IMAGE):
                 "image_id": resolved["Id"],
                 "source_digest": current["source_digest"],
                 "grant_id": broker.grant.id,
+                "github_grant_ids": sorted(g.id for g in broker.github_grants.values()),
+                "budget_scope": "model calls per run; one creation per finite GitHub grant",
                 "new_powers_blocked": len(diff["added"]),
                 "bridge": boundary,
                 "agent": agent_boundary,

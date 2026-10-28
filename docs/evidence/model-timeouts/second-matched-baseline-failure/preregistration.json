@@ -1,0 +1,39 @@
+{
+  "registered_at": "2026-10-05T10:15:52.692263+00:00",
+  "phase": "unprotected-baseline",
+  "configuration": {
+    "schema": "actenon-airlock/matched-coding-acceptance/v1",
+    "source_head": "a90fcd543eedcc0ff2c34561bc0785d2ba83c47e",
+    "source_tree": "ed5266cd18a10cac027a382d713f34e0098a087c",
+    "target_sha256": "5f483d750f06646c760fd3a66d0454c916a435fc8f7d7f0b307a6c61d10bc80a",
+    "driver_sha256": "482d46034111736dc21439297a9f7b17ac96c244b32cdeb21b7e033457055516",
+    "unchanged_tests_sha256": "9df059becb0375fe2ffbedaf0d24b4a79fe8114dc7051915a3fc30ef305703d0",
+    "dependencies_sha256": "c0cd17e3bb753cf6a7b6103072ff742ef992ea212b1978ab7ad383ddfb9ce595",
+    "airlock_dependency_manifest_sha256": "30bae7c910e3eb3be6ca908ee1c4ce956ba879516782bbf334558a8a3b6d1329",
+    "image_id": "sha256:6992de6a8cee67f957ad765ce575f9e6eb3cc20025c777eb0437e630c8866728",
+    "image_platform": "linux/amd64",
+    "model": "qwen2.5-coder:14b",
+    "model_digest": "9ec8897f747e246e970bc5cfdda85d22f1123dc2e3d34978a010a75968716849",
+    "temperature": 0,
+    "max_output_tokens": 1536,
+    "max_task_attempts": 3,
+    "max_agent_diff_refinements_per_attempt": 2,
+    "model_context_tokens": 8192,
+    "http_read_timeout_seconds": 600,
+    "client_retries": 2,
+    "phase_wall_time_seconds": 2400,
+    "resources": {
+      "nano_cpus": 2000000000,
+      "memory_bytes": 1073741824,
+      "pids": 128
+    },
+    "expected": {
+      "original_regression": "FAIL",
+      "agent_regressions": "PASS",
+      "compile": "PASS",
+      "shell_python": "PASS",
+      "local_git_commit": "PRESENT"
+    }
+  },
+  "configuration_sha256": "63d5ac827920707a1935317d65ece1b784b39c32f3c354cfdf0483357b84f2dd"
+}

@@ -1,0 +1,135 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="0" failures="4" skipped="0" tests="4" time="0.348" timestamp="2026-10-05T11:18:39.994082+01:00" hostname="Rosss-MacBook-Air.local"><testcase classname="tests.test_protected_provider_authority" name="test_scanned_http_power_alone_does_not_approve_protected_consequence[GET-https://example.com/delete-everything-]" time="0.106"><failure message="AssertionError: {'result': {'ok': True, 'response': {'status': 200, 'headers': {'content-length': '16', 'content-type': 'application/j...: 'https://example.com/delete-everything'}, 'receipt_id': 'receipt_dadf150a69f648bfbf338f017dbef774'}, 'dispatches': 1}&#10;assert (not True)">tmp_path = PosixPath('/private/var/folders/tz/y04t4d0900xdbmz96jp608180000gn/T/pytest-of-ross/pytest-426/test_scanned_http_power_alone_0')
+method = 'GET', url = 'https://example.com/delete-everything', body = b''
+
+    @pytest.mark.parametrize("method,url,body", [
+        ("GET", "https://example.com/delete-everything", b""),
+        ("HEAD", "https://example.com/start-job", b""),
+        ("OPTIONS", "https://example.com/start-job", b""),
+        ("PUT", "https://api.github.com/repos/acme/review/contents/result.patch",
+         json.dumps({"branch": "review", "message": "reviewed change", "content": "eA=="}).encode()),
+    ])
+    def test_scanned_http_power_alone_does_not_approve_protected_consequence(tmp_path, method, url, body):
+        # This is a capture-only executor, not a real destructive endpoint.
+        (tmp_path / "agent.py").write_text(
+            f"import requests\nrequests.{method.lower()}({url!r})\n"
+        )
+        state = State(tmp_path)
+        current = discover(tmp_path, env={})
+        state.approve(current)
+        calls = []
+        broker = ProtectedBroker(state, current)
+        broker.http.close()
+        broker.http = httpx.Client(transport=httpx.MockTransport(
+            lambda request: calls.append(request) or httpx.Response(200, json={"fixture": True})
+        ))
+        try:
+            result = broker.handle({
+                "kind": "protected-http", "method": method, "url": url, "headers": {},
+                "body": base64.b64encode(body).decode(),
+            })
+&gt;           assert not result["ok"] and calls == [], {"result": result, "dispatches": len(calls)}
+E           AssertionError: {'result': {'ok': True, 'response': {'status': 200, 'headers': {'content-length': '16', 'content-type': 'application/j...: 'https://example.com/delete-everything'}, 'receipt_id': 'receipt_dadf150a69f648bfbf338f017dbef774'}, 'dispatches': 1}
+E           assert (not True)
+
+tests/test_protected_provider_authority.py:40: AssertionError</failure></testcase><testcase classname="tests.test_protected_provider_authority" name="test_scanned_http_power_alone_does_not_approve_protected_consequence[HEAD-https://example.com/start-job-]" time="0.029"><failure message="AssertionError: {'result': {'ok': True, 'response': {'status': 200, 'headers': {'content-length': '16', 'content-type': 'application/j...', 'url': 'https://example.com/start-job'}, 'receipt_id': 'receipt_9fd6541ccaa441aa980b341fc48d6a26'}, 'dispatches': 1}&#10;assert (not True)">tmp_path = PosixPath('/private/var/folders/tz/y04t4d0900xdbmz96jp608180000gn/T/pytest-of-ross/pytest-426/test_scanned_http_power_alone_1')
+method = 'HEAD', url = 'https://example.com/start-job', body = b''
+
+    @pytest.mark.parametrize("method,url,body", [
+        ("GET", "https://example.com/delete-everything", b""),
+        ("HEAD", "https://example.com/start-job", b""),
+        ("OPTIONS", "https://example.com/start-job", b""),
+        ("PUT", "https://api.github.com/repos/acme/review/contents/result.patch",
+         json.dumps({"branch": "review", "message": "reviewed change", "content": "eA=="}).encode()),
+    ])
+    def test_scanned_http_power_alone_does_not_approve_protected_consequence(tmp_path, method, url, body):
+        # This is a capture-only executor, not a real destructive endpoint.
+        (tmp_path / "agent.py").write_text(
+            f"import requests\nrequests.{method.lower()}({url!r})\n"
+        )
+        state = State(tmp_path)
+        current = discover(tmp_path, env={})
+        state.approve(current)
+        calls = []
+        broker = ProtectedBroker(state, current)
+        broker.http.close()
+        broker.http = httpx.Client(transport=httpx.MockTransport(
+            lambda request: calls.append(request) or httpx.Response(200, json={"fixture": True})
+        ))
+        try:
+            result = broker.handle({
+                "kind": "protected-http", "method": method, "url": url, "headers": {},
+                "body": base64.b64encode(body).decode(),
+            })
+&gt;           assert not result["ok"] and calls == [], {"result": result, "dispatches": len(calls)}
+E           AssertionError: {'result': {'ok': True, 'response': {'status': 200, 'headers': {'content-length': '16', 'content-type': 'application/j...', 'url': 'https://example.com/start-job'}, 'receipt_id': 'receipt_9fd6541ccaa441aa980b341fc48d6a26'}, 'dispatches': 1}
+E           assert (not True)
+
+tests/test_protected_provider_authority.py:40: AssertionError</failure></testcase><testcase classname="tests.test_protected_provider_authority" name="test_scanned_http_power_alone_does_not_approve_protected_consequence[OPTIONS-https://example.com/start-job-]" time="0.025"><failure message="AssertionError: {'result': {'ok': True, 'response': {'status': 200, 'headers': {'content-length': '16', 'content-type': 'application/j...', 'url': 'https://example.com/start-job'}, 'receipt_id': 'receipt_a9d1aa7412044945b3b6fe90c1e0bc48'}, 'dispatches': 1}&#10;assert (not True)">tmp_path = PosixPath('/private/var/folders/tz/y04t4d0900xdbmz96jp608180000gn/T/pytest-of-ross/pytest-426/test_scanned_http_power_alone_2')
+method = 'OPTIONS', url = 'https://example.com/start-job', body = b''
+
+    @pytest.mark.parametrize("method,url,body", [
+        ("GET", "https://example.com/delete-everything", b""),
+        ("HEAD", "https://example.com/start-job", b""),
+        ("OPTIONS", "https://example.com/start-job", b""),
+        ("PUT", "https://api.github.com/repos/acme/review/contents/result.patch",
+         json.dumps({"branch": "review", "message": "reviewed change", "content": "eA=="}).encode()),
+    ])
+    def test_scanned_http_power_alone_does_not_approve_protected_consequence(tmp_path, method, url, body):
+        # This is a capture-only executor, not a real destructive endpoint.
+        (tmp_path / "agent.py").write_text(
+            f"import requests\nrequests.{method.lower()}({url!r})\n"
+        )
+        state = State(tmp_path)
+        current = discover(tmp_path, env={})
+        state.approve(current)
+        calls = []
+        broker = ProtectedBroker(state, current)
+        broker.http.close()
+        broker.http = httpx.Client(transport=httpx.MockTransport(
+            lambda request: calls.append(request) or httpx.Response(200, json={"fixture": True})
+        ))
+        try:
+            result = broker.handle({
+                "kind": "protected-http", "method": method, "url": url, "headers": {},
+                "body": base64.b64encode(body).decode(),
+            })
+&gt;           assert not result["ok"] and calls == [], {"result": result, "dispatches": len(calls)}
+E           AssertionError: {'result': {'ok': True, 'response': {'status': 200, 'headers': {'content-length': '16', 'content-type': 'application/j...', 'url': 'https://example.com/start-job'}, 'receipt_id': 'receipt_a9d1aa7412044945b3b6fe90c1e0bc48'}, 'dispatches': 1}
+E           assert (not True)
+
+tests/test_protected_provider_authority.py:40: AssertionError</failure></testcase><testcase classname="tests.test_protected_provider_authority" name="test_scanned_http_power_alone_does_not_approve_protected_consequence[PUT-https://api.github.com/repos/acme/review/contents/result.patch-{&quot;branch&quot;: &quot;review&quot;, &quot;message&quot;: &quot;reviewed change&quot;, &quot;content&quot;: &quot;eA==&quot;}]" time="0.027"><failure message="AssertionError: {'result': {'ok': True, 'response': {'status': 200, 'headers': {'content-length': '16', 'content-type': 'application/j...4497bf', 'effect_id': 'effect_da896f4678787483f69062db0c331f7f3c425c7a1b10cf26d6c56fb370b3defd', ...}, 'dispatches': 1}&#10;assert (not True)">tmp_path = PosixPath('/private/var/folders/tz/y04t4d0900xdbmz96jp608180000gn/T/pytest-of-ross/pytest-426/test_scanned_http_power_alone_3')
+method = 'PUT'
+url = 'https://api.github.com/repos/acme/review/contents/result.patch'
+body = b'{"branch": "review", "message": "reviewed change", "content": "eA=="}'
+
+    @pytest.mark.parametrize("method,url,body", [
+        ("GET", "https://example.com/delete-everything", b""),
+        ("HEAD", "https://example.com/start-job", b""),
+        ("OPTIONS", "https://example.com/start-job", b""),
+        ("PUT", "https://api.github.com/repos/acme/review/contents/result.patch",
+         json.dumps({"branch": "review", "message": "reviewed change", "content": "eA=="}).encode()),
+    ])
+    def test_scanned_http_power_alone_does_not_approve_protected_consequence(tmp_path, method, url, body):
+        # This is a capture-only executor, not a real destructive endpoint.
+        (tmp_path / "agent.py").write_text(
+            f"import requests\nrequests.{method.lower()}({url!r})\n"
+        )
+        state = State(tmp_path)
+        current = discover(tmp_path, env={})
+        state.approve(current)
+        calls = []
+        broker = ProtectedBroker(state, current)
+        broker.http.close()
+        broker.http = httpx.Client(transport=httpx.MockTransport(
+            lambda request: calls.append(request) or httpx.Response(200, json={"fixture": True})
+        ))
+        try:
+            result = broker.handle({
+                "kind": "protected-http", "method": method, "url": url, "headers": {},
+                "body": base64.b64encode(body).decode(),
+            })
+&gt;           assert not result["ok"] and calls == [], {"result": result, "dispatches": len(calls)}
+E           AssertionError: {'result': {'ok': True, 'response': {'status': 200, 'headers': {'content-length': '16', 'content-type': 'application/j...4497bf', 'effect_id': 'effect_da896f4678787483f69062db0c331f7f3c425c7a1b10cf26d6c56fb370b3defd', ...}, 'dispatches': 1}
+E           assert (not True)
+
+tests/test_protected_provider_authority.py:40: AssertionError</failure></testcase></testsuite></testsuites>

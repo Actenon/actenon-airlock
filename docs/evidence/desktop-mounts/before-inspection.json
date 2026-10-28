@@ -1,0 +1,69 @@
+{
+  "host": {
+    "NetworkMode": "none",
+    "ReadonlyRootfs": true,
+    "Privileged": false,
+    "CapDrop": [
+      "ALL"
+    ],
+    "CapAdd": null,
+    "Devices": [],
+    "DeviceRequests": null,
+    "GroupAdd": null,
+    "PortBindings": {},
+    "SecurityOpt": [
+      "no-new-privileges"
+    ],
+    "PidMode": "",
+    "IpcMode": "private",
+    "PidsLimit": 128,
+    "Memory": 1073741824,
+    "NanoCpus": 2000000000
+  },
+  "user": "10000:10000",
+  "mounts": [
+    {
+      "Type": "bind",
+      "Source": "/temporary-case/project/.airlock/local/runs/protected_a2fba78900c248de8bdffbf654c28bea/control",
+      "Destination": "/airlock",
+      "Mode": "",
+      "RW": false,
+      "Propagation": "rprivate"
+    },
+    {
+      "Type": "volume",
+      "Name": "airlock-ipc-bac6e7a1d501439e9627d1f305aca78c",
+      "Source": "/var/lib/docker/volumes/airlock-ipc-bac6e7a1d501439e9627d1f305aca78c/_data",
+      "Destination": "/ipc",
+      "Driver": "local",
+      "Mode": "z",
+      "RW": false,
+      "Propagation": ""
+    },
+    {
+      "Type": "bind",
+      "Source": "/host_mnt/temporary-case/project/.airlock/local/runs/protected_a2fba78900c248de8bdffbf654c28bea/workspace",
+      "Destination": "/workspace",
+      "Mode": "",
+      "RW": true,
+      "Propagation": "rprivate"
+    }
+  ],
+  "expected_mounts": {
+    "/airlock": {
+      "rw": false,
+      "type": "bind",
+      "source": "/temporary-case/project/.airlock/local/runs/protected_a2fba78900c248de8bdffbf654c28bea/control"
+    },
+    "/ipc": {
+      "rw": false,
+      "type": "volume",
+      "source": "airlock-ipc-bac6e7a1d501439e9627d1f305aca78c"
+    },
+    "/workspace": {
+      "rw": true,
+      "type": "bind",
+      "source": "/temporary-case/project/.airlock/local/runs/protected_a2fba78900c248de8bdffbf654c28bea/workspace"
+    }
+  }
+}
