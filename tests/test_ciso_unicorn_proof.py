@@ -6,7 +6,7 @@ import json
 from pathlib import Path
 from types import SimpleNamespace
 
-import pytest
+from actenon_permit.model import DecisionOutcome
 
 from actenon_airlock import export_compliance_bundle, verify_ledger
 from actenon_airlock.ciso_proof import (
@@ -15,7 +15,6 @@ from actenon_airlock.ciso_proof import (
     run_ciso_proof,
 )
 from actenon_airlock.state import State
-from actenon_permit.model import DecisionOutcome
 
 
 def test_sixty_second_ciso_unicorn_proof(tmp_path: Path) -> None:
@@ -145,11 +144,7 @@ def test_r1_candidate_admission_reports_not_ready_without_real_agent_artifact(
     import importlib.util
     import sys
 
-    script_path = (
-        Path(__file__).resolve().parents[1]
-        / "scripts"
-        / "check_candidate_admission.py"
-    )
+    script_path = Path(__file__).resolve().parents[1] / "scripts" / "check_candidate_admission.py"
     spec = importlib.util.spec_from_file_location("check_candidate_admission", script_path)
     assert spec is not None and spec.loader is not None
     mod = importlib.util.module_from_spec(spec)

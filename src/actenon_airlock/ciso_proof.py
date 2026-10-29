@@ -16,13 +16,13 @@ Evidence scope:
 
 from __future__ import annotations
 
-from collections.abc import Sequence
 import concurrent.futures
 import json
 import os
 import tempfile
 import threading
 import time
+from collections.abc import Sequence
 from dataclasses import replace
 from datetime import UTC, datetime, timedelta
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer

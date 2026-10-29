@@ -335,10 +335,7 @@ def export_compliance_bundle(
         completeness = "unknown_without_external_checkpoint"
 
     ledger_ok = bool(
-        verification["ok"]
-        and verification["receipts"] > 0
-        and approval_verified
-        and anchor_ok
+        verification["ok"] and verification["receipts"] > 0 and approval_verified and anchor_ok
     )
     allow_count = sum(
         1
