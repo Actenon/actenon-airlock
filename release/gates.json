@@ -1,0 +1,574 @@
+{
+  "schema": "actenon-airlock/release-gates/v1",
+  "programme": "G1-G40",
+  "frozen_definitions": {
+    "path": "release/G1-G40.frozen.md",
+    "sha256": null,
+    "note": "The verbatim frozen G1-G40 acceptance text is not committed to any Actenon repository. Until the owner commits it and pins its SHA-256 here, the programme is not frozen and the overall status cannot exceed NOT READY. Rejected non-authoritative sources: the grouped G1_G17/G18_G27/G6_G29 labels in the PR #14 draft gate, and the G28-G40 names hardcoded in field_test_7/consolidate_evidence.py (they contradict the G28-G38 frozen-programme scope)."
+  },
+  "gates": [
+    {
+      "id": "G1",
+      "definition": "MISSING",
+      "title": null,
+      "acceptance_condition": null,
+      "evidence": null,
+      "required_for": [
+        "candidate",
+        "release"
+      ]
+    },
+    {
+      "id": "G2",
+      "definition": "MISSING",
+      "title": null,
+      "acceptance_condition": null,
+      "evidence": null,
+      "required_for": [
+        "candidate",
+        "release"
+      ]
+    },
+    {
+      "id": "G3",
+      "definition": "MISSING",
+      "title": null,
+      "acceptance_condition": null,
+      "evidence": null,
+      "required_for": [
+        "candidate",
+        "release"
+      ]
+    },
+    {
+      "id": "G4",
+      "definition": "MISSING",
+      "title": null,
+      "acceptance_condition": null,
+      "evidence": null,
+      "required_for": [
+        "candidate",
+        "release"
+      ]
+    },
+    {
+      "id": "G5",
+      "definition": "MISSING",
+      "title": null,
+      "acceptance_condition": null,
+      "evidence": null,
+      "required_for": [
+        "candidate",
+        "release"
+      ]
+    },
+    {
+      "id": "G6",
+      "definition": "MISSING",
+      "title": null,
+      "acceptance_condition": null,
+      "evidence": null,
+      "required_for": [
+        "candidate",
+        "release"
+      ]
+    },
+    {
+      "id": "G7",
+      "definition": "MISSING",
+      "title": null,
+      "acceptance_condition": null,
+      "evidence": null,
+      "required_for": [
+        "candidate",
+        "release"
+      ]
+    },
+    {
+      "id": "G8",
+      "definition": "MISSING",
+      "title": null,
+      "acceptance_condition": null,
+      "evidence": null,
+      "required_for": [
+        "candidate",
+        "release"
+      ]
+    },
+    {
+      "id": "G9",
+      "definition": "MISSING",
+      "title": null,
+      "acceptance_condition": null,
+      "evidence": null,
+      "required_for": [
+        "candidate",
+        "release"
+      ]
+    },
+    {
+      "id": "G10",
+      "definition": "MISSING",
+      "title": null,
+      "acceptance_condition": null,
+      "evidence": null,
+      "required_for": [
+        "candidate",
+        "release"
+      ]
+    },
+    {
+      "id": "G11",
+      "definition": "MISSING",
+      "title": null,
+      "acceptance_condition": null,
+      "evidence": null,
+      "required_for": [
+        "candidate",
+        "release"
+      ]
+    },
+    {
+      "id": "G12",
+      "definition": "MISSING",
+      "title": null,
+      "acceptance_condition": null,
+      "evidence": null,
+      "required_for": [
+        "candidate",
+        "release"
+      ]
+    },
+    {
+      "id": "G13",
+      "definition": "MISSING",
+      "title": null,
+      "acceptance_condition": null,
+      "evidence": null,
+      "required_for": [
+        "candidate",
+        "release"
+      ]
+    },
+    {
+      "id": "G14",
+      "definition": "MISSING",
+      "title": null,
+      "acceptance_condition": null,
+      "evidence": null,
+      "required_for": [
+        "candidate",
+        "release"
+      ]
+    },
+    {
+      "id": "G15",
+      "definition": "MISSING",
+      "title": null,
+      "acceptance_condition": null,
+      "evidence": null,
+      "required_for": [
+        "candidate",
+        "release"
+      ]
+    },
+    {
+      "id": "G16",
+      "definition": "MISSING",
+      "title": null,
+      "acceptance_condition": null,
+      "evidence": null,
+      "required_for": [
+        "candidate",
+        "release"
+      ]
+    },
+    {
+      "id": "G17",
+      "definition": "MISSING",
+      "title": null,
+      "acceptance_condition": null,
+      "evidence": null,
+      "required_for": [
+        "candidate",
+        "release"
+      ]
+    },
+    {
+      "id": "G18",
+      "definition": "MISSING",
+      "title": null,
+      "acceptance_condition": null,
+      "evidence": null,
+      "required_for": [
+        "candidate",
+        "release"
+      ]
+    },
+    {
+      "id": "G19",
+      "definition": "MISSING",
+      "title": null,
+      "acceptance_condition": null,
+      "evidence": null,
+      "required_for": [
+        "candidate",
+        "release"
+      ]
+    },
+    {
+      "id": "G20",
+      "definition": "MISSING",
+      "title": null,
+      "acceptance_condition": null,
+      "evidence": null,
+      "required_for": [
+        "candidate",
+        "release"
+      ]
+    },
+    {
+      "id": "G21",
+      "definition": "MISSING",
+      "title": null,
+      "acceptance_condition": null,
+      "evidence": null,
+      "required_for": [
+        "candidate",
+        "release"
+      ]
+    },
+    {
+      "id": "G22",
+      "definition": "MISSING",
+      "title": null,
+      "acceptance_condition": null,
+      "evidence": null,
+      "required_for": [
+        "candidate",
+        "release"
+      ]
+    },
+    {
+      "id": "G23",
+      "definition": "MISSING",
+      "title": null,
+      "acceptance_condition": null,
+      "evidence": null,
+      "required_for": [
+        "candidate",
+        "release"
+      ]
+    },
+    {
+      "id": "G24",
+      "definition": "MISSING",
+      "title": null,
+      "acceptance_condition": null,
+      "evidence": null,
+      "required_for": [
+        "candidate",
+        "release"
+      ]
+    },
+    {
+      "id": "G25",
+      "definition": "MISSING",
+      "title": null,
+      "acceptance_condition": null,
+      "evidence": null,
+      "required_for": [
+        "candidate",
+        "release"
+      ]
+    },
+    {
+      "id": "G26",
+      "definition": "MISSING",
+      "title": null,
+      "acceptance_condition": null,
+      "evidence": null,
+      "required_for": [
+        "candidate",
+        "release"
+      ]
+    },
+    {
+      "id": "G27",
+      "definition": "MISSING",
+      "title": null,
+      "acceptance_condition": null,
+      "evidence": null,
+      "required_for": [
+        "candidate",
+        "release"
+      ]
+    },
+    {
+      "id": "G28",
+      "definition": "PROGRAMME_LEVEL",
+      "title": "Frozen external coding-agent acceptance (G28-G38 programme)",
+      "acceptance_condition": "A successful, authenticated run of the frozen matched-baseline programme on the exact candidate commit: preregistered gpt-engineer source, pinned qwen2.5-coder:14b digest, unchanged scoring rules, a passing unprotected baseline, and a passing protected run whose receipts verify. Per-gate wording for G28 is not committed; this gate shares the programme evidence and is reported as shared, never as independent evidence.",
+      "evidence": "frozen_external_acceptance",
+      "required_for": [
+        "candidate",
+        "release"
+      ]
+    },
+    {
+      "id": "G29",
+      "definition": "PROGRAMME_LEVEL",
+      "title": "Frozen external coding-agent acceptance (G28-G38 programme)",
+      "acceptance_condition": "A successful, authenticated run of the frozen matched-baseline programme on the exact candidate commit: preregistered gpt-engineer source, pinned qwen2.5-coder:14b digest, unchanged scoring rules, a passing unprotected baseline, and a passing protected run whose receipts verify. Per-gate wording for G29 is not committed; this gate shares the programme evidence and is reported as shared, never as independent evidence.",
+      "evidence": "frozen_external_acceptance",
+      "required_for": [
+        "candidate",
+        "release"
+      ]
+    },
+    {
+      "id": "G30",
+      "definition": "PROGRAMME_LEVEL",
+      "title": "Frozen external coding-agent acceptance (G28-G38 programme)",
+      "acceptance_condition": "A successful, authenticated run of the frozen matched-baseline programme on the exact candidate commit: preregistered gpt-engineer source, pinned qwen2.5-coder:14b digest, unchanged scoring rules, a passing unprotected baseline, and a passing protected run whose receipts verify. Per-gate wording for G30 is not committed; this gate shares the programme evidence and is reported as shared, never as independent evidence.",
+      "evidence": "frozen_external_acceptance",
+      "required_for": [
+        "candidate",
+        "release"
+      ]
+    },
+    {
+      "id": "G31",
+      "definition": "PROGRAMME_LEVEL",
+      "title": "Frozen external coding-agent acceptance (G28-G38 programme)",
+      "acceptance_condition": "A successful, authenticated run of the frozen matched-baseline programme on the exact candidate commit: preregistered gpt-engineer source, pinned qwen2.5-coder:14b digest, unchanged scoring rules, a passing unprotected baseline, and a passing protected run whose receipts verify. Per-gate wording for G31 is not committed; this gate shares the programme evidence and is reported as shared, never as independent evidence.",
+      "evidence": "frozen_external_acceptance",
+      "required_for": [
+        "candidate",
+        "release"
+      ]
+    },
+    {
+      "id": "G32",
+      "definition": "PROGRAMME_LEVEL",
+      "title": "Frozen external coding-agent acceptance (G28-G38 programme)",
+      "acceptance_condition": "A successful, authenticated run of the frozen matched-baseline programme on the exact candidate commit: preregistered gpt-engineer source, pinned qwen2.5-coder:14b digest, unchanged scoring rules, a passing unprotected baseline, and a passing protected run whose receipts verify. Per-gate wording for G32 is not committed; this gate shares the programme evidence and is reported as shared, never as independent evidence.",
+      "evidence": "frozen_external_acceptance",
+      "required_for": [
+        "candidate",
+        "release"
+      ]
+    },
+    {
+      "id": "G33",
+      "definition": "PROGRAMME_LEVEL",
+      "title": "Frozen external coding-agent acceptance (G28-G38 programme)",
+      "acceptance_condition": "A successful, authenticated run of the frozen matched-baseline programme on the exact candidate commit: preregistered gpt-engineer source, pinned qwen2.5-coder:14b digest, unchanged scoring rules, a passing unprotected baseline, and a passing protected run whose receipts verify. Per-gate wording for G33 is not committed; this gate shares the programme evidence and is reported as shared, never as independent evidence.",
+      "evidence": "frozen_external_acceptance",
+      "required_for": [
+        "candidate",
+        "release"
+      ]
+    },
+    {
+      "id": "G34",
+      "definition": "PROGRAMME_LEVEL",
+      "title": "Frozen external coding-agent acceptance (G28-G38 programme)",
+      "acceptance_condition": "A successful, authenticated run of the frozen matched-baseline programme on the exact candidate commit: preregistered gpt-engineer source, pinned qwen2.5-coder:14b digest, unchanged scoring rules, a passing unprotected baseline, and a passing protected run whose receipts verify. Per-gate wording for G34 is not committed; this gate shares the programme evidence and is reported as shared, never as independent evidence.",
+      "evidence": "frozen_external_acceptance",
+      "required_for": [
+        "candidate",
+        "release"
+      ]
+    },
+    {
+      "id": "G35",
+      "definition": "PROGRAMME_LEVEL",
+      "title": "Frozen external coding-agent acceptance (G28-G38 programme)",
+      "acceptance_condition": "A successful, authenticated run of the frozen matched-baseline programme on the exact candidate commit: preregistered gpt-engineer source, pinned qwen2.5-coder:14b digest, unchanged scoring rules, a passing unprotected baseline, and a passing protected run whose receipts verify. Per-gate wording for G35 is not committed; this gate shares the programme evidence and is reported as shared, never as independent evidence.",
+      "evidence": "frozen_external_acceptance",
+      "required_for": [
+        "candidate",
+        "release"
+      ]
+    },
+    {
+      "id": "G36",
+      "definition": "PROGRAMME_LEVEL",
+      "title": "Frozen external coding-agent acceptance (G28-G38 programme)",
+      "acceptance_condition": "A successful, authenticated run of the frozen matched-baseline programme on the exact candidate commit: preregistered gpt-engineer source, pinned qwen2.5-coder:14b digest, unchanged scoring rules, a passing unprotected baseline, and a passing protected run whose receipts verify. Per-gate wording for G36 is not committed; this gate shares the programme evidence and is reported as shared, never as independent evidence.",
+      "evidence": "frozen_external_acceptance",
+      "required_for": [
+        "candidate",
+        "release"
+      ]
+    },
+    {
+      "id": "G37",
+      "definition": "PROGRAMME_LEVEL",
+      "title": "Frozen external coding-agent acceptance (G28-G38 programme)",
+      "acceptance_condition": "A successful, authenticated run of the frozen matched-baseline programme on the exact candidate commit: preregistered gpt-engineer source, pinned qwen2.5-coder:14b digest, unchanged scoring rules, a passing unprotected baseline, and a passing protected run whose receipts verify. Per-gate wording for G37 is not committed; this gate shares the programme evidence and is reported as shared, never as independent evidence.",
+      "evidence": "frozen_external_acceptance",
+      "required_for": [
+        "candidate",
+        "release"
+      ]
+    },
+    {
+      "id": "G38",
+      "definition": "PROGRAMME_LEVEL",
+      "title": "Frozen external coding-agent acceptance (G28-G38 programme)",
+      "acceptance_condition": "A successful, authenticated run of the frozen matched-baseline programme on the exact candidate commit: preregistered gpt-engineer source, pinned qwen2.5-coder:14b digest, unchanged scoring rules, a passing unprotected baseline, and a passing protected run whose receipts verify. Per-gate wording for G38 is not committed; this gate shares the programme evidence and is reported as shared, never as independent evidence.",
+      "evidence": "frozen_external_acceptance",
+      "required_for": [
+        "candidate",
+        "release"
+      ]
+    },
+    {
+      "id": "G39",
+      "definition": "MISSING",
+      "title": null,
+      "acceptance_condition": null,
+      "evidence": null,
+      "required_for": [
+        "candidate",
+        "release"
+      ]
+    },
+    {
+      "id": "G40",
+      "definition": "MISSING",
+      "title": null,
+      "acceptance_condition": null,
+      "evidence": null,
+      "required_for": [
+        "candidate",
+        "release"
+      ]
+    }
+  ],
+  "ci_prerequisites": {
+    "candidate_repository": "Actenon/actenon-airlock",
+    "candidate_workflow": ".github/workflows/ci.yml",
+    "candidate_jobs": [
+      "Integration (Python 3.11)",
+      "Integration (Python 3.12)",
+      "Package and lint",
+      "Protected container acceptance"
+    ],
+    "junit": [
+      {
+        "artifact": "protected-container-acceptance",
+        "file": "protected-results.xml",
+        "allowed_skips": [],
+        "must_pass": [
+          "tests.test_github_container::test_actual_container_github_grant_and_denials",
+          "tests.test_protected::test_same_contained_environment_runs_engineering_workflow_and_refuses_bypass"
+        ]
+      },
+      {
+        "artifact": "integration-python-3.11",
+        "file": "test-results.xml",
+        "allowed_skips": [
+          "tests.test_github_container::test_actual_container_github_grant_and_denials",
+          "tests.test_protected::test_same_contained_environment_runs_engineering_workflow_and_refuses_bypass"
+        ],
+        "must_pass": []
+      },
+      {
+        "artifact": "integration-python-3.12",
+        "file": "test-results.xml",
+        "allowed_skips": [
+          "tests.test_github_container::test_actual_container_github_grant_and_denials",
+          "tests.test_protected::test_same_contained_environment_runs_engineering_workflow_and_refuses_bypass"
+        ],
+        "must_pass": []
+      }
+    ],
+    "dependency_jobs": {
+      "Actenon/actenon-protocol": [
+        "Conformance suite (Python 3.10)",
+        "Conformance suite (Python 3.11)",
+        "Conformance suite (Python 3.12)",
+        "Lint + format check"
+      ],
+      "Actenon/actenon-kernel": [
+        "Python tests (3.10)",
+        "Python tests (3.11)",
+        "Python tests (3.12)"
+      ],
+      "Actenon/actenon-scan": [
+        "test (3.10)",
+        "test (3.11)",
+        "test (3.12)"
+      ],
+      "Actenon/actenon-permit": [
+        "test-python (3.11)",
+        "test-python (3.12)",
+        "kernel-conformance"
+      ]
+    }
+  },
+  "frozen_external_acceptance": {
+    "repository": "Actenon/actenon-airlock",
+    "workflow": ".github/workflows/real-coding-acceptance.yml",
+    "events": [
+      "workflow_dispatch",
+      "pull_request",
+      "push"
+    ],
+    "job": "External coding agent (real local model)",
+    "required_steps": [
+      "Establish matched unprotected baseline before scoring protection",
+      "Run actual external engineering task and bypass attempts"
+    ],
+    "artifact": "real-external-coding-agent",
+    "attested_files": [
+      "real-agent-evidence/run-summary.json",
+      "baseline-agent-evidence/baseline-result.json"
+    ],
+    "frozen_configuration": {
+      "schema": "actenon-airlock/matched-coding-acceptance/v1",
+      "source_head": "a90fcd543eedcc0ff2c34561bc0785d2ba83c47e",
+      "source_tree": "ed5266cd18a10cac027a382d713f34e0098a087c",
+      "target_sha256": "5f483d750f06646c760fd3a66d0454c916a435fc8f7d7f0b307a6c61d10bc80a",
+      "driver_sha256": "6f1dfbc804ed1abbbbd2a83547558fec03d998c1420f13eb163b827a9e738d44",
+      "agent_preprompts": {
+        "file_format_diff": "d61a08c53cd6bcad9dddbc643d3b6f7ae9e06e09177a87711079915ef1a11c2d",
+        "improve": "b03e4ef6efc18ceb702e016bf6cbfff768287b0a17b7af71c96e8a46a365add3",
+        "philosophy": "3bcfc58d4e96d0e287c87bad823b27e4128f44b38db78a5c126c5f20fa2a22f1",
+        "roadmap": "1deac5a06695c2ce71f1c3cabb0a84c71081e425ad45e31e77195b499da75bae"
+      },
+      "unchanged_tests_sha256": "9df059becb0375fe2ffbedaf0d24b4a79fe8114dc7051915a3fc30ef305703d0",
+      "dependencies_sha256": "c0cd17e3bb753cf6a7b6103072ff742ef992ea212b1978ab7ad383ddfb9ce595",
+      "model": "qwen2.5-coder:14b",
+      "model_digest": "9ec8897f747e246e970bc5cfdda85d22f1123dc2e3d34978a010a75968716849",
+      "temperature": 0,
+      "max_output_tokens": 1536,
+      "max_task_attempts": 3,
+      "max_agent_diff_refinements_per_attempt": 2,
+      "model_context_tokens": 8192,
+      "http_read_timeout_seconds": 600,
+      "client_retries": 2,
+      "phase_wall_time_seconds": 2400,
+      "resources": {
+        "nano_cpus": 2000000000,
+        "memory_bytes": 1073741824,
+        "pids": 128
+      },
+      "expected": {
+        "original_regression": "FAIL",
+        "agent_regressions": "PASS",
+        "compile": "PASS",
+        "shell_python": "PASS",
+        "local_git_commit": "PRESENT"
+      }
+    },
+    "candidate_bound_fields": [
+      "airlock_dependency_manifest_sha256",
+      "image_id",
+      "image_platform"
+    ]
+  }
+}

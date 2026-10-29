@@ -135,24 +135,3 @@ def test_r4_attribute_delegated_overflow_attributes_actual_denied_grant() -> Non
     )
     assert gid_2 == "grant_beta"
     assert dec_2 is deny_dec
-
-
-def test_r1_candidate_admission_reports_not_ready_without_real_agent_artifact(
-    tmp_path: Path,
-) -> None:
-    """R1: check_candidate_admission reports NOT READY when real-agent acceptance has not run."""
-    import importlib.util
-    import sys
-
-    script_path = Path(__file__).resolve().parents[1] / "scripts" / "check_candidate_admission.py"
-    spec = importlib.util.spec_from_file_location("check_candidate_admission", script_path)
-    assert spec is not None and spec.loader is not None
-    mod = importlib.util.module_from_spec(spec)
-    sys.modules[spec.name] = mod
-    spec.loader.exec_module(mod)
-
-    repo_root = Path(__file__).resolve().parents[1]
-    report = mod.evaluate_gate_matrix(repo_root, acceptance_evidence_dir=tmp_path / "missing")
-    assert report["overall_status"] == "NOT READY"
-    assert report["gates"]["G36_G37_real_coding_agent_acceptance"]["status"] == "BLOCKED"
-    assert report["gates"]["G6_G29_released_package_coherence"]["status"] == "RELEASE_BLOCKED"
