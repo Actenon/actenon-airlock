@@ -1,11 +1,17 @@
-"""Phase C: The 60-Second CISO Proof — End-to-End Unicorn Smoke Test.
+"""Phase C: The 60-Second CISO Proof — Deterministic Local Fixture Demonstration.
 
-Proves the complete 4-stage Actenon lifecycle in a single zero-cloud local execution:
+Demonstrates the 5-stage Actenon control flow in a self-contained local fixture:
   Stage 1: Pre-Merge Code & Authority Discovery (actenon-scan + AIRLOCK AUTHORITY DIFF)
   Stage 2: Bounded Authority & Multi-Agent Delegation (actenon-permit + actenon-protocol)
-  Stage 3: Universal Dynamic Capability Execution & Witness Reconciliation (OpenAPIDynamicAdapter)
+  Stage 3: Experimental OpenAPI Capability Execution & Witness Reconciliation (loopback HTTP fixture)
   Stage 4: Stateless Edge Verification & Adversarial Attack Battery (actenon-kernel + actenon-airlock)
-  Stage 5: Insurer-Grade Hash-Chained Audit Ledger Verification (verify_ledger + export_compliance_bundle)
+  Stage 5: Hash-Chained Receipt Journal Verification (verify_ledger + export_compliance_bundle)
+
+Evidence scope:
+  This module is a deterministic local fixture demonstration using a loopback
+  HTTP server and checking that the test credential string is absent from
+  serialized fixture outputs. It does NOT substitute for external coding-agent
+  acceptance (G1-G40) or OS/container memory isolation.
 """
 
 from __future__ import annotations
@@ -16,6 +22,7 @@ import os
 import tempfile
 import threading
 import time
+from collections.abc import Sequence
 from dataclasses import replace
 from datetime import UTC, datetime, timedelta
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
@@ -41,9 +48,20 @@ from actenon_permit.revocation import StoreRevocationChecker
 from actenon_permit.state import SQLiteStore
 from actenon_scan.authority import diff_authority, extract_authority, format_authority_diff
 
+from .manifest import discover
 from .state import State, export_compliance_bundle, verify_ledger
 
 RAW_STRIPE_SECRET = "sk_live_SUPER_SECRET_NEVER_LEAK_998877"
+
+
+def attribute_delegated_overflow(
+    sub_decisions: Sequence[tuple[str, Any]],
+) -> tuple[str, Any]:
+    """Return the exact ``(sub_grant_id, decision)`` pair that was denied."""
+    for sub_grant_id, decision in sub_decisions:
+        if decision.outcome == DecisionOutcome.DENY:
+            return sub_grant_id, decision
+    raise AssertionError("expected at least one denied delegated sub-agent decision")
 
 
 class _LocalStripeWitnessHandler(BaseHTTPRequestHandler):
@@ -177,13 +195,12 @@ def run_ciso_proof(workspace: Path | None = None) -> dict[str, Any]:
             }
             for e in auth_diff.added
         ]
-        state.approve(
-            {
-                "schema": "actenon-airlock/manifest/v1",
-                "powers": compiled_powers,
-                "credential_bindings": {"STRIPE_SECRET_KEY": "https://api.stripe.com"},
-            }
-        )
+        # Approve canonical actenon-airlock/authority/v1 manifest discovered from candidate_dir
+        discovered_manifest = discover(candidate_dir)
+        state.approve(discovered_manifest)
+        # Verify both state.approved() and state.checked_in_approval() succeed
+        assert state.approved()["schema"] == "actenon-airlock/authority/v1"
+        assert state.checked_in_approval()["schema"] == "actenon-airlock/authority/v1"
 
         os.environ["ACTENON_SIGNING_KEY"] = json.loads(
             (state.local / "grant-key.json").read_text()
@@ -375,7 +392,7 @@ def run_ciso_proof(workspace: Path | None = None) -> dict[str, Any]:
         # Parent has $380 remaining ($500 cap - $120 spent). Two concurrent sub-agents
         # each attempt to spend $300 against their $300 sub-grants; ancestor charging
         # allows at most one ($380 -> $80) and atomically refuses the second with BUDGET_EXCEEDED.
-        def _attempt_sub_agent_spend(sub_grant_id: str, charge_id: str):
+        def _attempt_sub_agent_spend(sub_grant_id: str, charge_id: str) -> tuple[str, Any]:
             sub_action = Action(
                 grant_id=sub_grant_id,
                 type="http.post:api.stripe.com/v1/refunds",
@@ -384,17 +401,17 @@ def run_ciso_proof(workspace: Path | None = None) -> dict[str, Any]:
                 est_cost=300.0,
             )
             current_grant = store.get_grant(sub_grant_id)
-            return pdp.decide(current_grant, sub_action)
+            return sub_grant_id, pdp.decide(current_grant, sub_action)
 
         with concurrent.futures.ThreadPoolExecutor(max_workers=2) as pool:
             f1 = pool.submit(_attempt_sub_agent_spend, sub_grant_alpha.id, "ch_sub_1")
             f2 = pool.submit(_attempt_sub_agent_spend, sub_grant_beta.id, "ch_sub_2")
             sub_decisions = [f1.result(), f2.result()]
 
-        outcomes = [d.outcome for d in sub_decisions]
+        outcomes = [d.outcome for _, d in sub_decisions]
         assert outcomes.count(DecisionOutcome.ALLOW) == 1
         assert outcomes.count(DecisionOutcome.DENY) == 1
-        denied_sub = next(d for d in sub_decisions if d.outcome == DecisionOutcome.DENY)
+        denied_grant_id, denied_sub = attribute_delegated_overflow(sub_decisions)
         assert str(denied_sub.failure_code) == "BUDGET_EXCEEDED"
         refusals["attack_3_delegated_budget_overflow"] = record_ledger_entry(
             decision="DENY",
@@ -402,7 +419,7 @@ def run_ciso_proof(workspace: Path | None = None) -> dict[str, Any]:
             action_name="http.post:api.stripe.com/v1/refunds",
             target="api.stripe.com/v1/refunds",
             reason=f"BUDGET_EXCEEDED: {denied_sub.reason}",
-            grant_id=sub_grant_beta.id,
+            grant_id=denied_grant_id,
             refusal_code="BUDGET_EXCEEDED",
         )
 
@@ -468,7 +485,14 @@ def run_ciso_proof(workspace: Path | None = None) -> dict[str, Any]:
         assert ledger_verification["verified"] == 6
 
         bundle_path = candidate_dir / "compliance-bundle.json"
-        bundle = export_compliance_bundle(state, output_path=bundle_path)
+        bundle = export_compliance_bundle(
+            state,
+            output_path=bundle_path,
+            expected_head_sha256=ledger_verification["chain_head_sha256"],
+        )
+        assert bundle["ok"] is True
+        assert bundle["approval_verified"] is True
+        assert bundle["approved_manifest"] is not None
         assert bundle["ledger"]["ok"] is True
         assert bundle["ledger"]["allow_receipts"] == 1
         assert bundle["ledger"]["deny_refusals"] == 5
@@ -485,6 +509,7 @@ def run_ciso_proof(workspace: Path | None = None) -> dict[str, Any]:
 
         return {
             "ok": True,
+            "evidence_scope": "deterministic_local_fixture_demo",
             "elapsed_seconds": elapsed_seconds,
             "stage_1_authority_diff": rendered_diff,
             "stage_2_grants": {
@@ -492,23 +517,28 @@ def run_ciso_proof(workspace: Path | None = None) -> dict[str, Any]:
                 "parent_budget_usd": 500.0,
                 "sub_grants": [sub_grant_alpha.id, sub_grant_beta.id],
                 "allowed_scopes": allowed_scopes,
+                "approval_verified": bundle["approval_verified"],
             },
             "stage_3_execution": {
                 "receipt_id": allow_receipt["id"],
                 "proof_id": pccb.pccb_id,
                 "witness_reconciled": adapter_execution["witness_reconciled"],
                 "secret_leaked": False,
+                "secret_absent_from_serialized_outputs": True,
             },
             "stage_4_refusals": {
                 k: {
                     "receipt_id": v["id"],
+                    "grant_id": v["grant_id"],
                     "refusal_code": v["refusal_code"],
                     "reason": v["reason"],
                 }
                 for k, v in refusals.items()
             },
             "stage_5_ledger": {
-                "ok": ledger_verification["ok"],
+                "ok": bundle["ok"],
+                "approval_verified": bundle["approval_verified"],
+                "completeness": bundle["ledger"]["completeness"],
                 "total_entries": ledger_verification["receipts"],
                 "verified_entries": ledger_verification["verified"],
                 "chain_head_sha256": bundle["ledger"]["chain_head_sha256"],

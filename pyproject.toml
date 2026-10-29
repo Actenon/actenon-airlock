@@ -10,10 +10,10 @@ readme = "README.md"
 requires-python = ">=3.11"
 license = "Apache-2.0"
 dependencies = [
-  "actenon-scan @ git+https://github.com/Actenon/actenon-scan.git@ef8487af836158a028f9a68eb96fd59a0be9cc0b",
-  "actenon-protocol @ git+https://github.com/Actenon/actenon-protocol.git@d79af481be6badc99b13e15118026b96883fa171",
-  "actenon-kernel @ git+https://github.com/Actenon/actenon-kernel.git@1491379c40e95b8d64e7332b1be9c98c4b1ee8a8",
-  "actenon-permit @ git+https://github.com/Actenon/actenon-permit.git@4d9bc08ab4934cdae5133a42b1b66ae7896ba678",
+  "actenon-scan @ git+https://github.com/Actenon/actenon-scan.git@16388227a55a3b5a3ec392d1c70f3940b0c291c1",
+  "actenon-protocol @ git+https://github.com/Actenon/actenon-protocol.git@a2e0e08fcd24b71eb1668204ba6bed00e4c63551",
+  "actenon-kernel @ git+https://github.com/Actenon/actenon-kernel.git@7a1ad40581ce0f984f5b1cc4292f26d350cab311",
+  "actenon-permit @ git+https://github.com/Actenon/actenon-permit.git@b795a37cfa927c630605172f8ecaf073bfb2aa70",
   "requests>=2.32,<3",
   "httpx>=0.27,<1",
 ]

@@ -1,0 +1,62 @@
+{
+  "schema": "actenon-airlock/integration-candidate/v1",
+  "status": "candidate under evaluation; not a release",
+  "airlock": {
+    "branch": "integration/candidate-2026-10-29",
+    "built_on": {
+      "pr": "https://github.com/Actenon/actenon-airlock/pull/14",
+      "sha": "e5b633b46b5ad2c2615e62dd0b516a6dd08d8b3d"
+    }
+  },
+  "components": [
+    {
+      "repository": "Actenon/actenon-protocol",
+      "pr": 26,
+      "sha": "a2e0e08fcd24b71eb1668204ba6bed00e4c63551",
+      "package": "actenon-protocol",
+      "version": "1.6.0",
+      "wire_version": "1.3.0",
+      "published": false
+    },
+    {
+      "repository": "Actenon/actenon-kernel",
+      "pr": 50,
+      "sha": "7a1ad40581ce0f984f5b1cc4292f26d350cab311",
+      "package": "actenon-kernel",
+      "version": "1.3.0",
+      "published": false
+    },
+    {
+      "repository": "Actenon/actenon-scan",
+      "pr": 103,
+      "sha": "16388227a55a3b5a3ec392d1c70f3940b0c291c1",
+      "package": "actenon-scan",
+      "version": "1.6.0",
+      "published": false
+    },
+    {
+      "repository": "Actenon/actenon-permit",
+      "pr": 36,
+      "sha": "b795a37cfa927c630605172f8ecaf073bfb2aa70",
+      "package": "actenon-permit",
+      "version": "2.0.0rc1",
+      "published": false
+    },
+    {
+      "repository": "Actenon/blastradius",
+      "pr": 3,
+      "sha": "4246fede97be77030190b4508f79bad75167e207",
+      "package": "blastradius",
+      "airlock_dependency": false,
+      "published": false
+    }
+  ],
+  "graph": "Protocol -> Kernel, Scan -> Permit -> Airlock. Every component's candidate inputs ([tool.uv.sources], uv.lock, .github/candidate-constraints.txt) name these same commits, so pip and uv resolve one graph with no overrides.",
+  "notes": [
+    "None of these versions is on PyPI (latest: protocol 1.4.0, kernel 1.2.1, scan 1.5.0, permit 1.4.0).",
+    "Kernel #50, Permit #36 and Scan #103 each gained one commit that repins their candidate inputs to these heads; before it, uv refused to install the Airlock wheel because Kernel and Permit named Protocol d79af48 and Kernel 1491379."
+  ],
+  "verify": [
+    "python scripts/check_candidate_admission.py --candidate-sha <this branch head> --require \"CANDIDATE READY\" --expect-dependency Actenon/actenon-kernel=7a1ad40581ce0f984f5b1cc4292f26d350cab311 --expect-dependency Actenon/actenon-permit=b795a37cfa927c630605172f8ecaf073bfb2aa70 --expect-dependency Actenon/actenon-protocol=a2e0e08fcd24b71eb1668204ba6bed00e4c63551 --expect-dependency Actenon/actenon-scan=16388227a55a3b5a3ec392d1c70f3940b0c291c1"
+  ]
+}
