@@ -21,7 +21,7 @@
     {
       "repository": "Actenon/actenon-kernel",
       "pr": 50,
-      "sha": "fc0f9982f970e87de4692bdedb9c20cb28cb305a",
+      "sha": "7a1ad40581ce0f984f5b1cc4292f26d350cab311",
       "package": "actenon-kernel",
       "version": "1.3.0",
       "published": false
@@ -29,7 +29,7 @@
     {
       "repository": "Actenon/actenon-scan",
       "pr": 103,
-      "sha": "b1b55ca307ea2b1101a1d9f07eb8f44538ce8bb0",
+      "sha": "16388227a55a3b5a3ec392d1c70f3940b0c291c1",
       "package": "actenon-scan",
       "version": "1.6.0",
       "published": false
@@ -37,7 +37,7 @@
     {
       "repository": "Actenon/actenon-permit",
       "pr": 36,
-      "sha": "fe953178e116bfe4fbf83e407673e48984482b78",
+      "sha": "b795a37cfa927c630605172f8ecaf073bfb2aa70",
       "package": "actenon-permit",
       "version": "2.0.0rc1",
       "published": false
@@ -51,12 +51,12 @@
       "published": false
     }
   ],
-  "graph": "Protocol -> Kernel, Scan -> Permit -> Airlock; pinned by direct reference in pyproject.toml and resolved identically in uv.lock (tool.uv.override-dependencies replaces the older Protocol/Kernel commits named in Kernel's and Permit's own uv sources).",
+  "graph": "Protocol -> Kernel, Scan -> Permit -> Airlock. Every component's candidate inputs ([tool.uv.sources], uv.lock, .github/candidate-constraints.txt) name these same commits, so pip and uv resolve one graph with no overrides.",
   "notes": [
-    "Protocol d79af48 (pinned by Kernel/Permit/Scan CI) and a2e0e08 ship identical packaged code; a2e0e08 adds only a tomli dev entry and script changes.",
-    "None of these versions is on PyPI (latest: protocol 1.4.0, kernel 1.2.1, scan 1.5.0, permit 1.4.0)."
+    "None of these versions is on PyPI (latest: protocol 1.4.0, kernel 1.2.1, scan 1.5.0, permit 1.4.0).",
+    "Kernel #50, Permit #36 and Scan #103 each gained one commit that repins their candidate inputs to these heads; before it, uv refused to install the Airlock wheel because Kernel and Permit named Protocol d79af48 and Kernel 1491379."
   ],
   "verify": [
-    "python scripts/check_candidate_admission.py --candidate-sha <this branch head> --require \"CANDIDATE READY\" --expect-dependency Actenon/actenon-protocol=a2e0e08fcd24b71eb1668204ba6bed00e4c63551 --expect-dependency Actenon/actenon-kernel=fc0f9982f970e87de4692bdedb9c20cb28cb305a --expect-dependency Actenon/actenon-scan=b1b55ca307ea2b1101a1d9f07eb8f44538ce8bb0 --expect-dependency Actenon/actenon-permit=fe953178e116bfe4fbf83e407673e48984482b78"
+    "python scripts/check_candidate_admission.py --candidate-sha <this branch head> --require \"CANDIDATE READY\" --expect-dependency Actenon/actenon-kernel=7a1ad40581ce0f984f5b1cc4292f26d350cab311 --expect-dependency Actenon/actenon-permit=b795a37cfa927c630605172f8ecaf073bfb2aa70 --expect-dependency Actenon/actenon-protocol=a2e0e08fcd24b71eb1668204ba6bed00e4c63551 --expect-dependency Actenon/actenon-scan=16388227a55a3b5a3ec392d1c70f3940b0c291c1"
   ]
 }
