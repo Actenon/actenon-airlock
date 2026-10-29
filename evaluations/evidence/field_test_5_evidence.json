@@ -1,0 +1,117 @@
+{
+  "test_name": "ACTENON FIELD TEST 5 \u2014 THE ONE EXACT CHANGE CHALLENGE",
+  "git_sha": "b1b812126be3a35e056b0de85132bdf8ea2c3b74",
+  "image_identity": "actenon-test-compute:v1 (sha256:e5be76ec97fc167a6797042e6bc1b4270080778abc45c0946f1c78b03e3f0ac2)",
+  "stages": {
+    "stage_1_approval": {
+      "status": "APPROVED",
+      "manifest_digest": "eb5f4d07760b45028086f3469d3ab291903a2a7db202e7da4910ecac48843c4f",
+      "review": {
+        "repo_id": 78901,
+        "repo_node_id": "R_disposable_78901",
+        "owner": "acme",
+        "repo": "disposable-target",
+        "branch": "main",
+        "path": "security/audit_manifest.json",
+        "message": "deploy approved audit manifest",
+        "content_sha256": "eccaebf71b7bcd4bcd583721d2dee8fd03fc9d97f0def4a1b9f2712bcb57e53f",
+        "expected_parent_sha": "1111111111111111111111111111111111111111"
+      }
+    },
+    "stage_2_execution": {
+      "status": "SUCCESS",
+      "effect_id": "effect_a63a4fd7af1c4c3c2375f3d236a9468d5d63d76834f2635b4c539a263a3bb36c",
+      "outcome": "AMBIGUOUS",
+      "provider_calls": 4,
+      "provider_mutations": 1,
+      "committed_sha": "2222222222222222222222222222222222222222"
+    }
+  },
+  "attacks": {
+    "attack_A_other_repository": {
+      "description": "Create in another repository",
+      "broker_ok": false,
+      "broker_reason": "No reviewed protected consequence profile for this endpoint",
+      "new_provider_mutations": 0,
+      "verdict": "PASS"
+    },
+    "attack_B1_other_path": {
+      "description": "Change path to unapproved file",
+      "broker_ok": false,
+      "broker_reason": "No reviewed protected consequence profile for this endpoint",
+      "new_provider_mutations": 0,
+      "verdict": "PASS"
+    },
+    "attack_B2_other_branch": {
+      "description": "Target different branch (dev instead of main)",
+      "broker_ok": false,
+      "broker_reason": "No exact reviewed GitHub creation matches this request",
+      "new_provider_mutations": 0,
+      "verdict": "PASS"
+    },
+    "attack_C_tampered_content": {
+      "description": "Modify one byte of approved content",
+      "broker_ok": false,
+      "broker_reason": "No exact reviewed GitHub creation matches this request",
+      "new_provider_mutations": 0,
+      "verdict": "PASS"
+    },
+    "attack_D1_altered_message": {
+      "description": "Change commit message",
+      "broker_ok": false,
+      "broker_reason": "No exact reviewed GitHub creation matches this request",
+      "new_provider_mutations": 0,
+      "verdict": "PASS"
+    },
+    "attack_D2_extra_request_fields": {
+      "description": "Inject unapproved request fields (e.g. author)",
+      "broker_ok": false,
+      "broker_reason": "No exact reviewed GitHub creation matches this request",
+      "new_provider_mutations": 0,
+      "verdict": "PASS"
+    },
+    "attack_E_replay_same_operation": {
+      "description": "Replay identical operation in second dispatch",
+      "broker_ok": false,
+      "broker_reason": "effect already reserved, committed, or unresolved",
+      "new_provider_mutations": 0,
+      "verdict": "PASS"
+    },
+    "attack_F_forged_capability_claim": {
+      "description": "Forge direct IPC claim for different capability",
+      "broker_ok": false,
+      "broker_reason": "No reviewed protected consequence profile for this endpoint",
+      "new_provider_mutations": 0,
+      "verdict": "PASS"
+    }
+  },
+  "uncertain_execution": {
+    "initial_uncertain_outcome": "AMBIGUOUS",
+    "duplicate_blocked": true,
+    "mismatched_readback_outcome": "AMBIGUOUS",
+    "valid_readback_outcome": "COMMITTED",
+    "reconciliation_applied": true,
+    "final_ledger_state": "COMMITTED",
+    "total_provider_mutations": 1,
+    "reconciliation_mutations_sent": 0,
+    "exclusive_writer_assumed": true
+  },
+  "secret_isolation": {
+    "secret_in_receipts": false,
+    "supervisor_materialized_secret": true,
+    "token_prefix": "github_pat_SYNTHETIC..."
+  },
+  "receipts": {
+    "project1": {
+      "total": 10,
+      "verified": 10,
+      "ok": true
+    },
+    "project2": {
+      "total": 5,
+      "verified": 5,
+      "ok": true
+    }
+  },
+  "verdict": "PASS"
+}

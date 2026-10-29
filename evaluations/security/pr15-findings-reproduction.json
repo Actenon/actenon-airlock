@@ -1,0 +1,40 @@
+{
+  "commit": "f5ecfc133f3973ff72bbb3372ea01f2ad49605e6",
+  "image": "actenon-airlock-compute:dev",
+  "image_id": "sha256:76b1e8f2b1d7917aa440ce98512d48f9f4b73cd50d06b5cd489191c6b31e50c0",
+  "finding1_hardcoded_hmac": {
+    "secret_in_source": true,
+    "forged_record_verifies": true
+  },
+  "finding2_unverified_operator_approval": {
+    "operator_key_exists": false,
+    "approved": true,
+    "decision": "APPROVED",
+    "operator_signature_present": false
+  },
+  "findings3_5_host_execution_in_container": {
+    "finding3_gate_verdict": "VERIFIED",
+    "finding3_beacon_requests": 2,
+    "finding5_beacon_requests": 1,
+    "beacon_paths": [
+      "/import-time-telemetry-beacon"
+    ]
+  },
+  "finding4_hardened_gate": {
+    "mount_is_read_write": true,
+    "missing_flags": [
+      "--read-only",
+      "--cap-drop",
+      "no-new-privileges",
+      "--pids-limit",
+      "--memory",
+      "--cpus",
+      "--user"
+    ],
+    "isolation_fields_are_constants": true,
+    "image_recorded_as": "actenon-airlock-compute:dev",
+    "control_uncapped": "FAILED",
+    "tamper_withheld_suite": "VERIFIED",
+    "exit_zero_at_import": "VERIFIED"
+  }
+}
