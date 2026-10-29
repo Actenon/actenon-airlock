@@ -19,6 +19,15 @@ candidate falls short of `--require` and 2 when it cannot evaluate at all.
 Local files are never read as evidence. The rules (`gates.json`, the frozen
 definitions) come from the checkout running the gate, so dispatch it from `main`.
 
+## Recovered scope (A-F)
+
+`release/recovered/ACTENON_WORK_EXECUTION_GOAL.md` is the owner-recovered goal
+document, committed verbatim and pinned by SHA-256 in `gates.json`. Its
+mandatory sections A-F are candidate prerequisites. None has an automated
+evidence producer yet, so each is BLOCKED, and a changed document FAILs all six.
+`gates-recovered-v2.proposed.json` breaks A-F into requirements with a current,
+self-assessed status for owner review. The gate does not load it.
+
 ## Current blocker: the frozen G1-G40 text is not committed
 
 No Actenon repository contains the verbatim G1-G40 acceptance criteria. Only
