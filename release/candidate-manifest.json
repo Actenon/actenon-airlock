@@ -1,0 +1,62 @@
+{
+  "schema": "actenon-airlock/integration-candidate/v1",
+  "status": "candidate under evaluation; not a release",
+  "airlock": {
+    "branch": "integration/candidate-2026-10-29",
+    "built_on": {
+      "pr": "https://github.com/Actenon/actenon-airlock/pull/14",
+      "sha": "e5b633b46b5ad2c2615e62dd0b516a6dd08d8b3d"
+    }
+  },
+  "components": [
+    {
+      "repository": "Actenon/actenon-protocol",
+      "pr": 26,
+      "sha": "a2e0e08fcd24b71eb1668204ba6bed00e4c63551",
+      "package": "actenon-protocol",
+      "version": "1.6.0",
+      "wire_version": "1.3.0",
+      "published": false
+    },
+    {
+      "repository": "Actenon/actenon-kernel",
+      "pr": 50,
+      "sha": "fc0f9982f970e87de4692bdedb9c20cb28cb305a",
+      "package": "actenon-kernel",
+      "version": "1.3.0",
+      "published": false
+    },
+    {
+      "repository": "Actenon/actenon-scan",
+      "pr": 103,
+      "sha": "b1b55ca307ea2b1101a1d9f07eb8f44538ce8bb0",
+      "package": "actenon-scan",
+      "version": "1.6.0",
+      "published": false
+    },
+    {
+      "repository": "Actenon/actenon-permit",
+      "pr": 36,
+      "sha": "fe953178e116bfe4fbf83e407673e48984482b78",
+      "package": "actenon-permit",
+      "version": "2.0.0rc1",
+      "published": false
+    },
+    {
+      "repository": "Actenon/blastradius",
+      "pr": 3,
+      "sha": "4246fede97be77030190b4508f79bad75167e207",
+      "package": "blastradius",
+      "airlock_dependency": false,
+      "published": false
+    }
+  ],
+  "graph": "Protocol -> Kernel, Scan -> Permit -> Airlock; pinned by direct reference in pyproject.toml and resolved identically in uv.lock (tool.uv.override-dependencies replaces the older Protocol/Kernel commits named in Kernel's and Permit's own uv sources).",
+  "notes": [
+    "Protocol d79af48 (pinned by Kernel/Permit/Scan CI) and a2e0e08 ship identical packaged code; a2e0e08 adds only a tomli dev entry and script changes.",
+    "None of these versions is on PyPI (latest: protocol 1.4.0, kernel 1.2.1, scan 1.5.0, permit 1.4.0)."
+  ],
+  "verify": [
+    "python scripts/check_candidate_admission.py --candidate-sha <this branch head> --require \"CANDIDATE READY\" --expect-dependency Actenon/actenon-protocol=a2e0e08fcd24b71eb1668204ba6bed00e4c63551 --expect-dependency Actenon/actenon-kernel=fc0f9982f970e87de4692bdedb9c20cb28cb305a --expect-dependency Actenon/actenon-scan=b1b55ca307ea2b1101a1d9f07eb8f44538ce8bb0 --expect-dependency Actenon/actenon-permit=fe953178e116bfe4fbf83e407673e48984482b78"
+  ]
+}
