@@ -266,6 +266,7 @@ class World:
             self.github.attested.add(members[prefix + path])
 
     def freeze_definitions(self) -> None:
+        self.satisfy_recovered_sections()
         text = b"# G1-G40 frozen acceptance criteria (owner-supplied test fixture)\n"
         self.gate_files["release/G1-G40.frozen.md"] = text
         self.registry["frozen_definitions"]["sha256"] = hashlib.sha256(text).hexdigest()
@@ -273,6 +274,13 @@ class World:
             if g["definition"] == "MISSING":
                 g.update(definition="FROZEN", acceptance_condition="fixture condition")
                 g["evidence"] = "frozen_external_acceptance"
+
+    def satisfy_recovered_sections(self) -> None:
+        """Stand-in for future A-F evidence producers in positive controls only."""
+        self.gate_files["release/recovered/ACTENON_WORK_EXECUTION_GOAL.md"] = (
+            ROOT / "release" / "recovered" / "ACTENON_WORK_EXECUTION_GOAL.md"
+        ).read_bytes()
+        self.recovered_pass = True
 
     def make_release(self) -> None:
         wheel = b"published wheel"
@@ -293,6 +301,19 @@ class World:
 
     def evaluate(self, **kw) -> dict[str, Any]:
         self.gate_files["release/gates.json"] = json.dumps(self.registry).encode()
+        if getattr(self, "recovered_pass", False):
+            passing = {k: gate.Result(gate.PASS, "fixture") for k in "ABCDEF"}
+            original = gate.check_recovered_scope
+            gate.check_recovered_scope = lambda registry, tree: (original(registry, tree), passing)[
+                1
+            ]
+            try:
+                return self._evaluate(**kw)
+            finally:
+                gate.check_recovered_scope = original
+        return self._evaluate(**kw)
+
+    def _evaluate(self, **kw) -> dict[str, Any]:
         tree = Files({"pyproject.toml": self.pyproject, "uv.lock": self.lock})
         return gate.evaluate(
             gate_files=Files(self.gate_files),
@@ -681,3 +702,41 @@ def test_acceptance_workflow_attests_the_evidence_it_produces() -> None:
     assert "id-token: write" in workflow and "attestations: write" in workflow
     for path in registry["frozen_external_acceptance"]["attested_files"]:
         assert path in workflow
+
+
+# --- recovered A-F scope ---------------------------------------------------------
+
+
+def test_committed_goal_document_matches_its_pin() -> None:
+    registry = json.loads((ROOT / "release" / "gates.json").read_text())
+    pinned = registry["recovered_scope"]["sha256"]
+    doc = (ROOT / registry["recovered_scope"]["path"]).read_bytes()
+    assert hashlib.sha256(doc).hexdigest() == pinned
+    assert [s["id"] for s in registry["recovered_scope"]["sections"]] == list("ABCDEF")
+
+
+def test_recovered_sections_block_even_with_perfect_g_evidence(world: World) -> None:
+    world.publish_acceptance()
+    world.freeze_definitions()
+    world.recovered_pass = False
+    world.gate_files["release/recovered/ACTENON_WORK_EXECUTION_GOAL.md"] = (
+        ROOT / "release" / "recovered" / "ACTENON_WORK_EXECUTION_GOAL.md"
+    ).read_bytes()
+    report = world.evaluate()
+    assert report["overall_status"] == "NOT READY"
+    for section in "ABCDEF":
+        assert report["prerequisites"][f"recovered_section_{section}"]["status"] == "BLOCKED"
+
+
+def test_altered_goal_document_fails_every_section(world: World) -> None:
+    world.gate_files["release/recovered/ACTENON_WORK_EXECUTION_GOAL.md"] = b"relaxed scope\n"
+    report = world.evaluate()
+    assert all(
+        report["prerequisites"][f"recovered_section_{s}"]["status"] == "FAIL" for s in "ABCDEF"
+    )
+
+
+def test_recovered_section_cannot_claim_an_unknown_evidence_producer(world: World) -> None:
+    world.registry["recovered_scope"]["sections"][4]["evidence"] = "self_reported_summary"
+    with pytest.raises(gate.AdmissionError):
+        world.evaluate()

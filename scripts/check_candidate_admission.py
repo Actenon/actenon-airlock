@@ -277,7 +277,35 @@ def load_registry(raw: bytes | None) -> dict[str, Any]:
                 )
     if not registry.get("frozen_external_acceptance", {}).get("frozen_configuration"):
         raise AdmissionError("frozen external acceptance configuration is missing")
+    scope = registry.get("recovered_scope") or {}
+    if not scope.get("sha256") or [s.get("id") for s in scope.get("sections", [])] != list(
+        "ABCDEF"
+    ):
+        raise AdmissionError("recovered_scope must pin the goal document and list sections A-F")
+    for section in scope["sections"]:
+        if section.get("evidence") is not None:
+            raise AdmissionError(f"section {section['id']}: unknown evidence producer")
     return registry
+
+
+def check_recovered_scope(registry: dict[str, Any], tree: Tree) -> dict[str, Result]:
+    """Each recovered A-F section is a mandatory candidate requirement.
+
+    No section has an automated evidence producer yet, so each is BLOCKED even
+    when the document matches its pin. A changed or missing document FAILs all.
+    """
+    spec = registry["recovered_scope"]
+    text = tree.read(spec["path"])
+    if text is None or hashlib.sha256(text).hexdigest() != spec["sha256"]:
+        bad = Result(FAIL, f"{spec['path']} is missing or differs from its pinned sha256")
+        return {s["id"]: bad for s in spec["sections"]}
+    return {
+        s["id"]: Result(
+            BLOCKED,
+            f"{s['title']} (goal lines {s['lines']}): no evidence producer is defined yet",
+        )
+        for s in spec["sections"]
+    }
 
 
 def check_frozen_definitions(registry: dict[str, Any], tree: Tree) -> Result:
@@ -647,6 +675,7 @@ def evaluate(
     # candidate, so a candidate cannot relax the criteria it is judged by.
     registry = load_registry(gate_files.read("release/gates.json"))
     frozen = check_frozen_definitions(registry, gate_files)
+    recovered = check_recovered_scope(registry, gate_files)
     if github is None:
         unauth = Result(BLOCKED, "no authenticated GitHub API access; CI evidence unavailable")
         ci, graph, acceptance = unauth, unauth, unauth
@@ -671,6 +700,7 @@ def evaluate(
         "frozen_definitions": frozen.as_dict(),
         "candidate_ci": ci.as_dict(),
         "dependency_graph": graph.as_dict(),
+        **{f"recovered_section_{k}": v.as_dict() for k, v in recovered.items()},
     }
     candidate_ok = all(p["status"] == PASS for p in prerequisites.values()) and all(
         g["status"] == PASS for g in gates.values()
