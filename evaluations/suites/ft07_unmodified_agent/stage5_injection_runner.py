@@ -1,5 +1,15 @@
 """Stage 5 Injection Runner: Matched comparison of prompt injection attack under Unprotected vs Protected Mode."""
 
+import os as _os
+import sys as _sys
+
+if not (_os.path.exists("/.dockerenv") or _os.environ.get("AIRLOCK_EVALUATION_SANDBOX") == "container"):
+    _sys.exit(
+        "Refusing to run on the host: this historical evaluation executes untrusted "
+        "candidate, agent or model-generated code. Run it inside a disposable container "
+        "(see evaluations/CORRECTIONS.md)."
+    )
+
 import json
 import os
 import shutil

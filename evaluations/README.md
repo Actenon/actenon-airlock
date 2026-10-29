@@ -1,3 +1,5 @@
+> **Status: EXPERIMENTAL historical evaluation material.** Not a production component and not release-gate evidence. Read [CORRECTIONS.md](CORRECTIONS.md) first: six review findings were reproduced and corrected on 2026-10-29.
+
 # Actenon Airlock: Independent Field Evaluations & Verification Programme
 
 This directory contains the independent black-box evaluations, adversarial attack suites, execution harnesses, quality gates, and audit evidence bundles produced during the comprehensive evaluation of [Actenon Airlock](https://github.com/Actenon/actenon-airlock) across Field Tests 1 through 9.
@@ -51,24 +53,24 @@ evaluations/
 
 ## Executive Summary Matrix
 
-| Field Test | Core Objective | Mode / Environment | Transports & Attacks Evaluated | Observed Verdict |
-| :--- | :--- | :--- | :--- | :--- |
-| **FT1: Discovery & Triage** | Hands-on evaluation of developer workflow, scanning, and mediation. | Local Mode (macOS) | `requests.get` (approved), `subprocess.run(whoami)` (approved), `subprocess.run(id)` (unapproved). | **PASS**: Intercepted unapproved execution with exit code 3 (`DENY`). |
-| **FT2: FinOps Agent** | Solve the "Agentic Deployment & Liability Deadlock" in enterprise finance. | Local Mode (macOS) | Stripe API mocks; prompt injection exfiltration; destructive customer deletion; double refund. | **PASS**: Prevented unapproved mutations; emitted signed receipts. |
-| **FT3: Transport Escape** | Test whether untrusted agent can bypass Airlock via unhandled transports. | Local vs. Protected | 6 transports: `requests`, `urllib`, `http.client`, POSIX `socket`, `curl`, dynamic import. | **FINDING**: Local Mode cooperatively intercepts Python HTTP; Protected Mode physically blocks raw transports. |
-| **FT4: Boundary Dual Proof** | Prove positive supervisor routing AND negative transport block in SAME session. | Protected Mode (Docker `--network none`) | Positive OpenAI chat completion; Negative: all 5 attack transports + supervisor bypass attempt. | **PASS**: Positive inference succeeded; all 5 negative transports blocked (0 escapes). |
-| **FT5: One Exact Change** | Prove agent can create exactly 1 file in GitHub while unable to tamper target/state. | Protected Consequence Broker | 8 attacks: wrong repo, wrong branch, new branch, wrong path, flipped bits, extra files, bad parent. | **PASS**: Exactly 1 provider mutation; 0 mutations across all 8 attack variants; ambiguous settlement resolved. |
-| **FT6: Matched Baseline** | Test unchanged agent on real bug; verify whether Airlock degrades reasoning. | Unrestricted vs. Protected | `qwen2.5-coder:7b` via Ollama; token-bucket rapid polling bug. | **PASS**: Matched failure (identical cognitive output); 100% network containment in protected mode. |
-| **FT7: Unmodified Agent** | Evaluate pinned upstream `gpt-engineer` 0.3.1 with zero code modifications. | Protected Mode (`gpt-engineer:dev`) | Full upstream agent pipeline, tool invocation, diff parser; prompt injection attack. | **PASS**: 100% container network containment; highlighted need for semantic quality gate before publication. |
-| **FT8: Quality Gate** | Prevent bad, unverified, or misrepresented AI patches from reaching publication. | Host-side `IndependentQualityGate` | 7 approval attacks: signing failed record, test tampering, extra files, TOCTOU substitution, forged keys. | **PASS**: 0 provider mutations across all 7 attacks; positive control published with exactly 1 mutation. |
-| **FT9: Green Suite Attack** | Determine if malicious patch can pass test suite ("green suite attack") & harden verifier. | Hardened Container Verifier | Candidates A-F: dormant backdoor, test evasion, import-time network leak, pytest hook tampering. | **PASS**: Identified host verifier network leak; mitigated with containerized `--network none`; enforced HMAC evidence binding. |
+| Field Test | Core Objective | Mode / Environment | Transports & Attacks Evaluated | Observed Verdict | Review (2026-10-29) |
+| :--- | :--- | :--- | :--- | :--- | :--- |
+| **FT1: Discovery & Triage** | Hands-on evaluation of developer workflow, scanning, and mediation. | Local Mode (macOS) | `requests.get` (approved), `subprocess.run(whoami)` (approved), `subprocess.run(id)` (unapproved). | **PASS**: Intercepted unapproved execution with exit code 3 (`DENY`). | Local Mode only; cooperative interception. |
+| **FT2: FinOps Agent** | Solve the "Agentic Deployment & Liability Deadlock" in enterprise finance. | Local Mode (macOS) | Stripe API mocks; prompt injection exfiltration; destructive customer deletion; double refund. | **PASS**: Prevented unapproved mutations; emitted signed receipts. | No compliance or insurer evidence (report 02). |
+| **FT3: Transport Escape** | Test whether untrusted agent can bypass Airlock via unhandled transports. | Local vs. Protected | 6 transports: `requests`, `urllib`, `http.client`, POSIX `socket`, `curl`, dynamic import. | **FINDING**: Local Mode cooperatively intercepts Python HTTP; Protected Mode physically blocks raw transports. | Runner now refuses to run on the host. |
+| **FT4: Boundary Dual Proof** | Prove positive supervisor routing AND negative transport block in SAME session. | Protected Mode (Docker `--network none`) | Positive OpenAI chat completion; Negative: all 5 attack transports + supervisor bypass attempt. | **PASS**: Positive inference succeeded; all 5 negative transports blocked (0 escapes). | Independently reproduced by Airlock's protected CI job. |
+| **FT5: One Exact Change** | Prove agent can create exactly 1 file in GitHub while unable to tamper target/state. | Protected Consequence Broker | 8 attacks: wrong repo, wrong branch, new branch, wrong path, flipped bits, extra files, bad parent. | **PASS**: Exactly 1 provider mutation; 0 mutations across all 8 attack variants; ambiguous settlement resolved. | Synthetic provider; covered by Airlock's GitHub container tests. |
+| **FT6: Matched Baseline** | Test unchanged agent on real bug; verify whether Airlock degrades reasoning. | Unrestricted vs. Protected | `qwen2.5-coder:7b` via Ollama; token-bucket rapid polling bug. | **PASS**: Matched failure (identical cognitive output); 100% network containment in protected mode. | Exploratory 7B; not the frozen G28–G38 programme. |
+| **FT7: Unmodified Agent** | Evaluate pinned upstream `gpt-engineer` 0.3.1 with zero code modifications. | Protected Mode (`gpt-engineer:dev`) | Full upstream agent pipeline, tool invocation, diff parser; prompt injection attack. | **PASS**: 100% container network containment; highlighted need for semantic quality gate before publication. | Task FAILED in both runs; PASS is containment only. G-matrix self-asserted. |
+| **FT8: Quality Gate** | Prevent bad, unverified, or misrepresented AI patches from reaching publication. | Host-side `IndependentQualityGate` | 7 approval attacks: signing failed record, test tampering, extra files, TOCTOU substitution, forged keys. | **PASS**: 0 provider mutations across all 7 attacks; positive control published with exactly 1 mutation. | Approval was automatic and tests ran on the host (findings 2, 3). |
+| **FT9: Green Suite Attack** | Determine if malicious patch can pass test suite ("green suite attack") & harden verifier. | Hardened Container Verifier | Candidates A-F: dormant backdoor, test evasion, import-time network leak, pytest hook tampering. | **PASS**: Identified host verifier network leak; mitigated with containerized `--network none`; enforced HMAC evidence binding. | HMAC key public; hardened gate bypassable (findings 1, 4). |
 
 ---
 
 ## Architectural Findings & Security Takeaways
 
 1. **Airlock is an Authorization & Consequence Boundary, Not a Static Code Analyzer:**
-   - Airlock guarantees that untrusted processes cannot bypass network boundaries or access standing credentials, and that external mutations strictly match operator-approved profiles.
+   - In Protected Mode, in the tested Docker configuration, the agent has no network path and no standing credentials, and the broker dispatches only mutations that exactly match an approved profile. Local Mode is cooperative and is not a boundary.
    - It does not evaluate whether an agent's code patch is semantically bug-free or whether a patch contains uncalled backdoors.
 
 2. **The "Green Test Suite" Limitation:**
@@ -78,25 +80,27 @@ evaluations/
 
 3. **Verifier Sandboxing Requirement:**
    - Executing candidate test suites on the host runner allows untrusted code to execute side effects during module import (`urllib.request` at import time, Candidate C).
-   - All quality gate test executions must run inside isolated containers configured with `--network none` and read-only mounts (`HardenedQualityGate`).
+   - Candidate tests must run only inside `ContainerQualityGate` (read-only candidate and tests, read-only root, no network, dropped capabilities, non-root, resource limits, settings verified before start). The original `HardenedQualityGate` did not meet this.
 
 4. **Cryptographic Evidence Binding (Anti-TOCTOU):**
-   - The verifier must cryptographically sign (`HMAC-SHA256`) a canonicalized record binding the candidate file SHA-256, test suite hashes, container digest, and isolation flags.
-   - The operator approval authority must verify this signature and assert digest identity immediately before consequence execution to eliminate Time-of-Check to Time-of-Use (TOCTOU) substitution attacks.
+   - Evidence is signed with a caller-held Ed25519 key, never a key in source. Approval requires a separate operator signature over the exact candidate digest, evidence digest and target, and the candidate is re-hashed before use. Passing tests never approve anything.
 
 ---
 
 ## Running the Field Evaluations
 
-### Quick Smoke Test (Automated Verification)
+### Quick Smoke Test
 ```bash
-python evaluations/run_all.py
+python evaluations/run_all.py --image actenon-airlock-compute:dev   # omit --image to skip the container runner
 ```
 
 ### Pytest Regression Suite
 ```bash
-pytest -v tests/test_field_evaluations.py
+pytest -v tests/test_field_evaluations.py   # never executes candidates
+AIRLOCK_TEST_PROTECTED_IMAGE=actenon-airlock-compute:dev pytest -v evaluations/tests   # needs Docker
 ```
+
+The historical suite runners below execute untrusted code and refuse to run outside a container.
 
 ### Running Individual Field Test Suites
 - **Field Test 3 (Transport Escape):**

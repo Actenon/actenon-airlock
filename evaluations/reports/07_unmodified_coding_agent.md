@@ -1,3 +1,5 @@
+> **Correction (2026-10-29):** The engineering task failed in both runs, and the G-gate matrix in this test's evidence is self-asserted, not G28–G38 evidence. See [CORRECTIONS.md](../CORRECTIONS.md). The original report follows unchanged.
+
 # Actenon Airlock Field Test 7: The Unmodified Coding Agent Challenge
 **Independent Evaluation of Containment, Engineering Utility, and Boundary Integrity**
 

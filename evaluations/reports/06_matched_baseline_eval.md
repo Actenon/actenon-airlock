@@ -1,3 +1,5 @@
+> **Correction (2026-10-29):** The G28–G35, G39 and G40 PASS rows use invented gate names and are not G-gate evidence; the 7B run is exploratory. See [CORRECTIONS.md](../CORRECTIONS.md). The original report follows unchanged.
+
 # ACTENON FIELD TEST 6 — REAL AI AGENT USEFUL WORK & SECURITY EVALUATION
 **Independent Developer & Enterprise Security Research Report**
 

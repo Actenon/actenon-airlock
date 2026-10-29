@@ -1,144 +1,117 @@
 #!/usr/bin/env python3
-"""Actenon Airlock Field Evaluations Master Runner.
+"""Smoke checks for the EXPERIMENTAL evaluation harness.
 
-Runs and audits the independent evaluation suites and quality gate controls.
+Never executes candidate code on the host. The container test runner runs only
+when ``--image`` names a local image with python3 and pytest; otherwise that
+step is reported as NOT RUN rather than passed.
 """
 
 from __future__ import annotations
 
 import argparse
+import hashlib
 import sys
-import time
+import tempfile
 from pathlib import Path
 
-# Add repo root to pythonpath
 REPO_ROOT = Path(__file__).resolve().parent.parent
 if str(REPO_ROOT) not in sys.path:
     sys.path.insert(0, str(REPO_ROOT))
 
-from evaluations.harness.candidates import (
-    CANDIDATE_A_DORMANT_BACKDOOR,
-    CANDIDATE_B_TEST_EVASION,
-    CANDIDATE_C_IMPORT_TIME_SIDE_EFFECT,
-)
-from evaluations.harness.mock_github_fixture import (
+import httpx  # noqa: E402
+from cryptography.hazmat.primitives.asymmetric.ed25519 import Ed25519PrivateKey  # noqa: E402
+
+from evaluations.harness.hardened_verifier import ContainerQualityGate  # noqa: E402
+from evaluations.harness.mock_github_fixture import (  # noqa: E402
     GitHubContentsProviderFixture,
     ProviderFixtureState,
 )
-from evaluations.harness.problem_setup import (
-    BUGGY_RATE_LIMITER,
-    CORRECT_RATE_LIMITER,
-)
-from evaluations.harness.quality_gate import (
+from evaluations.harness.problem_setup import BUGGY_RATE_LIMITER, CORRECT_RATE_LIMITER  # noqa: E402
+from evaluations.harness.quality_gate import (  # noqa: E402
+    TESTS_FAILED,
+    TESTS_PASSED,
+    HostExecutionRefused,
     IndependentQualityGate,
     OperatorApprovalAuthority,
+    VerificationRecord,
     generate_signed_evidence_record,
+    public_key_b64,
+    sign_approval_request,
     verify_evidence_signature,
 )
 
-def run_smoke_evaluations() -> int:
-    print("=" * 70)
-    print("ACTENON AIRLOCK: INDEPENDENT FIELD EVALUATION SUITE AUDIT")
-    print("=" * 70)
 
-    overall_failures = 0
+def run_smoke_evaluations(image: str | None) -> int:
+    failures: list[str] = []
 
-    # 1. Audit Problem Setup & Baseline Defect
-    print("\n[Step 1] Verifying TokenBucket Problem Setup...")
-    import tempfile
-    with tempfile.TemporaryDirectory() as tmpdir:
-        tmp_path = Path(tmpdir)
-        buggy_file = tmp_path / "rate_limiter.py"
-        buggy_file.write_text(BUGGY_RATE_LIMITER, encoding="utf-8")
-        gate = IndependentQualityGate()
-        rec_buggy = gate.audit_and_verify(buggy_file)
-        if rec_buggy.verdict == "FAILED":
-            print("  ✓ Buggy baseline correctly rejected by quality gate (verdict=FAILED)")
-        else:
-            print(f"  ✗ Buggy baseline unexpectedly verified: {rec_buggy.verdict}")
-            overall_failures += 1
+    def check(label: str, ok: bool) -> None:
+        print(f"  {'ok  ' if ok else 'FAIL'} {label}")
+        if not ok:
+            failures.append(label)
 
-    # 2. Audit Correct Reference Patch
-    print("\n[Step 2] Verifying Reference Implementation Patch...")
-    with tempfile.TemporaryDirectory() as tmpdir:
-        tmp_path = Path(tmpdir)
-        correct_file = tmp_path / "rate_limiter.py"
-        correct_file.write_text(CORRECT_RATE_LIMITER, encoding="utf-8")
-        rec_correct = gate.audit_and_verify(correct_file)
-        if rec_correct.verdict == "VERIFIED":
-            print("  ✓ Reference patch verified by quality gate (verdict=VERIFIED)")
-        else:
-            print(f"  ✗ Reference patch failed: {rec_correct.rejection_reasons}")
-            overall_failures += 1
+    with tempfile.TemporaryDirectory() as tmp:
+        tmp_path = Path(tmp)
+        marker = tmp_path / "executed"
+        candidate = tmp_path / "rate_limiter.py"
+        candidate.write_text(f"open({str(marker)!r}, 'w').close()\n" + CORRECT_RATE_LIMITER)
 
-    # 3. Audit Operator Approval Authority Defenses
-    print("\n[Step 3] Verifying Operator Approval Authority Protections (Attacks A-G)...")
-    with tempfile.TemporaryDirectory() as tmpdir:
-        tmp_path = Path(tmpdir)
-        key_file = tmp_path / "operator.key"
-        key_file.write_text("synthetic-key", encoding="utf-8")
-        authority = OperatorApprovalAuthority(key_file)
+        print("[1] Host execution is refused")
+        try:
+            IndependentQualityGate().audit_and_verify(candidate)
+            check("host gate refused", False)
+        except HostExecutionRefused:
+            check("host gate refused", True)
+        check("candidate was not executed", not marker.exists())
 
-        # TOCTOU defense
-        correct_file = tmp_path / "rate_limiter.py"
-        correct_file.write_text(CORRECT_RATE_LIMITER, encoding="utf-8")
-        tampered_file = tmp_path / "tampered.py"
-        tampered_file.write_text(CANDIDATE_A_DORMANT_BACKDOOR, encoding="utf-8")
+        print("[2] Evidence is signed with a caller-held key")
+        verifier_key = Ed25519PrivateKey.generate()
+        record = {"candidate_sha256": hashlib.sha256(candidate.read_bytes()).hexdigest(),
+                  "verdict": TESTS_PASSED}  # fmt: skip
+        evidence = generate_signed_evidence_record(record, verifier_key)
+        trusted = public_key_b64(verifier_key)
+        check("genuine evidence verifies", verify_evidence_signature(evidence, trusted))
+        forged = generate_signed_evidence_record(record, Ed25519PrivateKey.generate())
+        check("evidence from another key is rejected", not verify_evidence_signature(forged, trusted))
 
-        allowed, msg, _ = authority.review_and_decide(tampered_file, rec_correct)
-        if not allowed and "TOCTOU" in msg:
-            print("  ✓ TOCTOU patch substitution attack blocked")
-        else:
-            print("  ✗ TOCTOU substitution attack failed to block")
-            overall_failures += 1
+        print("[3] Approval needs an operator signature")
+        operator = Ed25519PrivateKey.generate()
+        authority = OperatorApprovalAuthority(public_key_b64(operator))
+        rec = VerificationRecord("rate_limiter.py", record["candidate_sha256"], "", "", True, 0, 0,
+                                 TESTS_PASSED, 0.0, [])  # fmt: skip
+        request, _ = authority.request_approval(candidate, rec, evidence)
+        check("passing tests produce a request, not an approval", request is not None)
+        ok, _ = authority.accept_signed_approval(
+            request, sign_approval_request(request, Ed25519PrivateKey.generate()), candidate
+        )
+        check("a non-operator signature is rejected", not ok)
+        ok, _ = authority.accept_signed_approval(
+            request, sign_approval_request(request, operator), candidate
+        )
+        check("the operator's signature approves", ok)
 
-    # 4. Audit Cryptographic Evidence Binding
-    print("\n[Step 4] Verifying HMAC Cryptographic Evidence Binding...")
-    raw_record = {
-        "candidate_file": "rate_limiter.py",
-        "candidate_sha256": "abc12345",
-        "verdict": "VERIFIED",
-        "timestamp": time.time(),
-    }
-    signed_rec = generate_signed_evidence_record(raw_record)
-    if verify_evidence_signature(signed_rec):
-        print("  ✓ Valid HMAC signature correctly verified")
+    print("[4] Container test runner")
+    if image is None:
+        print("  NOT RUN (pass --image to run candidates in an isolated container)")
     else:
-        print("  ✗ Valid HMAC signature verification failed")
-        overall_failures += 1
+        gate = ContainerQualityGate(image)
+        with tempfile.TemporaryDirectory() as tmp:
+            for name, code, expected in (("correct", CORRECT_RATE_LIMITER, TESTS_PASSED),
+                                         ("buggy", BUGGY_RATE_LIMITER, TESTS_FAILED)):  # fmt: skip
+                path = Path(tmp) / name / "rate_limiter.py"
+                path.parent.mkdir()
+                path.write_text(code)
+                check(f"{name} candidate -> {expected}", gate.audit_and_verify(path).verdict == expected)
 
-    # Tamper with record
-    signed_rec["record"]["verdict"] = "TAMPERED_VERDICT"
-    if not verify_evidence_signature(signed_rec):
-        print("  ✓ Tampered evidence record signature verification failed as expected")
-    else:
-        print("  ✗ Tampered record signature unexpectedly passed")
-        overall_failures += 1
+    print("[5] GitHub Contents provider fixture")
+    fixture = GitHubContentsProviderFixture(ProviderFixtureState())
+    resp = fixture(httpx.Request("GET", "https://api.github.com/repos/acme/disposable-target"))
+    check("preflight answers", resp.status_code == 200)
 
-    # 5. Audit GitHub Contents Provider Fixture
-    print("\n[Step 5] Verifying GitHub Contents API Consequence Fixture...")
-    fixture_state = ProviderFixtureState()
-    fixture = GitHubContentsProviderFixture(fixture_state)
-    import httpx
-    req = httpx.Request("GET", "https://api.github.com/repos/acme/disposable-target")
-    resp = fixture(req)
-    if resp.status_code == 200 and resp.json().get("full_name") == "acme/disposable-target":
-        print("  ✓ GitHub provider fixture preflight response verified")
-    else:
-        print(f"  ✗ GitHub provider fixture error: {resp.status_code}")
-        overall_failures += 1
+    print(f"\n{len(failures)} failure(s)" + ("" if image else "; container runner NOT RUN"))
+    return 1 if failures else 0
 
-    print("\n" + "=" * 70)
-    if overall_failures == 0:
-        print("ALL EVALUATION SUITE AUDIT CHECKS PASSED.")
-        print("=" * 70)
-        return 0
-    else:
-        print(f"EVALUATION CHECKS FAILED: {overall_failures} errors.")
-        print("=" * 70)
-        return 1
 
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser(description="Actenon Airlock Field Evaluations Runner")
-    args = parser.parse_args()
-    sys.exit(run_smoke_evaluations())
+    parser = argparse.ArgumentParser(description=__doc__.split("\n\n")[0])
+    parser.add_argument("--image", help="local image with python3 and pytest")
+    sys.exit(run_smoke_evaluations(parser.parse_args().image))

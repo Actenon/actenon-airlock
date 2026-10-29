@@ -1,3 +1,5 @@
+> **Correction (2026-10-29):** No SOC 2, ISO 42001 or insurer evidence exists; signed receipts are local integrity evidence, not compliance. See [CORRECTIONS.md](../CORRECTIONS.md). The original report follows unchanged.
+
 ### The Major Industry Problem: The "Agentic Deployment & Liability Deadlock"
 
 Across enterprise engineering today, autonomous AI agents are stalled at the boundary between internal sandboxes and real production systems. Enterprise CISOs, SOC 2 auditors, and cyber-insurance underwriters routinely block deployment of agents with consequential write authority (issuing refunds, provisioning cloud infrastructure, modifying customer databases, or updating CRM/ERP state).

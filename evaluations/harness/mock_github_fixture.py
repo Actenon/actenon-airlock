@@ -12,15 +12,12 @@ from typing import Any
 import httpx
 
 from actenon_airlock.github_consequence import (
-    MAX_OBSERVATION_BYTES,
     ReviewedGitHubCreate,
-    project_create,
 )
-from actenon_airlock.github_runtime import PROFILE_SCHEMA, effect_descriptor, scan_power
-from actenon_protocol.effects import effect_identity
 
 DEFAULT_PARENT_SHA = "1" * 40
 DEFAULT_COMMITTED_SHA = "2" * 40
+
 
 @dataclass
 class ProviderFixtureState:
@@ -37,6 +34,7 @@ class ProviderFixtureState:
     calls: list[dict[str, Any]] = field(default_factory=list)
     lose_ack_on_put: bool = False
     fault_on_readback: str | None = None
+
 
 class GitHubContentsProviderFixture:
     """In-memory, independently auditable GitHub Contents API mock fixture."""
@@ -92,7 +90,8 @@ class GitHubContentsProviderFixture:
                         "path": s.path,
                         "name": Path(s.path).name,
                         "encoding": "base64",
-                        "content": base64.b64encode(b"MISMATCHED_UNAPPROVED_CONTENT").decode() + "\n",
+                        "content": base64.b64encode(b"MISMATCHED_UNAPPROVED_CONTENT").decode()
+                        + "\n",
                         "size": len(b"MISMATCHED_UNAPPROVED_CONTENT"),
                         "sha": "0" * 40,
                     },
@@ -195,6 +194,7 @@ class GitHubContentsProviderFixture:
             )
 
         return httpx.Response(404, json={"message": f"Unhandled mock route: {method} {url}"})
+
 
 def build_reviewed_create(
     owner: str,

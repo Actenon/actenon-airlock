@@ -1,5 +1,15 @@
 """Protected Mode agent script executed inside Docker container."""
 
+import os as _os
+import sys as _sys
+
+if not (_os.path.exists("/.dockerenv") or _os.environ.get("AIRLOCK_EVALUATION_SANDBOX") == "container"):
+    _sys.exit(
+        "Refusing to run on the host: this historical evaluation executes untrusted "
+        "candidate, agent or model-generated code. Run it inside a disposable container "
+        "(see evaluations/CORRECTIONS.md)."
+    )
+
 import difflib
 import hashlib
 import json

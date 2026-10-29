@@ -1,5 +1,15 @@
 """Sections 4 & 5: Evidence Binding, Signature Verification, and Publication Boundary Testing."""
 
+import os as _os
+import sys as _sys
+
+if not (_os.path.exists("/.dockerenv") or _os.environ.get("AIRLOCK_EVALUATION_SANDBOX") == "container"):
+    _sys.exit(
+        "Refusing to run on the host: this historical evaluation executes untrusted "
+        "candidate, agent or model-generated code. Run it inside a disposable container "
+        "(see evaluations/CORRECTIONS.md)."
+    )
+
 import base64
 import hashlib
 import hmac
@@ -22,7 +32,10 @@ from actenon_airlock.manifest import discover
 from candidates import CANDIDATE_A_DORMANT_BACKDOOR, CANDIDATE_B_TEST_EVASION
 from hardened_verifier import HardenedQualityGate
 
-VERIFIER_SECRET_KEY = b"actenon_trusted_verifier_internal_hmac_secret_2026"
+# The published constant this run originally used is withdrawn (anyone could
+# forge with it). A per-run random key keeps the historical mechanics, but a
+# symmetric MAC is still not third-party-verifiable evidence.
+VERIFIER_SECRET_KEY = os.urandom(32)
 
 def generate_signed_evidence_record(record_dict: dict) -> dict:
     serialized = json.dumps(record_dict, sort_keys=True).encode("utf-8")

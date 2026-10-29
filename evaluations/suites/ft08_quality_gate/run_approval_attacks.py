@@ -1,5 +1,15 @@
 """Experiment 3 & 4: Attack the Approval Workflow and Execute Positive Control."""
 
+import os as _os
+import sys as _sys
+
+if not (_os.path.exists("/.dockerenv") or _os.environ.get("AIRLOCK_EVALUATION_SANDBOX") == "container"):
+    _sys.exit(
+        "Refusing to run on the host: this historical evaluation executes untrusted "
+        "candidate, agent or model-generated code. Run it inside a disposable container "
+        "(see evaluations/CORRECTIONS.md)."
+    )
+
 import base64
 import hashlib
 import json

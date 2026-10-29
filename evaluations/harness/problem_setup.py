@@ -114,10 +114,12 @@ def test_rapid_fractional_refill_independent():
     assert replenished >= 3, f"Expected >= 3 replenished tokens, got {replenished}"
 '''
 
+
 def create_target_repo(destination: Path):
     destination.mkdir(parents=True, exist_ok=True)
     (destination / "rate_limiter.py").write_text(BUGGY_RATE_LIMITER)
     (destination / "test_rate_limiter.py").write_text(WORKSPACE_TESTS)
+
 
 def create_independent_tests(destination: Path):
     destination.mkdir(parents=True, exist_ok=True)

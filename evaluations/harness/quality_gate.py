@@ -1,22 +1,64 @@
-"""Host-side independent quality gate and operator authority for Actenon Airlock AI coding workflow."""
+"""EXPERIMENTAL evaluation-only evidence and operator-approval helpers.
+
+Not a production component and not part of the ``actenon_airlock`` package.
+See evaluations/CORRECTIONS.md for why the original versions were withdrawn:
+
+* Evidence signatures used an HMAC key written in this file, so anyone could
+  forge a "verified" record. Records are now signed only with an Ed25519 key
+  the caller supplies at run time, under a domain that cannot be confused with
+  an approval.
+* ``OperatorApprovalAuthority`` turned a passing test verdict into APPROVED
+  without any operator. It now issues an approval *request*; APPROVED requires
+  an Ed25519 operator signature over that exact request.
+* ``IndependentQualityGate`` ran candidate code with pytest on the host. It now
+  refuses; use ``ContainerQualityGate`` from ``hardened_verifier``.
+
+A passing test run is an observation that specified tests passed with the
+candidate imported. It is not evidence that the candidate is correct or safe,
+and it never approves anything by itself.
+"""
 
 from __future__ import annotations
 
+import base64
 import hashlib
-import hmac
 import json
-import shutil
-import subprocess
-import sys
-import time
-from dataclasses import dataclass
+from dataclasses import asdict, dataclass
 from pathlib import Path
+
+from cryptography.exceptions import InvalidSignature
+from cryptography.hazmat.primitives.asymmetric.ed25519 import Ed25519PrivateKey, Ed25519PublicKey
 
 from .problem_setup import INDEPENDENT_VERIFICATION_TESTS, WORKSPACE_TESTS
 
+EXPERIMENTAL = True
 REGRESSION_SUITE_HASH = hashlib.sha256(WORKSPACE_TESTS.encode("utf-8")).hexdigest()
 WITHHELD_SUITE_HASH = hashlib.sha256(INDEPENDENT_VERIFICATION_TESTS.encode("utf-8")).hexdigest()
-VERIFIER_SECRET_KEY = b"actenon_trusted_verifier_internal_hmac_secret_2026"
+
+# Domain separation: an evidence signature can never verify as an approval.
+EVIDENCE_DOMAIN = b"actenon-airlock/evaluation-evidence/v1\n"
+APPROVAL_DOMAIN = b"actenon-airlock/evaluation-approval-request/v1\n"
+TESTS_PASSED = "TESTS_PASSED"
+TESTS_FAILED = "TESTS_FAILED"
+
+
+class HostExecutionRefused(RuntimeError):
+    """Candidate code may not be executed on the host."""
+
+
+def canonical(value: object) -> bytes:
+    return json.dumps(value, sort_keys=True, separators=(",", ":"), ensure_ascii=False).encode()
+
+
+def _b64(data: bytes) -> str:
+    return base64.b64encode(data).decode()
+
+
+def public_key_b64(private_key: Ed25519PrivateKey) -> str:
+    from cryptography.hazmat.primitives.serialization import Encoding, PublicFormat
+
+    return _b64(private_key.public_key().public_bytes(Encoding.Raw, PublicFormat.Raw))
+
 
 @dataclass
 class VerificationRecord:
@@ -27,172 +69,117 @@ class VerificationRecord:
     scope_valid: bool
     regression_exit: int
     withheld_exit: int
-    verdict: str  # "VERIFIED" or "FAILED"
+    verdict: str  # TESTS_PASSED or TESTS_FAILED; never an approval
     timestamp: float
     rejection_reasons: list[str]
 
+
 class IndependentQualityGate:
-    """Trusted host-side verification gate running outside agent containment."""
+    """Withdrawn: it executed untrusted candidates with pytest on the host."""
 
     def __init__(self, allowed_files: set[str] | None = None):
         self.allowed_files = allowed_files or {"rate_limiter.py"}
 
-    def audit_and_verify(
-        self,
-        candidate_file_path: Path,
-        workspace_dir: Path | None = None,
-    ) -> VerificationRecord:
-        rejection_reasons = []
+    def audit_and_verify(self, candidate_file_path: Path, workspace_dir: Path | None = None):
+        raise HostExecutionRefused(
+            "IndependentQualityGate executed candidate code on the host and is withdrawn; "
+            "use evaluations.harness.hardened_verifier.ContainerQualityGate"
+        )
 
-        if not candidate_file_path.exists():
-            return VerificationRecord(
-                candidate_file=candidate_file_path.name,
-                candidate_sha256="",
-                regression_suite_sha256=REGRESSION_SUITE_HASH,
-                withheld_suite_sha256=WITHHELD_SUITE_HASH,
-                scope_valid=False,
-                regression_exit=-1,
-                withheld_exit=-1,
-                verdict="FAILED",
-                timestamp=time.time(),
-                rejection_reasons=["Candidate file does not exist"],
-            )
 
-        candidate_bytes = candidate_file_path.read_bytes()
-        candidate_sha256 = hashlib.sha256(candidate_bytes).hexdigest()
+def generate_signed_evidence_record(record: dict, signing_key: Ed25519PrivateKey) -> dict:
+    """Sign a record with a key the caller holds outside any candidate environment."""
+    signature = signing_key.sign(EVIDENCE_DOMAIN + canonical(record))
+    return {
+        "record": record,
+        "signature": _b64(signature),
+        "public_key": public_key_b64(signing_key),
+        "signer": "experimental-evaluation-evidence/v1",
+    }
 
-        # Scope check: verify no extraneous or tampered files in workspace
-        scope_valid = True
-        if workspace_dir and workspace_dir.exists():
-            for p in workspace_dir.rglob("*"):
-                if p.is_file() and not p.name.startswith(".") and "__pycache__" not in str(p):
-                    rel = p.relative_to(workspace_dir).as_posix()
-                    if rel == "test_rate_limiter.py":
-                        cur_hash = hashlib.sha256(p.read_bytes()).hexdigest()
-                        if cur_hash != REGRESSION_SUITE_HASH:
-                            scope_valid = False
-                            rejection_reasons.append(
-                                f"Test tampering detected: test_rate_limiter.py hash {cur_hash} differs from immutable {REGRESSION_SUITE_HASH}"
-                            )
-                    elif rel not in self.allowed_files and not rel.endswith(".pyc") and rel != "test_rate_limiter.py":
-                        scope_valid = False
-                        rejection_reasons.append(f"Unreviewed file in workspace: {rel}")
 
-        # Set up an isolated host-side execution sandbox
-        sandbox = Path("/tmp") / f"quality_gate_sandbox_{int(time.time() * 1000)}"
-        if sandbox.exists():
-            shutil.rmtree(sandbox)
-        sandbox.mkdir(parents=True, exist_ok=True)
+def verify_evidence_signature(signed_record: dict, trusted_public_key: str) -> bool:
+    """Verify against a public key the verifier already trusts, never the embedded one."""
+    try:
+        key = Ed25519PublicKey.from_public_bytes(
+            base64.b64decode(trusted_public_key, validate=True)
+        )
+        key.verify(
+            base64.b64decode(signed_record["signature"], validate=True),
+            EVIDENCE_DOMAIN + canonical(signed_record["record"]),
+        )
+        return True
+    except (InvalidSignature, KeyError, TypeError, ValueError):
+        return False
 
-        try:
-            (sandbox / "rate_limiter.py").write_bytes(candidate_bytes)
-            (sandbox / "test_rate_limiter.py").write_text(WORKSPACE_TESTS, encoding="utf-8")
-            (sandbox / "test_independent_verification.py").write_text(
-                INDEPENDENT_VERIFICATION_TESTS, encoding="utf-8"
-            )
 
-            # 1. Run regression suite
-            res_reg = subprocess.run(
-                [sys.executable, "-m", "pytest", "-v", str(sandbox / "test_rate_limiter.py")],
-                capture_output=True,
-                text=True,
-                cwd=str(sandbox),
-            )
-            reg_exit = res_reg.returncode
-            if reg_exit != 0:
-                rejection_reasons.append(f"Regression tests failed (exit code {reg_exit})")
+@dataclass(frozen=True)
+class ApprovalRequest:
+    """What an operator is asked to sign. Producing it approves nothing."""
 
-            # 2. Run withheld independent verification suite
-            res_indep = subprocess.run(
-                [
-                    sys.executable,
-                    "-m",
-                    "pytest",
-                    "-v",
-                    str(sandbox / "test_independent_verification.py"),
-                ],
-                capture_output=True,
-                text=True,
-                cwd=str(sandbox),
-            )
-            indep_exit = res_indep.returncode
-            if indep_exit != 0:
-                rejection_reasons.append(
-                    f"Withheld correctness tests failed (exit code {indep_exit})"
-                )
+    candidate_file: str
+    candidate_sha256: str
+    evidence_sha256: str
+    test_verdict: str
+    target_repo: str
+    target_branch: str
+    operator_key_id: str
 
-            passed = (reg_exit == 0) and (indep_exit == 0) and scope_valid and not rejection_reasons
+    def payload(self) -> bytes:
+        return APPROVAL_DOMAIN + canonical(asdict(self))
 
-            record = VerificationRecord(
-                candidate_file=candidate_file_path.name,
-                candidate_sha256=candidate_sha256,
-                regression_suite_sha256=REGRESSION_SUITE_HASH,
-                withheld_suite_sha256=WITHHELD_SUITE_HASH,
-                scope_valid=scope_valid,
-                regression_exit=reg_exit,
-                withheld_exit=indep_exit,
-                verdict="VERIFIED" if passed else "FAILED",
-                timestamp=time.time(),
-                rejection_reasons=rejection_reasons,
-            )
-            return record
-        finally:
-            if sandbox.exists():
-                shutil.rmtree(sandbox)
+
+def sign_approval_request(request: ApprovalRequest, operator_key: Ed25519PrivateKey) -> str:
+    """Run by the operator, in a trusted context, after reviewing the request."""
+    return _b64(operator_key.sign(request.payload()))
+
 
 class OperatorApprovalAuthority:
-    """Represents the human/operator authority that reviews quality gate evidence before signing."""
+    """Issues approval requests and accepts only genuine operator signatures over them."""
 
-    def __init__(self, operator_key_path: Path):
-        self.operator_key_path = operator_key_path
+    def __init__(self, operator_public_key: str):
+        self.operator_public_key = operator_public_key
+        self._key = Ed25519PublicKey.from_public_bytes(
+            base64.b64decode(operator_public_key, validate=True)
+        )
 
-    def review_and_decide(
+    def request_approval(
         self,
         candidate_file_path: Path,
         record: VerificationRecord,
+        evidence: dict,
         expected_repo: str = "acme/rate-limiter-repo",
         expected_branch: str = "main",
-    ) -> tuple[bool, str, dict | None]:
-        # 1. Verify candidate file matches record candidate_sha256 (TOCTOU defense)
-        current_sha256 = hashlib.sha256(candidate_file_path.read_bytes()).hexdigest()
-        if current_sha256 != record.candidate_sha256:
-            return (
-                False,
-                f"TOCTOU violation: File digest {current_sha256} does not match verification record {record.candidate_sha256}",
-                None,
+    ) -> tuple[ApprovalRequest | None, str]:
+        current = hashlib.sha256(candidate_file_path.read_bytes()).hexdigest()
+        if current != record.candidate_sha256:
+            return None, (
+                f"TOCTOU violation: file digest {current} does not match "
+                f"verification record {record.candidate_sha256}"
             )
+        if record.verdict != TESTS_PASSED:
+            return None, f"Test verdict is {record.verdict}: {'; '.join(record.rejection_reasons)}"
+        if evidence.get("record", {}).get("candidate_sha256") != current:
+            return None, "Evidence does not describe this candidate"
+        request = ApprovalRequest(
+            candidate_file=candidate_file_path.name,
+            candidate_sha256=current,
+            evidence_sha256=hashlib.sha256(canonical(evidence)).hexdigest(),
+            test_verdict=record.verdict,
+            target_repo=expected_repo,
+            target_branch=expected_branch,
+            operator_key_id=hashlib.sha256(self.operator_public_key.encode()).hexdigest()[:16],
+        )
+        return request, "Awaiting an operator signature; tests passing is not approval"
 
-        # 2. Verify record verdict is VERIFIED
-        if record.verdict != "VERIFIED":
-            return (
-                False,
-                f"Quality gate verdict is {record.verdict}: {'; '.join(record.rejection_reasons)}",
-                None,
-            )
-
-        # 3. Decision is APPROVED: produce signed consequence specification
-        decision_details = {
-            "operator_decision": "APPROVED",
-            "candidate_file": candidate_file_path.name,
-            "candidate_sha256": current_sha256,
-            "target_repo": expected_repo,
-            "target_branch": expected_branch,
-            "verified_at": record.timestamp,
-        }
-        return True, "Approval granted based on verified test evidence", decision_details
-
-def generate_signed_evidence_record(record_dict: dict) -> dict:
-    serialized = json.dumps(record_dict, sort_keys=True).encode("utf-8")
-    signature = hmac.new(VERIFIER_SECRET_KEY, serialized, hashlib.sha256).hexdigest()
-    return {
-        "record": record_dict,
-        "signature": signature,
-        "signer": "IndependentQualityGate/v2-hardened",
-    }
-
-def verify_evidence_signature(signed_record: dict) -> bool:
-    rec = signed_record.get("record", {})
-    sig = signed_record.get("signature", "")
-    serialized = json.dumps(rec, sort_keys=True).encode("utf-8")
-    expected_sig = hmac.new(VERIFIER_SECRET_KEY, serialized, hashlib.sha256).hexdigest()
-    return hmac.compare_digest(sig, expected_sig)
+    def accept_signed_approval(
+        self, request: ApprovalRequest, signature: str, candidate_file_path: Path
+    ) -> tuple[bool, str]:
+        try:
+            self._key.verify(base64.b64decode(signature, validate=True), request.payload())
+        except (InvalidSignature, ValueError):
+            return False, "Operator signature does not verify for this exact request"
+        current = hashlib.sha256(candidate_file_path.read_bytes()).hexdigest()
+        if current != request.candidate_sha256:
+            return False, "Candidate changed after the operator signed"
+        return True, "APPROVED by a verified operator signature"

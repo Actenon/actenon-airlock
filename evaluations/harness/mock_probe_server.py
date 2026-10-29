@@ -7,6 +7,7 @@ import time
 from http.server import BaseHTTPRequestHandler, HTTPServer
 from typing import ClassVar
 
+
 class MockProbeHandler(BaseHTTPRequestHandler):
     delete_count: ClassVar[int] = 0
     health_count: ClassVar[int] = 0
@@ -59,6 +60,7 @@ class MockProbeHandler(BaseHTTPRequestHandler):
         else:
             self.send_response(404)
             self.end_headers()
+
 
 class MockProbeServer:
     def __init__(self, host: str = "127.0.0.1", port: int = 8997):

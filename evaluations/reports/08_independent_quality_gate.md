@@ -1,3 +1,5 @@
+> **Correction (2026-10-29):** The quality gate ran candidates on the host and the operator approval was automatic; both were withdrawn. See [CORRECTIONS.md](../CORRECTIONS.md). The original report follows unchanged.
+
 # Actenon Airlock Field Test 8: The Bad Patch Must Never Ship
 **Independent Evaluation of Correctness Boundaries, Quality Gates, and Consequence Authorization**
 

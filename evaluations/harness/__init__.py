@@ -1,4 +1,8 @@
-"""Evaluations harness package exposing fixtures, problem setups, and verification gates."""
+"""EXPERIMENTAL evaluation harness: fixtures, problem setups and test runners.
+
+Nothing here is a production or release component. Candidate code may only be
+executed inside ContainerQualityGate; see evaluations/CORRECTIONS.md.
+"""
 
 from .candidates import (
     CANDIDATE_A_DORMANT_BACKDOOR,
@@ -8,7 +12,7 @@ from .candidates import (
     CANDIDATE_E_OVERWRITE_ATTEMPT,
     CANDIDATE_F_RESOURCE_EXHAUSTION,
 )
-from .hardened_verifier import HardenedQualityGate, HardenedVerificationRecord
+from .hardened_verifier import ContainerQualityGate, ContainerVerificationRecord, IsolationError
 from .mock_github_fixture import (
     DEFAULT_COMMITTED_SHA,
     DEFAULT_PARENT_SHA,
@@ -25,10 +29,15 @@ from .problem_setup import (
     create_problem_workspace,
 )
 from .quality_gate import (
+    TESTS_FAILED,
+    TESTS_PASSED,
+    ApprovalRequest,
+    HostExecutionRefused,
     IndependentQualityGate,
     OperatorApprovalAuthority,
     VerificationRecord,
     generate_signed_evidence_record,
+    sign_approval_request,
     verify_evidence_signature,
 )
 
@@ -44,8 +53,15 @@ __all__ = [
     "DEFAULT_COMMITTED_SHA",
     "DEFAULT_PARENT_SHA",
     "GitHubContentsProviderFixture",
-    "HardenedQualityGate",
-    "HardenedVerificationRecord",
+    "ApprovalRequest",
+    "ContainerQualityGate",
+    "ContainerVerificationRecord",
+    "HostExecutionRefused",
+    "IsolationError",
+    "TESTS_FAILED",
+    "TESTS_PASSED",
+    "VerificationRecord",
+    "sign_approval_request",
     "INDEPENDENT_VERIFICATION_TESTS",
     "IndependentQualityGate",
     "MockProbeServer",

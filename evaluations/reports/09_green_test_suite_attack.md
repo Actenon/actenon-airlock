@@ -1,3 +1,5 @@
+> **Correction (2026-10-29):** The HMAC binding used a public key, and the hardened gate passed a suite-rewriting and an exit-zero candidate; both were withdrawn. See [CORRECTIONS.md](../CORRECTIONS.md). The original report follows unchanged.
+
 # Actenon Airlock Field Test 9: The Green Test Suite Attack
 **Independent Adversarial Evaluation of Test-Based Verification, Verifier Containment, and Consequence Integrity**
 
