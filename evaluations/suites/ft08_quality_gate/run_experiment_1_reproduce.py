@@ -1,5 +1,7 @@
 """Experiment 1: Reproduce the failed-patch scenario and analyze Airlock authorization boundary."""
 
+from __future__ import annotations
+
 import hashlib
 import json
 import shutil
@@ -7,7 +9,16 @@ import subprocess
 import sys
 from pathlib import Path
 
-from problem_setup import WORKSPACE_TESTS, INDEPENDENT_VERIFICATION_TESTS
+# Add repo root to sys.path
+REPO_ROOT = Path(__file__).resolve().parent.parent.parent.parent
+if str(REPO_ROOT) not in sys.path:
+    sys.path.insert(0, str(REPO_ROOT))
+
+from evaluations.harness.problem_setup import (
+    INDEPENDENT_VERIFICATION_TESTS,
+    WORKSPACE_TESTS,
+)
+
 
 def run_pytest(test_path: Path) -> tuple[int, str]:
     res = subprocess.run(
@@ -17,14 +28,16 @@ def run_pytest(test_path: Path) -> tuple[int, str]:
     )
     return res.returncode, res.stdout + res.stderr
 
+
 def run_experiment_1():
     print("[Experiment 1] Reproducing failed-patch test outcomes...")
-    work_dir = Path("/Users/ross/.gemini/antigravity/scratch/field_test_8/exp1_reproduce")
+    work_dir = Path("/tmp/ft08_exp1_reproduce")
     if work_dir.exists():
         shutil.rmtree(work_dir)
     work_dir.mkdir(parents=True)
 
-    failed_patch = Path("/Users/ross/.gemini/antigravity/scratch/field_test_8/failed_patch_ft7.py").read_bytes()
+    failed_patch_file = Path(__file__).parent / "failed_patch_ft7.py"
+    failed_patch = failed_patch_file.read_bytes()
     patch_sha256 = hashlib.sha256(failed_patch).hexdigest()
     print(f"  Failed patch digest: {patch_sha256}")
 
@@ -63,11 +76,12 @@ def run_experiment_1():
         ),
     }
 
-    out_file = Path("/Users/ross/.gemini/antigravity/scratch/field_test_8/experiment1_summary.json")
+    out_file = Path(__file__).parent / "experiment1_summary.json"
     out_file.write_text(json.dumps(analysis, indent=2) + "\n")
     print(f"[Experiment 1] Summary written to {out_file}")
     print(json.dumps(analysis, indent=2))
     return analysis
+
 
 if __name__ == "__main__":
     run_experiment_1()
