@@ -1,0 +1,331 @@
+{
+  "schema": "actenon-airlock/release-admission-report/v1",
+  "repository": "Actenon/actenon-airlock",
+  "candidate_sha": "67837913f9379772f93ed9e34d244f187e1dde3f",
+  "overall_status": "NOT READY",
+  "gate_counts": {
+    "UNDEFINED": 29,
+    "BLOCKED": 11
+  },
+  "prerequisites": {
+    "frozen_definitions": {
+      "status": "BLOCKED",
+      "detail": "frozen G1-G40 definitions are not committed and hash-pinned: The verbatim frozen G1-G40 acceptance text is not committed to any Actenon repository. Until the owner commits it and pins its SHA-256 here, the programme is not frozen and the overall status cannot exceed NOT READY. Rejected non-authoritative sources: the grouped G1_G17/G18_G27/G6_G29 labels in the PR #14 draft gate, and the G28-G40 names hardcoded in field_test_7/consolidate_evidence.py (they contradict the G28-G38 frozen-programme scope).",
+      "evidence": []
+    },
+    "candidate_ci": {
+      "status": "PASS",
+      "detail": "all required CI jobs passed in run 41102598420",
+      "evidence": [
+        "https://github.com/Actenon/actenon-airlock/actions/runs/41102598420/job/124222801036",
+        "https://github.com/Actenon/actenon-airlock/actions/runs/41102598420/job/124222801077",
+        "https://github.com/Actenon/actenon-airlock/actions/runs/41102598420/job/124222801051",
+        "https://github.com/Actenon/actenon-airlock/actions/runs/41102598420/job/124222800607",
+        "protected-container-acceptance: 41 cases, skips []",
+        "protected-container-acceptance: 1 cases, skips []",
+        "integration-python-3.11: 674 cases, skips ['tests.test_github_container::test_actual_container_github_grant_and_denials', 'tests.test_guided_workflow::test_emergency_stop_kills_a_running_protected_agent', 'tests.test_guided_workflow::test_verification_runs_trusted_tests_in_a_contained_container', 'tests.test_independent_container::test_owned_transport_controls_and_protected_boundary', 'tests.test_protected::test_same_contained_environment_runs_engineering_workflow_and_refuses_bypass']",
+        "integration-python-3.12: 674 cases, skips ['tests.test_github_container::test_actual_container_github_grant_and_denials', 'tests.test_guided_workflow::test_emergency_stop_kills_a_running_protected_agent', 'tests.test_guided_workflow::test_verification_runs_trusted_tests_in_a_contained_container', 'tests.test_independent_container::test_owned_transport_controls_and_protected_boundary', 'tests.test_protected::test_same_contained_environment_runs_engineering_workflow_and_refuses_bypass']"
+      ]
+    },
+    "dependency_graph": {
+      "status": "PASS",
+      "detail": "4 locked candidate dependencies have passing CI",
+      "evidence": [
+        "Actenon/actenon-kernel@7a1ad40581ce0f984f5b1cc4292f26d350cab311: 3 required jobs passed",
+        "Actenon/actenon-permit@b795a37cfa927c630605172f8ecaf073bfb2aa70: 3 required jobs passed",
+        "Actenon/actenon-protocol@a2e0e08fcd24b71eb1668204ba6bed00e4c63551: 4 required jobs passed",
+        "Actenon/actenon-scan@16388227a55a3b5a3ec392d1c70f3940b0c291c1: 3 required jobs passed"
+      ]
+    },
+    "recovered_section_A": {
+      "status": "BLOCKED",
+      "detail": "One coherent candidate and truthful compatibility map (goal lines 39-41): no evidence producer is defined yet",
+      "evidence": []
+    },
+    "recovered_section_B": {
+      "status": "BLOCKED",
+      "detail": "Exact authority and request identity (goal lines 43-47): no evidence producer is defined yet",
+      "evidence": []
+    },
+    "recovered_section_C": {
+      "status": "BLOCKED",
+      "detail": "An externally enforced protected boundary (goal lines 49-53): no evidence producer is defined yet",
+      "evidence": []
+    },
+    "recovered_section_D": {
+      "status": "BLOCKED",
+      "detail": "Real effect ownership, truthful outcomes and recovery (goal lines 55-61): no evidence producer is defined yet",
+      "evidence": []
+    },
+    "recovered_section_E": {
+      "status": "BLOCKED",
+      "detail": "Useful unchanged external-agent acceptance (goal lines 63-69): no evidence producer is defined yet",
+      "evidence": []
+    },
+    "recovered_section_F": {
+      "status": "BLOCKED",
+      "detail": "Installation, review and independent evidence (goal lines 71-77): no evidence producer is defined yet",
+      "evidence": []
+    }
+  },
+  "release_only": {
+    "registry_coherence": {
+      "status": "FAIL",
+      "detail": "version 0.1.0.dev0 is a pre-release; candidates are not releases",
+      "evidence": []
+    }
+  },
+  "gates": {
+    "G1": {
+      "definition": "MISSING",
+      "status": "UNDEFINED",
+      "detail": "no committed acceptance condition; cannot be evaluated",
+      "evidence": []
+    },
+    "G2": {
+      "definition": "MISSING",
+      "status": "UNDEFINED",
+      "detail": "no committed acceptance condition; cannot be evaluated",
+      "evidence": []
+    },
+    "G3": {
+      "definition": "MISSING",
+      "status": "UNDEFINED",
+      "detail": "no committed acceptance condition; cannot be evaluated",
+      "evidence": []
+    },
+    "G4": {
+      "definition": "MISSING",
+      "status": "UNDEFINED",
+      "detail": "no committed acceptance condition; cannot be evaluated",
+      "evidence": []
+    },
+    "G5": {
+      "definition": "MISSING",
+      "status": "UNDEFINED",
+      "detail": "no committed acceptance condition; cannot be evaluated",
+      "evidence": []
+    },
+    "G6": {
+      "definition": "MISSING",
+      "status": "UNDEFINED",
+      "detail": "no committed acceptance condition; cannot be evaluated",
+      "evidence": []
+    },
+    "G7": {
+      "definition": "MISSING",
+      "status": "UNDEFINED",
+      "detail": "no committed acceptance condition; cannot be evaluated",
+      "evidence": []
+    },
+    "G8": {
+      "definition": "MISSING",
+      "status": "UNDEFINED",
+      "detail": "no committed acceptance condition; cannot be evaluated",
+      "evidence": []
+    },
+    "G9": {
+      "definition": "MISSING",
+      "status": "UNDEFINED",
+      "detail": "no committed acceptance condition; cannot be evaluated",
+      "evidence": []
+    },
+    "G10": {
+      "definition": "MISSING",
+      "status": "UNDEFINED",
+      "detail": "no committed acceptance condition; cannot be evaluated",
+      "evidence": []
+    },
+    "G11": {
+      "definition": "MISSING",
+      "status": "UNDEFINED",
+      "detail": "no committed acceptance condition; cannot be evaluated",
+      "evidence": []
+    },
+    "G12": {
+      "definition": "MISSING",
+      "status": "UNDEFINED",
+      "detail": "no committed acceptance condition; cannot be evaluated",
+      "evidence": []
+    },
+    "G13": {
+      "definition": "MISSING",
+      "status": "UNDEFINED",
+      "detail": "no committed acceptance condition; cannot be evaluated",
+      "evidence": []
+    },
+    "G14": {
+      "definition": "MISSING",
+      "status": "UNDEFINED",
+      "detail": "no committed acceptance condition; cannot be evaluated",
+      "evidence": []
+    },
+    "G15": {
+      "definition": "MISSING",
+      "status": "UNDEFINED",
+      "detail": "no committed acceptance condition; cannot be evaluated",
+      "evidence": []
+    },
+    "G16": {
+      "definition": "MISSING",
+      "status": "UNDEFINED",
+      "detail": "no committed acceptance condition; cannot be evaluated",
+      "evidence": []
+    },
+    "G17": {
+      "definition": "MISSING",
+      "status": "UNDEFINED",
+      "detail": "no committed acceptance condition; cannot be evaluated",
+      "evidence": []
+    },
+    "G18": {
+      "definition": "MISSING",
+      "status": "UNDEFINED",
+      "detail": "no committed acceptance condition; cannot be evaluated",
+      "evidence": []
+    },
+    "G19": {
+      "definition": "MISSING",
+      "status": "UNDEFINED",
+      "detail": "no committed acceptance condition; cannot be evaluated",
+      "evidence": []
+    },
+    "G20": {
+      "definition": "MISSING",
+      "status": "UNDEFINED",
+      "detail": "no committed acceptance condition; cannot be evaluated",
+      "evidence": []
+    },
+    "G21": {
+      "definition": "MISSING",
+      "status": "UNDEFINED",
+      "detail": "no committed acceptance condition; cannot be evaluated",
+      "evidence": []
+    },
+    "G22": {
+      "definition": "MISSING",
+      "status": "UNDEFINED",
+      "detail": "no committed acceptance condition; cannot be evaluated",
+      "evidence": []
+    },
+    "G23": {
+      "definition": "MISSING",
+      "status": "UNDEFINED",
+      "detail": "no committed acceptance condition; cannot be evaluated",
+      "evidence": []
+    },
+    "G24": {
+      "definition": "MISSING",
+      "status": "UNDEFINED",
+      "detail": "no committed acceptance condition; cannot be evaluated",
+      "evidence": []
+    },
+    "G25": {
+      "definition": "MISSING",
+      "status": "UNDEFINED",
+      "detail": "no committed acceptance condition; cannot be evaluated",
+      "evidence": []
+    },
+    "G26": {
+      "definition": "MISSING",
+      "status": "UNDEFINED",
+      "detail": "no committed acceptance condition; cannot be evaluated",
+      "evidence": []
+    },
+    "G27": {
+      "definition": "MISSING",
+      "status": "UNDEFINED",
+      "detail": "no committed acceptance condition; cannot be evaluated",
+      "evidence": []
+    },
+    "G28": {
+      "definition": "PROGRAMME_LEVEL",
+      "status": "BLOCKED",
+      "detail": "no trusted .github/workflows/real-coding-acceptance.yml run exists for candidate 67837913f9379772f93ed9e34d244f187e1dde3f",
+      "evidence": [],
+      "shared_evidence": "G28-G38 frozen programme run"
+    },
+    "G29": {
+      "definition": "PROGRAMME_LEVEL",
+      "status": "BLOCKED",
+      "detail": "no trusted .github/workflows/real-coding-acceptance.yml run exists for candidate 67837913f9379772f93ed9e34d244f187e1dde3f",
+      "evidence": [],
+      "shared_evidence": "G28-G38 frozen programme run"
+    },
+    "G30": {
+      "definition": "PROGRAMME_LEVEL",
+      "status": "BLOCKED",
+      "detail": "no trusted .github/workflows/real-coding-acceptance.yml run exists for candidate 67837913f9379772f93ed9e34d244f187e1dde3f",
+      "evidence": [],
+      "shared_evidence": "G28-G38 frozen programme run"
+    },
+    "G31": {
+      "definition": "PROGRAMME_LEVEL",
+      "status": "BLOCKED",
+      "detail": "no trusted .github/workflows/real-coding-acceptance.yml run exists for candidate 67837913f9379772f93ed9e34d244f187e1dde3f",
+      "evidence": [],
+      "shared_evidence": "G28-G38 frozen programme run"
+    },
+    "G32": {
+      "definition": "PROGRAMME_LEVEL",
+      "status": "BLOCKED",
+      "detail": "no trusted .github/workflows/real-coding-acceptance.yml run exists for candidate 67837913f9379772f93ed9e34d244f187e1dde3f",
+      "evidence": [],
+      "shared_evidence": "G28-G38 frozen programme run"
+    },
+    "G33": {
+      "definition": "PROGRAMME_LEVEL",
+      "status": "BLOCKED",
+      "detail": "no trusted .github/workflows/real-coding-acceptance.yml run exists for candidate 67837913f9379772f93ed9e34d244f187e1dde3f",
+      "evidence": [],
+      "shared_evidence": "G28-G38 frozen programme run"
+    },
+    "G34": {
+      "definition": "PROGRAMME_LEVEL",
+      "status": "BLOCKED",
+      "detail": "no trusted .github/workflows/real-coding-acceptance.yml run exists for candidate 67837913f9379772f93ed9e34d244f187e1dde3f",
+      "evidence": [],
+      "shared_evidence": "G28-G38 frozen programme run"
+    },
+    "G35": {
+      "definition": "PROGRAMME_LEVEL",
+      "status": "BLOCKED",
+      "detail": "no trusted .github/workflows/real-coding-acceptance.yml run exists for candidate 67837913f9379772f93ed9e34d244f187e1dde3f",
+      "evidence": [],
+      "shared_evidence": "G28-G38 frozen programme run"
+    },
+    "G36": {
+      "definition": "PROGRAMME_LEVEL",
+      "status": "BLOCKED",
+      "detail": "no trusted .github/workflows/real-coding-acceptance.yml run exists for candidate 67837913f9379772f93ed9e34d244f187e1dde3f",
+      "evidence": [],
+      "shared_evidence": "G28-G38 frozen programme run"
+    },
+    "G37": {
+      "definition": "PROGRAMME_LEVEL",
+      "status": "BLOCKED",
+      "detail": "no trusted .github/workflows/real-coding-acceptance.yml run exists for candidate 67837913f9379772f93ed9e34d244f187e1dde3f",
+      "evidence": [],
+      "shared_evidence": "G28-G38 frozen programme run"
+    },
+    "G38": {
+      "definition": "PROGRAMME_LEVEL",
+      "status": "BLOCKED",
+      "detail": "no trusted .github/workflows/real-coding-acceptance.yml run exists for candidate 67837913f9379772f93ed9e34d244f187e1dde3f",
+      "evidence": [],
+      "shared_evidence": "G28-G38 frozen programme run"
+    },
+    "G39": {
+      "definition": "MISSING",
+      "status": "UNDEFINED",
+      "detail": "no committed acceptance condition; cannot be evaluated",
+      "evidence": []
+    },
+    "G40": {
+      "definition": "MISSING",
+      "status": "UNDEFINED",
+      "detail": "no committed acceptance condition; cannot be evaluated",
+      "evidence": []
+    }
+  }
+}

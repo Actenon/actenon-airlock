@@ -57,7 +57,7 @@ Protected `ttl-lru` passed its tests in both runs but exited 3, so it counts as 
 | Working development candidate | Not awarded | U1 failed |
 | Security-tested candidate | Not awarded | Requires the above. S1 to S3 passed |
 | Product acceptance passed | Not awarded | Requires the above and owner acceptance of the specification |
-| Candidate ready | Not awarded | The gate reports NOT READY; G1-G27, G39 and G40 are undefined and G28-G38 fail |
+| Candidate ready | Not awarded | The gate reports NOT READY. G1-G27, G39 and G40 are undefined, G28-G38 have no frozen run at this commit and every past run failed, and A-F have no evidence producers wired in. Candidate CI and the dependency graph pass |
 | Release ready | Not awarded | Needs the live test and independent operators |
 | Production supported | Not awarded | An owner decision after Release ready |
 
@@ -66,6 +66,10 @@ Protected `ttl-lru` passed its tests in both runs but exited 3, so it counts as 
 * Nothing was tested against live GitHub. The provider is synthetic, and [the live test](LIVE_TEST.md) is prepared but not run.
 * One agent, one local model, one machine and five synthetic tasks. No independent person has reproduced this.
 * G1-G40 are unchanged, and no v2 result is substituted into them.
+
+## Release gate
+
+`check_candidate_admission.py` on the scored commit reports NOT READY, with candidate CI and the dependency graph passing. The report is [gate-67837913.json](evidence/gate-67837913.json). The full test suite at that code is 674 passed with real Docker, and no code changed afterwards.
 
 ## Reproduce
 
