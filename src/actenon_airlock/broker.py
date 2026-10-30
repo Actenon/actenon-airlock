@@ -56,6 +56,19 @@ WELL_KNOWN = {
     "ANTHROPIC_API_KEY": "https://api.anthropic.com",
 }
 MARKER = re.compile(r"airlock_credential_[a-f0-9]{32}")
+# Headers that change what a generic HTTP request does. Everything else
+# (tracing, request IDs, user agents, nonces, idempotency keys) is excluded
+# from effect identity, so varying it cannot mint a new logical effect and
+# re-dispatch an owned one. headers_sha256 still binds every header.
+SEMANTIC_HEADERS = frozenset(
+    {
+        "content-type",
+        "content-encoding",
+        "x-http-method-override",
+        "x-http-method",
+        "x-method-override",
+    }
+)
 
 
 class HttpDispatch:
@@ -188,6 +201,7 @@ class Broker:
         )["key"]
         os.environ["ACTENON_ED25519_KEY_FILE"] = str(state.key_path)
         self.store = SQLiteStore(str(state.local / "permit.sqlite3"))
+        self._require_effect_store_matches_journal()
         self.pdp = PDP(self.store, Ledger(self.store))
         # New files carry no Scan evidence, so only the scanned files can change authority.
         self.source_files = source_files(state.root)
@@ -228,6 +242,28 @@ class Broker:
         self.http = httpx.Client(trust_env=False, follow_redirects=False)
         self.denials = 0
         self.execution_errors = 0
+
+    def _require_effect_store_matches_journal(self) -> None:
+        """Refuse to run if the effect store has lost effects the signed journal records.
+
+        A deleted, reset or substituted store would otherwise forget ownership of
+        committed or ambiguous effects and allow a duplicate dispatch.
+        """
+        verification = self.state.verify_receipts()
+        recorded = {
+            item["row"]["effect_id"]
+            for item in verification["rows"]
+            if item["verified"] and isinstance(item["row"], dict) and item["row"].get("effect_id")
+        }
+        missing = sorted(e for e in recorded if not self.store.get_effect(e))
+        if missing:
+            self.store.close()
+            raise AirlockError(
+                f"The effect store is missing {len(missing)} effect(s) recorded in the signed "
+                f"receipt journal (first: {missing[0]}). Refusing to run so no owned effect is "
+                "dispatched again. Restore .airlock/local/permit.sqlite3 from backup "
+                "(see docs/operations.md)."
+            )
 
     def http_timeout(self, url):
         return 30
@@ -294,25 +330,31 @@ class Broker:
         return out, released
 
     def _effect_headers(self, headers: dict) -> dict:
-        """Stable parent credential references; never raw secrets or random handles."""
+        """The headers that define a logical effect: semantic ones and credential identity.
+
+        Credential headers contribute which bound credential and origin they use,
+        not their literal formatting. Never raw secrets or random handles.
+        """
         out = {}
+        seen = set()
         names = {marker: name for name, marker in self.markers.items()}
         for name, value in headers.items():
             normalized = name.lower()
-            if normalized in out:
+            if normalized in seen:
                 raise AirlockError("Duplicate case-insensitive HTTP header names are unsupported")
-            parts, position = [], 0
+            seen.add(normalized)
+            credentials = []
             for match in MARKER.finditer(value):
-                if match.start() > position:
-                    parts.append({"literal": value[position : match.start()]})
                 marker = match.group()
                 if marker not in names:
                     raise AirlockError("Unknown credential handle")
-                parts.append({"credential": names[marker], "origin": self.credentials[marker][1]})
-                position = match.end()
-            if position < len(value):
-                parts.append({"literal": value[position:]})
-            out[normalized] = parts
+                credentials.append(
+                    {"credential": names[marker], "origin": self.credentials[marker][1]}
+                )
+            if credentials:
+                out[normalized] = credentials
+            elif normalized in SEMANTIC_HEADERS:
+                out[normalized] = [{"literal": value}]
         return out
 
     def _http_effect_descriptor(self, intent) -> dict:
