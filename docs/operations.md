@@ -25,6 +25,11 @@ SQLite database, so two hosts sharing a project could not exclude each other.
 
 * The agent can read everything in its workspace copy, and it can send that text to
   the approved model through inference. Choose the model endpoint with that in mind.
+* Each protected request is single-use within a run. An agent that repeats an inference
+  prompt word for word gets a 403 for the repeat, and `airlock work` exits 3. A new run
+  is not affected.
+* The workspace is a host directory with no size quota. A hostile agent can fill the disk
+  it sits on, so keep the project on a volume where that is survivable.
 * Docker shares the host kernel. This is container isolation, not a microVM.
 * A rollback of both the journal and the ownership store is detectable only with a
   checkpoint held elsewhere, and it cannot be repaired from local state.
