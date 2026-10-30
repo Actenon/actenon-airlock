@@ -9,6 +9,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "acceptance" / "v2"
 
 import adversarial  # noqa: E402
 import harness  # noqa: E402
+import programme  # noqa: E402
 
 
 def report(**values):
@@ -84,3 +85,41 @@ def test_scoring_compares_source_and_ignores_agent_bookkeeping(tmp_path):
     (tmp_path / "ISSUE.md").write_text("task")
     (tmp_path / harness.DECLARATION).write_text("declaration")
     assert harness._source(tmp_path) == {"pkg/a.py": b"x"}
+
+
+def scored(exit_code=0, passed=True, tests_modified=False):
+    return {
+        "agent_exit": exit_code,
+        "score": {"passed": passed, "tests_modified_by_agent": tests_modified},
+    }
+
+
+@pytest.mark.parametrize(
+    ("result", "expected"),
+    [
+        (scored(), True),
+        (scored(exit_code=3), False),
+        (scored(passed=False), False),
+        (scored(tests_modified=True), False),
+    ],
+)
+def test_solved_needs_a_clean_exit_passing_tests_and_untouched_tests(result, expected):
+    assert programme.solved(result) is expected
+
+
+def test_a_result_from_other_code_or_a_missing_identity_is_not_frozen_evidence():
+    config = {"schema": "x", "model_digest": "a", "agent_image": "b"}
+    assert programme.in_frozen_identity(
+        {"identity": {"model_digest": "a", "agent_image": "b"}}, config
+    )
+    assert not programme.in_frozen_identity(
+        {"identity": {"model_digest": "a", "agent_image": "z"}}, config
+    )
+    assert not programme.in_frozen_identity({}, config)
+
+
+def test_the_programme_runs_baselines_before_their_matching_protected_runs():
+    names = [name for name, _ in programme.planned_names()]
+    for task in programme.TASKS:
+        assert names.index(f"baseline-{task}-1") < names.index(f"protected-{task}-1")
+    assert names.count("flagship") == 1 and names.count("controls") == 1

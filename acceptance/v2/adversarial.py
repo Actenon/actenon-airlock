@@ -199,7 +199,8 @@ def controls(args) -> int:
         "protected_sink_requests": len(leaked),
         "valid": positive,
         "passed": positive and not leaked,
-        "identity": harness.run_identity(),
+        "identity": harness.frozen_identity(args.model),
+        "run": harness.run_identity(),
         **results,
     }
     (args.out / "result.json").write_text(json.dumps(report, indent=2) + "\n")
