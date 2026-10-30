@@ -1,0 +1,184 @@
+/Users/ross/Documents/Codex/2026-10-30/actenon-airlock-independent-north-star-engineering/work/venv/lib/python3.12/site-packages/pytest_asyncio/plugin.py:300: PytestDeprecationWarning: The configuration option "asyncio_default_fixture_loop_scope" is unset.
+The event loop scope for asynchronous fixtures will default to the "fixture" caching scope. Future versions of pytest-asyncio will default the loop scope for asynchronous fixtures to "function" scope. Set the default fixture loop scope explicitly in order to avoid unexpected behavior in the future. Valid fixture loop scopes are: "function", "class", "module", "package", "session"
+
+  warnings.warn(PytestDeprecationWarning(_DEFAULT_FIXTURE_LOOP_SCOPE_UNSET))
+FFFFFF                                                                   [100%]
+=================================== FAILURES ===================================
+____________ test_invalid_journal_blocks_new_consequence[signature] ____________
+
+project = <function project.<locals>.create at 0x109d27920>
+server = ('http://127.0.0.1:60838', [('/a', b'hello', {'Host': '127.0.0.1:60838', 'Accept': '*/*', 'Accept-Encoding': 'gzip, de...', {'Host': '127.0.0.1:60838', 'Accept': '*/*', 'Accept-Encoding': 'gzip, deflate', 'Connection': 'keep-alive', ...})])
+damage = 'signature'
+
+    @pytest.mark.parametrize("damage", ["signature", "delete-middle", "reorder"])
+    def test_invalid_journal_blocks_new_consequence(project, server, damage):
+        url, calls = server
+        state = project(f'import requests\nrequests.post("{url}/a")\nrequests.post("{url}/b")\n')
+        assert attempt(state, message(url + "/a"))["ok"]
+        lines = state.receipts_path.read_bytes().splitlines()
+        if damage == "signature":
+            row = json.loads(lines[-1])
+            row["target"] += "-forged"
+            lines[-1] = json.dumps(row).encode()
+        elif damage == "delete-middle":
+            lines.pop(0)
+        else:
+            lines.reverse()
+        state.receipts_path.write_bytes(b"\n".join(lines) + b"\n")
+        assert not state.verify_receipts()["ok"]
+>       with pytest.raises(AirlockError, match="journal"):
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       Failed: DID NOT RAISE AirlockError
+
+tests/test_independent_recovery.py:40: Failed
+----------------------------- Captured stderr call -----------------------------
+AIRLOCK ALLOW http.post @ http://127.0.0.1:60838/a: effect AMBIGUOUS; duplicate dispatch blocked [receipt_10be16061ae5409abc39ed085b86cffe]
+AIRLOCK ALLOW http.post @ http://127.0.0.1:60838/b: effect AMBIGUOUS; duplicate dispatch blocked [receipt_d911e76b4d8947fba1a2521e014bb77f]
+__________ test_invalid_journal_blocks_new_consequence[delete-middle] __________
+
+project = <function project.<locals>.create at 0x109d58c20>
+server = ('http://127.0.0.1:60842', [('/a', b'hello', {'Host': '127.0.0.1:60842', 'Accept': '*/*', 'Accept-Encoding': 'gzip, de...', {'Host': '127.0.0.1:60842', 'Accept': '*/*', 'Accept-Encoding': 'gzip, deflate', 'Connection': 'keep-alive', ...})])
+damage = 'delete-middle'
+
+    @pytest.mark.parametrize("damage", ["signature", "delete-middle", "reorder"])
+    def test_invalid_journal_blocks_new_consequence(project, server, damage):
+        url, calls = server
+        state = project(f'import requests\nrequests.post("{url}/a")\nrequests.post("{url}/b")\n')
+        assert attempt(state, message(url + "/a"))["ok"]
+        lines = state.receipts_path.read_bytes().splitlines()
+        if damage == "signature":
+            row = json.loads(lines[-1])
+            row["target"] += "-forged"
+            lines[-1] = json.dumps(row).encode()
+        elif damage == "delete-middle":
+            lines.pop(0)
+        else:
+            lines.reverse()
+        state.receipts_path.write_bytes(b"\n".join(lines) + b"\n")
+        assert not state.verify_receipts()["ok"]
+>       with pytest.raises(AirlockError, match="journal"):
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       Failed: DID NOT RAISE AirlockError
+
+tests/test_independent_recovery.py:40: Failed
+----------------------------- Captured stderr call -----------------------------
+AIRLOCK ALLOW http.post @ http://127.0.0.1:60842/a: effect AMBIGUOUS; duplicate dispatch blocked [receipt_0c27feb137be41288a0319c3ef1bb399]
+AIRLOCK ALLOW http.post @ http://127.0.0.1:60842/b: effect AMBIGUOUS; duplicate dispatch blocked [receipt_aa7e424df3d44b3398a69be2846cbca1]
+_____________ test_invalid_journal_blocks_new_consequence[reorder] _____________
+
+project = <function project.<locals>.create at 0x109e94680>
+server = ('http://127.0.0.1:60845', [('/a', b'hello', {'Host': '127.0.0.1:60845', 'Accept': '*/*', 'Accept-Encoding': 'gzip, de...', {'Host': '127.0.0.1:60845', 'Accept': '*/*', 'Accept-Encoding': 'gzip, deflate', 'Connection': 'keep-alive', ...})])
+damage = 'reorder'
+
+    @pytest.mark.parametrize("damage", ["signature", "delete-middle", "reorder"])
+    def test_invalid_journal_blocks_new_consequence(project, server, damage):
+        url, calls = server
+        state = project(f'import requests\nrequests.post("{url}/a")\nrequests.post("{url}/b")\n')
+        assert attempt(state, message(url + "/a"))["ok"]
+        lines = state.receipts_path.read_bytes().splitlines()
+        if damage == "signature":
+            row = json.loads(lines[-1])
+            row["target"] += "-forged"
+            lines[-1] = json.dumps(row).encode()
+        elif damage == "delete-middle":
+            lines.pop(0)
+        else:
+            lines.reverse()
+        state.receipts_path.write_bytes(b"\n".join(lines) + b"\n")
+        assert not state.verify_receipts()["ok"]
+>       with pytest.raises(AirlockError, match="journal"):
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       Failed: DID NOT RAISE AirlockError
+
+tests/test_independent_recovery.py:40: Failed
+----------------------------- Captured stderr call -----------------------------
+AIRLOCK ALLOW http.post @ http://127.0.0.1:60845/a: effect AMBIGUOUS; duplicate dispatch blocked [receipt_9c41d00f9c9c48ef9ea41d84a1a7676e]
+AIRLOCK ALLOW http.post @ http://127.0.0.1:60845/b: effect AMBIGUOUS; duplicate dispatch blocked [receipt_127367f578e14623bfbba285977360cb]
+________ test_authorized_receipt_alone_preserves_crash_window_ownership ________
+
+project = <function project.<locals>.create at 0x109dc98a0>
+server = ('http://127.0.0.1:60848', [('/a', b'hello', {'Host': '127.0.0.1:60848', 'Accept': '*/*', 'Accept-Encoding': 'gzip, de...', {'Host': '127.0.0.1:60848', 'Accept': '*/*', 'Accept-Encoding': 'gzip, deflate', 'Connection': 'keep-alive', ...})])
+
+    def test_authorized_receipt_alone_preserves_crash_window_ownership(project, server):
+        url, calls = server
+        state = project(f'import requests\nrequests.post("{url}/a")\n')
+        assert attempt(state, message(url + "/a"))["ok"]
+        # A process can die after provider dispatch, before the outcome append.
+        first = state.receipts_path.read_bytes().splitlines()[0]
+        state.receipts_path.write_bytes(first + b"\n")
+        for suffix in ("", "-wal", "-shm"):
+            (state.local / ("permit.sqlite3" + suffix)).unlink(missing_ok=True)
+>       with pytest.raises(AirlockError, match="effect store"):
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       Failed: DID NOT RAISE AirlockError
+
+tests/test_independent_recovery.py:54: Failed
+----------------------------- Captured stderr call -----------------------------
+AIRLOCK ALLOW http.post @ http://127.0.0.1:60848/a: effect AMBIGUOUS; duplicate dispatch blocked [receipt_e79c5f77c6754dc19b0f8d9021decfaa]
+AIRLOCK ALLOW http.post @ http://127.0.0.1:60848/a: effect AMBIGUOUS; duplicate dispatch blocked [receipt_f6374b531b4d46f3938bf72e5e2c5f06]
+_______ test_older_non_execution_attempt_cannot_hide_missing_live_owner ________
+
+project = <function project.<locals>.create at 0x109e94a40>
+server = ('http://127.0.0.1:60851', [('/a', b'hello', {'Host': '127.0.0.1:60851', 'Accept': '*/*', 'Accept-Encoding': 'gzip, de...', {'Host': '127.0.0.1:60851', 'Accept': '*/*', 'Accept-Encoding': 'gzip, deflate', 'Connection': 'keep-alive', ...})])
+
+    def test_older_non_execution_attempt_cannot_hide_missing_live_owner(project, server):
+        url, calls = server
+        state = project(f'import requests\nrequests.post("{url}/a")\n')
+        item = message(url + "/a")
+        # Preserve a genuine earlier NOT_EXECUTED attempt, then a later dispatched one.
+        broker = Broker(state, discover(state.root))
+        # Generate non-execution at the actual Kernel edge by revoking the grant.
+        edge = broker.effect_edge.protect
+        def revoked(intent, proof, execute):
+            broker.store.set_status(broker.grant.id, GrantStatus.REVOKED)
+            return edge(intent, proof, execute)
+        broker.effect_edge.protect = revoked
+        try:
+            assert not broker.handle(item)["ok"]
+        finally:
+            broker.close()
+        backup = sqlite3.connect(":memory:")
+        with sqlite3.connect(state.local / "permit.sqlite3") as db:
+            db.backup(backup)
+        assert attempt(state, item)["ok"]
+        assert len(calls) == 1
+        with sqlite3.connect(state.local / "permit.sqlite3") as db:
+            backup.backup(db)
+        backup.close()
+>       with pytest.raises(AirlockError, match="effect store"):
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       Failed: DID NOT RAISE AirlockError
+
+tests/test_independent_recovery.py:83: Failed
+----------------------------- Captured stderr call -----------------------------
+AIRLOCK DENY http.post @ http://127.0.0.1:60851/a: AUTHORITY_REVOKED [receipt_0de23ed87c7d450faeb40847e9deedc4]
+AIRLOCK ALLOW http.post @ http://127.0.0.1:60851/a: effect AMBIGUOUS; duplicate dispatch blocked [receipt_f3371e57d40f41ce9c3cb0cf097e6966]
+AIRLOCK ALLOW http.post @ http://127.0.0.1:60851/a: effect AMBIGUOUS; duplicate dispatch blocked [receipt_83afbcd4fd0f41d18a3f7bc0bdfddcc3]
+__________ test_retry_denial_does_not_erase_unresolved_provider_truth __________
+
+project = <function project.<locals>.create at 0x109e94ae0>
+server = ('http://127.0.0.1:60854', [('/a', b'hello', {'Host': '127.0.0.1:60854', 'Accept': '*/*', 'Accept-Encoding': 'gzip, deflate', 'Connection': 'keep-alive', ...})])
+
+    def test_retry_denial_does_not_erase_unresolved_provider_truth(project, server):
+        url, calls = server
+        state = project(f'import requests\nrequests.post("{url}/a")\n')
+        assert attempt(state, message(url + "/a"))["ok"]
+        assert not attempt(state, message(url + "/a"))["ok"]
+        public = json.loads((state.path / "public-key.json").read_text())["key"]
+        truth = verify_offline(state.receipts_path.read_bytes(), public)["provider_truth"]
+>       assert len(truth["unresolved_ambiguous"]) == 1
+E       assert 0 == 1
+E        +  where 0 = len([])
+
+tests/test_independent_recovery.py:95: AssertionError
+----------------------------- Captured stderr call -----------------------------
+AIRLOCK ALLOW http.post @ http://127.0.0.1:60854/a: effect AMBIGUOUS; duplicate dispatch blocked [receipt_904dde3528434e8f9c730b04674626f9]
+AIRLOCK DENY http.post @ http://127.0.0.1:60854/a: effect already reserved, committed, or unresolved [receipt_ec1a42fd01e642a1b873b96bd5bb9380]
+=========================== short test summary info ============================
+FAILED tests/test_independent_recovery.py::test_invalid_journal_blocks_new_consequence[signature]
+FAILED tests/test_independent_recovery.py::test_invalid_journal_blocks_new_consequence[delete-middle]
+FAILED tests/test_independent_recovery.py::test_invalid_journal_blocks_new_consequence[reorder]
+FAILED tests/test_independent_recovery.py::test_authorized_receipt_alone_preserves_crash_window_ownership
+FAILED tests/test_independent_recovery.py::test_older_non_execution_attempt_cannot_hide_missing_live_owner
+FAILED tests/test_independent_recovery.py::test_retry_denial_does_not_erase_unresolved_provider_truth
+6 failed in 3.56s

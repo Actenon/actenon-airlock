@@ -1,0 +1,6 @@
+Using Python 3.12.13 environment at: /Users/ross/Documents/Codex/2026-10-30/actenon-airlock-independent-north-star-engineering/work/wheel-venv
+Resolved 1 package in 11ms
+Prepared 1 package in 8ms
+Uninstalled 1 package in 3ms
+Installed 1 package in 2ms
+ ~ actenon-airlock==0.1.0.dev0 (from file:///Users/ross/Documents/Codex/2026-10-30/actenon-airlock-independent-north-star-engineering/work/airlock-independent/dist/actenon_airlock-0.1.0.dev0-py3-none-any.whl)

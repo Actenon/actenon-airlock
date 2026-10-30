@@ -1,0 +1,105 @@
+{
+  "bridge": {
+    "container_id": "96c889b009a050d07c616dec42b2196b76a6e0c132f2003b907ede0525c030d1",
+    "image_id": "sha256:76b1e8f2b1d7917aa440ce98512d48f9f4b73cd50d06b5cd489191c6b31e50c0",
+    "user": "0:0",
+    "host_config": {
+      "NetworkMode": "none",
+      "ReadonlyRootfs": true,
+      "Privileged": false,
+      "CapDrop": [
+        "ALL"
+      ],
+      "CapAdd": null,
+      "SecurityOpt": [
+        "no-new-privileges"
+      ],
+      "PidMode": "",
+      "IpcMode": "private",
+      "PidsLimit": 128,
+      "Memory": 1073741824,
+      "NanoCpus": 2000000000,
+      "Devices": [],
+      "DeviceRequests": null,
+      "GroupAdd": null,
+      "PortBindings": {}
+    },
+    "mounts": {
+      "/airlock": {
+        "rw": false,
+        "type": "bind",
+        "source": "/private/var/folders/tz/y04t4d0900xdbmz96jp608180000gn/T/pytest-of-ross/pytest-248/test_actual_container_github_g0/project/.airlock/local/runs/protected_297a272e367c4018ba1f0c1931a067a9/control"
+      },
+      "/ipc": {
+        "rw": true,
+        "type": "volume",
+        "source": "airlock-ipc-5145061e9c0e46b58d9ffe8ef31c39c7"
+      }
+    },
+    "environment_names": [
+      "DEBIAN_FRONTEND",
+      "GPG_KEY",
+      "LANG",
+      "PATH",
+      "PYTHON_SHA256",
+      "PYTHON_VERSION"
+    ],
+    "github_credential_present": false
+  },
+  "agent": {
+    "container_id": "dc97e9e92e75635f2e4d3577e0ea7e2f5adf979cbe196d55f19c6e040956ec03",
+    "image_id": "sha256:76b1e8f2b1d7917aa440ce98512d48f9f4b73cd50d06b5cd489191c6b31e50c0",
+    "user": "10000:10000",
+    "host_config": {
+      "NetworkMode": "none",
+      "ReadonlyRootfs": true,
+      "Privileged": false,
+      "CapDrop": [
+        "ALL"
+      ],
+      "CapAdd": null,
+      "SecurityOpt": [
+        "no-new-privileges"
+      ],
+      "PidMode": "",
+      "IpcMode": "private",
+      "PidsLimit": 128,
+      "Memory": 1073741824,
+      "NanoCpus": 2000000000,
+      "Devices": [],
+      "DeviceRequests": null,
+      "GroupAdd": null,
+      "PortBindings": {}
+    },
+    "mounts": {
+      "/airlock": {
+        "rw": false,
+        "type": "bind",
+        "source": "/private/var/folders/tz/y04t4d0900xdbmz96jp608180000gn/T/pytest-of-ross/pytest-248/test_actual_container_github_g0/project/.airlock/local/runs/protected_297a272e367c4018ba1f0c1931a067a9/control"
+      },
+      "/ipc": {
+        "rw": false,
+        "type": "volume",
+        "source": "airlock-ipc-5145061e9c0e46b58d9ffe8ef31c39c7"
+      },
+      "/workspace": {
+        "rw": true,
+        "type": "bind",
+        "source": "/host_mnt/private/var/folders/tz/y04t4d0900xdbmz96jp608180000gn/T/pytest-of-ross/pytest-248/test_actual_container_github_g0/project/.airlock/local/runs/protected_297a272e367c4018ba1f0c1931a067a9/workspace"
+      }
+    },
+    "environment_names": [
+      "DEBIAN_FRONTEND",
+      "GPG_KEY",
+      "HOME",
+      "LANG",
+      "PATH",
+      "PYTHONDONTWRITEBYTECODE",
+      "PYTHON_SHA256",
+      "PYTHON_VERSION",
+      "TIKTOKEN_CACHE_DIR",
+      "TMPDIR"
+    ],
+    "github_credential_present": false
+  }
+}
