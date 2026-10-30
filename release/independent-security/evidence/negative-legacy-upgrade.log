@@ -1,0 +1,32 @@
+/Users/ross/Documents/Codex/2026-10-30/actenon-airlock-independent-north-star-engineering/work/venv/lib/python3.12/site-packages/pytest_asyncio/plugin.py:300: PytestDeprecationWarning: The configuration option "asyncio_default_fixture_loop_scope" is unset.
+The event loop scope for asynchronous fixtures will default to the "fixture" caching scope. Future versions of pytest-asyncio will default the loop scope for asynchronous fixtures to "function" scope. Set the default fixture loop scope explicitly in order to avoid unexpected behavior in the future. Valid fixture loop scopes are: "function", "class", "module", "package", "session"
+
+  warnings.warn(PytestDeprecationWarning(_DEFAULT_FIXTURE_LOOP_SCOPE_UNSET))
+F                                                                        [100%]
+=================================== FAILURES ===================================
+__________ test_legacy_database_without_journal_still_blocks_upgrade ___________
+
+project = <function project.<locals>.create at 0x10ab6ba60>
+server = ('http://127.0.0.1:62138', [('/a', b'hello', {'Host': '127.0.0.1:62138', 'Accept': '*/*', 'Accept-Encoding': 'gzip, deflate', 'Connection': 'keep-alive', ...})])
+
+    def test_legacy_database_without_journal_still_blocks_upgrade(project, server):
+        from actenon_airlock.common import AirlockError
+        url, calls = server
+        state = project(f'import requests\nrequests.post("{url}/a")\n')
+        broker = Broker(state, discover(state.root))
+        broker._effect_headers = lambda headers: {'content-type': [{'literal': 'application/json'}]}
+        try:
+            assert broker.handle(message(url + '/a'))['ok']
+        finally:
+            broker.close()
+        state.receipts_path.unlink()
+>       with pytest.raises(AirlockError, match='legacy header-dependent'):
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       Failed: DID NOT RAISE AirlockError
+
+tests/test_independent_headers.py:105: Failed
+----------------------------- Captured stderr call -----------------------------
+AIRLOCK ALLOW http.post @ http://127.0.0.1:62138/a: effect AMBIGUOUS; duplicate dispatch blocked [receipt_b23c2b104d1047e2970afcda0ed230a9]
+=========================== short test summary info ============================
+FAILED tests/test_independent_headers.py::test_legacy_database_without_journal_still_blocks_upgrade
+1 failed in 0.64s

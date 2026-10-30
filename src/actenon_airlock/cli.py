@@ -152,7 +152,7 @@ def main(argv=None):
     sub = parser.add_subparsers(dest="cmd", required=True)
     for cmd in (
         "init", "diff", "check", "doctor", "run", "receipts", "reconcile",
-        "checkpoint", "verify-evidence",
+        "checkpoint", "verify-evidence", "recovery-inventory",
     ):  # fmt: skip
         p = sub.add_parser(cmd)
         p.add_argument("--path", type=Path, default=Path.cwd())
@@ -174,6 +174,11 @@ def main(argv=None):
                 "--integrity-only", action="store_true",
                 help="Exit 0 on integrity alone; completeness stays UNANCHORED",
             )  # fmt: skip
+        if cmd == "recovery-inventory":
+            p.add_argument("--public-key", help="Independently retained public key or key file")
+            p.add_argument(
+                "--checkpoint", type=Path, help="Newest independently retained checkpoint"
+            )
         if cmd in {"diff", "check"}:
             p.add_argument("--base", help="Compare to the signed approval at this trusted Git ref")
             p.add_argument("--output", type=Path, help="Save JSON authority diff")
@@ -326,6 +331,17 @@ def main(argv=None):
             if report["integrity"]["ok"] and args.integrity_only:
                 return 0
             return 0 if report["ok"] else 2
+        if args.cmd == "recovery-inventory":
+            from .evidence import load_public_key
+            from .recovery import recovery_inventory
+
+            report = recovery_inventory(
+                root,
+                public_key=load_public_key(args.public_key) if args.public_key else None,
+                checkpoint=json.loads(args.checkpoint.read_text()) if args.checkpoint else None,
+            )
+            print(json.dumps(report, indent=2))
+            return 0 if report["status"] == "NO_DETECTED_BLOCKER" else 2
         if args.cmd == "receipts":
             result = State(root).verify_receipts()
             print(json.dumps(result, indent=2) if args.json else render_receipts(result))

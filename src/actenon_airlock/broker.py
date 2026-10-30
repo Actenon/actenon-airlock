@@ -8,10 +8,12 @@ import json
 import os
 import re
 import socket
+import sqlite3
 import subprocess
 import sys
 import tempfile
 import threading
+from contextlib import closing
 from datetime import UTC, datetime, timedelta
 from pathlib import Path
 from urllib.parse import urlsplit
@@ -56,17 +58,50 @@ WELL_KNOWN = {
     "ANTHROPIC_API_KEY": "https://api.anthropic.com",
 }
 MARKER = re.compile(r"airlock_credential_[a-f0-9]{32}")
-# Headers that change what a generic HTTP request does. Everything else
-# (tracing, request IDs, user agents, nonces, idempotency keys) is excluded
-# from effect identity, so varying it cannot mint a new logical effect and
-# re-dispatch an owned one. headers_sha256 still binds every header.
-SEMANTIC_HEADERS = frozenset(
+# SDK diagnostics are discarded before both authorization and dispatch. They
+# are not an agent-controlled server timeout or consequence contract.
+SDK_DIAGNOSTIC_HEADERS = frozenset(
+    {
+        "x-stainless-arch",
+        "x-stainless-lang",
+        "x-stainless-os",
+        "x-stainless-package-version",
+        "x-stainless-runtime",
+        "x-stainless-runtime-version",
+        "x-stainless-helper",
+        "x-stainless-read-timeout",
+        "x-stainless-retry-count",
+        "x-stainless-timeout",
+        "x-stainless-async",
+    }
+)
+# These are the only headers the generic transport understands. Unknown
+# tenant, account, precondition, encoding and method-override semantics need
+# a provider-specific executor. Never silently treat unknown headers as traces.
+SUPPORTED_HTTP_HEADERS = frozenset(
     {
         "content-type",
-        "content-encoding",
-        "x-http-method-override",
-        "x-http-method",
-        "x-method-override",
+        "content-length",
+        "accept",
+        "accept-encoding",
+        "connection",
+        "host",
+        "user-agent",
+        "authorization",
+        "x-api-key",
+        "api-key",
+        "traceparent",
+        "tracestate",
+        "x-request-id",
+        "x-correlation-id",
+        "x-amzn-trace-id",
+        "x-b3-traceid",
+        "x-cloud-trace-context",
+        "sentry-trace",
+        "baggage",
+        # Fixed, trusted GitHubCreateDispatch transport headers.
+        "x-github-api-version",
+        "anthropic-version",
     }
 )
 
@@ -196,12 +231,16 @@ class Broker:
             name: os.environ.get(name)
             for name in ("ACTENON_SIGNING_KEY", "ACTENON_ED25519_KEY_FILE")
         }
+        self.store = SQLiteStore(str(state.local / "permit.sqlite3"))
+        try:
+            self._require_effect_store_matches_journal()
+        except Exception:
+            self.store.close()
+            raise
         os.environ["ACTENON_SIGNING_KEY"] = json.loads(
             (state.local / "grant-key.json").read_text()
         )["key"]
         os.environ["ACTENON_ED25519_KEY_FILE"] = str(state.key_path)
-        self.store = SQLiteStore(str(state.local / "permit.sqlite3"))
-        self._require_effect_store_matches_journal()
         self.pdp = PDP(self.store, Ledger(self.store))
         # New files carry no Scan evidence, so only the scanned files can change authority.
         self.source_files = source_files(state.root)
@@ -250,20 +289,93 @@ class Broker:
         committed or ambiguous effects and allow a duplicate dispatch.
         """
         verification = self.state.verify_receipts()
+        if not verification["ok"]:
+            raise AirlockError(
+                "Receipt journal is invalid; refusing execution until trusted recovery"
+            )
+        # The authorized receipt is fsynced BEFORE the edge dispatch. A crash
+        # can leave only that receipt, so the nested proof reference matters.
+        # Compare attempts, not just effect IDs: an older NOT_EXECUTED attempt
+        # must never stand in for a lost live owner of the same consequence.
+        attempts = {}
+        outcomes = {}
+        for item in verification["rows"]:
+            row = item["row"]
+            ref = row.get("proof", {}).get("extensions", {}).get("effect")
+            if ref:
+                attempts[ref["reservation_id"]] = ref
+            ref = row.get("effect")
+            if ref and "reservation_id" in ref:
+                attempts[ref["reservation_id"]] = ref
+                if row.get("outcome"):
+                    outcomes[ref["reservation_id"]] = row["outcome"]
+            if row.get("stage") == "reconciled":
+                ref = row["reconciliation"]["payload"]["reference"]
+                attempts[ref["reservation_id"]] = ref
+                outcomes[ref["reservation_id"]] = row["outcome"]
         recorded = {
             item["row"]["effect_id"]
             for item in verification["rows"]
             if item["verified"] and isinstance(item["row"], dict) and item["row"].get("effect_id")
         }
-        missing = sorted(e for e in recorded if not self.store.get_effect(e))
+        recorded.update(ref["effect_id"] for ref in attempts.values())
+        # Migration must inspect surviving owners even if the journal was
+        # deleted. The pinned Permit API can retrieve an effect but cannot list
+        # IDs; this read-only inventory uses its pinned SQLite schema. Never
+        # rewrite reservations here or infer non-execution during recovery.
+        with closing(
+            sqlite3.connect((self.state.local / "permit.sqlite3").as_uri() + "?mode=ro", uri=True)
+        ) as recovery:
+            recorded.update(
+                row[0]
+                for row in recovery.execute(
+                    "SELECT DISTINCT effect_id FROM effect_reservations WHERE state <> 'NOT_EXECUTED'"
+                )
+            )
+        stored = {effect_id: self.store.get_effect(effect_id) for effect_id in recorded}
+        missing = sorted(e for e, rows in stored.items() if not rows)
         if missing:
-            self.store.close()
             raise AirlockError(
                 f"The effect store is missing {len(missing)} effect(s) recorded in the signed "
                 f"receipt journal (first: {missing[0]}). Refusing to run so no owned effect is "
                 "dispatched again. Restore .airlock/local/permit.sqlite3 from backup "
                 "(see docs/operations.md)."
             )
+        for rows in stored.values():
+            for owner in rows:
+                old_header_hash = (
+                    owner["descriptor"].get("semantic_key", {}).get("headers_effect_sha256")
+                )
+                if old_header_hash not in (None, digest({})) and owner["state"] != "NOT_EXECUTED":
+                    raise AirlockError(
+                        "The effect store contains legacy header-dependent ownership; "
+                        "upgrade blocked. Preserve the state and run airlock recovery-inventory "
+                        "(see docs/operations.md); no automatic migration is supported"
+                    )
+        for reservation_id, ref in attempts.items():
+            rows = stored[ref["effect_id"]]
+            owner = next(
+                (
+                    r
+                    for r in rows
+                    if r["reference"]
+                    == {
+                        k: ref[k]
+                        for k in ("profile", "effect_id", "reservation_id", "owner_attempt_id")
+                    }
+                ),
+                None,
+            )
+            expected = outcomes.get(reservation_id)
+            if (
+                owner is None
+                or (expected and owner["state"] != expected)
+                or (expected is None and owner["state"] == "NOT_EXECUTED")
+            ):
+                raise AirlockError(
+                    "The effect store is missing or contradicts a journal-recorded attempt; "
+                    "refusing execution until trusted recovery"
+                )
 
     def http_timeout(self, url):
         return 30
@@ -306,8 +418,12 @@ class Broker:
         if not isinstance(headers, dict):
             raise AirlockError("Headers must be an object")
         for name, value in headers.items():
+            if not isinstance(name, str):
+                raise AirlockError("Header names must be strings")
             if not isinstance(value, str):
                 raise AirlockError("Header values must be strings")
+            if name.lower() in SDK_DIAGNOSTIC_HEADERS:
+                continue
             if name.lower() == "host" and value.lower() != urlsplit(url).netloc.lower():
                 raise AirlockError("Host header differs from the approved URL")
             if name.lower() in {"proxy-authorization", "transfer-encoding"}:
@@ -330,35 +446,31 @@ class Broker:
         return out, released
 
     def _effect_headers(self, headers: dict) -> dict:
-        """The headers that define a logical effect: semantic ones and credential identity.
+        """Validate supported headers; retain a conservative header-independent hold.
 
-        Credential headers contribute which bound credential and origin they use,
-        not their literal formatting. Never raw secrets or random handles.
+        Unknown header semantics require a provider-specific executor. This
+        guard cannot prove semantic equivalence of arbitrary HTTP requests.
         """
-        out = {}
         seen = set()
-        names = {marker: name for name, marker in self.markers.items()}
-        for name, value in headers.items():
+        for name in headers:
             normalized = name.lower()
+            if normalized not in SUPPORTED_HTTP_HEADERS:
+                raise AirlockError(
+                    "HTTP header requires a supported consequence contract: " + normalized
+                )
             if normalized in seen:
                 raise AirlockError("Duplicate case-insensitive HTTP header names are unsupported")
             seen.add(normalized)
-            credentials = []
-            for match in MARKER.finditer(value):
-                marker = match.group()
-                if marker not in names:
-                    raise AirlockError("Unknown credential handle")
-                credentials.append(
-                    {"credential": names[marker], "origin": self.credentials[marker][1]}
-                )
-            if credentials:
-                out[normalized] = credentials
-            elif normalized in SEMANTIC_HEADERS:
-                out[normalized] = [{"literal": value}]
-        return out
+        return {}
 
     def _http_effect_descriptor(self, intent) -> dict:
-        """Trusted HTTP byte identity, independent of code/proof/run metadata."""
+        """Conservative byte-request hold, NOT a universal provider semantic identity.
+
+        Header changes never release an owned request. This deliberately holds
+        even potentially distinct header-dependent operations: a supported
+        provider contract is needed to distinguish them safely. Exact headers
+        remain bound to the proof through headers_sha256.
+        """
         return {
             "profile": EFFECT_PROFILE,
             "namespace": self.effect_namespace,
@@ -605,6 +717,17 @@ class Broker:
                     outcome.reason_code or "Kernel refused",
                     kernel=outcome.to_dict(),
                     credential_released=dispatch.credential_released,
+                    **(
+                        {
+                            "outcome": effect_evidence["outcome"],
+                            "effect_id": effect_evidence["effect_id"],
+                            "effect": effect_evidence,
+                            "proof_id": proof.pccb_id,
+                            "parent_receipt_id": pending["id"],
+                        }
+                        if effect_evidence
+                        else {}
+                    ),
                     **labels,
                 )
             released = dispatch.stage == "released"

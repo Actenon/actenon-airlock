@@ -1,0 +1,23 @@
+{
+  "schema": "actenon-airlock/offline-verification/v1",
+  "ok": false,
+  "integrity": {
+    "ok": true,
+    "receipts": 6,
+    "verified": 6,
+    "chain_head_sha256": "97b87fafd4e66c363b39fb33271c3a37c28a7693e279219b8399b95248ae3c94",
+    "problems": []
+  },
+  "completeness": {
+    "status": "UNANCHORED",
+    "detail": "no checkpoint supplied; a truncated or rolled-back journal is undetectable"
+  },
+  "provider_truth": {
+    "independently_observed": {},
+    "runtime_claims": {
+      "COMMITTED": 1
+    },
+    "unresolved_ambiguous": [],
+    "refusals_without_effect": 3
+  }
+}
