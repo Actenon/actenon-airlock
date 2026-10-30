@@ -349,7 +349,8 @@ class Broker:
                 if old_header_hash not in (None, digest({})) and owner["state"] != "NOT_EXECUTED":
                     raise AirlockError(
                         "The effect store contains legacy header-dependent ownership; "
-                        "trusted migration is required before execution"
+                        "upgrade blocked. Preserve the state and run airlock recovery-inventory "
+                        "(see docs/operations.md); no automatic migration is supported"
                     )
         for reservation_id, ref in attempts.items():
             rows = stored[ref["effect_id"]]

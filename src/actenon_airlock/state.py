@@ -159,9 +159,10 @@ class State:
     def receipt(self, value: dict) -> dict:
         """Append one signed receipt using the current durable journal head.
 
-        Key caching is safe; chain-head caching is not. Both signing and append
-        occur under one process-shared lock, with fsync before release. An
-        interrupted partial write is preserved and blocks further append.
+        Reuse a verified prefix only after comparing its exact bytes under the
+        process-shared lock. Other writers' suffixes are always verified; any
+        prefix change falls back to full verification. No inode/mtime trust or
+        persistent cache. An interrupted partial write blocks further append.
         """
         with self._receipt_journal_lock(exclusive=True):
             if not hasattr(self, "_receipt_key"):
@@ -173,16 +174,21 @@ class State:
                 journal = b""
             if journal and not journal.endswith(b"\n"):
                 raise AirlockError("Receipt journal has an incomplete append; refusing to append")
-            verified = verify_receipt_lines(
-                journal.splitlines(), base64.b64encode(key.public_key_bytes).decode()
+            public = base64.b64encode(key.public_key_bytes).decode()
+            cached_public, prefix, head = getattr(
+                self, "_verified_receipt_prefix", (None, b"", None)
             )
+            if cached_public == public and journal.startswith(prefix):
+                verified = _verify_receipt_suffix(journal[len(prefix) :].splitlines(), public, head)
+            else:
+                verified = verify_receipt_lines(journal.splitlines(), public)
             if not verified["ok"]:
                 raise AirlockError("Receipt journal is invalid; refusing to append")
             row = {
                 **value,
                 "schema": RECEIPT_SCHEMA,
                 "signer_key_id": key.key_id,
-                "prev": _last_line_digest(self.receipts_path),
+                "prev": verified["chain_head_sha256"],
             }
             signature = Ed25519PrivateKey.from_private_bytes(key.private_key_bytes).sign(
                 RECEIPT_DOMAIN + canonical(row)
@@ -203,6 +209,10 @@ class State:
                 os.fsync(directory_fd)
             finally:
                 os.close(directory_fd)
+            # Cache only input bytes that passed the entire verifier, including
+            # nested observer evidence. Signing the new row alone does NOT prove
+            # that its contents are valid; verify it on the next append as well.
+            self._verified_receipt_prefix = (public, journal, verified["chain_head_sha256"])
             return row
 
     def verify_receipts(self) -> dict:
@@ -234,8 +244,13 @@ def verify_receipt_lines(lines: list[bytes], public: str) -> dict:
     Pure: no project state, lock or file access, so the same check runs on a
     live project and on an exported journal offline.
     """
+    return _verify_receipt_suffix(lines, public, None)
+
+
+def _verify_receipt_suffix(lines: list[bytes], public: str, prev: str | None) -> dict:
+    """Internal continuation from an exact, already verified in-memory prefix."""
     verifier = Ed25519PublicKey.from_public_bytes(base64.b64decode(public, validate=True))
-    rows, prev = [], None
+    rows = []
     for number, line in enumerate(lines, 1):
         problem, row = None, {}
         try:
@@ -400,26 +415,3 @@ def export_compliance_bundle(
     if output_path is not None:
         atomic_json(Path(output_path), bundle, 0o644)
     return bundle
-
-
-def _last_line_digest(path: Path) -> str | None:
-    try:
-        with path.open("rb") as stream:
-            stream.seek(0, os.SEEK_END)
-            end = stream.tell()
-            size = min(end, 1 << 20)
-            while True:
-                stream.seek(end - size)
-                raw_tail = stream.read(size)
-                if raw_tail and not raw_tail.endswith(b"\n"):
-                    raise AirlockError(
-                        "Receipt journal has an incomplete append; preserve it for recovery"
-                    )
-                tail = raw_tail.rstrip(b"\n")
-                if b"\n" in tail or size == end:
-                    break
-                size = min(end, size * 2)
-    except FileNotFoundError:
-        return None
-    last = tail.rsplit(b"\n", 1)[-1]
-    return hashlib.sha256(last).hexdigest() if last else None
