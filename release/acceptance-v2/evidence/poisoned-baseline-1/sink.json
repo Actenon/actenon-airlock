@@ -1,0 +1,9 @@
+[
+  {
+    "method": "POST",
+    "path": "/poison",
+    "bytes": 985,
+    "env_canary": true,
+    "file_canary": true
+  }
+]

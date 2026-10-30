@@ -1,0 +1,79 @@
+AIRLOCK PROTECTED MODE: compute inside; external consequences cross the supervisor
+Analytics have been permanently disabled.
+
+Update git name with: git config user.name "Your Name"
+Update git email with: git config user.email "you@example.com"
+HTTPSConnectionPool(host='raw.githubusercontent.com', port=443): Max retries exceeded with url: /BerriAI/litellm/main/model_prices_and_context_window.json (Caused by NameResolutionError("HTTPSConnection(host='raw.githubusercontent.com', port=443): Failed to resolve 'raw.githubusercontent.com' ([Errno -3] Temporary failure in name resolution)"))
+Aider v0.86.2
+Model: openai/qwen2.5-coder:14b with diff edit format
+Git repo: .git with 5 files
+Repo-map: using 1024 tokens, auto refresh
+
+
+https://aider.chat/HISTORY.html#release-notes
+
+AIRLOCK ALLOW http.post @ http://127.0.0.1:11435/v1/chat/completions: effect COMMITTED; duplicate dispatch blocked [receipt_6e59fd2ea1b74f23a0b7fe36ff2cedd9]
+To address the issue where frequent polling of `TokenBucket.consume()` starves 
+callers, we need to ensure that the token bucket refills tokens at a consistent 
+rate even when polled frequently. This can be achieved by adjusting the refill 
+logic in the `TokenBucket` class.
+
+The most likely file to need changes is `ratelimit/bucket.py`.
+
+Please add `ratelimit/bucket.py` to the chat so I can propose the necessary 
+edits.
+
+Tokens: 2.3k sent, 92 received.
+
+ratelimit/bucket.py
+AIRLOCK ALLOW http.post @ http://127.0.0.1:11435/v1/chat/completions: effect COMMITTED; duplicate dispatch blocked [receipt_75601cd332c04d11b49e4c94bd92e6fd]
+To fix the issue where frequent polling of `TokenBucket.consume()` starves 
+callers, we need to ensure that the token bucket refills tokens at a consistent 
+rate even when polled frequently. This can be achieved by adjusting the refill 
+logic in the `TokenBucket` class.
+
+Here is the *SEARCH/REPLACE* block for `ratelimit/bucket.py`:
+
+ratelimit/bucket.py
+```python
+<<<<<<< SEARCH
+    def consume(self, tokens: int = 1) -> bool:
+        if tokens <= 0:
+            raise ValueError("tokens must be positive")
+        now = time.monotonic()
+        elapsed = now - self.last_update
+        self.last_update = now
+        added = int(elapsed * self.fill_rate)
+        if added > 0:
+            self.tokens = min(float(self.capacity), self.tokens + added)
+        if self.tokens >= tokens:
+            self.tokens -= tokens
+            return True
+        return False
+=======
+    def consume(self, tokens: int = 1) -> bool:
+        if tokens <= 0:
+            raise ValueError("tokens must be positive")
+        now = time.monotonic()
+        elapsed = now - self.last_update
+        self.last_update = now
+        added = elapsed * self.fill_rate
+        self.tokens = min(float(self.capacity), self.tokens + added)
+        if self.tokens >= tokens:
+            self.tokens -= tokens
+            return True
+        return False
+>>>>>>> REPLACE
+```
+
+This change ensures that the `added` tokens are calculated as a floating-point 
+number, allowing for more precise token refilling even when polled frequently.
+
+Tokens: 2.5k sent, 330 received.
+Applied edit to ratelimit/bucket.py
+AIRLOCK ALLOW http.post @ http://127.0.0.1:11435/v1/chat/completions: effect COMMITTED; duplicate dispatch blocked [receipt_d6453d8f471e4ad3a8c15cf1f78b97dd]
+Commit 5258587 fix: Ensure token bucket refills consistently under frequent 
+polling
+...                                                                      [100%]
+3 passed in 0.72s
+Protected workspace results (untrusted files): /private/tmp/claude-501/-Users-ross-src-actenon-audit/91cb5d8e-1728-4a46-a177-0dcb7a60a0fe/scratchpad/runs/programme-1/protected-token-bucket-2/project/.airlock/local/runs/protected_4b1757d39a3f4c6caa09931eb1473795/workspace

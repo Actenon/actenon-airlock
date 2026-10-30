@@ -14,9 +14,8 @@
     "BLOCKED"
   ],
   "assessed": {
-    "date": "2026-10-29",
-    "by": "Claude Code session; self-assessment, not independent reproduction",
-    "candidate": "integration/candidate-2026-10-29 (draft PR #16)"
+    "commit": "67837913f9379772f93ed9e34d244f187e1dde3f",
+    "date": "2026-10-30"
   },
   "requirements": [
     {
@@ -30,36 +29,36 @@
       "id": "A2",
       "section": "A",
       "requirement": "Every advertised language/profile, with Kernel and Airlock SDK pins reconciled",
-      "status": "BLOCKED",
-      "evidence": "Go/Rust/TypeScript SDKs not evaluated in this pass"
+      "status": "VERIFIED IN THIS ENVIRONMENT",
+      "evidence": "Conformance 1.1.0 reproduced in Python, TypeScript, Go and Rust at the pinned SDK commits: release/acceptance-v2/evidence/sdk-conformance.log"
     },
     {
       "id": "A3",
       "section": "A",
       "requirement": "Wire conformance, stateless verification, replay enforcement and effect protection distinguished",
-      "status": "BLOCKED",
-      "evidence": "Not evaluated in this pass"
+      "status": "IMPLEMENTED",
+      "evidence": "Each layer is tested separately (Kernel conformance/MATRIX.md, tests/test_effect_durability.py) and docs/enforcement.md separates them; no single report distinguishes all four"
     },
     {
       "id": "B1",
       "section": "B",
       "requirement": "Policy, proof, verification and dispatch operate on one validated typed request",
-      "status": "BLOCKED",
-      "evidence": "Not evaluated in this pass"
+      "status": "VERIFIED IN THIS ENVIRONMENT",
+      "evidence": "tests/test_independent_authority.py: typed changes are denied before provider I/O and a mutation after policy cannot change the dispatched request. Covers the reviewed GitHub creation path"
     },
     {
       "id": "B2",
       "section": "B",
       "requirement": "Typed-normalization cases (1.0 vs \"1.0\", bool vs int, tuple vs list, Unicode, large ints) traced to dispatch",
-      "status": "BLOCKED",
-      "evidence": "Not evaluated in this pass"
+      "status": "VERIFIED IN THIS ENVIRONMENT",
+      "evidence": "tests/fixtures/independent/canonical.json covers bool vs integer, numeric forms, Unicode ordering, large integers and nested authority. Tuple vs list has no JSON form"
     },
     {
       "id": "B3",
       "section": "B",
       "requirement": "Raw-byte negative corpus run against every implementation with decision and canonical-byte comparison",
-      "status": "BLOCKED",
-      "evidence": "Not evaluated in this pass"
+      "status": "VERIFIED IN THIS ENVIRONMENT",
+      "evidence": "32 raw cases across Python, TypeScript, Go and Rust: no byte mismatch and no unsafe acceptance; TypeScript and Rust each safely refuse 4. release/acceptance-v2/evidence/canonical-parity.json"
     },
     {
       "id": "C1",
@@ -79,8 +78,8 @@
       "id": "C3",
       "section": "C",
       "requirement": "IPv6, DNS, proxies, native code, host/Docker sockets, inherited environment, fake manifests",
-      "status": "BLOCKED",
-      "evidence": "Not all individually evidenced in this pass"
+      "status": "VERIFIED IN THIS ENVIRONMENT",
+      "evidence": "acceptance/v2 controls with a working positive control, plus tests/test_independent_container.py: IPv4, IPv6, DNS, proxy, native and raw sockets, nested processes, Docker socket, inherited environment, fabricated approvals"
     },
     {
       "id": "C4",
@@ -100,50 +99,50 @@
       "id": "D2",
       "section": "D",
       "requirement": "Durable reservation tested across threads, separate processes, restarts, crashes and response loss",
-      "status": "BLOCKED",
-      "evidence": "Separate-process tests exist for Permit's experimental OpenAPI adapter only, not Airlock's supported GitHub path"
+      "status": "VERIFIED IN THIS ENVIRONMENT",
+      "evidence": "tests/test_effect_durability.py: eight racing processes dispatch once, SIGKILL after dispatch keeps ownership; flagship result D covers response loss"
     },
     {
       "id": "D3",
       "section": "D",
       "requirement": "Reconciliation binds effect, reservation, attempt and reviewed state; replay cannot authorize a duplicate",
-      "status": "IMPLEMENTED",
-      "evidence": "airlock reconcile with operator key; not re-verified in this pass"
+      "status": "VERIFIED IN THIS ENVIRONMENT",
+      "evidence": "tests/test_reconciliation.py, tests/test_github_observer.py and flagship results C and D"
     },
     {
       "id": "E1",
       "section": "E",
       "requirement": "Frozen external agent solves the task in the matched baseline",
       "status": "FAIL",
-      "evidence": "All 8 recorded runs failed (docs/evidence/frozen-acceptance-history)"
+      "evidence": "Unchanged: all 8 recorded frozen runs failed. Separately, in acceptance v2 Aider's baseline solved 1 of 5 tasks. v2 results are not substituted here"
     },
     {
       "id": "E2",
       "section": "E",
       "requirement": "Protected run of the same agent: useful work, one approved GitHub mutation, then boundary attacks",
       "status": "BLOCKED",
-      "evidence": "Requires E1 to pass first"
+      "evidence": "The frozen programme remains blocked by E1. Acceptance v2 evidence is reported separately"
     },
     {
       "id": "E3",
       "section": "E",
       "requirement": "Three-original-repository / ten-case gate",
       "status": "BLOCKED",
-      "evidence": "Not run"
+      "evidence": "Not run. Acceptance v2 used five synthetic tasks, which is not this gate"
     },
     {
       "id": "F1",
       "section": "F",
       "requirement": "One documented entry point for discovery, review, authority diff, protected run and evidence",
-      "status": "IMPLEMENTED",
-      "evidence": "airlock CLI: init, diff, check, doctor, run --protected, receipts, reconcile"
+      "status": "VERIFIED IN THIS ENVIRONMENT",
+      "evidence": "airlock setup through reconcile, exercised end to end by acceptance/v2/flagship.py"
     },
     {
       "id": "F2",
       "section": "F",
       "requirement": "Clean candidate installation from built artifacts, no sibling checkouts or editable installs",
       "status": "VERIFIED IN THIS ENVIRONMENT",
-      "evidence": "CI Package job builds the wheel and installs it in a fresh venv with pinned VCS dependencies"
+      "evidence": "Scored programme ran from a wheel built at the frozen commit and installed in a fresh environment; release/acceptance-v2/evidence/install.json"
     },
     {
       "id": "F3",
@@ -156,8 +155,8 @@
       "id": "F4",
       "section": "F",
       "requirement": "Independent offline verifier; tampering, removal, reordering and rollback tested",
-      "status": "BLOCKED",
-      "evidence": "Receipt verification exists; the full tamper matrix was not re-run in this pass"
+      "status": "VERIFIED IN THIS ENVIRONMENT",
+      "evidence": "tests/test_offline_evidence.py covers tampering, removal, reordering, truncation, rollback and re-signing; flagship result D. It ships in the Airlock package and is not a separate implementation"
     },
     {
       "id": "F5",

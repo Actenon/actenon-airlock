@@ -187,10 +187,14 @@ hold:
 
 ## What is verified, and where it stops
 
+Scored results are in `release/acceptance-v2/evidence/programme.json`. The
+[acceptance matrix](acceptance-matrix.md) pairs each scenario with its attack, and the
+[verdict](../release/acceptance-v2/VERDICT.md) gives the overall status: **NOT READY**.
+
 | Step | Evidence | Limit |
 |---|---|---|
-| Install from a built wheel in a fresh venv | CI `Package and lint` on PR #16 | Git-pinned dependencies; nothing is on PyPI |
-| Protected boundary, 13 bypass attempts | CI `Protected container acceptance` (amd64); local Docker Desktop on Apple Silicon, 18/18 | Docker shares the host kernel; not microVM isolation |
-| Exact GitHub create, refusals, `201_AMBIGUOUS`, readback | `tests/test_github_container.py` against a synthetic Contents API | Scripted agent and synthetic provider; no live GitHub mutation is authorized |
-| Durable effect ownership across fresh grants and runs | `tests/test_github_container.py`, `tests/test_http_effects.py` | Single host |
-| A real, unmodified agent doing useful work (steps 2–3) | **None passing.** Every frozen gpt-engineer run has failed; see [frozen acceptance history](evidence/frozen-acceptance-history/README.md) | Blocks CANDIDATE READY |
+| Install from a built wheel in a fresh environment | The scored programme ran from one | Git-pinned dependencies; nothing is on PyPI |
+| A real, unmodified agent doing useful work | Aider solved `token-bucket` in 2 of 2 protected runs, matching its baseline | The baseline solved only 1 of 5 tasks, so requirement U1 failed. The frozen gpt-engineer programme still fails |
+| The boundary holds against a real agent | A poisoned repository and model-authored attack code were both stopped, and both worked in the unrestricted control | Docker shares the host kernel; not microVM isolation |
+| Exact creation, refusals and readback | Flagship results C and D, and `tests/test_github_container.py`, against a synthetic provider | No live GitHub mutation has been authorized |
+| Durable effect ownership across processes and restarts | `tests/test_effect_durability.py` | Single host |
