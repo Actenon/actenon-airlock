@@ -150,11 +150,30 @@ def main(argv=None):
     )
     parser.add_argument("--version", action="version", version=__version__)
     sub = parser.add_subparsers(dest="cmd", required=True)
-    for cmd in ("init", "diff", "check", "doctor", "run", "receipts", "reconcile"):
+    for cmd in (
+        "init", "diff", "check", "doctor", "run", "receipts", "reconcile",
+        "checkpoint", "verify-evidence",
+    ):  # fmt: skip
         p = sub.add_parser(cmd)
         p.add_argument("--path", type=Path, default=Path.cwd())
         if cmd != "run":
             p.add_argument("--json", action="store_true", help="Print machine-readable JSON")
+        if cmd == "checkpoint":
+            p.add_argument(
+                "--output", type=Path, required=True,
+                help="Where to write the signed checkpoint; keep it outside the project",
+            )  # fmt: skip
+        if cmd == "verify-evidence":
+            p.add_argument("--journal", type=Path, required=True, help="Exported receipts.jsonl")
+            p.add_argument(
+                "--public-key", required=True,
+                help="Trusted base64 Ed25519 key or public-key.json you obtained independently",
+            )  # fmt: skip
+            p.add_argument("--checkpoint", type=Path, help="Newest signed checkpoint you hold")
+            p.add_argument(
+                "--integrity-only", action="store_true",
+                help="Exit 0 on integrity alone; completeness stays UNANCHORED",
+            )  # fmt: skip
         if cmd in {"diff", "check"}:
             p.add_argument("--base", help="Compare to the signed approval at this trusted Git ref")
             p.add_argument("--output", type=Path, help="Save JSON authority diff")
@@ -260,6 +279,53 @@ def main(argv=None):
                     else "COOPERATIVE MODE ONLY: " + result["guarantees"]["protected"]["reason"]
                 )
             return 0 if result["ok"] else 2
+        if args.cmd == "checkpoint":
+            from .evidence import create_checkpoint
+
+            output = args.output.resolve()
+            if output.is_relative_to(root):
+                print(
+                    "WARNING: the checkpoint is inside the project; anything that can "
+                    "rewrite the journal can rewrite it too",
+                    file=sys.stderr,
+                )
+            checkpoint = create_checkpoint(State(root))
+            output.write_text(json.dumps(checkpoint, indent=2) + "\n")
+            payload = checkpoint["payload"]
+            print(
+                json.dumps(checkpoint, indent=2)
+                if args.json
+                else f"Checkpoint of {payload['journal_entries']} receipts written to {output}"
+            )
+            return 0
+        if args.cmd == "verify-evidence":
+            from .evidence import load_public_key, verify_offline
+
+            report = verify_offline(
+                args.journal.read_bytes(),
+                load_public_key(args.public_key),
+                json.loads(args.checkpoint.read_text()) if args.checkpoint else None,
+            )
+            if args.json:
+                print(json.dumps(report, indent=2))
+            else:
+                integrity, completeness = report["integrity"], report["completeness"]
+                truth = report["provider_truth"]
+                print(
+                    f"INTEGRITY    {'OK' if integrity['ok'] else 'FAILED'}: "
+                    f"{integrity['verified']} of {integrity['receipts']} receipts verify"
+                )
+                for problem in integrity["problems"]:
+                    print("  " + problem)
+                print(f"COMPLETENESS {completeness['status']}: {completeness['detail']}")
+                print(
+                    f"PROVIDER     observed {truth['independently_observed'] or 'none'}; "
+                    f"runtime claims {truth['runtime_claims'] or 'none'}; "
+                    f"unresolved {len(truth['unresolved_ambiguous'])}"
+                )
+            if report["integrity"]["ok"] and args.integrity_only:
+                return 0
+            return 0 if report["ok"] else 2
         if args.cmd == "receipts":
             result = State(root).verify_receipts()
             print(json.dumps(result, indent=2) if args.json else render_receipts(result))

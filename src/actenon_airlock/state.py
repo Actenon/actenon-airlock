@@ -198,7 +198,7 @@ class State:
         """Check every receipt against the project's committed public key and the hash chain."""
         try:
             public = json.loads((self.path / "public-key.json").read_text())["key"]
-            verifier = Ed25519PublicKey.from_public_bytes(base64.b64decode(public, validate=True))
+            Ed25519PublicKey.from_public_bytes(base64.b64decode(public, validate=True))
         except (OSError, ValueError, KeyError) as exc:
             raise AirlockError("Project public key is missing or invalid") from exc
         with self._receipt_journal_lock(exclusive=False):
@@ -206,94 +206,100 @@ class State:
                 lines = self.receipts_path.read_bytes().splitlines()
             except FileNotFoundError:
                 lines = []
-        rows, prev = [], None
-        for number, line in enumerate(lines, 1):
-            problem, row = None, {}
-            try:
-                row = json.loads(line)
-                signature = row["signature"]
-                if not isinstance(signature, dict):
-                    raise TypeError("signature")
-            except (ValueError, KeyError, TypeError):
-                problem = "unreadable or unsigned receipt"
-            if problem is None:
-                unsigned = {k: v for k, v in row.items() if k != "signature"}
-                if row.get("schema") != RECEIPT_SCHEMA or signature.get("algorithm") != "EdDSA":
-                    problem = "unsupported receipt schema or algorithm"
-                elif signature.get("encoding") != "base64url":
-                    problem = "unsupported receipt signature encoding"
-                elif "signer_key_id" in row and row["signer_key_id"] != signature.get("key_id"):
-                    problem = "signature key identifier differs from the signed receipt"
-                elif row.get("prev") != prev:
-                    problem = "hash chain broken (a receipt was removed, reordered, or edited)"
-                else:
-                    try:
-                        checking_observer = False
-                        verifier.verify(
-                            b64url_decode(signature["value"]), RECEIPT_DOMAIN + canonical(unsigned)
-                        )
-                        if row.get("stage") in {"reconciliation-requested", "reconciled"}:
-                            checking_observer = True
-                            from .reconciliation import verify_observation
-
-                            observation = verify_observation(
-                                row["reconciliation"],
-                                row["authority_approval"],
-                                public,
-                                at=datetime.fromisoformat(
-                                    row["settled_at"]
-                                    if row["stage"] == "reconciled"
-                                    else row["timestamp"]
-                                ),
-                            )
-                            if (
-                                any(
-                                    row.get(name) != observation[name]
-                                    for name in (
-                                        "action",
-                                        "target",
-                                        "grant_id",
-                                        "proof_id",
-                                        "source_digest",
-                                        "manifest_digest",
-                                    )
-                                )
-                                or row.get("effect_id") != observation["reference"]["effect_id"]
-                            ):
-                                raise ValueError(
-                                    "reconciliation receipt differs from its signed observation"
-                                )
-                            if row["stage"] == "reconciled" and (
-                                row.get("outcome") != observation["outcome"]
-                                or row.get("execution_occurred")
-                                is not observation["execution_occurred"]
-                            ):
-                                raise ValueError(
-                                    "reconciliation receipt contradicts its observation"
-                                )
-                    except Exception:
-                        problem = (
-                            "observer evidence does not verify against public-key.json"
-                            if checking_observer
-                            else "signature does not verify against public-key.json"
-                        )
-            prev = hashlib.sha256(line).hexdigest()
-            rows.append(
-                {"line": number, "row": row, "verified": problem is None, "problem": problem}
-            )
-        return {
-            "schema": "actenon-airlock/receipt-verification/v1",
-            "receipts": len(rows),
-            "verified": sum(r["verified"] for r in rows),
-            "ok": all(r["verified"] for r in rows),
-            "chain_head_sha256": prev,
-            "completeness": "prefix_integrity_only_without_external_anchor",
-            "rows": rows,
-        }
+        return verify_receipt_lines(lines, public)
 
     def verify_ledger(self) -> dict:
         """Verify the tamper-evident, hash-chained cryptographic ledger of Receipts and Refusals."""
         return self.verify_receipts()
+
+
+def verify_receipt_lines(lines: list[bytes], public: str) -> dict:
+    """Verify signed, hash-chained receipt lines against a trusted public key.
+
+    Pure: no project state, lock or file access, so the same check runs on a
+    live project and on an exported journal offline.
+    """
+    verifier = Ed25519PublicKey.from_public_bytes(base64.b64decode(public, validate=True))
+    rows, prev = [], None
+    for number, line in enumerate(lines, 1):
+        problem, row = None, {}
+        try:
+            row = json.loads(line)
+            signature = row["signature"]
+            if not isinstance(signature, dict):
+                raise TypeError("signature")
+        except (ValueError, KeyError, TypeError):
+            problem = "unreadable or unsigned receipt"
+        if problem is None:
+            unsigned = {k: v for k, v in row.items() if k != "signature"}
+            if row.get("schema") != RECEIPT_SCHEMA or signature.get("algorithm") != "EdDSA":
+                problem = "unsupported receipt schema or algorithm"
+            elif signature.get("encoding") != "base64url":
+                problem = "unsupported receipt signature encoding"
+            elif "signer_key_id" in row and row["signer_key_id"] != signature.get("key_id"):
+                problem = "signature key identifier differs from the signed receipt"
+            elif row.get("prev") != prev:
+                problem = "hash chain broken (a receipt was removed, reordered, or edited)"
+            else:
+                try:
+                    checking_observer = False
+                    verifier.verify(
+                        b64url_decode(signature["value"]), RECEIPT_DOMAIN + canonical(unsigned)
+                    )
+                    if row.get("stage") in {"reconciliation-requested", "reconciled"}:
+                        checking_observer = True
+                        from .reconciliation import verify_observation
+
+                        observation = verify_observation(
+                            row["reconciliation"],
+                            row["authority_approval"],
+                            public,
+                            at=datetime.fromisoformat(
+                                row["settled_at"]
+                                if row["stage"] == "reconciled"
+                                else row["timestamp"]
+                            ),
+                        )
+                        if (
+                            any(
+                                row.get(name) != observation[name]
+                                for name in (
+                                    "action",
+                                    "target",
+                                    "grant_id",
+                                    "proof_id",
+                                    "source_digest",
+                                    "manifest_digest",
+                                )
+                            )
+                            or row.get("effect_id") != observation["reference"]["effect_id"]
+                        ):
+                            raise ValueError(
+                                "reconciliation receipt differs from its signed observation"
+                            )
+                        if row["stage"] == "reconciled" and (
+                            row.get("outcome") != observation["outcome"]
+                            or row.get("execution_occurred")
+                            is not observation["execution_occurred"]
+                        ):
+                            raise ValueError("reconciliation receipt contradicts its observation")
+                except Exception:
+                    problem = (
+                        "observer evidence does not verify against public-key.json"
+                        if checking_observer
+                        else "signature does not verify against public-key.json"
+                    )
+        prev = hashlib.sha256(line).hexdigest()
+        rows.append({"line": number, "row": row, "verified": problem is None, "problem": problem})
+    return {
+        "schema": "actenon-airlock/receipt-verification/v1",
+        "receipts": len(rows),
+        "verified": sum(r["verified"] for r in rows),
+        "ok": all(r["verified"] for r in rows),
+        "chain_head_sha256": prev,
+        "completeness": "prefix_integrity_only_without_external_anchor",
+        "rows": rows,
+    }
 
 
 def verify_ledger(root_or_state: Path | str | State) -> dict:
