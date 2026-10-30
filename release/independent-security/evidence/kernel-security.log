@@ -1,0 +1,18 @@
+/Users/ross/Documents/Codex/2026-10-30/actenon-airlock-independent-north-star-engineering/work/venv/lib/python3.12/site-packages/pytest_asyncio/plugin.py:300: PytestDeprecationWarning: The configuration option "asyncio_default_fixture_loop_scope" is unset.
+The event loop scope for asynchronous fixtures will default to the "fixture" caching scope. Future versions of pytest-asyncio will default the loop scope for asynchronous fixtures to "function" scope. Set the default fixture loop scope explicitly in order to avoid unexpected behavior in the future. Valid fixture loop scopes are: "function", "class", "module", "package", "session"
+
+  warnings.warn(PytestDeprecationWarning(_DEFAULT_FIXTURE_LOOP_SCOPE_UNSET))
+............................................................... [ 18%]
+........................................................................ [ 38%]
+......................................ssssss................ssssss...... [ 59%]
+.............................................ss................ [ 77%]
+....................................................... [ 93%]
+......................                                           [100%]
+=========================== short test summary info ============================
+SKIPPED [3] tests/security/test_g3_explicit_development_intent.py:188: could not import 'mcp': No module named 'mcp'
+SKIPPED [3] tests/security/test_g3_explicit_development_intent.py:204: could not import 'mcp': No module named 'mcp'
+SKIPPED [4] tests/security/test_g3_explicit_development_intent.py:305: could not import 'mcp': No module named 'mcp'
+SKIPPED [2] tests/security/test_g3_explicit_development_intent.py:315: could not import 'mcp': No module named 'mcp'
+SKIPPED [1] tests/security/test_operation_idempotency.py:329: Reconciliation module not yet implemented (Phase 4B)
+SKIPPED [1] tests/security/test_operation_idempotency.py:344: Reconciliation module not yet implemented (Phase 4B)
+333 passed, 14 skipped, 43 subtests passed in 5.09s
