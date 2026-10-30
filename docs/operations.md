@@ -1,4 +1,46 @@
-# Recovering trusted Airlock execution state
+# Operating Airlock
+
+One supervisor on one host, with one project state directory. **Multi-host and
+high-availability deployments are not supported.** Effect ownership lives in a local
+SQLite database, so two hosts sharing a project could not exclude each other.
+
+| Topic | What to do | Evidence |
+|---|---|---|
+| Install | [Golden path](golden-path.md) step 1. Dependencies are pinned to exact commits. | Fresh-environment install from built artifacts |
+| Upgrade | Stop every supervisor, take a stopped snapshot, install, run `airlock doctor`. Startup refuses state it cannot prove safe; see [Recovering trusted execution state](#recovering-trusted-execution-state). | `tests/test_legacy_upgrade.py` |
+| Limits | Each container has 1 GiB of memory, 2 CPUs and 128 processes, with a read-only root and no network. A run has 128 model calls, 4096 output tokens per call and 64 KiB request text. Set the model read timeout with `--model-read-timeout`. Results over these bounds are refused, not truncated. | `tests/test_protected.py`, `tests/test_model_timeouts.py` |
+| Lifecycle | `setup`, `work`, `capture`, `verify-candidate`, `review-candidate`, `init --approve`, `publish`, `reconcile`. Each run gets a new workspace under `.airlock/local/runs`. | `tests/test_guided_workflow.py` |
+| Supervisor failure | The agent loses its only route out, and inference fails. Nothing falls back to Local Mode. An in-flight dispatch stays `AMBIGUOUS` and owned across restart. | `tests/test_effect_durability.py` |
+| Emergency stop | `airlock stop --reason "..."` kills the running agent within about a second and refuses dispatch and new runs. A dispatch already in flight is not recalled; it stays held. `reconcile` still works. `airlock resume --reason "..."` clears the stop and changes no effect. | `tests/test_guided_workflow.py` |
+| Revoke approval | `airlock init --approve --clear-github` removes publication authority. Held effects stay held. | `tests/test_guided_workflow.py` |
+| Rotate a provider credential | Replace it in the supervisor's environment and rerun. Effect identity does not depend on the credential, so rotation cannot release a held effect. | `tests/test_guided_workflow.py` |
+| Rotate an observer key | Approve a new `--reconciler-key` and drop the old key from approval. Past settlements stay verifiable; the old key can submit nothing new. | `tests/test_reconciliation.py` |
+| Back up | Stop first, or use SQLite's backup mechanism, and keep WAL files. Keep `public-key.json` and recent checkpoints off the host. | [Recovering trusted execution state](#recovering-trusted-execution-state) |
+| Crash recovery | Restart. Startup cross-checks the journal against the ownership store and holds execution on any disagreement. | `tests/test_effect_durability.py`, `tests/test_independent_recovery.py` |
+| Ambiguous settlement | Run `airlock reconcile effect_<id> --github-readback --operator-key <key>`. Readback never repeats the write. If it cannot confirm, the effect stays held; a timeout or 404 never proves non-execution. | `tests/test_guided_workflow.py`, `tests/test_github_observer.py` |
+| Logging and redaction | Supervisor lines go to stderr. Receipts record digests and decisions, never a credential. Bound credentials found anywhere in project input refuse the run. Agent output is not redacted, because it is not trusted to contain only what you expect. | `tests/test_protected.py`, `tests/test_guided_workflow.py` |
+| Diagnostics | `airlock doctor` for the boundary, `airlock status` for outcomes, `airlock receipts` for the journal, `airlock recovery-inventory` for stopped state. | `tests/test_independent_recovery.py` |
+
+## Known limits
+
+* The agent can read everything in its workspace copy, and it can send that text to
+  the approved model through inference. Choose the model endpoint with that in mind.
+* Docker shares the host kernel. This is container isolation, not a microVM.
+* A rollback of both the journal and the ownership store is detectable only with a
+  checkpoint held elsewhere, and it cannot be repaired from local state.
+* The agent's own answer can be wrong. `TESTS_PASSED` covers the tests you supplied.
+
+## Compatibility
+
+| Component | Validated | Not validated |
+|---|---|---|
+| Host | Ubuntu amd64 in CI; macOS arm64 through Docker Desktop 29.x | Windows; native Linux arm64 |
+| Python | 3.11 and 3.12 | Other versions |
+| Agent | Aider 0.86.2 from its pinned image | Any other agent |
+| Model route | Local Ollama through the OpenAI-compatible API | Hosted providers in an end-to-end agent run |
+| Provider | Synthetic GitHub Contents API | Live GitHub, until an owner authorizes a disposable test |
+
+# Recovering trusted execution state
 
 Protected Mode keeps keys, approval, receipts, replay state and effect ownership outside the agent container. Preserve that boundary. This guide covers the candidate's fail-closed recovery checks; it does not grant permission to clear an ambiguous effect.
 

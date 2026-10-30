@@ -11,6 +11,7 @@ import threading
 from contextlib import contextmanager
 from datetime import UTC, datetime
 from pathlib import Path
+from uuid import uuid4
 
 from actenon.proof.signers.base import b64url_decode, b64url_encode
 from actenon_permit.ed25519_signer import (
@@ -61,6 +62,41 @@ class State:
         self.path = self.root / ".airlock"
         self.local = self.path / "local"
         self.key_path = self.local / "key.json"
+
+    def emergency_stop(self) -> dict | None:
+        """Operator-held and outside the agent's reach; an unreadable marker still stops."""
+        try:
+            return json.loads((self.local / "emergency-stop.json").read_text())
+        except FileNotFoundError:
+            return None
+        except ValueError:
+            return {"reason": "unreadable emergency stop marker"}
+
+    def _record_stop(self, action: str, reason: str) -> None:
+        self.receipt(
+            {
+                "id": "receipt_" + uuid4().hex,
+                "timestamp": datetime.now(UTC).isoformat(),
+                "action": action,
+                "target": "<protected boundary>",
+                "reason": reason,
+                "decision": "OBSERVED",
+                "credential_released": False,
+                "execution_occurred": False,
+            }
+        )
+
+    def set_emergency_stop(self, reason: str) -> None:
+        self.initialize()
+        atomic_json(
+            self.local / "emergency-stop.json",
+            {"reason": reason, "timestamp": datetime.now(UTC).isoformat()},
+        )
+        self._record_stop("emergency.stop", reason)
+
+    def clear_emergency_stop(self, reason: str) -> None:
+        (self.local / "emergency-stop.json").unlink(missing_ok=True)
+        self._record_stop("emergency.resume", reason)
 
     def initialize(self) -> None:
         if self.path.is_symlink() or self.local.is_symlink():

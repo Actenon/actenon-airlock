@@ -195,6 +195,7 @@ class ProtectedBroker(Broker):
     """
 
     def __init__(self, state, current, bindings=None):
+        self.inference_run = uuid4().hex
         self.approval = state.approved()
         self.approval_envelope = json.loads((state.path / "approved.json").read_text())
         if self.approval_envelope.get("payload") != self.approval:
@@ -269,7 +270,11 @@ class ProtectedBroker(Broker):
 
     def _http_effect_descriptor(self, intent):
         if intent.target.resource_id in self.model_transports:
-            return super()._http_effect_descriptor(intent)
+            # Inference is not an external mutation, so ownership is scoped to this
+            # run: a rerun may send the same first prompt. Within a run a duplicate
+            # or unresolved call stays held, and each run has its own call budget.
+            base = super()._http_effect_descriptor(intent)
+            return {**base, "semantic_key": {**base["semantic_key"], "run": self.inference_run}}
         return project_intent(intent, self.github_profiles, self.effect_namespace)
 
     def grant_principal(self):
@@ -410,6 +415,8 @@ class ProtectedBroker(Broker):
         return "AMBIGUOUS", None
 
     def handle(self, message):
+        if self.state.emergency_stop():
+            return self._deny("emergency.stop", "<protected boundary>", "Emergency stop is active")
         if message.get("kind") != "protected-http":
             return self._deny(
                 "unsupported", "<protected boundary>", "No protected executor for this request"
@@ -584,6 +591,8 @@ def launch_protected(root, command, *, image=DEFAULT_IMAGE):
     if current["parse_errors"]:
         raise AirlockError("Source parse errors block protected launch")
     state = State(root)
+    if state.emergency_stop():
+        raise AirlockError("Emergency stop is active; an operator must run airlock resume")
     approved = state.approved()
     diff = authority_diff(approved, current)
     broker = ProtectedBroker(state, current, approved.get("credential_bindings", {}))
@@ -768,6 +777,14 @@ def launch_protected(root, command, *, image=DEFAULT_IMAGE):
         agent_process = subprocess.Popen(
             [docker.binary, "start", "-a", agent_id], env=docker.environment
         )
+
+        def watch():
+            while not stopping.wait(1):
+                if state.emergency_stop():
+                    docker.call(["kill", agent_id])
+                    return
+
+        threading.Thread(target=watch, daemon=True).start()
         attach_result = agent_process.wait()
         observed_state = docker.json(["inspect", agent_id])[0]["State"]
         if (
