@@ -584,15 +584,15 @@ def _verify_container(docker, identity, *, agent, mounts):
 
 
 def launch_protected(root, command, *, image=DEFAULT_IMAGE):
+    state = State(root)
+    if state.emergency_stop():  # First, so a stop holds even when Docker does not.
+        raise AirlockError("Emergency stop is active; an operator must run airlock resume")
     docker = Docker()
     engine = docker.verify_engine()  # Mandatory: no cooperative fallback.
     resolved = docker.image(image)
     current = discover(root)
     if current["parse_errors"]:
         raise AirlockError("Source parse errors block protected launch")
-    state = State(root)
-    if state.emergency_stop():
-        raise AirlockError("Emergency stop is active; an operator must run airlock resume")
     approved = state.approved()
     diff = authority_diff(approved, current)
     broker = ProtectedBroker(state, current, approved.get("credential_bindings", {}))

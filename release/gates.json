@@ -508,7 +508,17 @@
         "allowed_skips": [],
         "must_pass": [
           "tests.test_github_container::test_actual_container_github_grant_and_denials",
-          "tests.test_protected::test_same_contained_environment_runs_engineering_workflow_and_refuses_bypass"
+          "tests.test_protected::test_same_contained_environment_runs_engineering_workflow_and_refuses_bypass",
+          "tests.test_guided_workflow::test_verification_runs_trusted_tests_in_a_contained_container",
+          "tests.test_guided_workflow::test_emergency_stop_kills_a_running_protected_agent"
+        ]
+      },
+      {
+        "artifact": "protected-container-acceptance",
+        "file": "independent-boundary-results.xml",
+        "allowed_skips": [],
+        "must_pass": [
+          "tests.test_independent_container::test_owned_transport_controls_and_protected_boundary"
         ]
       },
       {
@@ -516,7 +526,10 @@
         "file": "test-results.xml",
         "allowed_skips": [
           "tests.test_github_container::test_actual_container_github_grant_and_denials",
-          "tests.test_protected::test_same_contained_environment_runs_engineering_workflow_and_refuses_bypass"
+          "tests.test_protected::test_same_contained_environment_runs_engineering_workflow_and_refuses_bypass",
+          "tests.test_guided_workflow::test_verification_runs_trusted_tests_in_a_contained_container",
+          "tests.test_guided_workflow::test_emergency_stop_kills_a_running_protected_agent",
+          "tests.test_independent_container::test_owned_transport_controls_and_protected_boundary"
         ],
         "must_pass": []
       },
@@ -525,7 +538,10 @@
         "file": "test-results.xml",
         "allowed_skips": [
           "tests.test_github_container::test_actual_container_github_grant_and_denials",
-          "tests.test_protected::test_same_contained_environment_runs_engineering_workflow_and_refuses_bypass"
+          "tests.test_protected::test_same_contained_environment_runs_engineering_workflow_and_refuses_bypass",
+          "tests.test_guided_workflow::test_verification_runs_trusted_tests_in_a_contained_container",
+          "tests.test_guided_workflow::test_emergency_stop_kills_a_running_protected_agent",
+          "tests.test_independent_container::test_owned_transport_controls_and_protected_boundary"
         ],
         "must_pass": []
       }

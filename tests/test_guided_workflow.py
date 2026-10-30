@@ -31,7 +31,6 @@ from actenon_airlock.workflow import (
 )
 
 ENDPOINT = "http://127.0.0.1:11435/v1/chat/completions"
-UNUSED_IMAGE = os.environ.get("AIRLOCK_TEST_PROTECTED_IMAGE", "actenon-airlock-compute:dev")
 
 
 class Project:
@@ -316,7 +315,7 @@ def test_emergency_stop_blocks_dispatch_but_not_settlement(project):
     assert project.publish(sha256)["reason"] == "Emergency stop is active"
     assert len(project.mutations()) == 1
     with pytest.raises(AirlockError, match="Emergency stop"):
-        launch_protected(project.root, ["true"], image=UNUSED_IMAGE)
+        launch_protected(project.root, ["true"], image="no-such-image:never-built")
     # Read-only settlement is what an operator needs most during an incident.
     assert project.reconcile(first["effect_id"]) == 0
     assert status(project.state)["independently_observed"] == {"COMMITTED": 1}
