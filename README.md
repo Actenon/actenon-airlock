@@ -18,14 +18,13 @@ Python 3.11+ on Linux or macOS, with Git installed:
 ~~~sh
 python3 -m venv .venv
 . .venv/bin/activate
-python -m pip install "git+https://github.com/Actenon/actenon-airlock.git@feat/protected-acceptance"
+python -m pip install "git+https://github.com/Actenon/actenon-airlock.git@feat/airlock-north-star"
 airlock doctor
 ~~~
 
 One Airlock installation includes Scan, Permit, Kernel, and Protocol at the exact commits in
 [dependency-pins.json](evidence/dependency-pins.json). Install your agent's own requirements
-in the same environment. This command follows the development branch in
-[candidate PR #13](https://github.com/Actenon/actenon-airlock/pull/13). For repeatable testing,
+in the same environment. This command follows a development branch. For repeatable testing,
 replace the branch with the exact reviewed Airlock commit. It is not a production release.
 
 ## Quickstart
@@ -73,6 +72,26 @@ to activate the new resolved powers. Templates and unknown targets stay blocked 
 For a demonstration without any external account, run examples/server.py directly in one terminal.
 In another terminal, change into examples/agent and run init --approve followed by run.
 Then change the POST to DELETE in main.py: diff shows the new power and run denies it.
+
+## Protect an existing coding agent
+
+Protected Mode runs a third-party agent with no network, no credentials and no way to
+reach your project. It can still do useful work. Model calls and one reviewed consequence
+cross a supervisor you control:
+
+~~~sh
+airlock doctor
+airlock setup --agent aider --model MODEL --model-endpoint URL --approve
+airlock work --message-file ISSUE.md --test-command "python -m pytest -q"
+airlock capture
+airlock status
+~~~
+
+Nothing the agent produces is executed on your host or published until you approve its
+exact bytes. The [golden path](docs/golden-path.md) walks all ten steps, and
+`acceptance/v2/flagship.py` runs the whole journey, attack included, against a synthetic
+provider on your own machine. For stopping, rotating and recovering, see
+[operations](docs/operations.md).
 
 ## Credentials and receipts
 

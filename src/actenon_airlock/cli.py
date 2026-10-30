@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import argparse
+import dataclasses
 import hashlib
 import importlib.metadata
 import json
@@ -144,6 +145,193 @@ def doctor(root: Path):
     }
 
 
+WORKFLOW_COMMANDS = {
+    "setup", "work", "capture", "verify-candidate", "review-candidate", "publish", "status",
+    "synthetic-provider", "stop", "resume",
+}  # fmt: skip
+
+
+def _workflow_command(args, root: Path) -> int:
+    """The guided path. Every consequence still goes through the existing broker."""
+    from .agents import command, declaration, require_supported, write_declaration
+    from .synthetic_github import TOKEN, create_provider, synthetic_client
+    from .workflow import (
+        TESTS_PASSED,
+        capture_candidate,
+        publish_candidate,
+        status,
+        verify_candidate,
+    )
+
+    state = State(root)
+    config_path = state.path / "agent.json"
+    if args.cmd == "setup":
+        profile = require_supported(args.agent)
+        state.initialize()
+        write_declaration(root, declaration(args.model, args.model_endpoint))
+        config = {
+            "agent": args.agent,
+            "model": args.model,
+            "model_endpoint": args.model_endpoint,
+            "image": profile["image"],
+        }
+        config_path.write_text(json.dumps(config, indent=2) + "\n")
+        forwarded = [
+            "init", "--path", str(root), "--command", "airlock_agent.py", "--model", args.model,
+            "--model-endpoint", args.model_endpoint, "--model-max-tokens", "4096",
+            "--model-read-timeout", "600",
+        ]  # fmt: skip
+        if args.reconciler_key:
+            forwarded += ["--reconciler-key", str(args.reconciler_key)]
+        return main([*forwarded, *(["--approve"] if args.approve else [])])
+    if args.cmd == "work":
+        from .protected import launch_protected
+
+        try:
+            config = json.loads(config_path.read_text())
+        except OSError as exc:
+            raise AirlockError("No agent configured; run airlock setup first") from exc
+        if not (root / args.message_file).resolve().is_relative_to(root.resolve()):
+            raise AirlockError("The message file must be inside the project the agent receives")
+        return launch_protected(
+            root,
+            command(config["agent"], config["model"], args.message_file, args.test_command),
+            image=args.image or config["image"],
+        )
+    if args.cmd == "capture":
+        manifest = capture_candidate(state)
+        if args.json:
+            print(json.dumps(manifest, indent=2))
+        else:
+            print("UNTRUSTED agent output captured; nothing was executed or approved.")
+            for change in manifest["changes"]:
+                print(f"  {change['status']:<9}{change['path']}")
+            print("Candidate " + manifest["candidate_sha256"])
+        return 0
+    if args.cmd == "verify-candidate":
+        from .protected import DEFAULT_IMAGE
+
+        result = verify_candidate(
+            state, args.candidate, args.tests.resolve(), image=args.image or DEFAULT_IMAGE
+        )
+        if args.json:
+            print(json.dumps(result, indent=2))
+        else:
+            print(f"{result['verdict']}: {result['detail']}")
+            print("Specified tests only. This is not a safety finding and approves nothing.")
+        return 0 if result["verdict"] == TESTS_PASSED else 2
+    if args.cmd == "review-candidate":
+        from .github_consequence import ReviewedGitHubCreate
+        from .github_runtime import PROFILE_SCHEMA
+
+        patch = state.local / "candidates" / args.candidate / "candidate.patch"
+        if not patch.is_file():
+            raise AirlockError("Unknown candidate; run airlock capture first")
+        facts = {
+            "repo_id": args.repo_id,
+            "repo_node_id": args.repo_node_id,
+            "owner": args.owner,
+            "repo": args.repo,
+            "branch": args.branch,
+            "expected_parent_sha": args.parent,
+        }
+        if args.synthetic_provider:
+            provider = json.loads(args.synthetic_provider.read_text())
+            repository = provider["repository"]
+            facts = {
+                "repo_id": repository["id"],
+                "repo_node_id": repository["node_id"],
+                "owner": repository["owner"],
+                "repo": repository["name"],
+                "branch": provider["branch"],
+                "expected_parent_sha": provider["head"],
+            }
+        missing = sorted(name for name, value in facts.items() if value is None)
+        if missing:
+            raise AirlockError("Repository facts are required: " + ", ".join(missing))
+        review = ReviewedGitHubCreate(
+            **facts,
+            path=args.path_in_repo,
+            message=args.message,
+            content_sha256=args.candidate,
+        )
+        profile = {
+            "schema": PROFILE_SCHEMA,
+            "exclusive_writer": True,
+            "credential_name": "GITHUB_TOKEN",
+            "review": dataclasses.asdict(review),
+        }
+        args.output.write_text(json.dumps(profile, indent=2) + "\n")
+        config = json.loads(config_path.read_text())
+        write_declaration(
+            root, declaration(config["model"], config["model_endpoint"], (review.contents_url,))
+        )
+        print(f"Proposed: create {review.path} in {review.owner}/{review.repo}@{review.branch}")
+        print(f"Exact bytes: sha256 {args.candidate}")
+        print("Nothing is authorized yet. Review the candidate, then sign with:")
+        print(f"  airlock init --approve --github-create {args.output} --reconciler-key <key>")
+        return 0
+    if args.cmd == "publish":
+        client = None
+        if args.synthetic_provider:
+            os.environ["GITHUB_TOKEN"] = TOKEN  # in-process; no network transport exists
+            client = synthetic_client(args.synthetic_provider)
+        result = publish_candidate(state, args.candidate, client=client)
+        if args.json:
+            print(json.dumps(result, indent=2))
+        elif result["status"] == "REFUSED":
+            print("REFUSED: " + str(result["reason"]))
+        else:
+            print(
+                f"{result['status']}: effect {result['effect_id']} outcome {result['outcome']}. "
+                "Not confirmed until independent readback settles it:"
+            )
+            print(
+                f"  airlock reconcile {result['effect_id']} --github-readback --operator-key <key>"
+            )
+        return 0 if result["status"] == "DISPATCHED_UNCONFIRMED" else 3
+    if args.cmd in {"stop", "resume"}:
+        (state.set_emergency_stop if args.cmd == "stop" else state.clear_emergency_stop)(
+            args.reason
+        )
+        print(
+            "EMERGENCY STOP ACTIVE: no dispatch, no new run; reconcile still works."
+            if args.cmd == "stop"
+            else "Emergency stop cleared. Held effects remain held."
+        )
+        return 0
+    if args.cmd == "status":
+        result = status(state)
+        if args.json:
+            print(json.dumps(result, indent=2))
+        else:
+            print(
+                f"Receipts: {result['receipts']} (integrity {'OK' if result['integrity_ok'] else 'FAILED'})"
+            )
+            print(f"History completeness: {result['completeness']}")
+            if result["emergency_stop"]:
+                print("EMERGENCY STOP ACTIVE: " + result["emergency_stop"]["reason"])
+            print(f"Refused: {result['refused']}")
+            for reason in result["refusal_reasons"]:
+                print("  " + reason)
+            print(f"Independently observed: {result['independently_observed'] or 'none'}")
+            print(f"Unresolved effects: {len(result['unresolved_effects'])}")
+            for effect in result["unresolved_effects"]:
+                print("  " + effect)
+        return 0 if result["integrity_ok"] else 2
+    if args.create:
+        create_provider(args.file)
+    provider = json.loads(args.file.read_text())
+    if args.lose_next_ack:
+        provider["lose_next_acknowledgement"] = True
+        args.file.write_text(json.dumps(provider, indent=2))
+    mutations = [r for r in provider["requests"] if r["method"] not in {"GET", "HEAD"}]
+    print(provider["notice"])
+    print(f"Requests received: {len(provider['requests'])}; mutations: {len(mutations)}")
+    print(f"Files: {sorted(provider['files']) or 'none'}")
+    return 0
+
+
 def main(argv=None):
     parser = argparse.ArgumentParser(
         description="See and control the powers of your Python AI agent."
@@ -152,7 +340,9 @@ def main(argv=None):
     sub = parser.add_subparsers(dest="cmd", required=True)
     for cmd in (
         "init", "diff", "check", "doctor", "run", "receipts", "reconcile",
-        "checkpoint", "verify-evidence",
+        "checkpoint", "verify-evidence", "recovery-inventory",
+        "setup", "work", "capture", "verify-candidate", "review-candidate", "publish", "status",
+        "synthetic-provider", "stop", "resume",
     ):  # fmt: skip
         p = sub.add_parser(cmd)
         p.add_argument("--path", type=Path, default=Path.cwd())
@@ -174,6 +364,58 @@ def main(argv=None):
                 "--integrity-only", action="store_true",
                 help="Exit 0 on integrity alone; completeness stays UNANCHORED",
             )  # fmt: skip
+        if cmd == "setup":
+            p.add_argument("--agent", required=True, help="A validated agent, e.g. aider")
+            p.add_argument("--model", required=True, help="The one model the agent may call")
+            p.add_argument(
+                "--model-endpoint", required=True,
+                help="Exact /chat/completions URL the supervisor calls (HTTPS or loopback)",
+            )  # fmt: skip
+            p.add_argument("--reconciler-key", type=Path, help="External operator key path")
+            p.add_argument("--approve", action="store_true", help="Sign the reviewed authority")
+        if cmd == "work":
+            p.add_argument("--message-file", required=True, help="Task, relative to the project")
+            p.add_argument("--test-command", default="python -m pytest -q")
+            p.add_argument("--image", help="Override the agent's image")
+        if cmd == "verify-candidate":
+            p.add_argument("--candidate", required=True, help="Candidate SHA-256")
+            p.add_argument(
+                "--tests", type=Path, required=True,
+                help="Trusted tests held outside the project",
+            )  # fmt: skip
+            p.add_argument("--image", help="Test image (default: the compute image)")
+        if cmd == "review-candidate":
+            p.add_argument("--candidate", required=True, help="Candidate SHA-256")
+            p.add_argument("--output", type=Path, required=True, help="Profile to review")
+            p.add_argument("--path-in-repo", required=True, help="New file to create")
+            p.add_argument("--message", required=True, help="Commit message")
+            p.add_argument("--repo-id", type=int)
+            p.add_argument("--repo-node-id")
+            p.add_argument("--owner")
+            p.add_argument("--repo")
+            p.add_argument("--branch")
+            p.add_argument("--parent", help="Expected parent commit SHA")
+            p.add_argument("--synthetic-provider", type=Path, help="Read repo facts from this file")
+        if cmd == "publish":
+            p.add_argument("--candidate", required=True, help="Candidate SHA-256")
+            p.add_argument(
+                "--synthetic-provider", type=Path,
+                help="Use this disposable synthetic provider; nothing reaches a network",
+            )  # fmt: skip
+        if cmd in {"stop", "resume"}:
+            p.add_argument("--reason", required=True, help="Recorded in the signed journal")
+        if cmd == "synthetic-provider":
+            p.add_argument("--file", type=Path, required=True)
+            p.add_argument("--create", action="store_true")
+            p.add_argument(
+                "--lose-next-ack", action="store_true",
+                help="Commit the next creation, then lose its acknowledgement",
+            )  # fmt: skip
+        if cmd == "recovery-inventory":
+            p.add_argument("--public-key", help="Independently retained public key or key file")
+            p.add_argument(
+                "--checkpoint", type=Path, help="Newest independently retained checkpoint"
+            )
         if cmd in {"diff", "check"}:
             p.add_argument("--base", help="Compare to the signed approval at this trusted Git ref")
             p.add_argument("--output", type=Path, help="Save JSON authority diff")
@@ -226,6 +468,10 @@ def main(argv=None):
                 action="store_true",
                 help="Observe the exact reviewed GitHub creation; uncertainty remains held",
             )
+            p.add_argument(
+                "--synthetic-provider", type=Path,
+                help="Observe this disposable synthetic provider; nothing reaches a network",
+            )  # fmt: skip
             p.add_argument(
                 "--operator-key", type=Path, help="External approved operator private key"
             )
@@ -326,6 +572,19 @@ def main(argv=None):
             if report["integrity"]["ok"] and args.integrity_only:
                 return 0
             return 0 if report["ok"] else 2
+        if args.cmd == "recovery-inventory":
+            from .evidence import load_public_key
+            from .recovery import recovery_inventory
+
+            report = recovery_inventory(
+                root,
+                public_key=load_public_key(args.public_key) if args.public_key else None,
+                checkpoint=json.loads(args.checkpoint.read_text()) if args.checkpoint else None,
+            )
+            print(json.dumps(report, indent=2))
+            return 0 if report["status"] == "NO_DETECTED_BLOCKER" else 2
+        if args.cmd in WORKFLOW_COMMANDS:
+            return _workflow_command(args, root)
         if args.cmd == "receipts":
             result = State(root).verify_receipts()
             print(json.dumps(result, indent=2) if args.json else render_receipts(result))
@@ -366,7 +625,13 @@ def main(argv=None):
                         "GitHub readback requires --operator-key and obtains its own evidence"
                     )
                 private = load_operator_key(state, args.operator_key)
-                result = observe_github(state, args.effect_id, private)
+                seam = {}
+                if args.synthetic_provider:
+                    from .synthetic_github import TOKEN, synthetic_client
+
+                    os.environ["GITHUB_TOKEN"] = TOKEN  # in-process; no network transport exists
+                    seam["client"] = synthetic_client(args.synthetic_provider)
+                result = observe_github(state, args.effect_id, private, **seam)
                 envelope = result.pop("envelope", None)
                 if envelope is not None:
                     if args.output:

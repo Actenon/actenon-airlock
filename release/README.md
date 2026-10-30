@@ -38,6 +38,12 @@ share one evidence run and are labelled as such. G1-G27, G39 and G40 are
 pin its SHA-256 in `gates.json`, and give each gate its condition and evidence
 producer in a reviewed change.
 
+## Acceptance v2
+
+`acceptance-v2/` is a separately versioned programme with its own specification, frozen
+config, evidence and [verdict](acceptance-v2/VERDICT.md). The gate does not load it, and
+it does not replace, pass or amend G1-G40.
+
 ## Limits
 
 * An attestation proves which workflow and commit produced a file, not that its

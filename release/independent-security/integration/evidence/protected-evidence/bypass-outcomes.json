@@ -1,0 +1,1 @@
+{"become_root": "blocked", "issue_write": "blocked", "nested_child_network": "blocked", "outside_workspace": "blocked", "raw_network": "blocked", "raw_packet": "blocked", "replace_bridge_socket": "blocked", "repo_delete": "blocked", "secret_egress": "blocked", "self_approve": "blocked", "self_reconcile": "blocked", "symlink_escape": "blocked", "unauthorized_git_push": "blocked"}

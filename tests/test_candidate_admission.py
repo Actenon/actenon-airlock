@@ -32,7 +32,12 @@ DEPS = {
 DOCKER_TESTS = [
     "tests.test_github_container::test_actual_container_github_grant_and_denials",
     "tests.test_protected::test_same_contained_environment_runs_engineering_workflow_and_refuses_bypass",
+    "tests.test_guided_workflow::test_verification_runs_trusted_tests_in_a_contained_container",
+    "tests.test_guided_workflow::test_emergency_stop_kills_a_running_protected_agent",
 ]
+INDEPENDENT_TEST = (
+    "tests.test_independent_container::test_owned_transport_controls_and_protected_boundary"
+)
 
 
 def _load():
@@ -189,13 +194,17 @@ class World:
         self.github.add_artifact(
             self.ci_run,
             "protected-container-acceptance",
-            {"protected-results.xml": junit({n: "passed" for n in DOCKER_TESTS})},
+            {
+                "protected-results.xml": junit({n: "passed" for n in DOCKER_TESTS}),
+                "independent-boundary-results.xml": junit({INDEPENDENT_TEST: "passed"}),
+            },
         )
+        skipped = {n: "skipped" for n in [*DOCKER_TESTS, INDEPENDENT_TEST]}
         for py in ("3.11", "3.12"):
             self.github.add_artifact(
                 self.ci_run,
                 f"integration-python-{py}",
-                {"test-results.xml": junit({**ordinary, **{n: "skipped" for n in DOCKER_TESTS}})},
+                {"test-results.xml": junit({**ordinary, **skipped})},
             )
 
     def _dependencies(self) -> None:
@@ -519,6 +528,26 @@ def test_green_unit_tests_cannot_override_missing_real_agent_evidence(world: Wor
     assert report["prerequisites"]["dependency_graph"]["status"] == "PASS"
     assert report["gates"]["G28"]["status"] == "BLOCKED"
     assert report["overall_status"] == "NOT READY"
+
+
+def test_independent_boundary_skip_fails_mandatory_ci(world: World) -> None:
+    run = world.ci_run
+    world.github.run_artifacts[run["id"]] = [
+        artifact
+        for artifact in world.github.run_artifacts[run["id"]]
+        if artifact["name"] != "protected-container-acceptance"
+    ]
+    world.github.add_artifact(
+        run,
+        "protected-container-acceptance",
+        {
+            "protected-results.xml": junit({n: "passed" for n in DOCKER_TESTS}),
+            "independent-boundary-results.xml": junit({INDEPENDENT_TEST: "skipped"}),
+        },
+    )
+    report = world.evaluate()
+    assert report["prerequisites"]["candidate_ci"]["status"] == "FAIL"
+    assert "skipped" in report["prerequisites"]["candidate_ci"]["detail"]
 
 
 def test_unexpected_skip_fails_mandatory_ci(world: World) -> None:
