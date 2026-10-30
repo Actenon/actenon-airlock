@@ -1,0 +1,13 @@
+{
+  "actual_docker_containment": true,
+  "actual_permit_kernel": true,
+  "receipt_signature_chain_ok": true,
+  "verified_receipts": 8,
+  "credential_after_actual_edge_claim": true,
+  "provider_fixture": true,
+  "live_github_truth": false,
+  "external_coding_agent_acceptance": false,
+  "completion_or_exactly_once_claim": false,
+  "creation_outcome": "AMBIGUOUS",
+  "denials": 5
+}

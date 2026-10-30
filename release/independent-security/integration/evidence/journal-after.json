@@ -1,0 +1,73 @@
+{
+  "source_commit": "d404d34a80e0d3a1e911e2b9e166d97d0f278933",
+  "state_source_sha256": "dd602abfcb9639994d241abcfb3ffd91ce00d1c6abac21d5f139c3e45b56aeb7",
+  "method": "Real Ed25519 chains, fsync append, process-shared flock; no provider calls",
+  "cases": [
+    {
+      "initial_rows": 100,
+      "initial_bytes": 71528,
+      "full_verify_s": 0.004091249953489751,
+      "cold_append_s": 0.004084666026756167,
+      "warm_append": {
+        "count": 5,
+        "median_s": 0.00016949995188042521,
+        "p95_s": 0.00019645801512524486,
+        "total_s": 0.0008681250037625432
+      },
+      "concurrent": {
+        "count": 16,
+        "median_s": 0.0015039795252960175,
+        "p95_s": 0.032152041036169976,
+        "total_s": 0.14302945922827348
+      },
+      "concurrent_wall_s": 0.038829625002108514,
+      "concurrent_writers": 4,
+      "final_integrity": true,
+      "final_rows": 122
+    },
+    {
+      "initial_rows": 1000,
+      "initial_bytes": 716828,
+      "full_verify_s": 0.04029170802095905,
+      "cold_append_s": 0.04024958302034065,
+      "warm_append": {
+        "count": 5,
+        "median_s": 0.00021479098359122872,
+        "p95_s": 0.0002786669647321105,
+        "total_s": 0.0011021668906323612
+      },
+      "concurrent": {
+        "count": 16,
+        "median_s": 0.003605978999985382,
+        "p95_s": 0.18340783298481256,
+        "total_s": 0.7615732498816215
+      },
+      "concurrent_wall_s": 0.19477441697381437,
+      "concurrent_writers": 4,
+      "final_integrity": true,
+      "final_rows": 1022
+    },
+    {
+      "initial_rows": 10000,
+      "initial_bytes": 7178828,
+      "full_verify_s": 0.40229641599580646,
+      "cold_append_s": 0.4045696660177782,
+      "warm_append": {
+        "count": 5,
+        "median_s": 0.0006775000365450978,
+        "p95_s": 0.0009091669926419854,
+        "total_s": 0.003667085024062544
+      },
+      "concurrent": {
+        "count": 16,
+        "median_s": 0.004456520488020033,
+        "p95_s": 1.6817193329916336,
+        "total_s": 6.762700830935501
+      },
+      "concurrent_wall_s": 1.6939512920216657,
+      "concurrent_writers": 4,
+      "final_integrity": true,
+      "final_rows": 10022
+    }
+  ]
+}

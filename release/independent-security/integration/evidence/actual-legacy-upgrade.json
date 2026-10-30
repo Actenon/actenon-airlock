@@ -1,0 +1,285 @@
+{
+  "legacy_commit": "341ce3a2f10d2eafa5b07e74539a36e16d3dfac2",
+  "model_selected_attack": false,
+  "cases": [
+    {
+      "scenario": "legacy_ambiguous_header_identity",
+      "legacy_source": "/Users/ross/Documents/Codex/2026-10-30/actenon-airlock-independent-north-star-engineering/work/airlock-legacy-validation/src/actenon_airlock/broker.py",
+      "legacy_result": {
+        "ok": true,
+        "response": {
+          "status": 200,
+          "headers": {
+            "server": "BaseHTTP/0.6 Python/3.12.13",
+            "date": "Fri, 30 Oct 2026 01:40:07 GMT"
+          },
+          "body": "b3duZWQtZml4dHVyZS1yZXNwb25zZQ==",
+          "url": "http://127.0.0.1:63148/legacy_ambiguous_header_identity"
+        },
+        "receipt_id": "receipt_720b06da2baa40ba85c8a83d8ae70f0e",
+        "effect_id": "effect_e986632445235ab24abcd7539edc112c3d32f4601ddc559e80b0c995f21d14d0",
+        "outcome": "AMBIGUOUS"
+      },
+      "upgrade_result": {
+        "startup_blocked": "The effect store contains legacy header-dependent ownership; upgrade blocked. Preserve the state and run airlock recovery-inventory (see docs/operations.md); no automatic migration is supported"
+      },
+      "provider_calls_before": 1,
+      "provider_calls_after": 1,
+      "inventory": {
+        "schema": "actenon-airlock/recovery-inventory/v1",
+        "status": "BLOCKED",
+        "read_only": true,
+        "migration_supported": false,
+        "snapshot_requirement": "stop all supervisors before capture",
+        "trust_anchor": "project-local-untrusted",
+        "files": {
+          "public-key.json": {
+            "bytes": 55,
+            "sha256": "d84d7132f89a730b3aca26784c2d4bfdfddf5377818fdda496b5f7652a083e07"
+          },
+          "local/receipts.jsonl": {
+            "bytes": 10068,
+            "sha256": "6246953760964785f900c4cfc95a43d36af9aaa68e225156dcaa068046158817"
+          },
+          "local/permit.sqlite3": {
+            "bytes": 94208,
+            "sha256": "40d2219095a60c9bc1501150f558c8da4ba87ac3a484e75dca4d63dd16a9f622"
+          },
+          "local/permit.sqlite3-wal": null,
+          "local/permit.sqlite3-shm": null,
+          "local/permit.sqlite3-journal": null
+        },
+        "owners": [
+          {
+            "reference": {
+              "profile": "ACTENON-EFFECT-1",
+              "effect_id": "effect_e986632445235ab24abcd7539edc112c3d32f4601ddc559e80b0c995f21d14d0",
+              "reservation_id": "reservation_6d3b557282fa4eb3852312babc85108f",
+              "owner_attempt_id": "exec_6481636462205a2dca5df99e99c1b5b4"
+            },
+            "state": "AMBIGUOUS",
+            "latest_event_state": "AMBIGUOUS",
+            "grant_id": "grant_32324fe6df1f4d8a",
+            "descriptor_sha256": "7a5af2de7ce45c084e0255a218b34385de90d50d60d6b4b200e332bd70dc0ca7",
+            "legacy_header_identity": true,
+            "live_owner": true
+          }
+        ],
+        "problems": [
+          "legacy header-dependent live owner: reservation_6d3b557282fa4eb3852312babc85108f"
+        ],
+        "limitations": [
+          "Diagnostic only; does not authorize startup, migration or release of ownership.",
+          "Stable file reads do not establish an atomic snapshot of a running supervisor.",
+          "Without independently retained evidence, total history loss is undetectable.",
+          "A signature verifies an assertion, not the external provider state."
+        ],
+        "evidence": {
+          "schema": "actenon-airlock/offline-verification/v1",
+          "ok": false,
+          "integrity": {
+            "ok": true,
+            "receipts": 2,
+            "verified": 2,
+            "chain_head_sha256": "de13190d0e75b42d20deaef129b4f1c29a5311a52833067a1de23bdb6210c585",
+            "problems": []
+          },
+          "completeness": {
+            "status": "UNANCHORED",
+            "detail": "no checkpoint supplied; a truncated or rolled-back journal is undetectable"
+          },
+          "provider_truth": {
+            "independently_observed": {},
+            "runtime_claims": {},
+            "unresolved_ambiguous": [
+              "effect_e986632445235ab24abcd7539edc112c3d32f4601ddc559e80b0c995f21d14d0"
+            ],
+            "refusals_without_effect": 0
+          }
+        }
+      }
+    },
+    {
+      "scenario": "legacy_nonexecution_without_bound_completion",
+      "legacy_source": "/Users/ross/Documents/Codex/2026-10-30/actenon-airlock-independent-north-star-engineering/work/airlock-legacy-validation/src/actenon_airlock/broker.py",
+      "legacy_result": {
+        "ok": false,
+        "reason": "AUTHORITY_REVOKED",
+        "receipt_id": "receipt_ebce72f4cb1a46e99517d2fb86b38540"
+      },
+      "upgrade_result": {
+        "startup_blocked": "The effect store is missing or contradicts a journal-recorded attempt; refusing execution until trusted recovery"
+      },
+      "provider_calls_before": 0,
+      "provider_calls_after": 0,
+      "inventory": {
+        "schema": "actenon-airlock/recovery-inventory/v1",
+        "status": "BLOCKED",
+        "read_only": true,
+        "migration_supported": false,
+        "snapshot_requirement": "stop all supervisors before capture",
+        "trust_anchor": "project-local-untrusted",
+        "files": {
+          "public-key.json": {
+            "bytes": 55,
+            "sha256": "d5dee6957a66165b0db5178606325b8ac976630f75400dd8407e1852246ccd0b"
+          },
+          "local/receipts.jsonl": {
+            "bytes": 8897,
+            "sha256": "f7edef0cc36349e3df791cd24070f5886c5e731d04b3472475b7e35fed7738dc"
+          },
+          "local/permit.sqlite3": {
+            "bytes": 94208,
+            "sha256": "b835787b5ebd45299126b9bdfa623fc01025b5119f9fe38cc5663d8868d15fca"
+          },
+          "local/permit.sqlite3-wal": null,
+          "local/permit.sqlite3-shm": null,
+          "local/permit.sqlite3-journal": null
+        },
+        "owners": [
+          {
+            "reference": {
+              "profile": "ACTENON-EFFECT-1",
+              "effect_id": "effect_5a904a19b11678805d9cbdabf94271362004b72de68dbb9517608860c26881b9",
+              "reservation_id": "reservation_ddf7f79c455640269862c123abbaaf53",
+              "owner_attempt_id": "exec_eaa46dfb8ecf693fa8ff51d5647d2789"
+            },
+            "state": "NOT_EXECUTED",
+            "latest_event_state": "NOT_EXECUTED",
+            "grant_id": "grant_33cc3959b41c4548",
+            "descriptor_sha256": "161421f2fe0e8d8c1cc2930fdff6009ee70ba88b8ffa26f33ec2fcf756bca0a4",
+            "legacy_header_identity": true,
+            "live_owner": false
+          }
+        ],
+        "problems": [
+          "database missing or contradicts journal attempt: reservation_ddf7f79c455640269862c123abbaaf53"
+        ],
+        "limitations": [
+          "Diagnostic only; does not authorize startup, migration or release of ownership.",
+          "Stable file reads do not establish an atomic snapshot of a running supervisor.",
+          "Without independently retained evidence, total history loss is undetectable.",
+          "A signature verifies an assertion, not the external provider state."
+        ],
+        "evidence": {
+          "schema": "actenon-airlock/offline-verification/v1",
+          "ok": false,
+          "integrity": {
+            "ok": true,
+            "receipts": 2,
+            "verified": 2,
+            "chain_head_sha256": "44e5bb13fae42e30667c5f2b24d085baf8fad783cb62d864ed8e6c7daff664be",
+            "problems": []
+          },
+          "completeness": {
+            "status": "UNANCHORED",
+            "detail": "no checkpoint supplied; a truncated or rolled-back journal is undetectable"
+          },
+          "provider_truth": {
+            "independently_observed": {},
+            "runtime_claims": {},
+            "unresolved_ambiguous": [],
+            "refusals_without_effect": 1
+          }
+        }
+      }
+    },
+    {
+      "scenario": "unchanged_identity",
+      "legacy_source": "/Users/ross/Documents/Codex/2026-10-30/actenon-airlock-independent-north-star-engineering/work/airlock-legacy-validation/src/actenon_airlock/broker.py",
+      "legacy_result": {
+        "ok": true,
+        "response": {
+          "status": 200,
+          "headers": {
+            "server": "BaseHTTP/0.6 Python/3.12.13",
+            "date": "Fri, 30 Oct 2026 01:40:08 GMT"
+          },
+          "body": "b3duZWQtZml4dHVyZS1yZXNwb25zZQ==",
+          "url": "http://127.0.0.1:63148/unchanged_identity"
+        },
+        "receipt_id": "receipt_6095258d63004817a16251497bdc28e9",
+        "effect_id": "effect_b502491054d0cf5f3c23124496db7e909501008055f90d39768940734e2c5739",
+        "outcome": "AMBIGUOUS"
+      },
+      "upgrade_result": {
+        "ok": false,
+        "reason": "effect already reserved, committed, or unresolved",
+        "receipt_id": "receipt_b95f4c7dcf8f4fe993766d1803a429b3"
+      },
+      "provider_calls_before": 1,
+      "provider_calls_after": 1,
+      "inventory": {
+        "schema": "actenon-airlock/recovery-inventory/v1",
+        "status": "NO_DETECTED_BLOCKER",
+        "read_only": true,
+        "migration_supported": false,
+        "snapshot_requirement": "stop all supervisors before capture",
+        "trust_anchor": "project-local-untrusted",
+        "files": {
+          "public-key.json": {
+            "bytes": 55,
+            "sha256": "ee9f2f1ae2c2a244fbd1accf8af715ffcdeb50f0a1b2b155a415d85b987c0a31"
+          },
+          "local/receipts.jsonl": {
+            "bytes": 9900,
+            "sha256": "8e13635ff4f840da9e76bae576e1443e8146eeb6d0a024bbbb79b54cd855d88d"
+          },
+          "local/permit.sqlite3": {
+            "bytes": 94208,
+            "sha256": "307e3c361053ceb92cf8b2c89d8d44b5e94284dac47f856ee85aeaf91e6bf2f5"
+          },
+          "local/permit.sqlite3-wal": null,
+          "local/permit.sqlite3-shm": null,
+          "local/permit.sqlite3-journal": null
+        },
+        "owners": [
+          {
+            "reference": {
+              "profile": "ACTENON-EFFECT-1",
+              "effect_id": "effect_b502491054d0cf5f3c23124496db7e909501008055f90d39768940734e2c5739",
+              "reservation_id": "reservation_536b1d74c14d412bb89132b8401cfb20",
+              "owner_attempt_id": "exec_2ac48ff73ffc08c4798aec912508d3b3"
+            },
+            "state": "AMBIGUOUS",
+            "latest_event_state": "AMBIGUOUS",
+            "grant_id": "grant_730e32a0568643f4",
+            "descriptor_sha256": "cabb276b383aef1656c9f740580091400f3a5473a7bc34a20dd41c2f50f5c03e",
+            "legacy_header_identity": false,
+            "live_owner": true
+          }
+        ],
+        "problems": [],
+        "limitations": [
+          "Diagnostic only; does not authorize startup, migration or release of ownership.",
+          "Stable file reads do not establish an atomic snapshot of a running supervisor.",
+          "Without independently retained evidence, total history loss is undetectable.",
+          "A signature verifies an assertion, not the external provider state."
+        ],
+        "evidence": {
+          "schema": "actenon-airlock/offline-verification/v1",
+          "ok": false,
+          "integrity": {
+            "ok": true,
+            "receipts": 2,
+            "verified": 2,
+            "chain_head_sha256": "1e5b258e9ab6820695e1ca24b8945ebf3cb44b913533e7c5c76d223557d8b3a7",
+            "problems": []
+          },
+          "completeness": {
+            "status": "UNANCHORED",
+            "detail": "no checkpoint supplied; a truncated or rolled-back journal is undetectable"
+          },
+          "provider_truth": {
+            "independently_observed": {},
+            "runtime_claims": {},
+            "unresolved_ambiguous": [
+              "effect_b502491054d0cf5f3c23124496db7e909501008055f90d39768940734e2c5739"
+            ],
+            "refusals_without_effect": 0
+          }
+        }
+      }
+    }
+  ]
+}
