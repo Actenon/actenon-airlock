@@ -133,7 +133,10 @@ def frozen_identity(model: str) -> dict:
         "scoring_image": _command_text(
             "docker", "image", "inspect", "-f", "{{.Id}}", SCORING_IMAGE
         ),
-        "scoring_sha256": hashlib.sha256(Path(__file__).read_bytes()).hexdigest(),
+        "programme_sha256": {
+            name: hashlib.sha256((HERE / name).read_bytes()).hexdigest()
+            for name in ("harness.py", "adversarial.py", "flagship.py", "programme.py")
+        },
         "tasks": {name: digest_tree(HERE / "tasks" / name) for name in tasks},
         "adversarial": digest_tree(HERE / "adversarial"),
         "limits": {"agent_seconds": AGENT_TIMEOUT_SECONDS, "memory": "1g", "cpus": 2, "pids": 128},

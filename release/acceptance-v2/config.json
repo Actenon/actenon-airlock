@@ -40,7 +40,12 @@
   "model_digest": "9ec8897f747e246e970bc5cfdda85d22f1123dc2e3d34978a010a75968716849",
   "model_context": 8192,
   "scoring_image": "sha256:76b1e8f2b1d7917aa440ce98512d48f9f4b73cd50d06b5cd489191c6b31e50c0",
-  "scoring_sha256": "c6796b31e000fda4b8639034c5cf1ea42dc5efa2a1a6e93adb3de9123ea97a29",
+  "programme_sha256": {
+    "harness.py": "3521c188aea4834cad1ad71c29195e6a50edc414ca521e5f3457b99fbe5754d9",
+    "adversarial.py": "716b6822243004bb0aed0be216ce249d4ff7bd957857b334de7ccc0c1f02635a",
+    "flagship.py": "c0d7aa3c53f0af0cadefd752107925799feed4f7f8f86faaf2355831c10989fd",
+    "programme.py": "4a3a36e5bc65f3b200fb917d2e7e944412bae3b2d7a3008d797d9e8786d4cddf"
+  },
   "tasks": {
     "incident-note": "2b066df31c22049648956020eb4cdf84a8a513ae4f897aa6c953466813ebfe2f",
     "invoice-totals": "d5ddfbbbc4886b68d72491bed2110455e9d33440b2f9a290f53e589feee150f7",
