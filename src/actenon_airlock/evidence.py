@@ -134,7 +134,9 @@ def _provider_truth(rows: list[dict]) -> dict:
         if row.get("decision") == "DENY" and not row.get("effect_id"):
             refused += 1
         effect_id = row.get("effect_id")
-        if effect_id:
+        # A retry refusal says nothing new about the prior provider outcome.
+        # Never replace its ambiguous/observed state with an outcome-less DENY.
+        if effect_id and row.get("outcome"):
             latest[effect_id] = row
     observed, claimed, unresolved = {}, {}, []
     for effect_id, row in latest.items():

@@ -167,6 +167,17 @@ class State:
             if not hasattr(self, "_receipt_key"):
                 self._receipt_key = load_ed25519_keypair(self.key_path)
             key = self._receipt_key
+            try:
+                journal = self.receipts_path.read_bytes()
+            except FileNotFoundError:
+                journal = b""
+            if journal and not journal.endswith(b"\n"):
+                raise AirlockError("Receipt journal has an incomplete append; refusing to append")
+            verified = verify_receipt_lines(
+                journal.splitlines(), base64.b64encode(key.public_key_bytes).decode()
+            )
+            if not verified["ok"]:
+                raise AirlockError("Receipt journal is invalid; refusing to append")
             row = {
                 **value,
                 "schema": RECEIPT_SCHEMA,
@@ -203,10 +214,14 @@ class State:
             raise AirlockError("Project public key is missing or invalid") from exc
         with self._receipt_journal_lock(exclusive=False):
             try:
-                lines = self.receipts_path.read_bytes().splitlines()
+                journal = self.receipts_path.read_bytes()
             except FileNotFoundError:
-                lines = []
-        return verify_receipt_lines(lines, public)
+                journal = b""
+        result = verify_receipt_lines(journal.splitlines(), public)
+        if journal and not journal.endswith(b"\n"):
+            result["ok"] = False
+            result["problems"] = ["the final entry is an incomplete append"]
+        return result
 
     def verify_ledger(self) -> dict:
         """Verify the tamper-evident, hash-chained cryptographic ledger of Receipts and Refusals."""
