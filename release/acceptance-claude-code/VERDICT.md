@@ -15,6 +15,8 @@ These come from tests and a scripted rehearsal. They show the integration works.
 | A lost reply stays held and counted, and the client's retry is not sent | Same tests |
 | The client tolerates a silent 100-second reply | One manual run, not in the suite |
 
+The programme is frozen in [`config.json`](config.json). A full [rehearsal](rehearsal/README.md) with a scripted model ran all 33 entries from a clean tree. It is not evidence, and the scorer refuses to count it.
+
 ## What is not established
 
 - Whether a real model does useful work inside the boundary.

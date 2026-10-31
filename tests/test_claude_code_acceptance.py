@@ -1,5 +1,6 @@
 """The programme's own honesty: what it refuses to run, and what it refuses to count."""
 
+import hashlib
 import importlib
 import json
 import subprocess
@@ -375,6 +376,33 @@ def test_every_requirement_belongs_to_exactly_one_dimension(modules):
     spec = json.loads((ROOT / "release/acceptance-claude-code/spec.json").read_text())
     assert {row["id"] for row in spec["requirements"]} == set(keys)
     assert spec["status"].startswith("NOT RUN")
+
+
+def test_the_frozen_config_still_matches_the_programme(modules):
+    """Image IDs are per machine. Everything else must not drift after the freeze."""
+    run_task = modules.run_task
+    config = json.loads((ROOT / "release/acceptance-claude-code/config.json").read_text())
+    for name in run_task.PROGRAMME:
+        digest = hashlib.sha256((PROGRAMME / name).read_bytes()).hexdigest()
+        assert config["programme_sha256"][name] == digest, name
+    lock = ROOT / "containers/claude-code/package-lock.json"
+    assert config["agent_lock_sha256"] == hashlib.sha256(lock.read_bytes()).hexdigest()
+    assert config["agent_command"] == run_task.agent_command(config["model"])
+    assert config["anthropic_betas"] == list(run_task.PROFILE["anthropic_betas"])
+    assert config["adversarial"]["claude_code"] == run_task.v2.digest_tree(PROGRAMME / "planted")
+
+
+def test_the_recorded_verdict_stays_not_ready_until_results_exist():
+    verdict = (ROOT / "release/acceptance-claude-code/VERDICT.md").read_text()
+    assert "**Status: NOT READY. Not run.**" in verdict
+    assert not (ROOT / "release/acceptance-claude-code/evidence").exists()
+
+
+def test_the_rehearsal_record_cannot_read_as_evidence():
+    record = ROOT / "release/acceptance-claude-code/rehearsal"
+    report = json.loads((record / "programme.json").read_text())
+    assert report["evidence"] == "REHEARSAL, NOT EVIDENCE"
+    assert report["status"] == "NOT READY"
 
 
 def test_historical_v2_evidence_is_left_alone():
