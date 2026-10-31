@@ -12,6 +12,7 @@ import argparse
 import base64
 import contextlib
 import hashlib
+import importlib.metadata
 import json
 import os
 import secrets
@@ -78,6 +79,16 @@ def identity(image):
             ["git", "rev-parse", "HEAD"], cwd=ROOT, text=True
         ).strip(),
         "source_digest": scoring.digest_tree(ROOT / "src/actenon_airlock"),
+        "python": sys.version,
+        "installed_versions": dict(
+            sorted((d.metadata["Name"], d.version) for d in importlib.metadata.distributions())
+        ),
+        "candidate_dependency_commits": {
+            name: json.loads(importlib.metadata.distribution(name).read_text("direct_url.json"))[
+                "vcs_info"
+            ]["commit_id"]
+            for name in ("actenon-protocol", "actenon-kernel", "actenon-permit", "actenon-scan")
+        },
         "image": docker.image(image)["Id"],
         "model": MODEL,
         "prices": PRICES,
