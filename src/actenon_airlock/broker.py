@@ -13,6 +13,7 @@ import subprocess
 import sys
 import tempfile
 import threading
+import time
 from contextlib import closing
 from datetime import UTC, datetime, timedelta
 from pathlib import Path
@@ -102,6 +103,8 @@ SUPPORTED_HTTP_HEADERS = frozenset(
         # Fixed, trusted GitHubCreateDispatch transport headers.
         "x-github-api-version",
         "anthropic-version",
+        # Only reviewed values reach here; see agent_inference.check_headers.
+        "anthropic-beta",
     }
 )
 
@@ -141,6 +144,7 @@ class HttpDispatch:
             self.headers, self.url, materialize=True
         )
         self.attempted = True
+        deadline = broker.http_deadline(self.url)
         # The exact URL/body/header handles used to mint the proof are used here.
         with broker.http.stream(
             self.method,
@@ -154,6 +158,8 @@ class HttpDispatch:
                 content.extend(part)
                 if len(content) > LIMIT // 2:
                     raise AirlockError("Response exceeds 4 MiB")
+                if deadline is not None and time.monotonic() > deadline:
+                    raise AirlockError("Response exceeded its deadline")
             response_headers = dict(response.headers)
             for marker, (secret, _) in broker.credentials.items():
                 content = content.replace(secret.encode(), marker.encode())
@@ -379,6 +385,9 @@ class Broker:
 
     def http_timeout(self, url):
         return 30
+
+    def http_deadline(self, url):
+        return None
 
     def close(self):
         self.http.close()
@@ -761,6 +770,7 @@ class Broker:
                 # Settlement/receipt/transport failures after dispatch cannot
                 # truthfully become a pre-execution DENY or release ownership.
                 self.execution_errors += 1
+                labels.update(getattr(dispatch, "receipt_fields", lambda: {})())
                 row = self._receipt(
                     action_name,
                     target,

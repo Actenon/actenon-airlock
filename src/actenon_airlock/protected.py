@@ -26,6 +26,7 @@ from actenon_permit.model import Budget, Grant, Scopes
 from actenon_protocol.effects import effect_identity
 from actenon_scan.authority import classify_http
 
+from .agent_inference import CONTRACT, check_headers, check_request, cost, observe, reservation
 from .broker import Broker, HttpDispatch
 from .common import AirlockError, canonical, power, validate_url
 from .github_runtime import (
@@ -195,12 +196,28 @@ class InferenceDispatch(HttpDispatch):
     billed that call. The contained path has no stable retry identity, so a client
     retry after a confirmed answer is a new call, with its own budget and receipts.
     Airlock never retries on its own, and inference is not exactly-once.
+
+    Under the agent contract a worst-case cost is reserved before any byte leaves, so a
+    lost reply stays counted. An observed answer replaces it with its reported usage, and
+    a provider's explicit rate-limit or overload refusal ends the call: its retry is a new
+    call. That reply still proves nothing about billing, so its effect stays unconfirmed.
     """
 
     def __init__(self, broker, effect, message):
         super().__init__(broker, effect, message)
         self.invocation = broker.inference_unconfirmed.get(self.params["body_sha256"])
         self.retry = self.invocation is not None
+        self.observation = None
+        self.reserved = self.charged = 0
+        profile = broker.agent_profile(self.url)
+        if profile and not self.retry:
+            self.reserved = reservation(
+                len(self.body),
+                json.loads(self.body)["max_tokens"],
+                profile["price_microusd_per_mtok"],
+            )
+            if broker.inference_spent + self.reserved > profile["max_run_microusd"]:
+                raise AirlockError("Model spend bound reached for this run")
         if not self.retry:
             broker.inference_calls += 1
             self.invocation = broker.inference_calls
@@ -213,9 +230,30 @@ class InferenceDispatch(HttpDispatch):
             "inference_retry": self.retry,
         }
 
+    def receipt_fields(self):
+        if not self.reserved:
+            return {}
+        fields = {"inference_cost_microusd": self.charged}
+        if self.observation is not None and self.observation.usage is not None:
+            fields["inference_usage"] = self.observation.usage
+        if self.observation is not None and self.observation.declined:
+            fields["inference_declined"] = True
+        return fields
+
+    def observed(self, observation, prices):
+        self.observation = observation
+        if observation.usage is not None:
+            actual = cost(observation.usage, prices)
+        else:
+            actual = 0 if observation.declined else self.charged
+        self.broker.inference_spent += actual - self.charged
+        self.charged = actual
+
     def run(self):
         # Set before any byte leaves: every outcome short of a confirmed answer holds.
         self.broker.inference_unconfirmed[self.params["body_sha256"]] = self.invocation
+        self.broker.inference_spent += self.reserved
+        self.charged = self.reserved
         return super().run()
 
 
@@ -231,6 +269,7 @@ class ProtectedBroker(Broker):
         self.inference_run = uuid4().hex
         self.inference_calls = 0
         self.inference_unconfirmed = {}
+        self.inference_spent = 0
         self.approval = state.approved()
         self.approval_envelope = json.loads((state.path / "approved.json").read_text())
         if self.approval_envelope.get("payload") != self.approval:
@@ -349,10 +388,22 @@ class ProtectedBroker(Broker):
             return profile.get("read_timeout_seconds", 30)
         return super().http_timeout(url)
 
+    def http_deadline(self, url):
+        # An agent's reply is released whole, so a trickled stream gets one overall limit.
+        return time.monotonic() + self.http_timeout(url) if self.agent_profile(url) else None
+
+    def agent_profile(self, url):
+        profile = self.approval.get("protected_model", {})
+        if profile.get("contract") == CONTRACT and endpoint(profile) == url:
+            return profile
+        return None
+
     def _settle_http_effect(self, intent, proof, outcome, dispatch, grant):
         evidence = super()._settle_http_effect(intent, proof, outcome, dispatch, grant)
-        if isinstance(dispatch, InferenceDispatch) and evidence["outcome"] == "COMMITTED":
-            self.inference_unconfirmed.pop(dispatch.params["body_sha256"], None)
+        if isinstance(dispatch, InferenceDispatch):
+            declined = dispatch.observation is not None and dispatch.observation.declined
+            if evidence["outcome"] == "COMMITTED" or declined:
+                self.inference_unconfirmed.pop(dispatch.params["body_sha256"], None)
         return evidence
 
     def bind_authority(self, effect, message):
@@ -378,6 +429,9 @@ class ProtectedBroker(Broker):
             or endpoint(profile) != url
         ):
             raise AirlockError("Model access requires an explicitly approved model constraint")
+        if profile.get("contract") == CONTRACT:
+            check_request(body, profile)
+            return body
         request = json.loads(body)
         if not isinstance(request, dict) or request.get("model") not in profile["models"]:
             raise AirlockError("Model is outside approved authority")
@@ -425,6 +479,12 @@ class ProtectedBroker(Broker):
         return canonical(request)
 
     def http_outcome(self, dispatch):
+        profile = self.agent_profile(dispatch.url)
+        if profile:
+            reply = base64.b64decode(dispatch.response["body"], validate=True)
+            observation = observe(dispatch.response["status"], reply, json.loads(dispatch.body))
+            dispatch.observed(observation, profile["price_microusd_per_mtok"])
+            return ("COMMITTED", True) if observation.confirmed else ("AMBIGUOUS", None)
         if dispatch.url not in self.model_transports or dispatch.response.get("status") != 200:
             return super().http_outcome(dispatch)
         try:
@@ -504,6 +564,9 @@ class ProtectedBroker(Broker):
                 for k, v in headers.items()
                 if k.lower() not in {"authorization", "x-api-key", "api-key", "host"}
             }
+            profile = self.agent_profile(url)
+            if profile:
+                headers = check_headers(headers, profile)
             for name, marker in self.markers.items():
                 if self.credentials[marker][1] == self.bindings[name] and url.startswith(
                     self.bindings[name] + "/"

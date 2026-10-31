@@ -137,10 +137,25 @@ def doctor(root: Path):
         except AirlockError:
             checks.append({"component": "local approval signature", "ok": False})
     protected = availability()
+    from .agents import SUPPORTED
+
+    agents = {}
+    for name, profile in SUPPORTED.items():
+        image = availability(profile["image"]) if protected["available"] else {"available": False}
+        agents[name] = {
+            "version": profile["version"],
+            "image": profile["image"],
+            "image_ready": image["available"],
+            "status": profile.get("status", "scored under acceptance v2"),
+        }
     return {
         "schema": "actenon-airlock/doctor/v1",
         "checks": checks,
         "guarantees": {"local": "cooperative Python interception", "protected": protected},
+        "agents": agents,
+        "supervisor_credentials": sorted(
+            name for name in ("ANTHROPIC_API_KEY", "OPENAI_API_KEY") if os.environ.get(name)
+        ),
         "ok": all(c["ok"] for c in checks),
     }
 
@@ -154,6 +169,7 @@ WORKFLOW_COMMANDS = {
 def _workflow_command(args, root: Path) -> int:
     """The guided path. Every consequence still goes through the existing broker."""
     from .agents import command, declaration, require_supported, write_declaration
+    from .model_constraints import DEFAULT_ENDPOINTS
     from .synthetic_github import TOKEN, create_provider, synthetic_client
     from .workflow import (
         TESTS_PASSED,
@@ -167,20 +183,44 @@ def _workflow_command(args, root: Path) -> int:
     config_path = state.path / "agent.json"
     if args.cmd == "setup":
         profile = require_supported(args.agent)
+        contract = profile.get("contract")
+        endpoint_url = args.model_endpoint or (DEFAULT_ENDPOINTS["anthropic"] if contract else None)
+        if not endpoint_url:
+            raise AirlockError("--model-endpoint is required for this agent")
+        if contract and not (args.max_run_usd and args.price_per_mtok):
+            raise AirlockError(
+                "This agent needs --max-run-usd and --price-per-mtok: the spend bound is "
+                "enforced from signed prices you review, so Airlock will not guess them"
+            )
         state.initialize()
-        write_declaration(root, declaration(args.model, args.model_endpoint))
+        write_declaration(root, declaration(args.model, endpoint_url))
         config = {
             "agent": args.agent,
             "model": args.model,
-            "model_endpoint": args.model_endpoint,
+            "model_endpoint": endpoint_url,
             "image": profile["image"],
         }
-        config_path.write_text(json.dumps(config, indent=2) + "\n")
         forwarded = [
             "init", "--path", str(root), "--command", "airlock_agent.py", "--model", args.model,
-            "--model-endpoint", args.model_endpoint, "--model-max-tokens", "4096",
-            "--model-read-timeout", "600",
+            "--model-endpoint", endpoint_url,
         ]  # fmt: skip
+        if contract:
+            config["command_options"] = {
+                "max_output_tokens": profile["max_output_tokens"],
+                "budget_usd": args.max_run_usd,
+            }
+            forwarded += [
+                "--model-provider", "anthropic", "--model-contract", contract,
+                "--model-max-tokens", str(profile["max_output_tokens"]),
+                "--model-max-input-bytes", str(profile["max_input_bytes"]),
+                "--model-max-run-usd", args.max_run_usd, "--model-price", args.price_per_mtok,
+                # Below the client's 600 seconds, so its timeout cannot race a live call.
+                "--model-read-timeout", "540",
+                *(arg for flag in profile["anthropic_betas"] for arg in ("--model-beta", flag)),
+            ]  # fmt: skip
+        else:
+            forwarded += ["--model-max-tokens", "4096", "--model-read-timeout", "600"]
+        config_path.write_text(json.dumps(config, indent=2) + "\n")
         if args.reconciler_key:
             forwarded += ["--reconciler-key", str(args.reconciler_key)]
         return main([*forwarded, *(["--approve"] if args.approve else [])])
@@ -195,7 +235,13 @@ def _workflow_command(args, root: Path) -> int:
             raise AirlockError("The message file must be inside the project the agent receives")
         return launch_protected(
             root,
-            command(config["agent"], config["model"], args.message_file, args.test_command),
+            command(
+                config["agent"],
+                config["model"],
+                args.message_file,
+                args.test_command,
+                **config.get("command_options", {}),
+            ),
             image=args.image or config["image"],
         )
     if args.cmd == "capture":
@@ -319,6 +365,12 @@ def _workflow_command(args, root: Path) -> int:
                 f"Model calls: {calls['dispatched']} dispatched, {calls['confirmed']} confirmed, "
                 f"{calls['unconfirmed']} unconfirmed, {calls['retries_held']} retries held"
             )
+            spend = result["model_spend"]
+            if spend["estimated_microusd"] or spend["declined_calls"]:
+                print(
+                    f"Model spend estimate: ${spend['estimated_microusd'] / 1_000_000:.4f} "
+                    f"(not billing); {spend['declined_calls']} calls declined by the provider"
+                )
             print(f"Independently observed: {result['independently_observed'] or 'none'}")
             print(f"Unresolved effects: {len(result['unresolved_effects'])}")
             for effect in result["unresolved_effects"]:
@@ -370,11 +422,16 @@ def main(argv=None):
                 help="Exit 0 on integrity alone; completeness stays UNANCHORED",
             )  # fmt: skip
         if cmd == "setup":
-            p.add_argument("--agent", required=True, help="A validated agent, e.g. aider")
+            p.add_argument("--agent", required=True, help="A supported agent, e.g. claude-code")
             p.add_argument("--model", required=True, help="The one model the agent may call")
             p.add_argument(
-                "--model-endpoint", required=True,
-                help="Exact /chat/completions URL the supervisor calls (HTTPS or loopback)",
+                "--model-endpoint",
+                help="Exact model URL the supervisor calls (HTTPS or loopback)",
+            )  # fmt: skip
+            p.add_argument("--max-run-usd", help="Supervisor-enforced model spend bound per run")
+            p.add_argument(
+                "--price-per-mtok",
+                help="USD per million tokens: input,cache_write,cache_read,output",
             )  # fmt: skip
             p.add_argument("--reconciler-key", type=Path, help="External operator key path")
             p.add_argument("--approve", action="store_true", help="Sign the reviewed authority")
@@ -445,6 +502,13 @@ def main(argv=None):
             p.add_argument("--model-max-tokens", type=int, default=2048)
             p.add_argument(
                 "--model-endpoint", help="Exact full inference endpoint also discovered by Scan"
+            )
+            p.add_argument("--model-contract", help="Review a named agent inference contract")
+            p.add_argument("--model-beta", action="append", default=[], help="Exact model feature")
+            p.add_argument("--model-max-input-bytes", type=int, default=2 * 1024 * 1024)
+            p.add_argument("--model-max-run-usd", help="Per-run model spend bound in USD")
+            p.add_argument(
+                "--model-price", help="USD per million tokens: input,cache_write,cache_read,output"
             )
             p.add_argument(
                 "--model-read-timeout",
@@ -529,6 +593,13 @@ def main(argv=None):
                     if result["guarantees"]["protected"]["available"]
                     else "COOPERATIVE MODE ONLY: " + result["guarantees"]["protected"]["reason"]
                 )
+                for name, agent in result["agents"].items():
+                    print(
+                        f"AGENT {name} ({agent['version']}): image "
+                        f"{'ready' if agent['image_ready'] else 'not built'}; {agent['status']}"
+                    )
+                held = ", ".join(result["supervisor_credentials"]) or "none"
+                print(f"Model credentials in the supervisor: {held}. None enter the container.")
             return 0 if result["ok"] else 2
         if args.cmd == "checkpoint":
             from .evidence import create_checkpoint
@@ -758,7 +829,7 @@ def main(argv=None):
             if args.model:
                 from .model_constraints import endpoint, validate_profile
 
-                if not 1 <= args.model_max_tokens <= 4096 or any(
+                if (not args.model_contract and not 1 <= args.model_max_tokens <= 4096) or any(
                     not model.strip() for model in args.model
                 ):
                     raise AirlockError("Models require names and a token bound between 1 and 4096")
@@ -767,6 +838,20 @@ def main(argv=None):
                     "models": sorted(set(args.model)),
                     "max_output_tokens": args.model_max_tokens,
                 }
+                if args.model_contract:
+                    from .agents import parse_prices, usd_to_micro
+
+                    if not args.model_price or not args.model_max_run_usd:
+                        raise AirlockError(
+                            "An agent contract needs signed prices and a spend bound"
+                        )
+                    current["protected_model"].update(
+                        contract=args.model_contract,
+                        max_input_bytes=args.model_max_input_bytes,
+                        anthropic_betas=sorted(set(args.model_beta)),
+                        price_microusd_per_mtok=parse_prices(args.model_price),
+                        max_run_microusd=usd_to_micro(args.model_max_run_usd),
+                    )
                 if args.model_endpoint:
                     current["protected_model"]["endpoint"] = args.model_endpoint
                 elif before.get("protected_model", {}).get(

@@ -8,6 +8,7 @@ from urllib.parse import urlsplit
 
 from actenon_scan.authority import sdk
 
+from .agent_inference import PROFILE_FIELDS, validate_agent_profile
 from .common import AirlockError, validate_url
 
 DEFAULT_ENDPOINTS = {
@@ -34,13 +35,9 @@ def endpoint(profile):
 
 def validate_profile(profile):
     endpoint(profile)
-    if set(profile) - {
-        "provider",
-        "endpoint",
-        "models",
-        "max_output_tokens",
-        "read_timeout_seconds",
-    }:
+    agent = "contract" in profile
+    known = {"provider", "endpoint", "models", "max_output_tokens", "read_timeout_seconds"}
+    if set(profile) - (known | PROFILE_FIELDS if agent else known):
         raise AirlockError("Unknown model constraint")
     models = profile.get("models")
     if (
@@ -57,7 +54,9 @@ def validate_profile(profile):
     ):
         raise AirlockError("Models must be a non-empty list of exact names")
     bound = profile.get("max_output_tokens")
-    if type(bound) is not int or not 1 <= bound <= 4096:
+    if agent:
+        validate_agent_profile(profile)
+    elif type(bound) is not int or not 1 <= bound <= 4096:
         raise AirlockError("Invalid approved model output bound")
     timeout = profile.get("read_timeout_seconds", 30)
     if type(timeout) is not int or not 1 <= timeout <= 600:

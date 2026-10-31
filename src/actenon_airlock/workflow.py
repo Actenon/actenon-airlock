@@ -400,6 +400,7 @@ def status(state: State) -> dict:
     confirmed = sum(r.get("outcome") == "COMMITTED" for r in answered)
     unconfirmed = len(answered) - confirmed
     unconfirmed += sum(r.get("stage") == "execution-error" for r in calls)
+    settled = [r for r in calls if r.get("stage") in {"response-received", "execution-error"}]
     return {
         "emergency_stop": state.emergency_stop(),
         "integrity_ok": report["integrity"]["ok"],
@@ -417,5 +418,9 @@ def status(state: State) -> dict:
             "retries_held": sum(
                 r.get("decision") == "DENY" and r["inference_retry"] for r in calls
             ),
+        },
+        "model_spend": {
+            "estimated_microusd": sum(r.get("inference_cost_microusd", 0) for r in settled),
+            "declined_calls": sum(bool(r.get("inference_declined")) for r in settled),
         },
     }
