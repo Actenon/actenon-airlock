@@ -18,7 +18,7 @@ from anthropic_fixture import (
     PRICES,
     USAGE,
     ScriptedProvider,
-    stream_body,
+    reply_body,
     stream_reply,
     text,
     tool,
@@ -181,7 +181,7 @@ def test_the_supervisor_credential_replaces_anything_the_agent_sends(project):
 
 def test_a_reply_holding_the_key_is_masked_before_the_agent_sees_it(project):
     _, build = project
-    leak = stream_body([text(f"key is {SECRET}")])
+    leak = reply_body([text(f"key is {SECRET}")])
     reply = httpx.Response(200, headers={"content-type": "text/event-stream"}, content=leak)
     result = build(lambda request: reply).handle(message())
     assert SECRET.encode() not in base64.b64decode(result["response"]["body"])
@@ -343,19 +343,19 @@ def test_only_a_reviewed_consequence_path_reaches_github(project):
 
 
 def replaced(old: bytes, new: bytes) -> bytes:
-    body = stream_body([text("answer")])
+    body = reply_body([text("answer")])
     assert old in body
     return body.replace(old, new)
 
 
 UNCONFIRMED = {
-    "cut before the end": stream_body([text("answer")]).split(b"event: message_delta")[0],
-    "no stop event": stream_body([text("answer")]).split(b"event: message_stop")[0],
-    "other model": stream_body([text("answer")], model="claude-other"),
+    "cut before the end": reply_body([text("answer")]).split(b"event: message_delta")[0],
+    "no stop event": reply_body([text("answer")]).split(b"event: message_stop")[0],
+    "other model": reply_body([text("answer")], model="claude-other"),
     "stream error": replaced(b"event: message_stop", b'event: error\ndata: {"type":"error"}\n\nx:'),
     "server tool block": replaced(b'"type":"text","text":""', b'"type":"server_tool_use"'),
     "mcp block": replaced(b'"type":"text","text":""', b'"type":"mcp_tool_use"'),
-    "pause": stream_body([text("answer")], stop_reason="pause_turn"),
+    "pause": reply_body([text("answer")], stop_reason="pause_turn"),
     "second start": replaced(
         b"event: ping\n", b'event: message_start\ndata: {"type":"message_start"}\n\nevent: ping\n'
     ),
@@ -418,7 +418,7 @@ def test_identical_calls_under_the_contract_stay_separate(project):
 
 def test_usage_becomes_a_receipted_estimate_from_signed_prices(project):
     state, build = project
-    reply = stream_body([text("answer")], output_tokens=1000)
+    reply = reply_body([text("answer")], output_tokens=1000)
     reply = reply.replace(b'"cache_read_input_tokens":0', b'"cache_read_input_tokens":5000')
     provider = lambda request: httpx.Response(  # noqa: E731
         200, headers={"content-type": "text/event-stream"}, content=reply
@@ -650,6 +650,17 @@ def test_review_shows_every_bound_and_activates_nothing(tmp_path, capsys):
     for bound in ("max_run_microusd", "price_microusd_per_mtok", "anthropic_betas", "contract"):
         assert bound in output
     assert not (tmp_path / ".airlock" / "approved.json").exists()
+
+
+def test_a_subscription_token_is_refused_before_any_container_starts(tmp_path, capsys, monkeypatch):
+    configure(tmp_path)
+    (tmp_path / "ISSUE.md").write_text("task\n")
+    capsys.readouterr()
+    monkeypatch.setenv("ANTHROPIC_API_KEY", "sk-ant-oat01-test")
+    code = main(["work", "--path", str(tmp_path), "--message-file", "ISSUE.md"])
+    assert code == 2
+    assert "subscription" in capsys.readouterr().err
+    assert not (tmp_path / ".airlock/local/runs").exists()
 
 
 def test_the_launch_command_holds_no_secret_and_pins_every_model_alias():

@@ -233,6 +233,11 @@ def _workflow_command(args, root: Path) -> int:
             raise AirlockError("No agent configured; run airlock setup first") from exc
         if not (root / args.message_file).resolve().is_relative_to(root.resolve()):
             raise AirlockError("The message file must be inside the project the agent receives")
+        if os.environ.get("ANTHROPIC_API_KEY", "").startswith("sk-ant-oat"):
+            raise AirlockError(
+                "ANTHROPIC_API_KEY holds a subscription token. Claude subscription credentials "
+                "cannot be held by an intermediary: use an API key from the Claude Console"
+            )
         return launch_protected(
             root,
             command(
