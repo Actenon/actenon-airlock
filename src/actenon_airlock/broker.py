@@ -671,8 +671,13 @@ class Broker:
                     scope=scope(entry),
                     **labels,
                 )
+                held = (
+                    ""
+                    if effect_evidence["outcome"] == "COMMITTED"
+                    else "; duplicate dispatch blocked"
+                )
                 print(
-                    f"AIRLOCK ALLOW {action_name} @ {target}: effect {effect_evidence['outcome']}; duplicate dispatch blocked [{row['id']}]",
+                    f"AIRLOCK ALLOW {action_name} @ {target}: effect {effect_evidence['outcome']}{held} [{row['id']}]",
                     file=sys.stderr,
                 )
                 return {

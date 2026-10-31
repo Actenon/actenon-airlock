@@ -25,9 +25,21 @@ SQLite database, so two hosts sharing a project could not exclude each other.
 
 * The agent can read everything in its workspace copy, and it can send that text to
   the approved model through inference. Choose the model endpoint with that in mind.
-* Each protected request is single-use within a run. An agent that repeats an inference
-  prompt word for word gets a 403 for the repeat, and `airlock work` exits 3. A new run
-  is not affected.
+* An identical model request is a new call once the earlier one has a confirmed answer.
+  Each call has its own receipts and counts against the 128 calls in a run. Airlock
+  caches nothing, and this applies to model calls only. A GitHub creation stays
+  single-use across runs.
+* If a model call has no confirmed answer, an identical request is treated as a retry of
+  that call. That covers a lost reply, a provider error and a malformed answer. Airlock
+  refuses the retry without sending it, `airlock work` exits 3, and `airlock status`
+  counts it under retries held. A different prompt still goes through, and a new run
+  starts with no hold.
+* Inference is not exactly-once. After a lost reply nobody here knows whether the provider
+  processed or billed the call, so it stays unconfirmed. Airlock never retries on its own.
+* The SDKs in the contained path give no stable retry identity. If an answer is confirmed
+  at the supervisor and then lost on its way into the container, a client retry looks like
+  a new call. It is sent, counted and billed separately, with its own receipts.
+* The model grant has no time-based rate limit. The limit is 128 calls per run.
 * The workspace is a host directory with no size quota. A hostile agent can fill the disk
   it sits on, so keep the project on a volume where that is survivable.
 * Docker shares the host kernel. This is container isolation, not a microVM.

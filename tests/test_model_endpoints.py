@@ -101,7 +101,6 @@ def test_custom_model_endpoint_keeps_scan_target_proof_and_transport_identical(t
         assert executed["target"] == ENDPOINT
         assert executed["outcome"] == "COMMITTED" and executed["execution_occurred"] is True
         assert executed["credential_released"] is False
-        assert not broker.handle(message())["ok"]
         assert len(calls) == 1
     finally:
         broker.close()

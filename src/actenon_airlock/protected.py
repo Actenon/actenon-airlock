@@ -26,7 +26,7 @@ from actenon_permit.model import Budget, Grant, Scopes
 from actenon_protocol.effects import effect_identity
 from actenon_scan.authority import classify_http
 
-from .broker import Broker
+from .broker import Broker, HttpDispatch
 from .common import AirlockError, canonical, power, validate_url
 from .github_runtime import (
     GitHubCreateDispatch,
@@ -186,6 +186,39 @@ def snapshot(root: Path, destination: Path, secrets=()):
         os.close(source_fd)
 
 
+class InferenceDispatch(HttpDispatch):
+    """One logical model call, named by the supervisor and never by the agent.
+
+    Identical bytes after a confirmed answer are a new call. Identical bytes while an
+    earlier call has no confirmed answer may be a retry of it, so they keep its name and
+    its durable hold refuses them: nobody here knows whether the provider processed or
+    billed that call. The contained path has no stable retry identity, so a client
+    retry after a confirmed answer is a new call, with its own budget and receipts.
+    Airlock never retries on its own, and inference is not exactly-once.
+    """
+
+    def __init__(self, broker, effect, message):
+        super().__init__(broker, effect, message)
+        self.invocation = broker.inference_unconfirmed.get(self.params["body_sha256"])
+        self.retry = self.invocation is not None
+        if not self.retry:
+            broker.inference_calls += 1
+            self.invocation = broker.inference_calls
+        self.params["inference_invocation"] = self.invocation
+
+    def authority_fields(self):
+        return {
+            "inference_run": self.broker.inference_run,
+            "inference_invocation": self.invocation,
+            "inference_retry": self.retry,
+        }
+
+    def run(self):
+        # Set before any byte leaves: every outcome short of a confirmed answer holds.
+        self.broker.inference_unconfirmed[self.params["body_sha256"]] = self.invocation
+        return super().run()
+
+
 class ProtectedBroker(Broker):
     """Scan vocabulary and Permit policy, with an OS-bound grant principal.
 
@@ -196,6 +229,8 @@ class ProtectedBroker(Broker):
 
     def __init__(self, state, current, bindings=None):
         self.inference_run = uuid4().hex
+        self.inference_calls = 0
+        self.inference_unconfirmed = {}
         self.approval = state.approved()
         self.approval_envelope = json.loads((state.path / "approved.json").read_text())
         if self.approval_envelope.get("payload") != self.approval:
@@ -258,7 +293,7 @@ class ProtectedBroker(Broker):
 
     def make_dispatch(self, adapter, effect, message):
         if effect.target in self.model_transports:
-            return super().make_dispatch(adapter, effect, message)
+            return InferenceDispatch(self, effect, message)
         for profile in self.github_profiles:
             if effect.target != review_for(profile).contents_url:
                 continue
@@ -270,11 +305,13 @@ class ProtectedBroker(Broker):
 
     def _http_effect_descriptor(self, intent):
         if intent.target.resource_id in self.model_transports:
-            # Inference is not an external mutation, so ownership is scoped to this
-            # run: a rerun may send the same first prompt. Within a run a duplicate
-            # or unresolved call stays held, and each run has its own call budget.
+            # Inference is not an external mutation, so ownership belongs to one
+            # logical call in this run, not to its prompt. Both names are the
+            # supervisor's, and each run has its own call budget.
             base = super()._http_effect_descriptor(intent)
-            return {**base, "semantic_key": {**base["semantic_key"], "run": self.inference_run}}
+            invocation = intent.action.parameters["inference_invocation"]
+            key = {**base["semantic_key"], "run": self.inference_run, "invocation": invocation}
+            return {**base, "semantic_key": key}
         return project_intent(intent, self.github_profiles, self.effect_namespace)
 
     def grant_principal(self):
@@ -311,6 +348,12 @@ class ProtectedBroker(Broker):
             # an agent request/header. This is not an overall execution deadline.
             return profile.get("read_timeout_seconds", 30)
         return super().http_timeout(url)
+
+    def _settle_http_effect(self, intent, proof, outcome, dispatch, grant):
+        evidence = super()._settle_http_effect(intent, proof, outcome, dispatch, grant)
+        if isinstance(dispatch, InferenceDispatch) and evidence["outcome"] == "COMMITTED":
+            self.inference_unconfirmed.pop(dispatch.params["body_sha256"], None)
+        return evidence
 
     def bind_authority(self, effect, message):
         for candidate in effect.candidates:

@@ -314,6 +314,11 @@ def _workflow_command(args, root: Path) -> int:
             print(f"Refused: {result['refused']}")
             for reason in result["refusal_reasons"]:
                 print("  " + reason)
+            calls = result["inference"]
+            print(
+                f"Model calls: {calls['dispatched']} dispatched, {calls['confirmed']} confirmed, "
+                f"{calls['unconfirmed']} unconfirmed, {calls['retries_held']} retries held"
+            )
             print(f"Independently observed: {result['independently_observed'] or 'none'}")
             print(f"Unresolved effects: {len(result['unresolved_effects'])}")
             for effect in result["unresolved_effects"]:

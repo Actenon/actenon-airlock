@@ -395,6 +395,11 @@ def status(state: State) -> dict:
     report = verify_offline(journal, public)
     rows = [json.loads(line) for line in journal.splitlines()] if report["integrity"]["ok"] else []
     refused = [r for r in rows if r.get("decision") == "DENY"]
+    calls = [r for r in rows if "inference_invocation" in r]
+    answered = [r for r in calls if r.get("stage") == "response-received"]
+    confirmed = sum(r.get("outcome") == "COMMITTED" for r in answered)
+    unconfirmed = len(answered) - confirmed
+    unconfirmed += sum(r.get("stage") == "execution-error" for r in calls)
     return {
         "emergency_stop": state.emergency_stop(),
         "integrity_ok": report["integrity"]["ok"],
@@ -405,4 +410,12 @@ def status(state: State) -> dict:
         "independently_observed": report["provider_truth"]["independently_observed"],
         "runtime_claims": report["provider_truth"]["runtime_claims"],
         "unresolved_effects": report["provider_truth"]["unresolved_ambiguous"],
+        "inference": {
+            "dispatched": confirmed + unconfirmed,
+            "confirmed": confirmed,
+            "unconfirmed": unconfirmed,
+            "retries_held": sum(
+                r.get("decision") == "DENY" and r["inference_retry"] for r in calls
+            ),
+        },
     }
