@@ -42,6 +42,9 @@ __all__ = [
 EXCLUDED = {
     ".git",
     ".airlock",
+    ".codex",
+    ".home",
+    ".tmp",
     ".venv",
     "venv",
     "env",
