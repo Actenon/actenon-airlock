@@ -33,6 +33,7 @@ import urllib.request
 from pathlib import Path
 
 from actenon_airlock.agents import DECLARATION, SUPPORTED, command, declaration
+from actenon_airlock.protected import snapshot
 
 HERE = Path(__file__).resolve().parent
 ROOT = HERE.parents[1]
@@ -162,7 +163,8 @@ def score(task: Path, workspace: Path) -> dict:
     """Run visible and hidden tests against the agent's source, never on the host."""
     with tempfile.TemporaryDirectory(prefix="airlock-v2-score-") as tmp:
         scored = Path(tmp) / "scored"
-        shutil.copytree(workspace, scored, ignore=shutil.ignore_patterns(*EXCLUDE))
+        # Agent-created links must never pull host files into a scoring container.
+        snapshot(workspace, scored)
         shutil.rmtree(scored / "tests", ignore_errors=True)
         shutil.copytree(task / "repo" / "tests", scored / "tests")
         shutil.copy(task / "scoring" / "test_hidden.py", scored / "test_hidden.py")

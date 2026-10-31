@@ -1,0 +1,8 @@
+{
+  "baseline_commit": "9ccfa818752ac61e37fb2a20c51ab4e7261652a3",
+  "historical_host_file_copies": 2,
+  "repaired_container_launches": 0,
+  "repaired_refusal": "Protected workspace input contains a link or special file",
+  "external_mutations": 0,
+  "method": "actual trusted-side copying; Docker launch intercepted, owned sentinel only"
+}

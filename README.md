@@ -220,3 +220,9 @@ proof mutation/replay, JSON/CI output, and attempted runtime bypasses.
 The local signed receipt journal serializes appends across threads and broker
 processes. An interrupted partial record stops further appends until recovery;
 evidence is preserved. See [the journal attack evidence and guarantees](docs/evidence/receipt-journal/README.md).
+
+### Codex CLI integration candidate
+
+[Run unchanged Codex CLI inside Protected Mode](docs/codex-cli.md). The pinned
+Responses integration has a scripted real-binary rehearsal and independent Docker
+controls. Live-model acceptance is not yet run; historical release gates still apply.

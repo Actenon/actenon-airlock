@@ -8,11 +8,13 @@ from urllib.parse import urlsplit
 
 from actenon_scan.authority import sdk
 
+from . import responses_inference
 from .agent_inference import PROFILE_FIELDS, validate_agent_profile
 from .common import AirlockError, validate_url
 
 DEFAULT_ENDPOINTS = {
     "openai": "https://api.openai.com/v1/chat/completions",
+    "openai-responses": "https://api.openai.com/v1/responses",
     "anthropic": "https://api.anthropic.com/v1/messages",
 }
 
@@ -55,7 +57,12 @@ def validate_profile(profile):
         raise AirlockError("Models must be a non-empty list of exact names")
     bound = profile.get("max_output_tokens")
     if agent:
-        validate_agent_profile(profile)
+        if profile.get("contract") == responses_inference.CONTRACT:
+            responses_inference.validate_profile(profile)
+        else:
+            validate_agent_profile(profile)
+    elif profile["provider"] == "openai-responses":
+        raise AirlockError("Responses requires its reviewed agent contract")
     elif type(bound) is not int or not 1 <= bound <= 4096:
         raise AirlockError("Invalid approved model output bound")
     timeout = profile.get("read_timeout_seconds", 30)
@@ -80,6 +87,8 @@ def scan_transports(current):
                 "langchain_openai.ChatOpenAI",
             }:
                 format_name = "openai"
+            elif route == ("post", "/responses") and family == "openai":
+                format_name = "openai-responses"
             elif route == ("post", "/v1/messages") and family in {
                 "anthropic",
                 "langchain_anthropic.ChatAnthropic",
