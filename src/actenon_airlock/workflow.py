@@ -27,14 +27,21 @@ from uuid import uuid4
 from .common import AirlockError
 from .github_consequence import MAX_CONTENT_BYTES
 from .github_runtime import review_for, validate_profiles
-from .manifest import EXCLUDED, discover
-from .protected import DEFAULT_IMAGE, Docker, ProtectedBroker, _verify_container
+from .manifest import discover
+from .protected import (
+    DEFAULT_IMAGE,
+    EXCLUDED_INPUT,
+    Docker,
+    ProtectedBroker,
+    _verify_container,
+)
 from .state import State
 
 CANDIDATE_SCHEMA = "actenon-airlock/candidate/v1"
 TESTS_PASSED = "TESTS_PASSED"
 TESTS_FAILED = "TESTS_FAILED"
-SKIP_NAMES = EXCLUDED | {".home", ".tmp", ".gitignore", "airlock_agent.py"}
+# Never staged for the agent, so their absence from a workspace is no change it made.
+SKIP_NAMES = EXCLUDED_INPUT | {".home", ".tmp", ".gitignore", "airlock_agent.py"}
 MAX_JUNIT_BYTES = 1024 * 1024
 MAX_CANDIDATE_FILE_BYTES = 32 * 1024 * 1024
 MAX_CANDIDATE_TOTAL_BYTES = 256 * 1024 * 1024

@@ -36,9 +36,9 @@ from actenon_airlock.cli import main
 from actenon_airlock.common import AirlockError
 from actenon_airlock.manifest import authority_diff, discover
 from actenon_airlock.model_constraints import validate_profile
-from actenon_airlock.protected import ProtectedBroker
+from actenon_airlock.protected import ProtectedBroker, snapshot
 from actenon_airlock.state import State
-from actenon_airlock.workflow import status
+from actenon_airlock.workflow import capture_candidate, status
 
 SECRET = "sk-ant-supervisor-held-test-value"
 ROOT = Path(__file__).resolve().parents[1]
@@ -618,10 +618,48 @@ def test_cost_rounds_up_and_a_reservation_exceeds_ordinary_use():
     assert reservation(4000, 2048, prices) > cost({**usage, "output_tokens": 2048}, prices)
 
 
-@pytest.mark.parametrize("value", ["abc", "-1", "0.0000001", "NaN", ""])
+@pytest.mark.parametrize("value", ["abc", "-1", "0.0000001", "NaN", "", "Infinity", "-Infinity"])
 def test_money_must_be_a_whole_positive_number_of_micro_usd(value):
     with pytest.raises(AirlockError):
         usd_to_micro(value)
+
+
+HOST_STATE = {
+    ".claude.json": "login state",
+    ".credentials.json": "oauth-token",
+    ".claude/settings.local.json": "per-machine settings",
+    "nested/.claude/.credentials.json": "oauth-token",
+}
+
+
+def test_host_claude_state_never_enters_the_workspace(tmp_path):
+    source = tmp_path / "project"
+    (source / ".claude").mkdir(parents=True)
+    (source / "nested" / ".claude").mkdir(parents=True)
+    for name, value in HOST_STATE.items():
+        (source / name).write_text(value)
+    (source / ".claude" / "settings.json").write_text("{}")
+    (source / "CLAUDE.md").write_text("project notes")
+    snapshot(source, tmp_path / "copy")
+    copied = {str(p.relative_to(tmp_path / "copy")) for p in (tmp_path / "copy").rglob("*")}
+    assert not copied & set(HOST_STATE)
+    # Project-owned guidance is content, and the agent is meant to read it.
+    assert {"CLAUDE.md", ".claude/settings.json"} <= copied
+
+
+def test_withheld_host_state_is_not_reported_as_an_agent_deletion(tmp_path):
+    state = State(tmp_path)
+    state.initialize()
+    for name, value in HOST_STATE.items():
+        (tmp_path / name).parent.mkdir(parents=True, exist_ok=True)
+        (tmp_path / name).write_text(value)
+    (tmp_path / "app.py").write_text("old\n")
+    workspace = tmp_path / ".airlock/local/runs/run/workspace"
+    workspace.mkdir(parents=True)
+    (workspace / "app.py").write_text("new\n")
+    (workspace.parent / "result.json").write_text("{}")
+    manifest = capture_candidate(state)
+    assert [change["path"] for change in manifest["changes"]] == ["app.py"]
 
 
 def test_prices_need_every_token_class():

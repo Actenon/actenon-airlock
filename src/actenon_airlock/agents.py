@@ -115,7 +115,7 @@ def usd_to_micro(text: str) -> int:
         value = Decimal(str(text)) * 1_000_000
     except InvalidOperation as exc:
         raise AirlockError("Prices and spend bounds must be decimal USD amounts") from exc
-    if value != value.to_integral_value() or value < 0:
+    if not value.is_finite() or value != value.to_integral_value() or value < 0:
         raise AirlockError("Prices and spend bounds resolve to whole micro-USD")
     return int(value)
 

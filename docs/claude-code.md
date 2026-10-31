@@ -44,6 +44,8 @@ The rest is the [golden path](golden-path.md): `capture`, `verify-candidate`, `r
 
 Use an API key from the Claude Console. It is billed separately from any Claude subscription.
 
+Host-local Claude state is withheld from the workspace, including `.credentials.json`, `.claude.json` and `settings.local.json`. A project's own `CLAUDE.md` and `.claude/settings.json` are copied, because they are project content the agent is meant to read. They are also untrusted input.
+
 Airlock refuses a subscription token. Protected Mode keeps credentials out of the container, so the supervisor would have to hold the token and attach it, and [Claude Code's terms](https://code.claude.com/docs/en/legal-and-compliance) say developers may not "collect, store, or intermediate Claude.ai credentials or session tokens". The container gets a placeholder key instead, and the supervisor replaces it.
 
 ## What the agent can do

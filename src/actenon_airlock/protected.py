@@ -45,6 +45,8 @@ from .wire import LIMIT
 DEFAULT_IMAGE = "actenon-airlock-compute:dev"
 MODEL_ENDPOINTS = {url: provider for provider, url in DEFAULT_ENDPOINTS.items()}
 EXCLUDED_INPUT = EXCLUDED | {".ssh", ".aws", ".azure", ".config", ".gnupg", ".docker"}
+# Host-local Claude Code state: logins and per-machine settings, never project content.
+EXCLUDED_INPUT |= {".claude.json", ".credentials.json", "settings.local.json"}
 
 
 class Docker:
