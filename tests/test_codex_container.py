@@ -70,10 +70,14 @@ def steps():
     return [
         [tool("read", "cat calculator.py && python -m pytest -q")],
         [
-            tool(
-                "edit",
-                "python -c \"from pathlib import Path; p=Path('calculator.py'); p.write_text(p.read_text().replace('a - b', 'a + b'))\"",
-            )
+            {
+                "type": "custom_tool_call",
+                "id": "ct_edit",
+                "call_id": "edit",
+                "name": "apply_patch",
+                "status": "completed",
+                "input": "*** Begin Patch\n*** Update File: calculator.py\n@@\n-    return a - b\n+    return a + b\n*** End Patch",
+            }
         ],
         [tool("test", "python -m pytest -q")],
         [text("Fixture correction complete.")],

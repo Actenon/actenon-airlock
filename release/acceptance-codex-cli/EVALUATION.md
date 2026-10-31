@@ -78,8 +78,9 @@ correctly require a new freeze when the scorer changes.
 
 Commands and live authorization limits are in `docs/codex-cli.md`.
 New unit regressions, real Codex/Docker controls, synthetic consequence tests, lint,
-package build and clean wheel installation were executed. Final aggregate suite and
-exact-head CI results are recorded in the final checkpoint and attached evidence.
+package build and clean wheel installation were executed. Full local suite: 896 passed, zero failed/skipped, with Docker tests enabled.
+Native apply_patch follow-up: five Codex container tests passed. Exact-head CI results
+are recorded in the external final evidence bundle and PR description.
 The first aggregate run had 890 passing tests and one fixture assertion failure:
 publication without approval raised the intended fail-closed exception instead of
 returning a refusal dictionary. The assertion was fixed and that full journey passed.

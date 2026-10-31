@@ -65,8 +65,8 @@ jobs:
         with:
           python-version: "3.12"
       - run: python -m pip install build ruff
-      - run: ruff check src tests scripts
-      - run: ruff format --check src tests scripts
+      - run: ruff check src tests scripts acceptance/codex-cli containers/codex-cli
+      - run: ruff format --check src tests scripts acceptance/codex-cli containers/codex-cli
       - run: python -m build
       - name: Install built wheel with real pinned dependencies
         run: |
