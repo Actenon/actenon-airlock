@@ -93,6 +93,11 @@ exact bytes. The [golden path](docs/golden-path.md) walks all ten steps, and
 provider on your own machine. For stopping, rotating and recovering, see
 [operations](docs/operations.md).
 
+Unchanged Claude Code also runs through the same boundary, with a reviewed
+[inference contract](docs/claude-code.md) and a supervisor-enforced spend bound. It is an
+integration candidate: it has been tested with the real binary against a scripted model,
+and it has [no scored live result](release/acceptance-claude-code/VERDICT.md) yet.
+
 ## Credentials and receipts
 
 The parent broker retains credentials. In Local Mode, the agent receives opaque handles for GITHUB_TOKEN,
@@ -123,7 +128,7 @@ linked completion record. Consequential HTTP uses Permit's durable effect reserv
 and claimed independently by Kernel before credential release. Lost responses leave AMBIGUOUS
 ownership held, and identical retries remain blocked across new runs and grants. In Local Mode,
 read-only classification comes from Scan; those requests remain repeatable. Protected Mode
-supports reviewed text inference and exact GitHub file creation. Other outbound calls, including
+supports reviewed model inference and exact GitHub file creation. Other outbound calls, including
 arbitrary GETs, are denied: an HTTP verb alone does not establish harmless consequences.
 
 A generic HTTP response is returned to the agent, but does not prove the remote consequence

@@ -40,6 +40,10 @@ SQLite database, so two hosts sharing a project could not exclude each other.
   at the supervisor and then lost on its way into the container, a client retry looks like
   a new call. It is sent, counted and billed separately, with its own receipts.
 * The model grant has no time-based rate limit. The limit is 128 calls per run.
+* Under the [Claude Code contract](claude-code.md), a provider's explicit 429 or 529 ends
+  that call, so its retry is a new one. The first call's effect still reads as unconfirmed
+  in `airlock status`, because the reply proves nothing about billing. Each run also has a
+  signed spend bound, and a lost reply stays counted against it.
 * The workspace is a host directory with no size quota. A hostile agent can fill the disk
   it sits on, so keep the project on a volume where that is survivable.
 * Docker shares the host kernel. This is container isolation, not a microVM.

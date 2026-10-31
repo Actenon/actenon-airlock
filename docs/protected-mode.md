@@ -33,6 +33,8 @@ are filled with the approved bound **before** hashing, verification and dispatch
 Remote tools, stored state, attachments, extra outputs and unknown parameters
 are refused. A valid completed model response with usage establishes observed
 inference output; it does not establish billing settlement or downstream effects.
+Claude Code uses a separate reviewed contract with tools and streaming; see
+[Claude Code in Protected Mode](claude-code.md).
 The other supported external operation is an explicitly reviewed
 [GitHub create-only consequence](github-consequence.md). Its response remains AMBIGUOUS until
 trusted readback confirms the exact provider state. All other outbound HTTP is denied, including
