@@ -714,6 +714,25 @@ def test_the_launch_command_holds_no_secret_and_pins_every_model_alias():
     assert "WebFetch" not in joined and "WebSearch" not in joined
 
 
+def test_thinking_can_be_turned_off_only_when_asked():
+    options = {"max_output_tokens": 4096, "budget_usd": "1"}
+    assert "CLAUDE_CODE_DISABLE_THINKING=1" not in command(
+        "claude-code", MODEL, "ISSUE.md", "pytest", **options
+    )
+    assert "CLAUDE_CODE_DISABLE_THINKING=1" in command(
+        "claude-code", MODEL, "ISSUE.md", "pytest", **options, thinking=False
+    )
+
+
+def test_a_lower_output_bound_is_what_gets_signed(tmp_path):
+    arguments = ["setup", "--path", str(tmp_path), "--agent", "claude-code", "--model", MODEL]
+    bounds = ["--max-run-usd", "1", "--price-per-mtok", PRICES, "--max-output-tokens", "4096"]
+    assert main([*arguments, *bounds, "--no-thinking", "--approve"]) == 0
+    assert State(tmp_path).approved()["protected_model"]["max_output_tokens"] == 4096
+    options = json.loads((tmp_path / ".airlock" / "agent.json").read_text())["command_options"]
+    assert options["max_output_tokens"] == 4096 and options["thinking"] is False
+
+
 def test_the_frozen_v2_aider_command_is_unchanged():
     frozen = json.loads((ROOT / "release/acceptance-v2/config.json").read_text())
     assert (
@@ -797,6 +816,61 @@ def test_relay_answers_optional_token_counting_without_a_refused_effect(monkeypa
     status_code, _, _ = relay.post("/v1/messages/count_tokens?beta=true")
     relay.server.shutdown()
     assert status_code == 404 and relay.sent == []
+
+
+def slow_relay(monkeypatch, reply):
+    relay = RelayFixture(monkeypatch, reply)
+    answer = contained_agent.rpc
+    monkeypatch.setattr(contained_agent, "rpc", lambda value: time.sleep(0.4) or answer(value))
+    monkeypatch.setattr(contained_agent, "KEEPALIVE_AFTER_SECONDS", 0.05)
+    monkeypatch.setattr(contained_agent, "KEEPALIVE_EVERY_SECONDS", 0.05)
+    return relay
+
+
+def streaming_post(relay):
+    request = urllib.request.Request(
+        f"http://127.0.0.1:{relay.server.server_port}/v1/messages",
+        json.dumps({"stream": True}).encode(),
+        {"Content-Type": "application/json"},
+    )
+    with urllib.request.urlopen(request) as response:
+        return response.status, response.read()
+
+
+def test_relay_keeps_a_slow_stream_open_with_comments_only(monkeypatch):
+    reply = {
+        "ok": True,
+        "response": {
+            "status": 200,
+            "headers": {"content-type": "text/event-stream"},
+            "body": base64.b64encode(b"event: message_stop\ndata: {}\n\n").decode(),
+        },
+    }
+    relay = slow_relay(monkeypatch, reply)
+    status_code, body = streaming_post(relay)
+    relay.server.shutdown()
+    assert status_code == 200
+    before, _, after = body.rpartition(b"event: message_stop")
+    assert before.count(b": airlock is waiting") >= 2
+    # Comments are all that precedes the validated reply, so no model content leaked early.
+    assert all(line.startswith(b":") for line in before.split(b"\n") if line)
+    assert after == b"\ndata: {}\n\n"
+
+
+def test_relay_reports_a_late_refusal_as_a_stream_error(monkeypatch):
+    relay = slow_relay(monkeypatch, {"ok": False, "reason": "held"})
+    status_code, body = streaming_post(relay)
+    relay.server.shutdown()
+    assert status_code == 200
+    event = body.split(b"event: error\ndata: ")[1].split(b"\n\n")[0]
+    assert json.loads(event)["error"] == {"type": "permission_error", "message": "held"}
+
+
+def test_relay_keeps_real_status_codes_for_a_quick_refusal(monkeypatch):
+    relay = RelayFixture(monkeypatch, {"ok": False, "reason": "refused"})
+    status_code, _, _ = relay.post("/v1/messages")
+    relay.server.shutdown()
+    assert status_code == 403
 
 
 def test_relay_treats_other_query_strings_as_unknown_paths(monkeypatch):

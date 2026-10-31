@@ -205,16 +205,17 @@ def _workflow_command(args, root: Path) -> int:
             "--model-endpoint", endpoint_url,
         ]  # fmt: skip
         if contract:
+            output_tokens = args.max_output_tokens or profile["max_output_tokens"]
             config["command_options"] = {
-                "max_output_tokens": profile["max_output_tokens"],
+                "max_output_tokens": output_tokens,
                 "budget_usd": args.max_run_usd,
+                "thinking": not args.no_thinking,
             }
             forwarded += [
                 "--model-provider", "anthropic", "--model-contract", contract,
-                "--model-max-tokens", str(profile["max_output_tokens"]),
+                "--model-max-tokens", str(output_tokens),
                 "--model-max-input-bytes", str(profile["max_input_bytes"]),
                 "--model-max-run-usd", args.max_run_usd, "--model-price", args.price_per_mtok,
-                # Below the client's 600 seconds, so its timeout cannot race a live call.
                 "--model-read-timeout", "540",
                 *(arg for flag in profile["anthropic_betas"] for arg in ("--model-beta", flag)),
             ]  # fmt: skip
@@ -434,6 +435,10 @@ def main(argv=None):
                 help="Exact model URL the supervisor calls (HTTPS or loopback)",
             )  # fmt: skip
             p.add_argument("--max-run-usd", help="Supervisor-enforced model spend bound per run")
+            p.add_argument("--max-output-tokens", type=int, help="Lower the signed reply bound")
+            p.add_argument(
+                "--no-thinking", action="store_true", help="Ask the agent not to request thinking"
+            )
             p.add_argument(
                 "--price-per-mtok",
                 help="USD per million tokens: input,cache_write,cache_read,output",

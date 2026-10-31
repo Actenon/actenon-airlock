@@ -72,7 +72,7 @@ The agent runs with `Bash,Read,Edit,Write,Glob,Grep`. Permission prompts are off
 
 Anthropic's gateway guidance says to forward beta headers without an allowlist. Airlock deliberately does not, because it is a security boundary rather than a pass-through. A new Claude Code version may therefore need a reviewed update to its list.
 
-Bodies are forwarded byte for byte after a strict parse. Replies are checked whole before the agent sees them, so a tool call reaches the agent as data and authorizes nothing. This means responses arrive all at once rather than streaming.
+Bodies are forwarded byte for byte after a strict parse. Replies are checked whole before the agent sees them, so a tool call reaches the agent as data and authorizes nothing. Responses therefore arrive all at once rather than streaming. After 60 seconds the relay sends SSE comments so the client does not hang up. They carry no model content. A refusal that arrives after that point reaches the client as a stream error rather than a status code.
 
 ## Spend and failure
 
@@ -83,6 +83,8 @@ The supervisor enforces `--max-run-usd` from the signed prices. It reserves each
 | Complete and in contract | Confirmed. An identical later request is a new call |
 | Explicit 429 or 529 | The call ended, so the client's retry is a new call. Its effect stays unconfirmed, because the reply proves nothing about billing |
 | Lost, cut off, 5xx or malformed | Unconfirmed and still counted. An identical retry is refused, so the run usually ends |
+
+For a slow local model, `airlock setup` takes `--max-output-tokens` and `--no-thinking`. Both go through the same review.
 
 ## Limits
 

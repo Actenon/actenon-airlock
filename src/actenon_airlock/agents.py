@@ -129,7 +129,7 @@ def parse_prices(text: str) -> dict:
 
 
 def claude_code_command(
-    model: str, message_file: str, max_output_tokens: int, budget_usd: str
+    model: str, message_file: str, max_output_tokens: int, budget_usd: str, thinking: bool = True
 ) -> list[str]:
     """Documented headless mode. Every value here is public configuration, not a secret.
 
@@ -156,6 +156,8 @@ def claude_code_command(
         "GIT_CONFIG_KEY_0": "safe.directory",
         "GIT_CONFIG_VALUE_0": "*",
     }
+    if not thinking:
+        environment["CLAUDE_CODE_DISABLE_THINKING"] = "1"
     return [
         "env", *(f"{name}={value}" for name, value in environment.items()),
         "sh", "-c", _CLAUDE_START, "sh", message_file,
