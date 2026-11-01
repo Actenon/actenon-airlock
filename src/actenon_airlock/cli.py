@@ -162,7 +162,7 @@ def doctor(root: Path):
 
 WORKFLOW_COMMANDS = {
     "setup", "work", "capture", "verify-candidate", "review-candidate", "publish", "status",
-    "synthetic-provider", "stop", "resume",
+    "synthetic-provider", "stop", "resume", "protect",
 }  # fmt: skip
 
 
@@ -179,6 +179,10 @@ def _workflow_command(args, root: Path) -> int:
         verify_candidate,
     )
 
+    if args.cmd == "protect":
+        from .protect import protect
+
+        return protect(args, root, main)
     state = State(root)
     config_path = state.path / "agent.json"
     if args.cmd == "setup":
@@ -213,6 +217,7 @@ def _workflow_command(args, root: Path) -> int:
                 "budget_usd": args.max_run_usd,
                 "thinking": not args.no_thinking,
             }
+            config.update(max_run_usd=args.max_run_usd, price_per_mtok=args.price_per_mtok)
             forwarded += [
                 "--model-provider", profile.get("provider", "anthropic"),
                 "--model-contract", contract,
@@ -408,12 +413,25 @@ def main(argv=None):
         "init", "diff", "check", "doctor", "run", "receipts", "reconcile",
         "checkpoint", "verify-evidence", "recovery-inventory",
         "setup", "work", "capture", "verify-candidate", "review-candidate", "publish", "status",
-        "synthetic-provider", "stop", "resume",
+        "synthetic-provider", "stop", "resume", "protect", "demo",
     ):  # fmt: skip
         p = sub.add_parser(cmd)
         p.add_argument("--path", type=Path, default=Path.cwd())
-        if cmd != "run":
+        if cmd not in {"run", "protect", "demo"}:
             p.add_argument("--json", action="store_true", help="Print machine-readable JSON")
+        if cmd == "protect":
+            p.add_argument("task", help="What the agent should do, in plain words")
+            p.add_argument("--agent", help="Default: the agent whose model key is in this shell")
+            p.add_argument("--model", help="Default: the agent's supported model")
+            p.add_argument("--max-run-usd", help="Spend limit per run. Default: 2.00")
+            p.add_argument("--price-per-mtok", help="input,cache_write,cache_read,output")
+            p.add_argument("--model-endpoint", help="Exact model URL the supervisor calls")
+            p.add_argument("--image", help="Your own image, built on the agent's image")
+            p.add_argument(
+                "--tests", type=Path,
+                help="Tests you hold outside the project, run against the change",
+            )  # fmt: skip
+            p.add_argument("--approve", action="store_true", help="Approve without being asked")
         if cmd == "checkpoint":
             p.add_argument(
                 "--output", type=Path, required=True,
@@ -592,6 +610,10 @@ def main(argv=None):
     try:
         if not root.is_dir():
             raise AirlockError("Project directory does not exist")
+        if args.cmd == "demo":
+            from .demo import run
+
+            return run()
         if args.cmd == "doctor":
             result = doctor(root)
             if args.json:

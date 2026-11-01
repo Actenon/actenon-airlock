@@ -16,11 +16,16 @@ from .common import AirlockError
 from .responses_inference import CONTRACT as RESPONSES_CONTRACT
 
 DECLARATION = "airlock_agent.py"
+TASK_FILE = "AIRLOCK_TASK.md"
 HEADER = '"""Reviewed declaration of agent authority. Never executed."""'
 SUPPORTED = {
     "codex-cli": {
         "image": "actenon-airlock-codex-cli:v1",
+        "dockerfile": "Dockerfile.codex-cli",
         "version": "codex-cli 0.166.0",
+        "credential": "OPENAI_API_KEY",
+        "default_model": "gpt-5.5-2026-04-23",
+        "default_prices": "5,0,0.5,30",
         "status": "integration candidate: no scored live acceptance result yet",
         "provider": "openai-responses",
         "contract": RESPONSES_CONTRACT,
@@ -34,7 +39,11 @@ SUPPORTED = {
     },
     "claude-code": {
         "image": "actenon-airlock-claude-code:v1",
+        "dockerfile": "Dockerfile.claude-code",
         "version": "@anthropic-ai/claude-code 2.1.308",
+        "credential": "ANTHROPIC_API_KEY",
+        "default_model": "claude-opus-5-5",
+        "default_prices": "4,5,0.2,20",
         "status": "integration candidate: no scored live acceptance result yet",
         "contract": CONTRACT,
         "max_output_tokens": 16000,

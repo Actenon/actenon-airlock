@@ -24,6 +24,7 @@ from datetime import UTC, datetime
 from pathlib import Path
 from uuid import uuid4
 
+from .agents import TASK_FILE
 from .common import AirlockError
 from .github_consequence import MAX_CONTENT_BYTES
 from .github_runtime import review_for, validate_profiles
@@ -41,7 +42,7 @@ CANDIDATE_SCHEMA = "actenon-airlock/candidate/v1"
 TESTS_PASSED = "TESTS_PASSED"
 TESTS_FAILED = "TESTS_FAILED"
 # Never staged for the agent, so their absence from a workspace is no change it made.
-SKIP_NAMES = EXCLUDED_INPUT | {".home", ".tmp", ".gitignore", "airlock_agent.py"}
+SKIP_NAMES = EXCLUDED_INPUT | {".home", ".tmp", ".gitignore", "airlock_agent.py", TASK_FILE}
 MAX_JUNIT_BYTES = 1024 * 1024
 MAX_CANDIDATE_FILE_BYTES = 32 * 1024 * 1024
 MAX_CANDIDATE_TOTAL_BYTES = 256 * 1024 * 1024
@@ -393,14 +394,18 @@ def publish_candidate(state: State, sha256: str, *, client=None) -> dict:
     }
 
 
-def status(state: State) -> dict:
-    """What happened, kept separate from what is known about the outside world."""
+def status(state: State, since: int = 0) -> dict:
+    """What happened, kept separate from what is known about the outside world.
+
+    `since` limits the activity counts to receipts after that position, for one run.
+    """
     from .evidence import load_public_key, verify_offline
 
     public = load_public_key(str(state.path / "public-key.json"))
     journal = state.receipts_path.read_bytes() if state.receipts_path.exists() else b""
     report = verify_offline(journal, public)
     rows = [json.loads(line) for line in journal.splitlines()] if report["integrity"]["ok"] else []
+    rows = rows[since:]
     refused = [r for r in rows if r.get("decision") == "DENY"]
     calls = [r for r in rows if "inference_invocation" in r]
     answered = [r for r in calls if r.get("stage") == "response-received"]

@@ -34,6 +34,22 @@ Issues = "https://github.com/Actenon/actenon-airlock/issues"
 [tool.setuptools.packages.find]
 where = ["src"]
 
+# `airlock protect` builds the pinned agent images on first use.
+[tool.setuptools.data-files]
+"share/actenon-airlock/containers" = [
+  "containers/Dockerfile.compute",
+  "containers/Dockerfile.claude-code",
+  "containers/Dockerfile.codex-cli",
+]
+"share/actenon-airlock/containers/claude-code" = [
+  "containers/claude-code/package.json",
+  "containers/claude-code/package-lock.json",
+]
+"share/actenon-airlock/containers/codex-cli" = [
+  "containers/codex-cli/install.py",
+  "containers/codex-cli/upstream.json",
+]
+
 [tool.pytest.ini_options]
 testpaths = ["tests"]
 addopts = "-ra"
