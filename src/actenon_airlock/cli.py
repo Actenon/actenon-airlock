@@ -404,9 +404,7 @@ def _workflow_command(args, root: Path) -> int:
 
 
 def main(argv=None):
-    parser = argparse.ArgumentParser(
-        description="Let AI agents work. Never surrender control."
-    )
+    parser = argparse.ArgumentParser(description="Let AI agents work. Never surrender control.")
     parser.add_argument("--version", action="version", version=__version__)
     sub = parser.add_subparsers(dest="cmd", required=True)
     for cmd in (
