@@ -184,7 +184,9 @@ def _workflow_command(args, root: Path) -> int:
     if args.cmd == "setup":
         profile = require_supported(args.agent)
         contract = profile.get("contract")
-        endpoint_url = args.model_endpoint or (DEFAULT_ENDPOINTS["anthropic"] if contract else None)
+        endpoint_url = args.model_endpoint or (
+            DEFAULT_ENDPOINTS[profile.get("provider", "anthropic")] if contract else None
+        )
         if not endpoint_url:
             raise AirlockError("--model-endpoint is required for this agent")
         if contract and not (args.max_run_usd and args.price_per_mtok):
@@ -212,7 +214,8 @@ def _workflow_command(args, root: Path) -> int:
                 "thinking": not args.no_thinking,
             }
             forwarded += [
-                "--model-provider", "anthropic", "--model-contract", contract,
+                "--model-provider", profile.get("provider", "anthropic"),
+                "--model-contract", contract,
                 "--model-max-tokens", str(output_tokens),
                 "--model-max-input-bytes", str(profile["max_input_bytes"]),
                 "--model-max-run-usd", args.max_run_usd, "--model-price", args.price_per_mtok,
@@ -508,7 +511,11 @@ def main(argv=None):
             p.add_argument(
                 "--model", action="append", default=[], help="Approve this exact inference model"
             )
-            p.add_argument("--model-provider", choices=("openai", "anthropic"), default="openai")
+            p.add_argument(
+                "--model-provider",
+                choices=("openai", "anthropic", "openai-responses"),
+                default="openai",
+            )
             p.add_argument("--model-max-tokens", type=int, default=2048)
             p.add_argument(
                 "--model-endpoint", help="Exact full inference endpoint also discovered by Scan"

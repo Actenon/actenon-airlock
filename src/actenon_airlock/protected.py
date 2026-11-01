@@ -26,7 +26,8 @@ from actenon_permit.model import Budget, Grant, Scopes
 from actenon_protocol.effects import effect_identity
 from actenon_scan.authority import classify_http
 
-from .agent_inference import CONTRACT, check_headers, check_request, cost, observe, reservation
+from . import agent_inference, responses_inference
+from .agent_inference import CONTRACT, check_request, cost, reservation
 from .broker import Broker, HttpDispatch
 from .common import AirlockError, canonical, power, validate_url
 from .github_runtime import (
@@ -213,9 +214,11 @@ class InferenceDispatch(HttpDispatch):
         self.reserved = self.charged = 0
         profile = broker.agent_profile(self.url)
         if profile and not self.retry:
-            self.reserved = reservation(
+            responses = profile["contract"] == responses_inference.CONTRACT
+            reserve = responses_inference.reservation if responses else reservation
+            self.reserved = reserve(
                 len(self.body),
-                json.loads(self.body)["max_tokens"],
+                json.loads(self.body)["max_output_tokens" if responses else "max_tokens"],
                 profile["price_microusd_per_mtok"],
             )
             if broker.inference_spent + self.reserved > profile["max_run_microusd"]:
@@ -396,7 +399,10 @@ class ProtectedBroker(Broker):
 
     def agent_profile(self, url):
         profile = self.approval.get("protected_model", {})
-        if profile.get("contract") == CONTRACT and endpoint(profile) == url:
+        if (
+            profile.get("contract") in {CONTRACT, responses_inference.CONTRACT}
+            and endpoint(profile) == url
+        ):
             return profile
         return None
 
@@ -431,6 +437,8 @@ class ProtectedBroker(Broker):
             or endpoint(profile) != url
         ):
             raise AirlockError("Model access requires an explicitly approved model constraint")
+        if profile.get("contract") == responses_inference.CONTRACT:
+            return responses_inference.check_request(body, profile)
         if profile.get("contract") == CONTRACT:
             check_request(body, profile)
             return body
@@ -484,7 +492,14 @@ class ProtectedBroker(Broker):
         profile = self.agent_profile(dispatch.url)
         if profile:
             reply = base64.b64decode(dispatch.response["body"], validate=True)
-            observation = observe(dispatch.response["status"], reply, json.loads(dispatch.body))
+            contract = (
+                responses_inference
+                if profile["contract"] == responses_inference.CONTRACT
+                else agent_inference
+            )
+            observation = contract.observe(
+                dispatch.response["status"], reply, json.loads(dispatch.body)
+            )
             dispatch.observed(observation, profile["price_microusd_per_mtok"])
             return ("COMMITTED", True) if observation.confirmed else ("AMBIGUOUS", None)
         if dispatch.url not in self.model_transports or dispatch.response.get("status") != 200:
@@ -568,7 +583,12 @@ class ProtectedBroker(Broker):
             }
             profile = self.agent_profile(url)
             if profile:
-                headers = check_headers(headers, profile)
+                contract = (
+                    responses_inference
+                    if profile["contract"] == responses_inference.CONTRACT
+                    else agent_inference
+                )
+                headers = contract.check_headers(headers, profile)
             for name, marker in self.markers.items():
                 if self.credentials[marker][1] == self.bindings[name] and url.startswith(
                     self.bindings[name] + "/"
@@ -726,10 +746,15 @@ def launch_protected(root, command, *, image=DEFAULT_IMAGE):
         model_targets = {
             "/v1/chat/completions": DEFAULT_ENDPOINTS["openai"],
             "/v1/messages": DEFAULT_ENDPOINTS["anthropic"],
+            "/v1/responses": DEFAULT_ENDPOINTS["openai-responses"],
         }
         profile = approved.get("protected_model", {})
         if profile:
-            path = "/v1/chat/completions" if profile["provider"] == "openai" else "/v1/messages"
+            path = {
+                "openai": "/v1/chat/completions",
+                "anthropic": "/v1/messages",
+                "openai-responses": "/v1/responses",
+            }[profile["provider"]]
             model_targets[path] = endpoint(profile)
         atomic_json(control / "model-targets.json", model_targets, 0o444)
         docker.call(["volume", "create", volume])

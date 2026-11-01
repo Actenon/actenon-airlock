@@ -13,10 +13,21 @@ from pathlib import Path
 
 from .agent_inference import CONTRACT, PRICES
 from .common import AirlockError
+from .responses_inference import CONTRACT as RESPONSES_CONTRACT
 
 DECLARATION = "airlock_agent.py"
 HEADER = '"""Reviewed declaration of agent authority. Never executed."""'
 SUPPORTED = {
+    "codex-cli": {
+        "image": "actenon-airlock-codex-cli:v1",
+        "version": "codex-cli 0.166.0",
+        "status": "integration candidate: no scored live acceptance result yet",
+        "provider": "openai-responses",
+        "contract": RESPONSES_CONTRACT,
+        "max_output_tokens": 16000,
+        "max_input_bytes": 200000,
+        "anthropic_betas": (),
+    },
     "aider": {
         "image": "actenon-airlock-aider:v2",
         "version": "aider-chat 0.86.2",
@@ -67,9 +78,12 @@ def declaration(model: str, endpoint: str, github_urls: tuple[str, ...] = ()) ->
         ]
         lines += [f'requests.put("{url}")' for url in github_urls]
         return "\n".join(lines) + "\n"
-    base = endpoint.removesuffix("/chat/completions")
+    responses = endpoint.endswith("/responses")
+    base = endpoint.removesuffix("/responses" if responses else "/chat/completions")
     if base == endpoint:
-        raise AirlockError("Model endpoint must end in /chat/completions or /v1/messages")
+        raise AirlockError(
+            "Model endpoint must end in /chat/completions or /responses or /v1/messages"
+        )
     lines = [
         HEADER,
         "",
@@ -77,7 +91,11 @@ def declaration(model: str, endpoint: str, github_urls: tuple[str, ...] = ()) ->
         "from openai import OpenAI",
         "",
         f'client = OpenAI(base_url="{base}", api_key="none")',
-        f'client.chat.completions.create(model="{model}", messages=[])',
+        (
+            f'client.responses.create(model="{model}", input=[])'
+            if responses
+            else f'client.chat.completions.create(model="{model}", messages=[])'
+        ),
     ]
     lines += [f'requests.put("{url}")' for url in github_urls]
     return "\n".join(lines) + "\n"
@@ -170,6 +188,8 @@ def claude_code_command(
 
 def command(agent: str, model: str, message_file: str, test_command: str, **options) -> list[str]:
     require_supported(agent)
+    if agent == "codex-cli":
+        return codex_command(model, message_file, **options)
     if agent == "claude-code":
         return claude_code_command(model, message_file, **options)
     return [
@@ -183,3 +203,49 @@ def command(agent: str, model: str, message_file: str, test_command: str, **opti
         "--no-suggest-shell-commands", "--no-detect-urls", "--no-gitignore",
         "--timeout", "500", "--message-file", message_file,
     ]  # fmt: skip
+
+
+def codex_command(model: str, message_file: str, **_options) -> list[str]:
+    """Public exec/custom-provider options; Airlock owns the actual boundary."""
+    configs = [
+        'model_provider="airlock"',
+        'model_providers.airlock.name="Airlock"',
+        'model_providers.airlock.wire_api="responses"',
+        "model_providers.airlock.requires_openai_auth=false",
+        "model_providers.airlock.supports_websockets=false",
+        "model_providers.airlock.request_max_retries=0",
+        "model_providers.airlock.stream_max_retries=0",
+        'web_search="disabled"',
+        "features.shell_snapshot=false",
+        "features.code_mode=false",
+        "features.code_mode_only=false",
+        "features.multi_agent=false",
+        "features.multi_agent_v2=false",
+    ]
+    # No host configuration or credential cache is copied. The loopback URL is
+    # supplied by the contained relay and conveys no external network authority.
+    start = (
+        'message=$1; shift; mkdir -p "$CODEX_HOME" && '
+        'exec "$@" -c "model_providers.airlock.base_url=\\"$OPENAI_BASE_URL\\"" - < "$message"'
+    )
+    return [
+        "env",
+        "CODEX_HOME=/workspace/.home/.codex",
+        "sh",
+        "-c",
+        start,
+        "sh",
+        message_file,
+        "codex",
+        "exec",
+        "--ignore-user-config",
+        "--ignore-rules",
+        "--ephemeral",
+        "--skip-git-repo-check",
+        "--sandbox",
+        "danger-full-access",
+        "--json",
+        "-m",
+        model,
+        *(arg for config in configs for arg in ("-c", config)),
+    ]

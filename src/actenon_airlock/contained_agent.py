@@ -24,6 +24,7 @@ KEEPALIVE_EVERY_SECONDS = 15
 MODEL_TARGETS = {
     "/v1/chat/completions": "https://api.openai.com/v1/chat/completions",
     "/v1/messages": "https://api.anthropic.com/v1/messages",
+    "/v1/responses": "https://api.openai.com/v1/responses",
 }
 
 
