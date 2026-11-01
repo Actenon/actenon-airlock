@@ -30,6 +30,9 @@ self-assessed status for owner review. The gate does not load it.
 
 ## Current blocker: the frozen G1-G40 text is not committed
 
+[`RELEASE_BAR.proposed.md`](RELEASE_BAR.proposed.md) proposes a way through this for the owner
+to decide. The gate does not load it.
+
 No Actenon repository contains the verbatim G1-G40 acceptance criteria. Only
 G28-G38 can be identified (the frozen gpt-engineer / `qwen2.5-coder:14b`
 matched-baseline programme), and only at programme level, so those eleven gates

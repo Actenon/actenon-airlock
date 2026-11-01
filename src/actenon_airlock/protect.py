@@ -7,6 +7,8 @@ person still gives it, and the project is not touched: the result is a patch to 
 
 from __future__ import annotations
 
+import contextlib
+import io
 import json
 import os
 import subprocess
@@ -115,7 +117,7 @@ def report(manifest, verdict, activity, patch, *, agent_exit, spend_limit, root)
     spent = _usd(activity["model_spend"]["estimated_microusd"])
     print(f"  Model     {calls['dispatched']} call(s), about {spent} of {spend_limit}")
     state = "OK" if activity["integrity_ok"] else "FAILED"
-    print(f"  Evidence  {activity['receipts']} signed receipts, integrity {state}")
+    print(f"  Evidence  {activity['receipts']} signed receipt(s), integrity {state}")
     if activity["unresolved_effects"]:
         print(f"  Uncertain {len(activity['unresolved_effects'])} call(s) with no confirmed answer")
     if manifest:
@@ -156,7 +158,7 @@ def protect(args, root: Path, run) -> int:
     }
     if not _approved(state, wanted):
         print(f"\n{agent} will run in a sealed container with a copy of this project.")
-        print(f"  It can call one model: {model}, up to ${limit} a run.")
+        print(f"  It can call one model: {model} at {endpoint}, up to ${limit} a run.")
         print(f"  Prices used for that bound, USD per million tokens: {prices}")
         print("  Input, cache write, cache read, output. Check them against your provider.")
         print("  It has no network, no credentials, and no access to your home directory.")
@@ -164,9 +166,13 @@ def protect(args, root: Path, run) -> int:
         if not (args.approve or _ask()):
             print("Nothing was approved and nothing ran.")
             return 2
-        configured = run([*setup, "--approve"])
+        review = io.StringIO()
+        with contextlib.redirect_stdout(review):
+            configured = run([*setup, "--approve"])
         if configured:
+            print(review.getvalue())
             return configured
+        print("Approved and signed. Airlock keeps this in .airlock and airlock_agent.py.")
 
     runs = state.local / "runs"
     earlier = set(runs.iterdir()) if runs.is_dir() else set()

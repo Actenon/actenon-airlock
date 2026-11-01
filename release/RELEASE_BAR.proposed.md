@@ -26,12 +26,14 @@ Only the owner can resolve that, in one of two ways: commit the verbatim text as
 | 9 | Two independent operators on fresh machines | F | **Blocked** | Two people outside this work. Another agent rerunning the same workspace does not count |
 | 10 | The owner accepts this bar, or commits G1-G40 | - | **Open** | One decision |
 
+Item 5 also includes one short local run, about 6 minutes of `qwen2.5-coder:14b`, to confirm real Aider now exits 0. It costs nothing, but it makes a 16 GB Mac hard to use while it runs.
+
 Items 1-4 are engineering, and they are finished. Items 5-10 need money, a credential, a name or a decision that only the owner can give.
 
 ## The shortest route
 
 1. **Item 10:** accept this bar, or amend it.
-2. **Item 5, first slice:** one Claude Code journey, capped at $2.00. This is the first time a real model drives the product end to end, so it may find defects no scripted reply can.
+2. **Item 5, first slice:** one Claude Code journey, capped at $2.00. This is the first time a real model drives the product end to end, so it may find defects no scripted reply can. A scripted rehearsal of all 33 entries ran clean on this freeze, which shows the path is wired and is not evidence.
 3. **Item 6:** the [live GitHub test](acceptance-v2/LIVE_TEST.md). It costs nothing and takes minutes.
 4. **Item 5, the rest,** once the first slice's real cost is known.
 5. **Item 7.**
