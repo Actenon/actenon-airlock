@@ -12,6 +12,7 @@ import hashlib
 import importlib.util
 import io
 import json
+import re
 import sys
 import zipfile
 from pathlib import Path
@@ -39,6 +40,11 @@ DOCKER_TESTS = [
     "tests.test_protect::test_protect_takes_a_task_to_a_reviewed_patch",
     "tests.test_protect::test_the_demo_runs_with_its_control_and_cleans_up",
     "tests.test_protect::test_the_live_test_passes_against_the_synthetic_provider",
+    "tests.test_codex_container::test_real_codex_executes_edits_tests_and_continues",
+    "tests.test_codex_container::test_real_codex_lost_ack_stays_held",
+    "tests.test_codex_container::test_real_codex_budget_refusal_before_provider",
+    "tests.test_codex_container::test_codex_executed_transport_attacks_have_working_controls",
+    "tests.test_codex_container::test_codex_artifact_approved_creation_readback_and_lost_ack",
     "tests.test_claude_code_container::test_real_client_completes_tool_loop_inside_protected_mode",
     "tests.test_claude_code_container::test_every_model_request_carries_only_the_contract",
     "tests.test_claude_code_container::test_agent_tools_reach_no_credential_network_or_host",
@@ -962,3 +968,15 @@ def test_a_malformed_bar_cannot_be_evaluated(world: World, mutate) -> None:
     mutate(world.registry["release_bar"])
     with pytest.raises(gate.AdmissionError):
         world.evaluate()
+
+
+@pytest.mark.parametrize("module", ["test_claude_code_container", "test_codex_container"])
+def test_every_agent_container_test_is_mandatory(module: str) -> None:
+    """A Docker-only test that is not listed skips on integration and fails the gate."""
+    registry = json.loads((ROOT / "release" / "gates.json").read_text())
+    required = {
+        node for spec in registry["ci_prerequisites"]["junit"] for node in spec["must_pass"]
+    }
+    source = (ROOT / "tests" / f"{module}.py").read_text()
+    names = re.findall(r"^def (test_\w+)", source, re.MULTILINE)
+    assert names and {f"tests.{module}::{name}" for name in names} <= required
