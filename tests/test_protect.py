@@ -1,10 +1,12 @@
 """The one-command path only sequences the guided path, and a person still approves."""
 
+import importlib.util
 import io
 import json
 import os
 import shutil
 import subprocess
+import sys
 from pathlib import Path
 
 import pytest
@@ -16,12 +18,13 @@ from actenon_airlock.cli import main
 from actenon_airlock.common import AirlockError
 from actenon_airlock.demo import STOLEN, verdict
 from actenon_airlock.protect import TASK_FILE, _approved, _new_run, choose_agent
-from actenon_airlock.protected import ProtectedBroker, snapshot
+from actenon_airlock.protected import Docker, ProtectedBroker, snapshot
 from actenon_airlock.state import State
 
 IMAGE = os.environ.get("AIRLOCK_TEST_CLAUDE_CODE_IMAGE")
 COMPUTE = os.environ.get("AIRLOCK_TEST_PROTECTED_IMAGE")
 ARGS = ["--agent", "claude-code", "--model", MODEL, "--price-per-mtok", PRICES]
+LIVE_TEST = Path(__file__).parents[1] / "acceptance" / "live-github" / "run.py"
 
 
 @pytest.fixture
@@ -238,6 +241,84 @@ def test_the_agent_gets_the_projects_docs_and_can_change_them(tmp_path):
     snapshot(root, tmp_path / "copy")
     assert (tmp_path / "copy" / "docs" / "guide.md").read_text() == "guide\n"
     assert "docs/guide.md" in workflow._tree(root)
+
+
+def docker_failing_first(prefix, calls):
+    docker = Docker.__new__(Docker)
+    docker.host_path_prefix = prefix
+
+    def call(args, *, timeout=45):
+        calls.append(args)
+        if len(calls) == 1:
+            raise AirlockError("Protected Mode Docker operation failed: create")
+        return "container"
+
+    docker.call = call
+    return docker
+
+
+def test_docker_desktop_recovers_from_a_stale_view_of_a_recreated_project():
+    calls = []
+    docker = docker_failing_first("/host_mnt", calls)
+    assert docker.create(["create", "x"], project="/project", image="sha256:i") == "container"
+    assert calls[0] == calls[2] == ["create", "x"]
+    assert calls[1][:3] == ["run", "--rm", "--network"] and calls[1][3] == "none"
+    assert "/project/.airlock" in calls[1] and "--read-only" in calls[1]
+
+
+def test_a_create_failure_on_linux_is_reported_and_never_retried():
+    calls = []
+    docker = docker_failing_first(None, calls)
+    with pytest.raises(AirlockError, match="create"):
+        docker.create(["create", "x"], project="/project", image="sha256:i")
+    assert len(calls) == 1
+
+
+def live_test_module():
+    spec = importlib.util.spec_from_file_location("live_github_run", LIVE_TEST)
+    module = importlib.util.module_from_spec(spec)
+    sys.modules[spec.name] = module
+    spec.loader.exec_module(module)
+    return module
+
+
+def test_the_live_test_refuses_anything_but_a_disposable_private_repository():
+    refusal = live_test_module().refusal
+    assert refusal({"private": True}, 1) is None
+    assert "public" in refusal({"private": False}, 1)
+    assert "archived" in refusal({"private": True, "archived": True}, 1)
+    assert "disposable" in refusal({"private": True}, 6)
+
+
+def test_the_live_test_will_not_write_without_being_told(tmp_path, monkeypatch):
+    monkeypatch.setenv("GITHUB_TOKEN", "held")
+    completed = subprocess.run(
+        [sys.executable, str(LIVE_TEST), "--repo", "a/b", "--out", str(tmp_path / "out")],
+        capture_output=True,
+        text=True,
+    )
+    assert completed.returncode != 0 and "--confirm-live-write" in completed.stderr
+    assert not (tmp_path / "out").exists()
+
+
+@pytest.mark.skipif(not COMPUTE, reason="requires the protected compute image")
+def test_the_live_test_passes_against_the_synthetic_provider(tmp_path):
+    out = tmp_path / "live"
+    completed = subprocess.run(
+        [sys.executable, str(LIVE_TEST), "--synthetic", "--out", str(out)],
+        capture_output=True,
+        text=True,
+        timeout=280,
+    )
+    assert completed.returncode == 0, completed.stdout + completed.stderr
+    summary = json.loads((out / "summary.json").read_text())
+    assert summary["evidence_class"] == "synthetic" and summary["passed"]
+    assert all(summary["checks"].values()) and len(summary["checks"]) == 9
+    assert summary["patch_sha256"] == summary["provider_bytes_sha256"]
+    assert sorted(path.name for path in (out / "evidence").iterdir()) == [
+        "public-key.json",
+        "receipts.jsonl",
+    ]
 
 
 def test_the_demo_claims_nothing_if_the_control_failed():

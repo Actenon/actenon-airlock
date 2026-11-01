@@ -83,6 +83,22 @@ class Docker:
     def json(self, args, *, timeout=45):
         return json.loads(self.call(args, timeout=timeout))
 
+    def create(self, args, *, project, image):
+        """Docker Desktop can hold a stale view of a project that was deleted and recreated.
+
+        Starting over would otherwise fail on a new run folder. Reading the state through
+        a mount refreshes that view, with a fixed listing and no network.
+        """
+        try:
+            return self.call(args)
+        except AirlockError:
+            if not self.host_path_prefix:
+                raise
+        mount = f"type=bind,source={project},target=/project,readonly"
+        listing = ["--mount", mount, "--entrypoint", "ls", image, "-R", "/project/.airlock"]
+        self.call(["run", "--rm", "--network", "none", "--read-only", *listing])
+        return self.call(args)
+
     def verify_engine(self, timeout=30):
         self.host_path_prefix = None
         context = self.json(["context", "inspect"], timeout=5)[0]
@@ -800,7 +816,7 @@ def launch_protected(root, command, *, image=DEFAULT_IMAGE):
             "--env",
             "TIKTOKEN_CACHE_DIR=/opt/airlock/tiktoken",
         ]
-        bridge_id = docker.call(
+        bridge_id = docker.create(
             [
                 *fixed,
                 "-i",
@@ -817,7 +833,9 @@ def launch_protected(root, command, *, image=DEFAULT_IMAGE):
                 "-I",
                 "-B",
                 "/airlock/contained_bridge.py",
-            ]
+            ],
+            project=root,
+            image=resolved["Id"],
         )
         identities.append(bridge_id)
         boundary = _verify_container(
