@@ -76,7 +76,8 @@ Know the limits before you rely on it:
 This is a development candidate, version 0.1.0.dev0, and not a release. Nothing is published
 to a package registry. Dependencies are pinned to exact source commits, including unmerged
 Kernel and Permit candidates, and the [release admission gate](release/README.md) reports NOT
-READY. See [what a release still needs](release/RELEASE_BAR.proposed.md).
+READY. The [release bar](release/RELEASE_BAR.md) sets what a release needs, and the
+[checkpoint](release/CHECKPOINT.md) shows where each item stands.
 
 ## Protect your own Python agent
 

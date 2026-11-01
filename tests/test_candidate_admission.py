@@ -176,7 +176,14 @@ class World:
 
     def __init__(self) -> None:
         self.registry = json.loads((ROOT / "release" / "gates.json").read_text())
-        self.gate_files: dict[str, bytes] = {}
+        self.gate_files: dict[str, bytes] = {
+            path: (ROOT / path).read_bytes()
+            for path in (
+                "release/RELEASE_BAR.md",
+                "release/recovered/ACTENON_WORK_EXECUTION_GOAL.md",
+            )
+        }
+        self.candidate_files: dict[str, bytes] = {}
         self.pyproject = (
             b'[project]\nname = "actenon-airlock"\nversion = "0.1.0.dev0"\n'
             b'dependencies = ["actenon-scan @ git+https://github.com/Actenon/actenon-scan.git@'
@@ -289,6 +296,8 @@ class World:
             self.github.attested.add(members[prefix + path])
 
     def freeze_definitions(self) -> None:
+        # These positive controls cover the G1-G40 path, which applies without the bar.
+        self.registry.pop("release_bar", None)
         self.satisfy_recovered_sections()
         text = b"# G1-G40 frozen acceptance criteria (owner-supplied test fixture)\n"
         self.gate_files["release/G1-G40.frozen.md"] = text
@@ -337,7 +346,9 @@ class World:
         return self._evaluate(**kw)
 
     def _evaluate(self, **kw) -> dict[str, Any]:
-        tree = Files({"pyproject.toml": self.pyproject, "uv.lock": self.lock})
+        tree = Files(
+            {"pyproject.toml": self.pyproject, "uv.lock": self.lock, **self.candidate_files}
+        )
         return gate.evaluate(
             gate_files=Files(self.gate_files),
             tree=tree,
@@ -781,5 +792,173 @@ def test_altered_goal_document_fails_every_section(world: World) -> None:
 
 def test_recovered_section_cannot_claim_an_unknown_evidence_producer(world: World) -> None:
     world.registry["recovered_scope"]["sections"][4]["evidence"] = "self_reported_summary"
+    with pytest.raises(gate.AdmissionError):
+        world.evaluate()
+
+
+# --- the owner's accepted release bar ------------------------------------------
+
+
+def record(world: World, number: int, *, result="PASS", sha=CANDIDATE, **changes) -> None:
+    evidence = f"release/bar-records/item-{number}/evidence.json"
+    data = b'{"reviewed": true}'
+    world.gate_files[evidence] = data
+    value = {
+        "schema": gate.BAR_RECORD_SCHEMA,
+        "item": number,
+        "candidate_sha": sha,
+        "result": result,
+        "evidence_path": evidence,
+        "evidence_sha256": hashlib.sha256(data).hexdigest(),
+        **changes,
+    }
+    world.gate_files[f"release/bar-records/item-{number}.json"] = json.dumps(value).encode()
+
+
+def item_status(report: dict[str, Any], item: int) -> str:
+    return report["release_bar"]["items"][str(item)]["status"]
+
+
+def test_committed_bar_matches_its_pin_and_records_the_owner_decision() -> None:
+    registry = json.loads((ROOT / "release" / "gates.json").read_text())
+    bar = registry["release_bar"]
+    assert hashlib.sha256((ROOT / bar["path"]).read_bytes()).hexdigest() == bar["sha256"]
+    assert bar["accepted_by"] == "owner" and bar["accepted_on"] == "2026-11-01"
+    assert [item["id"] for item in bar["items"]] == list(range(1, 11))
+    assert not (ROOT / "release" / "bar-records").exists()
+
+
+def test_perfect_ci_alone_cannot_pass_the_bar(world: World) -> None:
+    report = world.evaluate()
+    assert report["overall_status"] == "NOT READY"
+    assert report["requirement"] == "release_bar"
+    assert [item_status(report, n) for n in (1, 2, 3, 4, 10)] == ["PASS"] * 5
+    assert [item_status(report, n) for n in (5, 6, 7, 9)] == ["BLOCKED"] * 4
+    assert item_status(report, 8) == "FAIL"
+
+
+def test_every_candidate_record_reaches_candidate_ready_without_g_text(world: World) -> None:
+    for item in (5, 6, 7):
+        record(world, item)
+    report = world.evaluate()
+    assert report["overall_status"] == "CANDIDATE READY", report["release_bar"]
+    assert report["gates"]["G1"]["status"] == "UNDEFINED"
+    assert report["prerequisites"]["frozen_definitions"]["status"] == "BLOCKED"
+
+
+@pytest.mark.parametrize("missing", [5, 6, 7])
+def test_one_missing_record_keeps_the_candidate_not_ready(world: World, missing: int) -> None:
+    for item in {5, 6, 7} - {missing}:
+        record(world, item)
+    report = world.evaluate()
+    assert report["overall_status"] == "NOT READY"
+    assert item_status(report, missing) == "BLOCKED"
+
+
+def test_release_ready_needs_public_packages_and_independent_operators(world: World) -> None:
+    world.make_release()
+    for item in (5, 6, 7):
+        record(world, item)
+    assert world.evaluate()["overall_status"] == "CANDIDATE READY"
+    record(world, 9)
+    assert world.evaluate()["overall_status"] == "RELEASE READY"
+
+
+def test_operators_alone_do_not_make_a_development_version_a_release(world: World) -> None:
+    for item in (5, 6, 7, 9):
+        record(world, item)
+    report = world.evaluate()
+    assert report["overall_status"] == "CANDIDATE READY"
+    assert item_status(report, 8) == "FAIL"
+
+
+@pytest.mark.parametrize(
+    ("changes", "status"),
+    [
+        ({"sha": "b" * 40}, "BLOCKED"),
+        ({"result": "FAIL"}, "FAIL"),
+        ({"result": "pass"}, "FAIL"),
+        ({"item": 6}, "FAIL"),
+        ({"schema": "something-else"}, "FAIL"),
+        ({"evidence_sha256": "0" * 64}, "FAIL"),
+        ({"evidence_path": "release/bar-records/missing.json"}, "FAIL"),
+        ({"evidence_path": None}, "FAIL"),
+    ],
+)
+def test_a_record_that_does_not_hold_up_never_passes(world: World, changes, status) -> None:
+    for item in (6, 7):
+        record(world, item)
+    record(world, 5, **changes)
+    report = world.evaluate()
+    assert item_status(report, 5) == status
+    assert report["overall_status"] == "NOT READY"
+
+
+def test_a_malformed_record_fails(world: World) -> None:
+    world.gate_files["release/bar-records/item-5.json"] = b"{not json"
+    assert item_status(world.evaluate(), 5) == "FAIL"
+
+
+def test_a_candidate_cannot_supply_its_own_records(world: World) -> None:
+    for item in (5, 6, 7):
+        record(world, item)
+    world.candidate_files = {k: v for k, v in world.gate_files.items() if "bar-records" in k}
+    world.gate_files = {k: v for k, v in world.gate_files.items() if "bar-records" not in k}
+    report = world.evaluate()
+    assert report["overall_status"] == "NOT READY"
+    assert [item_status(report, n) for n in (5, 6, 7)] == ["BLOCKED"] * 3
+
+
+def test_a_changed_bar_fails_every_item(world: World) -> None:
+    for item in (5, 6, 7, 9):
+        record(world, item)
+    world.gate_files["release/RELEASE_BAR.md"] = b"# A relaxed bar\n"
+    report = world.evaluate()
+    assert report["overall_status"] == "NOT READY"
+    assert {item_status(report, n) for n in range(1, 11)} == {"FAIL"}
+
+
+def test_failing_ci_blocks_even_with_every_record(world: World) -> None:
+    for item in (5, 6, 7):
+        record(world, item)
+    world.github.checks[(REPO, CANDIDATE)][0]["conclusion"] = "failure"
+    report = world.evaluate()
+    assert report["overall_status"] == "NOT READY"
+    assert item_status(report, 2) != "PASS"
+
+
+def test_failing_dependency_ci_blocks_even_with_every_record(world: World) -> None:
+    for item in (5, 6, 7):
+        record(world, item)
+    repo, rev = DEPS["actenon-scan"]
+    world.github.checks[(repo, rev)][0]["conclusion"] = "failure"
+    assert world.evaluate()["overall_status"] == "NOT READY"
+
+
+def test_a_changed_goal_document_blocks_even_with_every_record(world: World) -> None:
+    for item in (5, 6, 7):
+        record(world, item)
+    world.gate_files["release/recovered/ACTENON_WORK_EXECUTION_GOAL.md"] = b"relaxed scope\n"
+    assert world.evaluate()["overall_status"] == "NOT READY"
+
+
+def test_no_github_access_cannot_pass_the_bar(world: World) -> None:
+    for item in (5, 6, 7):
+        record(world, item)
+    assert world.evaluate(github=None)["overall_status"] == "NOT READY"
+
+
+@pytest.mark.parametrize(
+    "mutate",
+    [
+        lambda bar: bar.update(sha256=None),
+        lambda bar: bar.update(accepted_on=None),
+        lambda bar: bar["items"].pop(),
+        lambda bar: bar["items"][4].update(evidence="self_reported_summary"),
+        lambda bar: bar["items"][4].update(required_for="never"),
+    ],
+)
+def test_a_malformed_bar_cannot_be_evaluated(world: World, mutate) -> None:
+    mutate(world.registry["release_bar"])
     with pytest.raises(gate.AdmissionError):
         world.evaluate()

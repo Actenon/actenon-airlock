@@ -672,5 +672,74 @@
       "image_id",
       "image_platform"
     ]
+  },
+  "release_bar": {
+    "path": "release/RELEASE_BAR.md",
+    "sha256": "51aae87ddde416c6401c47b590e4b171418e87a490dfb23d5e4e0715b33e66a0",
+    "accepted_by": "owner",
+    "accepted_on": "2026-11-01",
+    "note": "Replaces G1-G40 as the admission requirement, by owner decision, because their text was never recovered and the frozen G28-G38 programme cannot be repeated. All recorded history stands. Removing this block restores the G1-G40 path.",
+    "items": [
+      {
+        "id": 1,
+        "title": "One candidate holding every supported agent",
+        "required_for": "candidate",
+        "evidence": "candidate_ci"
+      },
+      {
+        "id": 2,
+        "title": "Exact authority, an enforced boundary and truthful effect ownership",
+        "required_for": "candidate",
+        "evidence": "candidate_ci"
+      },
+      {
+        "id": 3,
+        "title": "A stranger can see it work, with no key and no cost",
+        "required_for": "candidate",
+        "evidence": "candidate_ci"
+      },
+      {
+        "id": 4,
+        "title": "One entry point from task to reviewed patch",
+        "required_for": "candidate",
+        "evidence": "candidate_ci"
+      },
+      {
+        "id": 5,
+        "title": "A real model does useful work beside a matched baseline, and the attacks run from the same environment",
+        "required_for": "candidate",
+        "evidence": "owner_record"
+      },
+      {
+        "id": 6,
+        "title": "One real GitHub write, confirmed by independent readback",
+        "required_for": "candidate",
+        "evidence": "owner_record"
+      },
+      {
+        "id": 7,
+        "title": "Three original repositories and ten agent cases",
+        "required_for": "candidate",
+        "evidence": "owner_record"
+      },
+      {
+        "id": 8,
+        "title": "Install from public registries alone",
+        "required_for": "release",
+        "evidence": "registry_coherence"
+      },
+      {
+        "id": 9,
+        "title": "Two independent operators on fresh machines",
+        "required_for": "release",
+        "evidence": "owner_record"
+      },
+      {
+        "id": 10,
+        "title": "The owner accepts this bar",
+        "required_for": "candidate",
+        "evidence": "accepted"
+      }
+    ]
   }
 }

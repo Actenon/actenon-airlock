@@ -2,7 +2,7 @@
 
 Branch `feat/airlock-release-candidate`, draft [PR #20](https://github.com/Actenon/actenon-airlock/pull/20) against `feat/airlock-milestone-1`. Status: **NOT READY**. No designation is awarded. Nothing is merged, tagged, published or deployed, and no paid inference or live GitHub write has happened.
 
-Start with [what a release still needs](RELEASE_BAR.proposed.md).
+The owner accepted the [release bar](RELEASE_BAR.md) on 2026-11-01. The gate checks it, and that takes effect when this reaches `main`.
 
 ## Resume
 
@@ -36,17 +36,21 @@ See it work, with no key and no cost:
 .venv/bin/airlock demo
 ```
 
-## Open
+## Where each bar item stands
 
-Everything engineering can finish alone is done. These remain, and each needs the owner:
+| # | Requirement | Status | What it needs |
+|---|---|---|---|
+| 1-4 | Candidate, boundary, demo and one command | **Done** | Nothing |
+| 5 | A real model, a matched baseline and attacks | **Not run** | Paid inference: $2.00 for the first slice, at most $62.00 in all for Claude Code, and at most $8.00 for Codex. See [LIVE_RUN.md](acceptance-claude-code/LIVE_RUN.md) |
+| 6 | One real GitHub write | **Not run.** Passes against the synthetic provider | The owner's go-ahead, a disposable repository and a token limited to it. See [LIVE_TEST.md](acceptance-v2/LIVE_TEST.md) |
+| 7 | Three original repositories and ten agent cases | **Not run** | The owner names the repositories. At $2.00 a run with a matched baseline, at most $40.00 |
+| 8 | Install from public registries alone | **Blocked** | The owner merges the Kernel and Permit candidates and publishes the packages and images |
+| 9 | Two independent operators on fresh machines | **Blocked** | Two people outside this work. The [reproduction guide](../acceptance/v2/README.md) is what they follow |
+| 10 | The owner accepts the bar | **Done** on 2026-11-01 | Nothing |
 
-1. Accept [the proposed bar](RELEASE_BAR.proposed.md), or commit G1-G40.
-2. Authorize the first real-model slice, capped at $2.00, and set an API key. See [LIVE_RUN.md](acceptance-claude-code/LIVE_RUN.md).
-3. Run the [live GitHub test](acceptance-v2/LIVE_TEST.md), or authorize it.
-4. Show real Aider exits 0 with a real model. The repeated-inference fix has a real-boundary test with an SDK client, and a failing reproduction on the scored wheel. The confirming run was stopped because 14B made the Mac unusable. A scripted model could not reproduce Aider's duplicate, because it depends on model timing. One `ttl-lru` run takes about 6 minutes of 14B, and it needs the owner's go-ahead.
-5. Name three original repositories for the ten-case gate.
-6. Merge the Kernel and Permit candidates, and publish the packages and images.
-7. Find two independent operators.
+Also open, outside the bar: show that real Aider exits 0 with a real model. The repeated-inference fix has a real-boundary test with an SDK client and a failing reproduction on the scored wheel. The confirming run was stopped because 14B made the Mac unusable, and a scripted model could not reproduce Aider's duplicate, which depends on model timing. One `ttl-lru` run takes about 6 minutes of 14B and needs the owner's go-ahead.
+
+The order that makes sense: the first $2.00 slice, then the live GitHub test, then the rest of item 5, item 7, item 8 and item 9. A failure at any step stays in the evidence. After a run, an owner record in `release/bar-records/` carries the result, as the [bar](RELEASE_BAR.md) describes.
 
 ## Known limits of this candidate
 
