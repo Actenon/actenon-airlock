@@ -34,7 +34,7 @@ docker build -f containers/Dockerfile.compute -t actenon-airlock-compute:dev .
 ```
 
 ```bash
-docker build -f acceptance/v2/Dockerfile -t actenon-airlock-aider:v2 acceptance/v2
+docker build -f acceptance/v2/Dockerfile -t actenon-airlock-aider:v2 .
 ```
 
 ## 2. Check the boundary

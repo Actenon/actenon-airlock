@@ -1,33 +1,87 @@
 # Actenon Airlock
 
-**See what new powers your AI agent gained—and block them until approved.**
+**Let AI agents work. Never surrender control.**
 
-Airlock scans Python source, shows new and removed powers, and checks supported HTTP calls
-before they execute. New and unresolved powers stay blocked. Consequential requests reserve
-their effect before dispatch; duplicates and blind retries of uncertain outcomes are refused.
-Signed receipts preserve each decision and its evidence.
+A coding agent needs real access to be useful, and that access is the risk. One poisoned
+README, dependency or issue can turn it against your keys, your code and your GitHub. So you
+either watch every step or run it wide open.
 
-This is an installable development product, version 0.1.0.dev0. Its dependencies are pinned to the
-coherent integration candidate, including unmerged Kernel and Permit candidates. These are staging source pins; public registry dependencies are still
-a release gate. No Airlock package, tag, or release has been published.
+Airlock is the third option. Your unchanged agent runs in a sealed container with a copy of
+your project. It can read, edit and run code as usual. It has no network, no credentials and
+no route to your home directory, and nothing it produces reaches your project until you
+read it and take it.
 
-## Install
+## See it in a minute
 
-Python 3.11+ on Linux or macOS, with Git installed:
+No key, no model and no cost. You need Python 3.11+, Git and a running Docker.
 
 ~~~sh
-python3 -m venv .venv
-. .venv/bin/activate
-python -m pip install "git+https://github.com/Actenon/actenon-airlock.git@feat/airlock-north-star"
-airlock doctor
+python3 -m pip install "git+https://github.com/Actenon/actenon-airlock.git@feat/airlock-release-candidate"
+airlock demo
 ~~~
 
-One Airlock installation includes Scan, Permit, Kernel, and Protocol at the exact commits in
-[dependency-pins.json](evidence/dependency-pins.json). Install your agent's own requirements
-in the same environment. This command follows a development branch. For repeatable testing,
-replace the branch with the exact reviewed Airlock commit. It is not a production release.
+A script does a small job, then acts like a hijacked agent. It runs once in an ordinary
+container and once in Protected Mode, and the result comes from what reached an independent
+sink:
 
-## Quickstart
+~~~text
+                              Ordinary container    Protected Mode
+Fix the bug                   done                  done, as a patch to review
+Steal the GitHub token        LEAKED                nothing got out
+Steal the project's .env      LEAKED                nothing got out
+Steal the SSH private key     LEAKED                nothing got out
+Send data straight out        LEAKED                nothing got out
+Change your real files        yes                   no, your files are untouched
+Ask the supervisor to send it -                     refused, signed receipt
+~~~
+
+Every secret in the demo is a fake made for that run. If the attacks do not land in the
+ordinary container, the demo says so and claims nothing.
+
+## Use it on your project
+
+~~~sh
+cd my-project
+export ANTHROPIC_API_KEY=...    # or OPENAI_API_KEY for Codex
+airlock protect "Fix the failing test"
+~~~
+
+The first run builds the sealed image and asks you to approve one thing: this agent, this
+model, this spend limit for each run. The default limit is $2.00. The key stays on your
+machine, outside the container. When the agent finishes, you get what it changed, what was
+blocked, what it cost, and a patch you can take with `git apply`. Add `--tests DIR` to check
+the change with tests you hold outside the project.
+
+| Agent | Version | Status |
+|---|---|---|
+| Claude Code | 2.1.308, unchanged | Real binary tested through the real boundary with a scripted model. No scored real-model result yet |
+| Codex CLI | 0.166.0, unchanged | Same |
+| Aider | 0.86.2, unchanged | Scored with a local model under [acceptance v2](release/acceptance-v2/VERDICT.md). Uses the [guided path](docs/golden-path.md) |
+
+To publish a change, Airlock can create one exact file on GitHub after you approve its exact
+bytes, then confirm it by reading it back. See the [golden path](docs/golden-path.md).
+
+Know the limits before you rely on it:
+
+* The agent can send anything in its copy of the project to the model it is allowed to use.
+  `.env` files and known credential folders are left out, but a secret in ordinary source
+  goes in.
+* The container has no network, so the agent cannot install packages. If your tests need
+  dependencies, [build them into an image](docs/protected-mode.md#your-projects-dependencies)
+  and pass `--image`.
+* The agent's work can still be wrong. Airlock limits what it can do, not whether it is right.
+
+## Status
+
+This is a development candidate, version 0.1.0.dev0, and not a release. Nothing is published
+to a package registry. Dependencies are pinned to exact source commits, including unmerged
+Kernel and Permit candidates, and the [release admission gate](release/README.md) reports NOT
+READY. See [what a release still needs](release/RELEASE_BAR.proposed.md).
+
+## Protect your own Python agent
+
+This is a separate, lighter path for agents you write yourself. It runs in Local Mode, which
+is cooperative Python interception and not a container boundary.
 
 In your agent's project:
 
@@ -73,11 +127,10 @@ For a demonstration without any external account, run examples/server.py directl
 In another terminal, change into examples/agent and run init --approve followed by run.
 Then change the POST to DELETE in main.py: diff shows the new power and run denies it.
 
-## Protect an existing coding agent
+## The guided path
 
-Protected Mode runs a third-party agent with no network, no credentials and no way to
-reach your project. It can still do useful work. Model calls and one reviewed consequence
-cross a supervisor you control:
+`airlock protect` runs the first half of the [ten-step golden path](docs/golden-path.md). Use
+the steps directly when you want to see each one, or to publish a reviewed change:
 
 ~~~sh
 airlock doctor
@@ -87,16 +140,9 @@ airlock capture
 airlock status
 ~~~
 
-Nothing the agent produces is executed on your host or published until you approve its
-exact bytes. The [golden path](docs/golden-path.md) walks all ten steps, and
-`acceptance/v2/flagship.py` runs the whole journey, attack included, against a synthetic
-provider on your own machine. For stopping, rotating and recovering, see
+Details for each agent are in [Claude Code](docs/claude-code.md) and
+[Codex CLI](docs/codex-cli.md). For stopping, rotating and recovering, see
 [operations](docs/operations.md).
-
-Unchanged Claude Code also runs through the same boundary, with a reviewed
-[inference contract](docs/claude-code.md) and a supervisor-enforced spend bound. It is an
-integration candidate: it has been tested with the real binary against a scripted model,
-and it has [no scored live result](release/acceptance-claude-code/VERDICT.md) yet.
 
 ## Credentials and receipts
 

@@ -35,7 +35,7 @@ docker build -f containers/Dockerfile.compute -t actenon-airlock-compute:dev .
 ```
 
 ```bash
-docker build -t actenon-airlock-aider:v2 acceptance/v2
+docker build -f acceptance/v2/Dockerfile -t actenon-airlock-aider:v2 .
 ```
 
 Start a private model server in its own terminal:
