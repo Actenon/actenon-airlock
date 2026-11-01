@@ -15,7 +15,7 @@ These come from tests and a scripted rehearsal. They show the integration works.
 | A lost reply stays held and counted, and the client's retry is not sent | Same tests |
 | With relay keepalive, the client waits through a silent 400-second reply and makes one call. Without it, a 6-minute reply was lost | One manual run and [one real-model diagnostic](../../docs/evidence/local-model-diagnostics/README.md), not in the suite |
 
-The programme is frozen in [`config.json`](config.json). A full [rehearsal](rehearsal/README.md) with a scripted model ran all 33 entries from a clean tree. It is not evidence, and the scorer refuses to count it.
+The programme is frozen in [`config-rc1.json`](config-rc1.json), which replaced `config.json` after the images were rebuilt. A full [rehearsal](rehearsal/README.md) with a scripted model ran all 33 entries from a clean tree. It is not evidence, and the scorer refuses to count it.
 
 ## What is not established
 

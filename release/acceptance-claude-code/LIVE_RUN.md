@@ -50,7 +50,7 @@ Spend figures are estimates from provider-reported usage, not billing settlement
 
 ## To run it
 
-`config.json` is frozen for `claude-opus-5-5` on the machine that built these images. A freeze pins local image IDs, so a scored run refuses any drift. To use another model or machine, write a new config from a clean checkout before any scored run, then use it in the commands below:
+`config-rc1.json` is frozen for `claude-opus-5-5` on the machine that built the images. It replaces `config.json`, whose image IDs no longer exist, and differs from it only in those two IDs. No scored run used the older freeze. A freeze pins local image IDs, so a scored run refuses any drift. To use another model or machine, write a new config from a clean checkout before any scored run, then use it in the commands below:
 
 ```bash
 python acceptance/claude-code/run_task.py freeze --model claude-sonnet-5-5 --output /tmp/claude-code-config.json
@@ -59,27 +59,27 @@ python acceptance/claude-code/run_task.py freeze --model claude-sonnet-5-5 --out
 Run the free controls and the first slice:
 
 ```bash
-ANTHROPIC_API_KEY=YOUR_KEY python acceptance/claude-code/claude_programme.py run --config release/acceptance-claude-code/config.json --model claude-opus-5-5 --only controls --out /tmp/cc-programme
+ANTHROPIC_API_KEY=YOUR_KEY python acceptance/claude-code/claude_programme.py run --config release/acceptance-claude-code/config-rc1.json --model claude-opus-5-5 --only controls --out /tmp/cc-programme
 ```
 
 ```bash
-ANTHROPIC_API_KEY=YOUR_KEY python acceptance/claude-code/claude_programme.py run --config release/acceptance-claude-code/config.json --model claude-opus-5-5 --only contract --out /tmp/cc-programme
+ANTHROPIC_API_KEY=YOUR_KEY python acceptance/claude-code/claude_programme.py run --config release/acceptance-claude-code/config-rc1.json --model claude-opus-5-5 --only contract --out /tmp/cc-programme
 ```
 
 ```bash
-ANTHROPIC_API_KEY=YOUR_KEY python acceptance/claude-code/claude_programme.py run --config release/acceptance-claude-code/config.json --model claude-opus-5-5 --only flagship --authorized-usd 2.00 --out /tmp/cc-programme
+ANTHROPIC_API_KEY=YOUR_KEY python acceptance/claude-code/claude_programme.py run --config release/acceptance-claude-code/config-rc1.json --model claude-opus-5-5 --only flagship --authorized-usd 2.00 --out /tmp/cc-programme
 ```
 
 Then the rest, once you are content with the first slice's cost:
 
 ```bash
-ANTHROPIC_API_KEY=YOUR_KEY python acceptance/claude-code/claude_programme.py run --config release/acceptance-claude-code/config.json --model claude-opus-5-5 --authorized-usd 60.00 --out /tmp/cc-programme
+ANTHROPIC_API_KEY=YOUR_KEY python acceptance/claude-code/claude_programme.py run --config release/acceptance-claude-code/config-rc1.json --model claude-opus-5-5 --authorized-usd 60.00 --out /tmp/cc-programme
 ```
 
 Score it:
 
 ```bash
-python acceptance/claude-code/claude_programme.py score --config release/acceptance-claude-code/config.json --out /tmp/cc-programme --evidence release/acceptance-claude-code/evidence
+python acceptance/claude-code/claude_programme.py score --config release/acceptance-claude-code/config-rc1.json --out /tmp/cc-programme --evidence release/acceptance-claude-code/evidence
 ```
 
 Each run stays one at a time, and finished runs are kept and skipped, so an interruption resumes rather than rebills. Failed and partial runs stay in the evidence.
