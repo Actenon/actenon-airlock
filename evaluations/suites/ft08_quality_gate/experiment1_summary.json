@@ -1,0 +1,11 @@
+{
+  "patch_digest": "47e4c264d7e285c7652472d0a561622d1da739e5c9d1a4b0a4e582065ef586ba",
+  "regression_exit": 1,
+  "regression_passed": false,
+  "independent_exit": 1,
+  "independent_passed": false,
+  "trusted_component_authorizing_publication": "Operator Signing Key (via airlock init --approve --reconciler-key)",
+  "airlock_built_in_correctness_check": null,
+  "airlock_design_boundary": "Airlock enforces cryptographic authority, transport isolation, and consequence matching. It checks that an outbound action matches a signed ReviewedGitHubCreate profile. Airlock has NO built-in semantics, test runners, or code-correctness prerequisites. Exact-authority enforcement guarantees consequence fidelity, NOT source code quality.",
+  "why_failed_patch_shipped_in_ft7": "In Field Test 7, the test harness simulated human review by signing the consequence profile directly for the generated artifact without requiring a passing test gate. Airlock's ProtectedBroker correctly verified the signature and dispatched the PUT request as instructed."
+}
