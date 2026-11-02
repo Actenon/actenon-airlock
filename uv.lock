@@ -28,7 +28,7 @@ test = [
 [package.metadata]
 requires-dist = [
     { name = "actenon-kernel", git = "https://github.com/Actenon/actenon-kernel.git?rev=ead6a00aa38e7e3e21f6129a8565803f8ac48dd2" },
-    { name = "actenon-permit", git = "https://github.com/Actenon/actenon-permit.git?rev=b63cf8ac6968f72e45a082dc4fb91f3d4d08d689" },
+    { name = "actenon-permit", git = "https://github.com/Actenon/actenon-permit.git?rev=85aa3ae2a141f76fd78fe95db4aa1d196bc733da" },
     { name = "actenon-protocol", git = "https://github.com/Actenon/actenon-protocol.git?rev=a2e0e08fcd24b71eb1668204ba6bed00e4c63551" },
     { name = "actenon-scan", git = "https://github.com/Actenon/actenon-scan.git?rev=16388227a55a3b5a3ec392d1c70f3940b0c291c1" },
     { name = "anthropic", marker = "extra == 'test'", specifier = ">=0.40,<1" },
@@ -60,7 +60,7 @@ asymmetric = [
 [[package]]
 name = "actenon-permit"
 version = "2.0.0rc1"
-source = { git = "https://github.com/Actenon/actenon-permit.git?rev=b63cf8ac6968f72e45a082dc4fb91f3d4d08d689#b63cf8ac6968f72e45a082dc4fb91f3d4d08d689" }
+source = { git = "https://github.com/Actenon/actenon-permit.git?rev=85aa3ae2a141f76fd78fe95db4aa1d196bc733da#85aa3ae2a141f76fd78fe95db4aa1d196bc733da" }
 dependencies = [
     { name = "actenon-kernel", extra = ["asymmetric"] },
     { name = "actenon-protocol" },
