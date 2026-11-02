@@ -41,13 +41,14 @@
     {
       "repository": "Actenon/actenon-permit",
       "pr": 36,
-      "sha": "b63cf8ac6968f72e45a082dc4fb91f3d4d08d689",
+      "sha": "85aa3ae2a141f76fd78fe95db4aa1d196bc733da",
       "package": "actenon-permit",
       "version": "2.0.0rc1",
       "published": false,
       "adds_on_top_of_pr_head": [
-        "4868424 LLMAgent grant-state fix (GatewayClient.get_grant live state; example/test path only, no Airlock protected-path change)",
-        "kernel candidate repin to ead6a00"
+        "4868424 LLMAgent grant-state fix (example/test path only, no Airlock protected-path change)",
+        "kernel candidate repin to ead6a00",
+        "merge of PR #36 into main (dafde7584; content-identical, brings the branch current)"
       ]
     },
     {
@@ -78,6 +79,6 @@
     "Correction against the previous session record: the corpus comparison is 251 byte-identical MATCHes plus 4 documented TypeScript safe-integer rejections (i64_min, i64_max, u64_max, two_pow_63), not 255 byte-identical matches across all five implementations. No unexplained divergence exists."
   ],
   "verify": [
-    "python scripts/check_candidate_admission.py --candidate-sha <this branch head> --require \"CANDIDATE READY\" --expect-dependency Actenon/actenon-kernel=ead6a00aa38e7e3e21f6129a8565803f8ac48dd2 --expect-dependency Actenon/actenon-permit=b63cf8ac6968f72e45a082dc4fb91f3d4d08d689 --expect-dependency Actenon/actenon-protocol=a2e0e08fcd24b71eb1668204ba6bed00e4c63551 --expect-dependency Actenon/actenon-scan=16388227a55a3b5a3ec392d1c70f3940b0c291c1"
+    "python scripts/check_candidate_admission.py --candidate-sha <this branch head> --require \"CANDIDATE READY\" --expect-dependency Actenon/actenon-kernel=ead6a00aa38e7e3e21f6129a8565803f8ac48dd2 --expect-dependency Actenon/actenon-permit=85aa3ae2a141f76fd78fe95db4aa1d196bc733da --expect-dependency Actenon/actenon-protocol=a2e0e08fcd24b71eb1668204ba6bed00e4c63551 --expect-dependency Actenon/actenon-scan=16388227a55a3b5a3ec392d1c70f3940b0c291c1"
   ]
 }
