@@ -11,6 +11,13 @@ jobs:
     name: External coding agent (real local model)
     runs-on: ubuntu-latest
     timeout-minutes: 90
+    # Sigstore build provenance for the evidence below; the release-admission
+    # gate refuses frozen-programme evidence that is not attested by this
+    # workflow at the candidate commit.
+    permissions:
+      contents: read
+      id-token: write
+      attestations: write
     steps:
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
         with:
@@ -70,6 +77,12 @@ jobs:
       - name: Run actual external engineering task and bypass attempts
         run: |
           python acceptance/gpt-engineer/run.py --source external-agent-source --case "$RUNNER_TEMP/real-agent-case" --evidence "$GITHUB_WORKSPACE/real-agent-evidence" --matched-baseline "$GITHUB_WORKSPACE/baseline-agent-evidence" 2>&1 | tee real-agent.log
+      - name: Attest acceptance evidence provenance
+        uses: actions/attest-build-provenance@4d101475d8b20a2381f78447822ac1eab6504dd8 # v4.2.2
+        with:
+          subject-path: |
+            real-agent-evidence/run-summary.json
+            baseline-agent-evidence/baseline-result.json
       - name: Stop only this job's model runtime
         if: always()
         run: |
