@@ -5,15 +5,15 @@ build-backend = "setuptools.build_meta"
 [project]
 name = "actenon-airlock"
 version = "0.1.0.dev0"
-description = "See and control the powers of your Python AI agent."
+description = "Let AI agents work. Never surrender control."
 readme = "README.md"
 requires-python = ">=3.11"
 license = "Apache-2.0"
 dependencies = [
   "actenon-scan @ git+https://github.com/Actenon/actenon-scan.git@16388227a55a3b5a3ec392d1c70f3940b0c291c1",
   "actenon-protocol @ git+https://github.com/Actenon/actenon-protocol.git@a2e0e08fcd24b71eb1668204ba6bed00e4c63551",
-  "actenon-kernel @ git+https://github.com/Actenon/actenon-kernel.git@7a1ad40581ce0f984f5b1cc4292f26d350cab311",
-  "actenon-permit @ git+https://github.com/Actenon/actenon-permit.git@b795a37cfa927c630605172f8ecaf073bfb2aa70",
+  "actenon-kernel @ git+https://github.com/Actenon/actenon-kernel.git@ead6a00aa38e7e3e21f6129a8565803f8ac48dd2",
+  "actenon-permit @ git+https://github.com/Actenon/actenon-permit.git@b63cf8ac6968f72e45a082dc4fb91f3d4d08d689",
   "requests>=2.32,<3",
   "httpx>=0.27,<1",
 ]
@@ -33,6 +33,22 @@ Issues = "https://github.com/Actenon/actenon-airlock/issues"
 
 [tool.setuptools.packages.find]
 where = ["src"]
+
+# `airlock protect` builds the pinned agent images on first use.
+[tool.setuptools.data-files]
+"share/actenon-airlock/containers" = [
+  "containers/Dockerfile.compute",
+  "containers/Dockerfile.claude-code",
+  "containers/Dockerfile.codex-cli",
+]
+"share/actenon-airlock/containers/claude-code" = [
+  "containers/claude-code/package.json",
+  "containers/claude-code/package-lock.json",
+]
+"share/actenon-airlock/containers/codex-cli" = [
+  "containers/codex-cli/install.py",
+  "containers/codex-cli/upstream.json",
+]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]

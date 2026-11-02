@@ -1,7 +1,9 @@
 # Release admission
 
 `scripts/check_candidate_admission.py` decides whether an Airlock commit is
-`NOT READY`, `CANDIDATE READY` or `RELEASE READY` against the G1-G40 programme.
+`NOT READY`, `CANDIDATE READY` or `RELEASE READY` against the owner's accepted
+[release bar](RELEASE_BAR.md). G1-G40 are still evaluated and reported, as
+superseded history.
 It is enforced by `.github/workflows/release-admission.yml` (manual dispatch with
 a mandatory threshold, and every `v*` tag at `RELEASE READY`). It exits 1 when the
 candidate falls short of `--require` and 2 when it cannot evaluate at all.
@@ -15,8 +17,9 @@ candidate falls short of `--require` and 2 when it cannot evaluate at all.
 | Dependency graph | each repo's CI on the commit pinned in the candidate `uv.lock` | `uv.lock` read from the candidate commit object; optional `--expect-dependency` | GitHub Actions API |
 | G28-G38 frozen programme | `real-coding-acceptance.yml` | run on the candidate commit; artifact digest; Sigstore provenance (`gh attestation verify --signer-workflow --source-digest --deny-self-hosted-runners`); frozen model, digest, agent revision and harness hashes; `airlock_dependency_manifest_sha256` = candidate `pyproject.toml` | GitHub Actions OIDC + Sigstore public-good |
 | Registry coherence (release only) | PyPI JSON API | final version, no git/URL dependencies, locked hashes published | PyPI |
+| Bar items 5, 6, 7 and 9 | The owner, in `release/bar-records/` | the exact commit; the hash of evidence committed beside the record | Review onto `main`. Read from the gate's checkout, never the candidate |
 
-Local files are never read as evidence. The rules (`gates.json`, the frozen
+Apart from those reviewed owner records, local files are never read as evidence. The rules (`gates.json`, the frozen
 definitions) come from the checkout running the gate, so dispatch it from `main`.
 
 ## Recovered scope (A-F)
@@ -28,15 +31,23 @@ evidence producer yet, so each is BLOCKED, and a changed document FAILs all six.
 `gates-recovered-v2.proposed.json` breaks A-F into requirements with a current,
 self-assessed status for owner review. The gate does not load it.
 
-## Current blocker: the frozen G1-G40 text is not committed
+## G1-G40
 
-No Actenon repository contains the verbatim G1-G40 acceptance criteria. Only
-G28-G38 can be identified (the frozen gpt-engineer / `qwen2.5-coder:14b`
-matched-baseline programme), and only at programme level, so those eleven gates
-share one evidence run and are labelled as such. G1-G27, G39 and G40 are
-`UNDEFINED`. To unblock: commit the verbatim text as `release/G1-G40.frozen.md`,
-pin its SHA-256 in `gates.json`, and give each gate its condition and evidence
-producer in a reviewed change.
+No Actenon repository contains the verbatim G1-G40 acceptance criteria. Only G28-G38 can be
+identified, as the frozen gpt-engineer / `qwen2.5-coder:14b` matched-baseline programme, and
+only at programme level. G1-G27, G39 and G40 are `UNDEFINED`.
+
+On 2026-11-01 the owner accepted the [release bar](RELEASE_BAR.md) in their place, pinned in
+`release_bar` in `gates.json`. It takes effect once it reaches `main`. Every recorded result
+stands, and the report still lists G1-G40. Removing that block restores the G1-G40 path, which
+would then need the verbatim text committed as `release/G1-G40.frozen.md`, its SHA-256 pinned
+and each gate given a condition and an evidence producer.
+
+## Acceptance v2
+
+`acceptance-v2/` is a separately versioned programme with its own specification, frozen
+config, evidence and [verdict](acceptance-v2/VERDICT.md). The gate does not load it, and
+it does not replace, pass or amend G1-G40.
 
 ## Limits
 

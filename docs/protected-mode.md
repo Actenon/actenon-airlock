@@ -33,6 +33,8 @@ are filled with the approved bound **before** hashing, verification and dispatch
 Remote tools, stored state, attachments, extra outputs and unknown parameters
 are refused. A valid completed model response with usage establishes observed
 inference output; it does not establish billing settlement or downstream effects.
+Claude Code uses a separate reviewed contract with tools and streaming; see
+[Claude Code in Protected Mode](claude-code.md).
 The other supported external operation is an explicitly reviewed
 [GitHub create-only consequence](github-consequence.md). Its response remains AMBIGUOUS until
 trusted readback confirms the exact provider state. All other outbound HTTP is denied, including
@@ -43,6 +45,26 @@ image; the supervisor resolves its immutable content ID, disables healthchecks,
 clears inherited environment values and refuses image-declared extra volumes.
 Agent requirements belong in that image, prepared before a protected run.
 Automatic image preparation and registry-only installation remain release gates.
+
+## Your project's dependencies
+
+The container has no network, so the agent cannot install packages. `.venv`, `node_modules`
+and similar folders are not copied in. If your tests need dependencies, build them into an
+image in a trusted step, then hand that image to the run:
+
+~~~dockerfile
+FROM actenon-airlock-claude-code:v1
+COPY requirements.txt /opt/project/requirements.txt
+RUN python -m pip install --no-cache-dir -r /opt/project/requirements.txt
+~~~
+
+~~~sh
+docker build -t my-project-agent .
+airlock protect --image my-project-agent "Fix the failing test"
+~~~
+
+That build has network access and runs your dependencies' install scripts, so build from a
+version of the project you trust. Use `actenon-airlock-codex-cli:v1` as the base for Codex.
 
 ## Boundary and authority
 

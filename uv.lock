@@ -1,5 +1,5 @@
 version = 1
-revision = 3
+revision = 5
 requires-python = ">=3.11"
 
 [[package]]
@@ -27,8 +27,8 @@ test = [
 
 [package.metadata]
 requires-dist = [
-    { name = "actenon-kernel", git = "https://github.com/Actenon/actenon-kernel.git?rev=7a1ad40581ce0f984f5b1cc4292f26d350cab311" },
-    { name = "actenon-permit", git = "https://github.com/Actenon/actenon-permit.git?rev=b795a37cfa927c630605172f8ecaf073bfb2aa70" },
+    { name = "actenon-kernel", git = "https://github.com/Actenon/actenon-kernel.git?rev=ead6a00aa38e7e3e21f6129a8565803f8ac48dd2" },
+    { name = "actenon-permit", git = "https://github.com/Actenon/actenon-permit.git?rev=b63cf8ac6968f72e45a082dc4fb91f3d4d08d689" },
     { name = "actenon-protocol", git = "https://github.com/Actenon/actenon-protocol.git?rev=a2e0e08fcd24b71eb1668204ba6bed00e4c63551" },
     { name = "actenon-scan", git = "https://github.com/Actenon/actenon-scan.git?rev=16388227a55a3b5a3ec392d1c70f3940b0c291c1" },
     { name = "anthropic", marker = "extra == 'test'", specifier = ">=0.40,<1" },
@@ -45,7 +45,7 @@ provides-extras = ["test"]
 [[package]]
 name = "actenon-kernel"
 version = "1.3.0"
-source = { git = "https://github.com/Actenon/actenon-kernel?rev=7a1ad40581ce0f984f5b1cc4292f26d350cab311#7a1ad40581ce0f984f5b1cc4292f26d350cab311" }
+source = { git = "https://github.com/Actenon/actenon-kernel?rev=ead6a00aa38e7e3e21f6129a8565803f8ac48dd2#ead6a00aa38e7e3e21f6129a8565803f8ac48dd2" }
 dependencies = [
     { name = "actenon-protocol" },
     { name = "cryptography" },
@@ -60,7 +60,7 @@ asymmetric = [
 [[package]]
 name = "actenon-permit"
 version = "2.0.0rc1"
-source = { git = "https://github.com/Actenon/actenon-permit.git?rev=b795a37cfa927c630605172f8ecaf073bfb2aa70#b795a37cfa927c630605172f8ecaf073bfb2aa70" }
+source = { git = "https://github.com/Actenon/actenon-permit.git?rev=b63cf8ac6968f72e45a082dc4fb91f3d4d08d689#b63cf8ac6968f72e45a082dc4fb91f3d4d08d689" }
 dependencies = [
     { name = "actenon-kernel", extra = ["asymmetric"] },
     { name = "actenon-protocol" },

@@ -1,0 +1,11 @@
+# Trusted preparation of unchanged Claude Code. No login, key or host configuration enters this image.
+FROM node@sha256:4b150b48b4116e2a22f2c39cc27025fbf4f153e2078fd3b14d159fdb5c7279da AS upstream
+WORKDIR /opt/claude-code
+COPY containers/claude-code/package.json containers/claude-code/package-lock.json ./
+# npm ci checks each archive against the lockfile. The skipped postinstall only copies this binary.
+RUN npm ci --ignore-scripts --omit=dev --no-audit --no-fund \
+    && cp node_modules/@anthropic-ai/claude-code-linux-*/claude /opt/claude
+
+FROM actenon-airlock-compute:dev
+COPY --from=upstream --chmod=0555 /opt/claude /usr/local/bin/claude
+RUN claude --version

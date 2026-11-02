@@ -26,7 +26,9 @@ from actenon_permit.model import Budget, Grant, Scopes
 from actenon_protocol.effects import effect_identity
 from actenon_scan.authority import classify_http
 
-from .broker import Broker
+from . import agent_inference, responses_inference
+from .agent_inference import CONTRACT, check_request, cost, reservation
+from .broker import Broker, HttpDispatch
 from .common import AirlockError, canonical, power, validate_url
 from .github_runtime import (
     GitHubCreateDispatch,
@@ -43,7 +45,10 @@ from .wire import LIMIT
 
 DEFAULT_IMAGE = "actenon-airlock-compute:dev"
 MODEL_ENDPOINTS = {url: provider for provider, url in DEFAULT_ENDPOINTS.items()}
-EXCLUDED_INPUT = EXCLUDED | {".ssh", ".aws", ".azure", ".config", ".gnupg", ".docker"}
+# Scan skips docs, but an agent's task can be about them.
+EXCLUDED_INPUT = (EXCLUDED - {"docs"}) | {".ssh", ".aws", ".azure", ".config", ".gnupg", ".docker"}
+# Host-local Claude Code state: logins and per-machine settings, never project content.
+EXCLUDED_INPUT |= {".claude.json", ".credentials.json", "settings.local.json"}
 
 
 class Docker:
@@ -77,6 +82,22 @@ class Docker:
 
     def json(self, args, *, timeout=45):
         return json.loads(self.call(args, timeout=timeout))
+
+    def create(self, args, *, project, image):
+        """Docker Desktop can hold a stale view of a project that was deleted and recreated.
+
+        Starting over would otherwise fail on a new run folder. Reading the state through
+        a mount refreshes that view, with a fixed listing and no network.
+        """
+        try:
+            return self.call(args)
+        except AirlockError:
+            if not self.host_path_prefix:
+                raise
+        mount = f"type=bind,source={project},target=/project,readonly"
+        listing = ["--mount", mount, "--entrypoint", "ls", image, "-R", "/project/.airlock"]
+        self.call(["run", "--rm", "--network", "none", "--read-only", *listing])
+        return self.call(args)
 
     def verify_engine(self, timeout=30):
         self.host_path_prefix = None
@@ -186,6 +207,78 @@ def snapshot(root: Path, destination: Path, secrets=()):
         os.close(source_fd)
 
 
+class InferenceDispatch(HttpDispatch):
+    """One logical model call, named by the supervisor and never by the agent.
+
+    Identical bytes after a confirmed answer are a new call. Identical bytes while an
+    earlier call has no confirmed answer may be a retry of it, so they keep its name and
+    its durable hold refuses them: nobody here knows whether the provider processed or
+    billed that call. The contained path has no stable retry identity, so a client
+    retry after a confirmed answer is a new call, with its own budget and receipts.
+    Airlock never retries on its own, and inference is not exactly-once.
+
+    Under the agent contract a worst-case cost is reserved before any byte leaves, so a
+    lost reply stays counted. An observed answer replaces it with its reported usage, and
+    a provider's explicit rate-limit or overload refusal ends the call: its retry is a new
+    call. That reply still proves nothing about billing, so its effect stays unconfirmed.
+    """
+
+    def __init__(self, broker, effect, message):
+        super().__init__(broker, effect, message)
+        self.invocation = broker.inference_unconfirmed.get(self.params["body_sha256"])
+        self.retry = self.invocation is not None
+        self.observation = None
+        self.reserved = self.charged = 0
+        profile = broker.agent_profile(self.url)
+        if profile and not self.retry:
+            responses = profile["contract"] == responses_inference.CONTRACT
+            reserve = responses_inference.reservation if responses else reservation
+            self.reserved = reserve(
+                len(self.body),
+                json.loads(self.body)["max_output_tokens" if responses else "max_tokens"],
+                profile["price_microusd_per_mtok"],
+            )
+            if broker.inference_spent + self.reserved > profile["max_run_microusd"]:
+                raise AirlockError("Model spend bound reached for this run")
+        if not self.retry:
+            broker.inference_calls += 1
+            self.invocation = broker.inference_calls
+        self.params["inference_invocation"] = self.invocation
+
+    def authority_fields(self):
+        return {
+            "inference_run": self.broker.inference_run,
+            "inference_invocation": self.invocation,
+            "inference_retry": self.retry,
+        }
+
+    def receipt_fields(self):
+        if not self.reserved:
+            return {}
+        fields = {"inference_cost_microusd": self.charged}
+        if self.observation is not None and self.observation.usage is not None:
+            fields["inference_usage"] = self.observation.usage
+        if self.observation is not None and self.observation.declined:
+            fields["inference_declined"] = True
+        return fields
+
+    def observed(self, observation, prices):
+        self.observation = observation
+        if observation.usage is not None:
+            actual = cost(observation.usage, prices)
+        else:
+            actual = 0 if observation.declined else self.charged
+        self.broker.inference_spent += actual - self.charged
+        self.charged = actual
+
+    def run(self):
+        # Set before any byte leaves: every outcome short of a confirmed answer holds.
+        self.broker.inference_unconfirmed[self.params["body_sha256"]] = self.invocation
+        self.broker.inference_spent += self.reserved
+        self.charged = self.reserved
+        return super().run()
+
+
 class ProtectedBroker(Broker):
     """Scan vocabulary and Permit policy, with an OS-bound grant principal.
 
@@ -195,6 +288,10 @@ class ProtectedBroker(Broker):
     """
 
     def __init__(self, state, current, bindings=None):
+        self.inference_run = uuid4().hex
+        self.inference_calls = 0
+        self.inference_unconfirmed = {}
+        self.inference_spent = 0
         self.approval = state.approved()
         self.approval_envelope = json.loads((state.path / "approved.json").read_text())
         if self.approval_envelope.get("payload") != self.approval:
@@ -257,7 +354,7 @@ class ProtectedBroker(Broker):
 
     def make_dispatch(self, adapter, effect, message):
         if effect.target in self.model_transports:
-            return super().make_dispatch(adapter, effect, message)
+            return InferenceDispatch(self, effect, message)
         for profile in self.github_profiles:
             if effect.target != review_for(profile).contents_url:
                 continue
@@ -269,7 +366,13 @@ class ProtectedBroker(Broker):
 
     def _http_effect_descriptor(self, intent):
         if intent.target.resource_id in self.model_transports:
-            return super()._http_effect_descriptor(intent)
+            # Inference is not an external mutation, so ownership belongs to one
+            # logical call in this run, not to its prompt. Both names are the
+            # supervisor's, and each run has its own call budget.
+            base = super()._http_effect_descriptor(intent)
+            invocation = intent.action.parameters["inference_invocation"]
+            key = {**base["semantic_key"], "run": self.inference_run, "invocation": invocation}
+            return {**base, "semantic_key": key}
         return project_intent(intent, self.github_profiles, self.effect_namespace)
 
     def grant_principal(self):
@@ -307,6 +410,27 @@ class ProtectedBroker(Broker):
             return profile.get("read_timeout_seconds", 30)
         return super().http_timeout(url)
 
+    def http_deadline(self, url):
+        # An agent's reply is released whole, so a trickled stream gets one overall limit.
+        return time.monotonic() + self.http_timeout(url) if self.agent_profile(url) else None
+
+    def agent_profile(self, url):
+        profile = self.approval.get("protected_model", {})
+        if (
+            profile.get("contract") in {CONTRACT, responses_inference.CONTRACT}
+            and endpoint(profile) == url
+        ):
+            return profile
+        return None
+
+    def _settle_http_effect(self, intent, proof, outcome, dispatch, grant):
+        evidence = super()._settle_http_effect(intent, proof, outcome, dispatch, grant)
+        if isinstance(dispatch, InferenceDispatch):
+            declined = dispatch.observation is not None and dispatch.observation.declined
+            if evidence["outcome"] == "COMMITTED" or declined:
+                self.inference_unconfirmed.pop(dispatch.params["body_sha256"], None)
+        return evidence
+
     def bind_authority(self, effect, message):
         for candidate in effect.candidates:
             if candidate["action"] == "github.graphql":
@@ -330,6 +454,11 @@ class ProtectedBroker(Broker):
             or endpoint(profile) != url
         ):
             raise AirlockError("Model access requires an explicitly approved model constraint")
+        if profile.get("contract") == responses_inference.CONTRACT:
+            return responses_inference.check_request(body, profile)
+        if profile.get("contract") == CONTRACT:
+            check_request(body, profile)
+            return body
         request = json.loads(body)
         if not isinstance(request, dict) or request.get("model") not in profile["models"]:
             raise AirlockError("Model is outside approved authority")
@@ -377,6 +506,19 @@ class ProtectedBroker(Broker):
         return canonical(request)
 
     def http_outcome(self, dispatch):
+        profile = self.agent_profile(dispatch.url)
+        if profile:
+            reply = base64.b64decode(dispatch.response["body"], validate=True)
+            contract = (
+                responses_inference
+                if profile["contract"] == responses_inference.CONTRACT
+                else agent_inference
+            )
+            observation = contract.observe(
+                dispatch.response["status"], reply, json.loads(dispatch.body)
+            )
+            dispatch.observed(observation, profile["price_microusd_per_mtok"])
+            return ("COMMITTED", True) if observation.confirmed else ("AMBIGUOUS", None)
         if dispatch.url not in self.model_transports or dispatch.response.get("status") != 200:
             return super().http_outcome(dispatch)
         try:
@@ -410,6 +552,8 @@ class ProtectedBroker(Broker):
         return "AMBIGUOUS", None
 
     def handle(self, message):
+        if self.state.emergency_stop():
+            return self._deny("emergency.stop", "<protected boundary>", "Emergency stop is active")
         if message.get("kind") != "protected-http":
             return self._deny(
                 "unsupported", "<protected boundary>", "No protected executor for this request"
@@ -454,6 +598,14 @@ class ProtectedBroker(Broker):
                 for k, v in headers.items()
                 if k.lower() not in {"authorization", "x-api-key", "api-key", "host"}
             }
+            profile = self.agent_profile(url)
+            if profile:
+                contract = (
+                    responses_inference
+                    if profile["contract"] == responses_inference.CONTRACT
+                    else agent_inference
+                )
+                headers = contract.check_headers(headers, profile)
             for name, marker in self.markers.items():
                 if self.credentials[marker][1] == self.bindings[name] and url.startswith(
                     self.bindings[name] + "/"
@@ -577,13 +729,15 @@ def _verify_container(docker, identity, *, agent, mounts):
 
 
 def launch_protected(root, command, *, image=DEFAULT_IMAGE):
+    state = State(root)
+    if state.emergency_stop():  # First, so a stop holds even when Docker does not.
+        raise AirlockError("Emergency stop is active; an operator must run airlock resume")
     docker = Docker()
     engine = docker.verify_engine()  # Mandatory: no cooperative fallback.
     resolved = docker.image(image)
     current = discover(root)
     if current["parse_errors"]:
         raise AirlockError("Source parse errors block protected launch")
-    state = State(root)
     approved = state.approved()
     diff = authority_diff(approved, current)
     broker = ProtectedBroker(state, current, approved.get("credential_bindings", {}))
@@ -609,10 +763,15 @@ def launch_protected(root, command, *, image=DEFAULT_IMAGE):
         model_targets = {
             "/v1/chat/completions": DEFAULT_ENDPOINTS["openai"],
             "/v1/messages": DEFAULT_ENDPOINTS["anthropic"],
+            "/v1/responses": DEFAULT_ENDPOINTS["openai-responses"],
         }
         profile = approved.get("protected_model", {})
         if profile:
-            path = "/v1/chat/completions" if profile["provider"] == "openai" else "/v1/messages"
+            path = {
+                "openai": "/v1/chat/completions",
+                "anthropic": "/v1/messages",
+                "openai-responses": "/v1/responses",
+            }[profile["provider"]]
             model_targets[path] = endpoint(profile)
         atomic_json(control / "model-targets.json", model_targets, 0o444)
         docker.call(["volume", "create", volume])
@@ -657,7 +816,7 @@ def launch_protected(root, command, *, image=DEFAULT_IMAGE):
             "--env",
             "TIKTOKEN_CACHE_DIR=/opt/airlock/tiktoken",
         ]
-        bridge_id = docker.call(
+        bridge_id = docker.create(
             [
                 *fixed,
                 "-i",
@@ -674,7 +833,9 @@ def launch_protected(root, command, *, image=DEFAULT_IMAGE):
                 "-I",
                 "-B",
                 "/airlock/contained_bridge.py",
-            ]
+            ],
+            project=root,
+            image=resolved["Id"],
         )
         identities.append(bridge_id)
         boundary = _verify_container(
@@ -768,6 +929,14 @@ def launch_protected(root, command, *, image=DEFAULT_IMAGE):
         agent_process = subprocess.Popen(
             [docker.binary, "start", "-a", agent_id], env=docker.environment
         )
+
+        def watch():
+            while not stopping.wait(1):
+                if state.emergency_stop():
+                    docker.call(["kill", agent_id])
+                    return
+
+        threading.Thread(target=watch, daemon=True).start()
         attach_result = agent_process.wait()
         observed_state = docker.json(["inspect", agent_id])[0]["State"]
         if (

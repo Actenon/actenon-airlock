@@ -65,8 +65,8 @@ jobs:
         with:
           python-version: "3.12"
       - run: python -m pip install build ruff
-      - run: ruff check src tests scripts
-      - run: ruff format --check src tests scripts
+      - run: ruff check src tests scripts acceptance/codex-cli containers/codex-cli
+      - run: ruff format --check src tests scripts acceptance/codex-cli containers/codex-cli
       - run: python -m build
       - name: Install built wheel with real pinned dependencies
         run: |
@@ -95,11 +95,23 @@ jobs:
         run: python -m pip install ".[test]"
       - name: Build credential-free compute image
         run: docker build -f containers/Dockerfile.compute -t actenon-airlock-compute:dev .
+      - name: Build the pinned Claude Code image
+        run: docker build -f containers/Dockerfile.claude-code -t actenon-airlock-claude-code:v1 .
+      - name: Build pinned unchanged Codex image
+        run: docker build -f containers/Dockerfile.codex-cli -t actenon-airlock-codex-cli:v1 .
       - name: Run positive workflow and bypass attempts in one contained environment
         env:
           AIRLOCK_TEST_PROTECTED_IMAGE: actenon-airlock-compute:dev
+          AIRLOCK_TEST_CODEX_IMAGE: actenon-airlock-codex-cli:v1
+          AIRLOCK_CODEX_EVIDENCE: ${{ github.workspace }}/codex-evidence
+          AIRLOCK_TEST_CLAUDE_CODE_IMAGE: actenon-airlock-claude-code:v1
           AIRLOCK_PROTECTED_EVIDENCE: ${{ github.workspace }}/protected-evidence
-        run: python -m pytest -q tests/test_protected.py tests/test_github_container.py --junitxml=protected-results.xml
+        run: python -m pytest -q tests/test_protected.py tests/test_github_container.py tests/test_guided_workflow.py tests/test_claude_code_container.py tests/test_codex_container.py tests/test_protect.py --junitxml=protected-results.xml
+      - name: Independent containment with working transport controls
+        env:
+          AIRLOCK_TEST_PROTECTED_IMAGE: actenon-airlock-compute:dev
+          AIRLOCK_INDEPENDENT_EVIDENCE: ${{ github.workspace }}/independent-boundary-evidence
+        run: python -m pytest -q tests/test_independent_container.py --junitxml=independent-boundary-results.xml
       - name: Preserve public evidence
         if: always()
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
@@ -108,3 +120,6 @@ jobs:
           path: |
             protected-results.xml
             protected-evidence/
+            codex-evidence/
+            independent-boundary-results.xml
+            independent-boundary-evidence/

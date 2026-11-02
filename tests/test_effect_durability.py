@@ -221,7 +221,7 @@ def test_tracing_headers_cannot_mint_a_new_effect_after_a_lost_response(project,
     assert len(calls) == 1, f"{header} let a retry re-dispatch an ambiguous effect"
 
 
-def test_semantic_headers_still_distinguish_effects(project, server):
+def test_header_dependent_operations_require_a_provider_contract(project, server):
     url, calls = server
     state = project(f'import requests\nrequests.post("{url}/pay")\n')
     broker = Broker(state, discover(state.root))
@@ -230,10 +230,10 @@ def test_semantic_headers_still_distinguish_effects(project, server):
         first["headers"] = {"content-type": "application/json"}
         second = message(url + "/pay")
         second["headers"] = {"content-type": "text/plain"}
-        assert broker.handle(first)["ok"] and broker.handle(second)["ok"]
+        assert broker.handle(first)["ok"] and not broker.handle(second)["ok"]
     finally:
         broker.close()
-    assert len(calls) == 2
+    assert len(calls) == 1
 
 
 def test_missing_state_key_fails_closed(project, server):

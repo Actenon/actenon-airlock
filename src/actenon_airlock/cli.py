@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import argparse
+import dataclasses
 import hashlib
 import importlib.metadata
 import json
@@ -136,28 +137,299 @@ def doctor(root: Path):
         except AirlockError:
             checks.append({"component": "local approval signature", "ok": False})
     protected = availability()
+    from .agents import SUPPORTED
+
+    agents = {}
+    for name, profile in SUPPORTED.items():
+        image = availability(profile["image"]) if protected["available"] else {"available": False}
+        agents[name] = {
+            "version": profile["version"],
+            "image": profile["image"],
+            "image_ready": image["available"],
+            "status": profile.get("status", "scored under acceptance v2"),
+        }
     return {
         "schema": "actenon-airlock/doctor/v1",
         "checks": checks,
         "guarantees": {"local": "cooperative Python interception", "protected": protected},
+        "agents": agents,
+        "supervisor_credentials": sorted(
+            name for name in ("ANTHROPIC_API_KEY", "OPENAI_API_KEY") if os.environ.get(name)
+        ),
         "ok": all(c["ok"] for c in checks),
     }
 
 
-def main(argv=None):
-    parser = argparse.ArgumentParser(
-        description="See and control the powers of your Python AI agent."
+WORKFLOW_COMMANDS = {
+    "setup", "work", "capture", "verify-candidate", "review-candidate", "publish", "status",
+    "synthetic-provider", "stop", "resume", "protect",
+}  # fmt: skip
+
+
+def _workflow_command(args, root: Path) -> int:
+    """The guided path. Every consequence still goes through the existing broker."""
+    from .agents import command, declaration, require_supported, write_declaration
+    from .model_constraints import DEFAULT_ENDPOINTS
+    from .synthetic_github import TOKEN, create_provider, synthetic_client
+    from .workflow import (
+        TESTS_PASSED,
+        capture_candidate,
+        publish_candidate,
+        status,
+        verify_candidate,
     )
+
+    if args.cmd == "protect":
+        from .protect import protect
+
+        return protect(args, root, main)
+    state = State(root)
+    config_path = state.path / "agent.json"
+    if args.cmd == "setup":
+        profile = require_supported(args.agent)
+        contract = profile.get("contract")
+        endpoint_url = args.model_endpoint or (
+            DEFAULT_ENDPOINTS[profile.get("provider", "anthropic")] if contract else None
+        )
+        if not endpoint_url:
+            raise AirlockError("--model-endpoint is required for this agent")
+        if contract and not (args.max_run_usd and args.price_per_mtok):
+            raise AirlockError(
+                "This agent needs --max-run-usd and --price-per-mtok: the spend bound is "
+                "enforced from signed prices you review, so Airlock will not guess them"
+            )
+        state.initialize()
+        write_declaration(root, declaration(args.model, endpoint_url))
+        config = {
+            "agent": args.agent,
+            "model": args.model,
+            "model_endpoint": endpoint_url,
+            "image": profile["image"],
+        }
+        forwarded = [
+            "init", "--path", str(root), "--command", "airlock_agent.py", "--model", args.model,
+            "--model-endpoint", endpoint_url,
+        ]  # fmt: skip
+        if contract:
+            output_tokens = args.max_output_tokens or profile["max_output_tokens"]
+            config["command_options"] = {
+                "max_output_tokens": output_tokens,
+                "budget_usd": args.max_run_usd,
+                "thinking": not args.no_thinking,
+            }
+            config.update(max_run_usd=args.max_run_usd, price_per_mtok=args.price_per_mtok)
+            forwarded += [
+                "--model-provider", profile.get("provider", "anthropic"),
+                "--model-contract", contract,
+                "--model-max-tokens", str(output_tokens),
+                "--model-max-input-bytes", str(profile["max_input_bytes"]),
+                "--model-max-run-usd", args.max_run_usd, "--model-price", args.price_per_mtok,
+                "--model-read-timeout", "540",
+                *(arg for flag in profile["anthropic_betas"] for arg in ("--model-beta", flag)),
+            ]  # fmt: skip
+        else:
+            forwarded += ["--model-max-tokens", "4096", "--model-read-timeout", "600"]
+        config_path.write_text(json.dumps(config, indent=2) + "\n")
+        if args.reconciler_key:
+            forwarded += ["--reconciler-key", str(args.reconciler_key)]
+        return main([*forwarded, *(["--approve"] if args.approve else [])])
+    if args.cmd == "work":
+        from .protected import launch_protected
+
+        try:
+            config = json.loads(config_path.read_text())
+        except OSError as exc:
+            raise AirlockError("No agent configured; run airlock setup first") from exc
+        if not (root / args.message_file).resolve().is_relative_to(root.resolve()):
+            raise AirlockError("The message file must be inside the project the agent receives")
+        if os.environ.get("ANTHROPIC_API_KEY", "").startswith("sk-ant-oat"):
+            raise AirlockError(
+                "ANTHROPIC_API_KEY holds a subscription token. Claude subscription credentials "
+                "cannot be held by an intermediary: use an API key from the Claude Console"
+            )
+        return launch_protected(
+            root,
+            command(
+                config["agent"],
+                config["model"],
+                args.message_file,
+                args.test_command,
+                **config.get("command_options", {}),
+            ),
+            image=args.image or config["image"],
+        )
+    if args.cmd == "capture":
+        manifest = capture_candidate(state)
+        if args.json:
+            print(json.dumps(manifest, indent=2))
+        else:
+            print("UNTRUSTED agent output captured; nothing was executed or approved.")
+            for change in manifest["changes"]:
+                print(f"  {change['status']:<9}{change['path']}")
+            print("Candidate " + manifest["candidate_sha256"])
+        return 0
+    if args.cmd == "verify-candidate":
+        from .protected import DEFAULT_IMAGE
+
+        result = verify_candidate(
+            state, args.candidate, args.tests.resolve(), image=args.image or DEFAULT_IMAGE
+        )
+        if args.json:
+            print(json.dumps(result, indent=2))
+        else:
+            print(f"{result['verdict']}: {result['detail']}")
+            print("Specified tests only. This is not a safety finding and approves nothing.")
+        return 0 if result["verdict"] == TESTS_PASSED else 2
+    if args.cmd == "review-candidate":
+        from .github_consequence import ReviewedGitHubCreate
+        from .github_runtime import PROFILE_SCHEMA
+
+        patch = state.local / "candidates" / args.candidate / "candidate.patch"
+        if not patch.is_file():
+            raise AirlockError("Unknown candidate; run airlock capture first")
+        facts = {
+            "repo_id": args.repo_id,
+            "repo_node_id": args.repo_node_id,
+            "owner": args.owner,
+            "repo": args.repo,
+            "branch": args.branch,
+            "expected_parent_sha": args.parent,
+        }
+        if args.synthetic_provider:
+            provider = json.loads(args.synthetic_provider.read_text())
+            repository = provider["repository"]
+            facts = {
+                "repo_id": repository["id"],
+                "repo_node_id": repository["node_id"],
+                "owner": repository["owner"],
+                "repo": repository["name"],
+                "branch": provider["branch"],
+                "expected_parent_sha": provider["head"],
+            }
+        missing = sorted(name for name, value in facts.items() if value is None)
+        if missing:
+            raise AirlockError("Repository facts are required: " + ", ".join(missing))
+        review = ReviewedGitHubCreate(
+            **facts,
+            path=args.path_in_repo,
+            message=args.message,
+            content_sha256=args.candidate,
+        )
+        profile = {
+            "schema": PROFILE_SCHEMA,
+            "exclusive_writer": True,
+            "credential_name": "GITHUB_TOKEN",
+            "review": dataclasses.asdict(review),
+        }
+        args.output.write_text(json.dumps(profile, indent=2) + "\n")
+        config = json.loads(config_path.read_text())
+        write_declaration(
+            root, declaration(config["model"], config["model_endpoint"], (review.contents_url,))
+        )
+        print(f"Proposed: create {review.path} in {review.owner}/{review.repo}@{review.branch}")
+        print(f"Exact bytes: sha256 {args.candidate}")
+        print("Nothing is authorized yet. Review the candidate, then sign with:")
+        print(f"  airlock init --approve --github-create {args.output} --reconciler-key <key>")
+        return 0
+    if args.cmd == "publish":
+        client = None
+        if args.synthetic_provider:
+            os.environ["GITHUB_TOKEN"] = TOKEN  # in-process; no network transport exists
+            client = synthetic_client(args.synthetic_provider)
+        result = publish_candidate(state, args.candidate, client=client)
+        if args.json:
+            print(json.dumps(result, indent=2))
+        elif result["status"] == "REFUSED":
+            print("REFUSED: " + str(result["reason"]))
+        else:
+            print(
+                f"{result['status']}: effect {result['effect_id']} outcome {result['outcome']}. "
+                "Not confirmed until independent readback settles it:"
+            )
+            print(
+                f"  airlock reconcile {result['effect_id']} --github-readback --operator-key <key>"
+            )
+        return 0 if result["status"] == "DISPATCHED_UNCONFIRMED" else 3
+    if args.cmd in {"stop", "resume"}:
+        (state.set_emergency_stop if args.cmd == "stop" else state.clear_emergency_stop)(
+            args.reason
+        )
+        print(
+            "EMERGENCY STOP ACTIVE: no dispatch, no new run; reconcile still works."
+            if args.cmd == "stop"
+            else "Emergency stop cleared. Held effects remain held."
+        )
+        return 0
+    if args.cmd == "status":
+        result = status(state)
+        if args.json:
+            print(json.dumps(result, indent=2))
+        else:
+            print(
+                f"Receipts: {result['receipts']} (integrity {'OK' if result['integrity_ok'] else 'FAILED'})"
+            )
+            print(f"History completeness: {result['completeness']}")
+            if result["emergency_stop"]:
+                print("EMERGENCY STOP ACTIVE: " + result["emergency_stop"]["reason"])
+            print(f"Refused: {result['refused']}")
+            for reason in result["refusal_reasons"]:
+                print("  " + reason)
+            calls = result["inference"]
+            print(
+                f"Model calls: {calls['dispatched']} dispatched, {calls['confirmed']} confirmed, "
+                f"{calls['unconfirmed']} unconfirmed, {calls['retries_held']} retries held"
+            )
+            spend = result["model_spend"]
+            if spend["estimated_microusd"] or spend["declined_calls"]:
+                print(
+                    f"Model spend estimate: ${spend['estimated_microusd'] / 1_000_000:.4f} "
+                    f"(not billing); {spend['declined_calls']} calls declined by the provider"
+                )
+            print(f"Independently observed: {result['independently_observed'] or 'none'}")
+            print(f"Unresolved effects: {len(result['unresolved_effects'])}")
+            for effect in result["unresolved_effects"]:
+                print("  " + effect)
+        return 0 if result["integrity_ok"] else 2
+    if args.create:
+        create_provider(args.file)
+    provider = json.loads(args.file.read_text())
+    if args.lose_next_ack:
+        provider["lose_next_acknowledgement"] = True
+        args.file.write_text(json.dumps(provider, indent=2))
+    mutations = [r for r in provider["requests"] if r["method"] not in {"GET", "HEAD"}]
+    print(provider["notice"])
+    print(f"Requests received: {len(provider['requests'])}; mutations: {len(mutations)}")
+    print(f"Files: {sorted(provider['files']) or 'none'}")
+    return 0
+
+
+def main(argv=None):
+    parser = argparse.ArgumentParser(description="Let AI agents work. Never surrender control.")
     parser.add_argument("--version", action="version", version=__version__)
     sub = parser.add_subparsers(dest="cmd", required=True)
     for cmd in (
         "init", "diff", "check", "doctor", "run", "receipts", "reconcile",
-        "checkpoint", "verify-evidence",
+        "checkpoint", "verify-evidence", "recovery-inventory",
+        "setup", "work", "capture", "verify-candidate", "review-candidate", "publish", "status",
+        "synthetic-provider", "stop", "resume", "protect", "demo",
     ):  # fmt: skip
         p = sub.add_parser(cmd)
         p.add_argument("--path", type=Path, default=Path.cwd())
-        if cmd != "run":
+        if cmd not in {"run", "protect", "demo"}:
             p.add_argument("--json", action="store_true", help="Print machine-readable JSON")
+        if cmd == "protect":
+            p.add_argument("task", help="What the agent should do, in plain words")
+            p.add_argument("--agent", help="Default: the agent whose model key is in this shell")
+            p.add_argument("--model", help="Default: the agent's supported model")
+            p.add_argument("--max-run-usd", help="Spend limit per run. Default: 2.00")
+            p.add_argument("--price-per-mtok", help="input,cache_write,cache_read,output")
+            p.add_argument("--model-endpoint", help="Exact model URL the supervisor calls")
+            p.add_argument("--image", help="Your own image, built on the agent's image")
+            p.add_argument(
+                "--tests", type=Path,
+                help="Tests you hold outside the project, run against the change",
+            )  # fmt: skip
+            p.add_argument("--approve", action="store_true", help="Approve without being asked")
         if cmd == "checkpoint":
             p.add_argument(
                 "--output", type=Path, required=True,
@@ -174,6 +446,67 @@ def main(argv=None):
                 "--integrity-only", action="store_true",
                 help="Exit 0 on integrity alone; completeness stays UNANCHORED",
             )  # fmt: skip
+        if cmd == "setup":
+            p.add_argument("--agent", required=True, help="A supported agent, e.g. claude-code")
+            p.add_argument("--model", required=True, help="The one model the agent may call")
+            p.add_argument(
+                "--model-endpoint",
+                help="Exact model URL the supervisor calls (HTTPS or loopback)",
+            )  # fmt: skip
+            p.add_argument("--max-run-usd", help="Supervisor-enforced model spend bound per run")
+            p.add_argument("--max-output-tokens", type=int, help="Lower the signed reply bound")
+            p.add_argument(
+                "--no-thinking", action="store_true", help="Ask the agent not to request thinking"
+            )
+            p.add_argument(
+                "--price-per-mtok",
+                help="USD per million tokens: input,cache_write,cache_read,output",
+            )  # fmt: skip
+            p.add_argument("--reconciler-key", type=Path, help="External operator key path")
+            p.add_argument("--approve", action="store_true", help="Sign the reviewed authority")
+        if cmd == "work":
+            p.add_argument("--message-file", required=True, help="Task, relative to the project")
+            p.add_argument("--test-command", default="python -m pytest -q")
+            p.add_argument("--image", help="Override the agent's image")
+        if cmd == "verify-candidate":
+            p.add_argument("--candidate", required=True, help="Candidate SHA-256")
+            p.add_argument(
+                "--tests", type=Path, required=True,
+                help="Trusted tests held outside the project",
+            )  # fmt: skip
+            p.add_argument("--image", help="Test image (default: the compute image)")
+        if cmd == "review-candidate":
+            p.add_argument("--candidate", required=True, help="Candidate SHA-256")
+            p.add_argument("--output", type=Path, required=True, help="Profile to review")
+            p.add_argument("--path-in-repo", required=True, help="New file to create")
+            p.add_argument("--message", required=True, help="Commit message")
+            p.add_argument("--repo-id", type=int)
+            p.add_argument("--repo-node-id")
+            p.add_argument("--owner")
+            p.add_argument("--repo")
+            p.add_argument("--branch")
+            p.add_argument("--parent", help="Expected parent commit SHA")
+            p.add_argument("--synthetic-provider", type=Path, help="Read repo facts from this file")
+        if cmd == "publish":
+            p.add_argument("--candidate", required=True, help="Candidate SHA-256")
+            p.add_argument(
+                "--synthetic-provider", type=Path,
+                help="Use this disposable synthetic provider; nothing reaches a network",
+            )  # fmt: skip
+        if cmd in {"stop", "resume"}:
+            p.add_argument("--reason", required=True, help="Recorded in the signed journal")
+        if cmd == "synthetic-provider":
+            p.add_argument("--file", type=Path, required=True)
+            p.add_argument("--create", action="store_true")
+            p.add_argument(
+                "--lose-next-ack", action="store_true",
+                help="Commit the next creation, then lose its acknowledgement",
+            )  # fmt: skip
+        if cmd == "recovery-inventory":
+            p.add_argument("--public-key", help="Independently retained public key or key file")
+            p.add_argument(
+                "--checkpoint", type=Path, help="Newest independently retained checkpoint"
+            )
         if cmd in {"diff", "check"}:
             p.add_argument("--base", help="Compare to the signed approval at this trusted Git ref")
             p.add_argument("--output", type=Path, help="Save JSON authority diff")
@@ -194,10 +527,21 @@ def main(argv=None):
             p.add_argument(
                 "--model", action="append", default=[], help="Approve this exact inference model"
             )
-            p.add_argument("--model-provider", choices=("openai", "anthropic"), default="openai")
+            p.add_argument(
+                "--model-provider",
+                choices=("openai", "anthropic", "openai-responses"),
+                default="openai",
+            )
             p.add_argument("--model-max-tokens", type=int, default=2048)
             p.add_argument(
                 "--model-endpoint", help="Exact full inference endpoint also discovered by Scan"
+            )
+            p.add_argument("--model-contract", help="Review a named agent inference contract")
+            p.add_argument("--model-beta", action="append", default=[], help="Exact model feature")
+            p.add_argument("--model-max-input-bytes", type=int, default=2 * 1024 * 1024)
+            p.add_argument("--model-max-run-usd", help="Per-run model spend bound in USD")
+            p.add_argument(
+                "--model-price", help="USD per million tokens: input,cache_write,cache_read,output"
             )
             p.add_argument(
                 "--model-read-timeout",
@@ -226,6 +570,10 @@ def main(argv=None):
                 action="store_true",
                 help="Observe the exact reviewed GitHub creation; uncertainty remains held",
             )
+            p.add_argument(
+                "--synthetic-provider", type=Path,
+                help="Observe this disposable synthetic provider; nothing reaches a network",
+            )  # fmt: skip
             p.add_argument(
                 "--operator-key", type=Path, help="External approved operator private key"
             )
@@ -260,6 +608,10 @@ def main(argv=None):
     try:
         if not root.is_dir():
             raise AirlockError("Project directory does not exist")
+        if args.cmd == "demo":
+            from .demo import run
+
+            return run()
         if args.cmd == "doctor":
             result = doctor(root)
             if args.json:
@@ -278,6 +630,13 @@ def main(argv=None):
                     if result["guarantees"]["protected"]["available"]
                     else "COOPERATIVE MODE ONLY: " + result["guarantees"]["protected"]["reason"]
                 )
+                for name, agent in result["agents"].items():
+                    print(
+                        f"AGENT {name} ({agent['version']}): image "
+                        f"{'ready' if agent['image_ready'] else 'not built'}; {agent['status']}"
+                    )
+                held = ", ".join(result["supervisor_credentials"]) or "none"
+                print(f"Model credentials in the supervisor: {held}. None enter the container.")
             return 0 if result["ok"] else 2
         if args.cmd == "checkpoint":
             from .evidence import create_checkpoint
@@ -326,6 +685,19 @@ def main(argv=None):
             if report["integrity"]["ok"] and args.integrity_only:
                 return 0
             return 0 if report["ok"] else 2
+        if args.cmd == "recovery-inventory":
+            from .evidence import load_public_key
+            from .recovery import recovery_inventory
+
+            report = recovery_inventory(
+                root,
+                public_key=load_public_key(args.public_key) if args.public_key else None,
+                checkpoint=json.loads(args.checkpoint.read_text()) if args.checkpoint else None,
+            )
+            print(json.dumps(report, indent=2))
+            return 0 if report["status"] == "NO_DETECTED_BLOCKER" else 2
+        if args.cmd in WORKFLOW_COMMANDS:
+            return _workflow_command(args, root)
         if args.cmd == "receipts":
             result = State(root).verify_receipts()
             print(json.dumps(result, indent=2) if args.json else render_receipts(result))
@@ -366,7 +738,13 @@ def main(argv=None):
                         "GitHub readback requires --operator-key and obtains its own evidence"
                     )
                 private = load_operator_key(state, args.operator_key)
-                result = observe_github(state, args.effect_id, private)
+                seam = {}
+                if args.synthetic_provider:
+                    from .synthetic_github import TOKEN, synthetic_client
+
+                    os.environ["GITHUB_TOKEN"] = TOKEN  # in-process; no network transport exists
+                    seam["client"] = synthetic_client(args.synthetic_provider)
+                result = observe_github(state, args.effect_id, private, **seam)
                 envelope = result.pop("envelope", None)
                 if envelope is not None:
                     if args.output:
@@ -488,7 +866,7 @@ def main(argv=None):
             if args.model:
                 from .model_constraints import endpoint, validate_profile
 
-                if not 1 <= args.model_max_tokens <= 4096 or any(
+                if (not args.model_contract and not 1 <= args.model_max_tokens <= 4096) or any(
                     not model.strip() for model in args.model
                 ):
                     raise AirlockError("Models require names and a token bound between 1 and 4096")
@@ -497,6 +875,20 @@ def main(argv=None):
                     "models": sorted(set(args.model)),
                     "max_output_tokens": args.model_max_tokens,
                 }
+                if args.model_contract:
+                    from .agents import parse_prices, usd_to_micro
+
+                    if not args.model_price or not args.model_max_run_usd:
+                        raise AirlockError(
+                            "An agent contract needs signed prices and a spend bound"
+                        )
+                    current["protected_model"].update(
+                        contract=args.model_contract,
+                        max_input_bytes=args.model_max_input_bytes,
+                        anthropic_betas=sorted(set(args.model_beta)),
+                        price_microusd_per_mtok=parse_prices(args.model_price),
+                        max_run_microusd=usd_to_micro(args.model_max_run_usd),
+                    )
                 if args.model_endpoint:
                     current["protected_model"]["endpoint"] = args.model_endpoint
                 elif before.get("protected_model", {}).get(

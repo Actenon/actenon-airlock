@@ -189,7 +189,7 @@ def test_two_airlock_processes_share_one_consequential_dispatch(project, server)
         queue.close()
 
 
-def test_literal_header_cannot_spoof_a_bound_credential_identity(project, monkeypatch):
+def test_credential_switch_cannot_release_opaque_request_ownership(project, monkeypatch):
     url = "https://api.github.com/repos/acme/support/issues"
     monkeypatch.setenv("GITHUB_TOKEN", "offline-secret")
     state = project(f'import requests\nrequests.post("{url}")\n')
@@ -204,7 +204,6 @@ def test_literal_header_cannot_spoof_a_bound_credential_identity(project, monkey
         credential = message(url)
         credential["headers"] = {"Authorization": "Bearer " + broker.markers["GITHUB_TOKEN"]}
         first, second = broker.handle(literal), broker.handle(credential)
-        assert first["ok"] and second["ok"]
-        assert first["effect_id"] != second["effect_id"]
+        assert first["ok"] and not second["ok"]
     finally:
         broker.close()

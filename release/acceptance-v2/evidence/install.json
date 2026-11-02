@@ -1,0 +1,16 @@
+{
+  "schema": "actenon-airlock/clean-install/v1",
+  "method": "wheel built from the frozen commit, installed into a new virtual environment with no editable or sibling checkout",
+  "commit": "67837913f9379772f93ed9e34d244f187e1dde3f",
+  "wheel": "actenon_airlock-0.1.0.dev0-py3-none-any.whl",
+  "wheel_sha256": "277e5450655745d070a1ca29dab97f73c5a03f970797a4d875422c9df96b4543",
+  "python": "3.12",
+  "dependencies": {
+    "actenon-kernel": "7a1ad40581ce0f984f5b1cc4292f26d350cab311",
+    "actenon-permit": "b795a37cfa927c630605172f8ecaf073bfb2aa70",
+    "actenon-protocol": "a2e0e08fcd24b71eb1668204ba6bed00e4c63551",
+    "actenon-scan": "16388227a55a3b5a3ec392d1c70f3940b0c291c1"
+  },
+  "environment": "Docker Desktop 29.9.2 linux/arm64 on macOS, Apple M5, 16 GB",
+  "not_covered": "A different machine, a second operator, or public-registry installation"
+}

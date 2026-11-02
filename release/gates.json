@@ -508,7 +508,36 @@
         "allowed_skips": [],
         "must_pass": [
           "tests.test_github_container::test_actual_container_github_grant_and_denials",
-          "tests.test_protected::test_same_contained_environment_runs_engineering_workflow_and_refuses_bypass"
+          "tests.test_protected::test_same_contained_environment_runs_engineering_workflow_and_refuses_bypass",
+          "tests.test_guided_workflow::test_verification_runs_trusted_tests_in_a_contained_container",
+          "tests.test_guided_workflow::test_emergency_stop_kills_a_running_protected_agent",
+          "tests.test_protected::test_identical_inference_repeats_through_the_real_boundary",
+          "tests.test_protected::test_lost_inference_reply_holds_its_retry_through_the_real_boundary",
+          "tests.test_protect::test_protect_takes_a_task_to_a_reviewed_patch",
+          "tests.test_protect::test_the_demo_runs_with_its_control_and_cleans_up",
+          "tests.test_protect::test_the_live_test_passes_against_the_synthetic_provider",
+          "tests.test_codex_container::test_real_codex_executes_edits_tests_and_continues",
+          "tests.test_codex_container::test_real_codex_lost_ack_stays_held",
+          "tests.test_codex_container::test_real_codex_budget_refusal_before_provider",
+          "tests.test_codex_container::test_codex_executed_transport_attacks_have_working_controls",
+          "tests.test_codex_container::test_codex_artifact_approved_creation_readback_and_lost_ack",
+          "tests.test_claude_code_container::test_real_client_completes_tool_loop_inside_protected_mode",
+          "tests.test_claude_code_container::test_every_model_request_carries_only_the_contract",
+          "tests.test_claude_code_container::test_agent_tools_reach_no_credential_network_or_host",
+          "tests.test_claude_code_container::test_candidate_capture_sees_the_edit_and_no_agent_state",
+          "tests.test_claude_code_container::test_out_of_contract_output_from_a_compromised_client_is_refused",
+          "tests.test_claude_code_container::test_a_tool_call_naming_an_external_action_grants_nothing",
+          "tests.test_claude_code_container::test_provider_rate_limit_retries_as_a_new_call_with_the_real_client",
+          "tests.test_claude_code_container::test_a_lost_reply_ends_the_real_client_without_a_second_dispatch",
+          "tests.test_claude_code_container::test_supervisor_spend_bound_stops_the_real_client"
+        ]
+      },
+      {
+        "artifact": "protected-container-acceptance",
+        "file": "independent-boundary-results.xml",
+        "allowed_skips": [],
+        "must_pass": [
+          "tests.test_independent_container::test_owned_transport_controls_and_protected_boundary"
         ]
       },
       {
@@ -516,7 +545,29 @@
         "file": "test-results.xml",
         "allowed_skips": [
           "tests.test_github_container::test_actual_container_github_grant_and_denials",
-          "tests.test_protected::test_same_contained_environment_runs_engineering_workflow_and_refuses_bypass"
+          "tests.test_protected::test_same_contained_environment_runs_engineering_workflow_and_refuses_bypass",
+          "tests.test_guided_workflow::test_verification_runs_trusted_tests_in_a_contained_container",
+          "tests.test_guided_workflow::test_emergency_stop_kills_a_running_protected_agent",
+          "tests.test_protected::test_identical_inference_repeats_through_the_real_boundary",
+          "tests.test_protected::test_lost_inference_reply_holds_its_retry_through_the_real_boundary",
+          "tests.test_protect::test_protect_takes_a_task_to_a_reviewed_patch",
+          "tests.test_protect::test_the_demo_runs_with_its_control_and_cleans_up",
+          "tests.test_protect::test_the_live_test_passes_against_the_synthetic_provider",
+          "tests.test_codex_container::test_real_codex_executes_edits_tests_and_continues",
+          "tests.test_codex_container::test_real_codex_lost_ack_stays_held",
+          "tests.test_codex_container::test_real_codex_budget_refusal_before_provider",
+          "tests.test_codex_container::test_codex_executed_transport_attacks_have_working_controls",
+          "tests.test_codex_container::test_codex_artifact_approved_creation_readback_and_lost_ack",
+          "tests.test_claude_code_container::test_real_client_completes_tool_loop_inside_protected_mode",
+          "tests.test_claude_code_container::test_every_model_request_carries_only_the_contract",
+          "tests.test_claude_code_container::test_agent_tools_reach_no_credential_network_or_host",
+          "tests.test_claude_code_container::test_candidate_capture_sees_the_edit_and_no_agent_state",
+          "tests.test_claude_code_container::test_out_of_contract_output_from_a_compromised_client_is_refused",
+          "tests.test_claude_code_container::test_a_tool_call_naming_an_external_action_grants_nothing",
+          "tests.test_claude_code_container::test_provider_rate_limit_retries_as_a_new_call_with_the_real_client",
+          "tests.test_claude_code_container::test_a_lost_reply_ends_the_real_client_without_a_second_dispatch",
+          "tests.test_claude_code_container::test_supervisor_spend_bound_stops_the_real_client",
+          "tests.test_independent_container::test_owned_transport_controls_and_protected_boundary"
         ],
         "must_pass": []
       },
@@ -525,7 +576,29 @@
         "file": "test-results.xml",
         "allowed_skips": [
           "tests.test_github_container::test_actual_container_github_grant_and_denials",
-          "tests.test_protected::test_same_contained_environment_runs_engineering_workflow_and_refuses_bypass"
+          "tests.test_protected::test_same_contained_environment_runs_engineering_workflow_and_refuses_bypass",
+          "tests.test_guided_workflow::test_verification_runs_trusted_tests_in_a_contained_container",
+          "tests.test_guided_workflow::test_emergency_stop_kills_a_running_protected_agent",
+          "tests.test_protected::test_identical_inference_repeats_through_the_real_boundary",
+          "tests.test_protected::test_lost_inference_reply_holds_its_retry_through_the_real_boundary",
+          "tests.test_protect::test_protect_takes_a_task_to_a_reviewed_patch",
+          "tests.test_protect::test_the_demo_runs_with_its_control_and_cleans_up",
+          "tests.test_protect::test_the_live_test_passes_against_the_synthetic_provider",
+          "tests.test_codex_container::test_real_codex_executes_edits_tests_and_continues",
+          "tests.test_codex_container::test_real_codex_lost_ack_stays_held",
+          "tests.test_codex_container::test_real_codex_budget_refusal_before_provider",
+          "tests.test_codex_container::test_codex_executed_transport_attacks_have_working_controls",
+          "tests.test_codex_container::test_codex_artifact_approved_creation_readback_and_lost_ack",
+          "tests.test_claude_code_container::test_real_client_completes_tool_loop_inside_protected_mode",
+          "tests.test_claude_code_container::test_every_model_request_carries_only_the_contract",
+          "tests.test_claude_code_container::test_agent_tools_reach_no_credential_network_or_host",
+          "tests.test_claude_code_container::test_candidate_capture_sees_the_edit_and_no_agent_state",
+          "tests.test_claude_code_container::test_out_of_contract_output_from_a_compromised_client_is_refused",
+          "tests.test_claude_code_container::test_a_tool_call_naming_an_external_action_grants_nothing",
+          "tests.test_claude_code_container::test_provider_rate_limit_retries_as_a_new_call_with_the_real_client",
+          "tests.test_claude_code_container::test_a_lost_reply_ends_the_real_client_without_a_second_dispatch",
+          "tests.test_claude_code_container::test_supervisor_spend_bound_stops_the_real_client",
+          "tests.test_independent_container::test_owned_transport_controls_and_protected_boundary"
         ],
         "must_pass": []
       }
@@ -613,6 +686,75 @@
       "airlock_dependency_manifest_sha256",
       "image_id",
       "image_platform"
+    ]
+  },
+  "release_bar": {
+    "path": "release/RELEASE_BAR.md",
+    "sha256": "51aae87ddde416c6401c47b590e4b171418e87a490dfb23d5e4e0715b33e66a0",
+    "accepted_by": "owner",
+    "accepted_on": "2026-11-01",
+    "note": "Replaces G1-G40 as the admission requirement, by owner decision, because their text was never recovered and the frozen G28-G38 programme cannot be repeated. All recorded history stands. Removing this block restores the G1-G40 path.",
+    "items": [
+      {
+        "id": 1,
+        "title": "One candidate holding every supported agent",
+        "required_for": "candidate",
+        "evidence": "candidate_ci"
+      },
+      {
+        "id": 2,
+        "title": "Exact authority, an enforced boundary and truthful effect ownership",
+        "required_for": "candidate",
+        "evidence": "candidate_ci"
+      },
+      {
+        "id": 3,
+        "title": "A stranger can see it work, with no key and no cost",
+        "required_for": "candidate",
+        "evidence": "candidate_ci"
+      },
+      {
+        "id": 4,
+        "title": "One entry point from task to reviewed patch",
+        "required_for": "candidate",
+        "evidence": "candidate_ci"
+      },
+      {
+        "id": 5,
+        "title": "A real model does useful work beside a matched baseline, and the attacks run from the same environment",
+        "required_for": "candidate",
+        "evidence": "owner_record"
+      },
+      {
+        "id": 6,
+        "title": "One real GitHub write, confirmed by independent readback",
+        "required_for": "candidate",
+        "evidence": "owner_record"
+      },
+      {
+        "id": 7,
+        "title": "Three original repositories and ten agent cases",
+        "required_for": "candidate",
+        "evidence": "owner_record"
+      },
+      {
+        "id": 8,
+        "title": "Install from public registries alone",
+        "required_for": "release",
+        "evidence": "registry_coherence"
+      },
+      {
+        "id": 9,
+        "title": "Two independent operators on fresh machines",
+        "required_for": "release",
+        "evidence": "owner_record"
+      },
+      {
+        "id": 10,
+        "title": "The owner accepts this bar",
+        "required_for": "candidate",
+        "evidence": "accepted"
+      }
     ]
   }
 }
