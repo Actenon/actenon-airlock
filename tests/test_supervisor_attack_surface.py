@@ -25,9 +25,7 @@ class _RefereeHandler(BaseHTTPRequestHandler):
 
     def _record(self):
         body = self.rfile.read(int(self.headers.get("Content-Length", "0")))
-        self.server.records.append(
-            (self.command, self.path, body, dict(self.headers))
-        )
+        self.server.records.append((self.command, self.path, body, dict(self.headers)))
         self.send_response(200)
         self.send_header("Content-Type", "application/json")
         self.end_headers()
@@ -53,8 +51,9 @@ def referee():
         http.server_close()
 
 
-def attack(url, *, method="POST", line=2, file="main.py", kind="http",
-           locations=None, body=b"hello"):
+def attack(
+    url, *, method="POST", line=2, file="main.py", kind="http", locations=None, body=b"hello"
+):
     """An agent-authored message with fully attacker-chosen metadata."""
     msg = message(url, method=method, file=file, line=line, body=body)
     msg["kind"] = kind
@@ -64,9 +63,7 @@ def attack(url, *, method="POST", line=2, file="main.py", kind="http",
 
 
 def last_receipt(state):
-    return json.loads(
-        (state.local / "receipts.jsonl").read_text().splitlines()[-1]
-    )
+    return json.loads((state.local / "receipts.jsonl").read_text().splitlines()[-1])
 
 
 def test_method_confusion_cannot_reuse_post_authority_for_get(project, referee):
@@ -168,9 +165,7 @@ def test_wide_span_covering_two_callsites_is_refused(project, referee):
     span narrowed to one callsite works (positive control).
     """
     url, seen = referee
-    source = (
-        f'import requests\nrequests.post("{url}/a")\nrequests.post("{url}/b")\n'
-    )
+    source = f'import requests\nrequests.post("{url}/a")\nrequests.post("{url}/b")\n'
     state = project(source)
     broker = Broker(state, discover(state.root))
     try:
@@ -178,10 +173,15 @@ def test_wide_span_covering_two_callsites_is_refused(project, referee):
         out = broker.handle(
             attack(
                 url + "/a",
-                locations=[{
-                    "file": "main.py", "line": 2, "col": 1,
-                    "end_line": 3, "end_col": 40,
-                }],
+                locations=[
+                    {
+                        "file": "main.py",
+                        "line": 2,
+                        "col": 1,
+                        "end_line": 3,
+                        "end_col": 40,
+                    }
+                ],
             )
         )
         assert not out["ok"]
@@ -193,10 +193,15 @@ def test_wide_span_covering_two_callsites_is_refused(project, referee):
         assert not broker.handle(
             attack(
                 url + "/b",
-                locations=[{
-                    "file": "main.py", "line": 2, "col": 1,
-                    "end_line": 3, "end_col": 40,
-                }],
+                locations=[
+                    {
+                        "file": "main.py",
+                        "line": 2,
+                        "col": 1,
+                        "end_line": 3,
+                        "end_col": 40,
+                    }
+                ],
             )
         )["ok"]
         assert seen == []
@@ -206,10 +211,15 @@ def test_wide_span_covering_two_callsites_is_refused(project, referee):
         assert broker.handle(
             attack(
                 url + "/b",
-                locations=[{
-                    "file": "main.py", "line": 3, "col": 1,
-                    "end_line": 3, "end_col": 40,
-                }],
+                locations=[
+                    {
+                        "file": "main.py",
+                        "line": 3,
+                        "col": 1,
+                        "end_line": 3,
+                        "end_col": 40,
+                    }
+                ],
             )
         )["ok"]
         assert [r[:3] for r in seen] == [("POST", "/b", b"hello")]
@@ -274,9 +284,7 @@ def test_github_kind_cannot_ride_unrelated_http_authority(project, monkeypatch):
         assert row["decision"] == "DENY"
         assert "already reserved" in row["reason"]
         # The supervisor-held credential never appears in the evidence.
-        assert "supervisor-held-secret" not in (
-            state.local / "receipts.jsonl"
-        ).read_text()
+        assert "supervisor-held-secret" not in (state.local / "receipts.jsonl").read_text()
     finally:
         broker.close()
 
