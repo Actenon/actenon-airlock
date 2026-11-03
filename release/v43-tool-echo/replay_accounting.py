@@ -3,6 +3,7 @@
 import importlib.util
 import json
 import os
+import shutil
 import subprocess
 import sys
 import tempfile
@@ -18,6 +19,7 @@ from test_responses_inference import SECRET, configure, message  # noqa: E402
 from test_responses_observation import wire  # noqa: E402
 
 from actenon_airlock import protected  # noqa: E402
+from actenon_airlock.evidence import create_checkpoint, load_public_key, verify_offline  # noqa: E402
 from actenon_airlock.manifest import discover  # noqa: E402
 from actenon_airlock.workflow import status  # noqa: E402
 
@@ -39,11 +41,15 @@ changed = echo(EIGHT)
 changed[0]["parameters"] = {}
 programmatic = echo(EIGHT)
 programmatic[0]["allowed_callers"] = ["programmatic"]
+unknown = echo(EIGHT)
+secret = "synthetic-private-tool-property-and-value"
+unknown[0].update({secret + str(i): secret for i in range(40)})
 for label, module, metadata, partial in (
     ("original_echo", original, echo(EIGHT), False),
     ("repaired_echo", repaired, echo(EIGHT), False),
     ("repaired_changed_schema", repaired, changed, False),
     ("repaired_programmatic", repaired, programmatic, False),
+    ("repaired_unknown", repaired, unknown, False),
     ("repaired_partial", repaired, echo(EIGHT), True),
 ):
     protected.responses_inference = module
@@ -85,6 +91,7 @@ for label, module, metadata, partial in (
                             "inference_reserved_microusd",
                             "inference_cost_microusd",
                             "inference_usage",
+                            "inference_observation",
                             "outcome",
                         )
                     }
@@ -97,6 +104,20 @@ for label, module, metadata, partial in (
             assert results[label]["integrity_ok"]
             assert second["ok"] == (label == "repaired_echo")
             assert len(provider.requests) == (2 if label == "repaired_echo" else 1)
+            dest = Path(__file__).with_name("signed-replay") / label
+            dest.mkdir(parents=True, exist_ok=True)
+            checkpoint = create_checkpoint(state)
+            shutil.copyfile(state.receipts_path, dest / "receipts.jsonl")
+            shutil.copyfile(state.path / "public-key.json", dest / "public-key.json")
+            (dest / "checkpoint.json").write_text(json.dumps(checkpoint, indent=2) + "\n")
+            verification = verify_offline(
+                state.receipts_path.read_bytes(),
+                load_public_key(str(dest / "public-key.json")),
+                checkpoint,
+            )
+            assert verification["ok"] and verification["completeness"]["status"] == "ANCHORED"
+            assert secret not in state.receipts_path.read_text()
+            (dest / "verification.json").write_text(json.dumps(verification, indent=2) + "\n")
         finally:
             subject.close()
 protected.responses_inference = repaired

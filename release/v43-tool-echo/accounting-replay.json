@@ -16,6 +16,80 @@
         "inference_reserved_microusd": 509795,
         "inference_cost_microusd": 509795,
         "inference_usage": null,
+        "inference_observation": {
+          "body_sha256": "2b427dac441f010c2cc05c9d1116f7216c2784419ec5db7c450ce26139d57107",
+          "checked_event": 0,
+          "checked_event_metadata": {
+            "response_id_sha256": "9cbbbce3924493c41b1a2390e88f85ae39cc947751022fbaf1b58b8aa10bddce",
+            "sequence_number": 0,
+            "type": "response.created"
+          },
+          "checked_sequence_number": 0,
+          "event_count": 9,
+          "events": [
+            {
+              "response_id_sha256": "9cbbbce3924493c41b1a2390e88f85ae39cc947751022fbaf1b58b8aa10bddce",
+              "sequence_number": 0,
+              "type": "response.created"
+            },
+            {
+              "response_id_sha256": "9cbbbce3924493c41b1a2390e88f85ae39cc947751022fbaf1b58b8aa10bddce",
+              "sequence_number": 1,
+              "type": "response.in_progress"
+            },
+            {
+              "item_id_sha256": "f8c53bd3866d4822377e53015ed4533834b2ba9e300d02d80bf3b51bc3682917",
+              "item_type": "message",
+              "output_index": 0,
+              "sequence_number": 2,
+              "type": "response.output_item.added"
+            },
+            {
+              "content_index": 0,
+              "item_id_sha256": "f8c53bd3866d4822377e53015ed4533834b2ba9e300d02d80bf3b51bc3682917",
+              "output_index": 0,
+              "sequence_number": 3,
+              "type": "response.content_part.added"
+            },
+            {
+              "content_index": 0,
+              "item_id_sha256": "f8c53bd3866d4822377e53015ed4533834b2ba9e300d02d80bf3b51bc3682917",
+              "output_index": 0,
+              "sequence_number": 4,
+              "type": "response.output_text.delta"
+            },
+            {
+              "content_index": 0,
+              "item_id_sha256": "f8c53bd3866d4822377e53015ed4533834b2ba9e300d02d80bf3b51bc3682917",
+              "output_index": 0,
+              "sequence_number": 5,
+              "type": "response.output_text.done"
+            },
+            {
+              "content_index": 0,
+              "item_id_sha256": "f8c53bd3866d4822377e53015ed4533834b2ba9e300d02d80bf3b51bc3682917",
+              "output_index": 0,
+              "sequence_number": 6,
+              "type": "response.content_part.done"
+            },
+            {
+              "item_id_sha256": "f8c53bd3866d4822377e53015ed4533834b2ba9e300d02d80bf3b51bc3682917",
+              "item_type": "message",
+              "output_index": 0,
+              "sequence_number": 7,
+              "type": "response.output_item.done"
+            },
+            {
+              "response_id_sha256": "9cbbbce3924493c41b1a2390e88f85ae39cc947751022fbaf1b58b8aa10bddce",
+              "sequence_number": 8,
+              "type": "response.completed"
+            }
+          ],
+          "events_sha256": "db99b660e7cae6e14fdcd8e3a7750228f111b31217ae0115281b670db047e3ca",
+          "rejection_reason": "response-tools",
+          "schema": "actenon-airlock/responses-observation/v1",
+          "terminal_status": "completed"
+        },
         "outcome": "AMBIGUOUS"
       }
     ]
@@ -40,6 +114,86 @@
           "input_tokens": 90,
           "output_tokens": 20
         },
+        "inference_observation": {
+          "body_sha256": "2b427dac441f010c2cc05c9d1116f7216c2784419ec5db7c450ce26139d57107",
+          "checked_event": 8,
+          "checked_event_metadata": {
+            "response_id_sha256": "9cbbbce3924493c41b1a2390e88f85ae39cc947751022fbaf1b58b8aa10bddce",
+            "sequence_number": 8,
+            "type": "response.completed"
+          },
+          "checked_sequence_number": 8,
+          "event_count": 9,
+          "events": [
+            {
+              "response_id_sha256": "9cbbbce3924493c41b1a2390e88f85ae39cc947751022fbaf1b58b8aa10bddce",
+              "sequence_number": 0,
+              "type": "response.created"
+            },
+            {
+              "response_id_sha256": "9cbbbce3924493c41b1a2390e88f85ae39cc947751022fbaf1b58b8aa10bddce",
+              "sequence_number": 1,
+              "type": "response.in_progress"
+            },
+            {
+              "item_id_sha256": "f8c53bd3866d4822377e53015ed4533834b2ba9e300d02d80bf3b51bc3682917",
+              "item_type": "message",
+              "output_index": 0,
+              "sequence_number": 2,
+              "type": "response.output_item.added"
+            },
+            {
+              "content_index": 0,
+              "item_id_sha256": "f8c53bd3866d4822377e53015ed4533834b2ba9e300d02d80bf3b51bc3682917",
+              "output_index": 0,
+              "sequence_number": 3,
+              "type": "response.content_part.added"
+            },
+            {
+              "content_index": 0,
+              "item_id_sha256": "f8c53bd3866d4822377e53015ed4533834b2ba9e300d02d80bf3b51bc3682917",
+              "output_index": 0,
+              "sequence_number": 4,
+              "type": "response.output_text.delta"
+            },
+            {
+              "content_index": 0,
+              "item_id_sha256": "f8c53bd3866d4822377e53015ed4533834b2ba9e300d02d80bf3b51bc3682917",
+              "output_index": 0,
+              "sequence_number": 5,
+              "type": "response.output_text.done"
+            },
+            {
+              "content_index": 0,
+              "item_id_sha256": "f8c53bd3866d4822377e53015ed4533834b2ba9e300d02d80bf3b51bc3682917",
+              "output_index": 0,
+              "sequence_number": 6,
+              "type": "response.content_part.done"
+            },
+            {
+              "item_id_sha256": "f8c53bd3866d4822377e53015ed4533834b2ba9e300d02d80bf3b51bc3682917",
+              "item_type": "message",
+              "output_index": 0,
+              "sequence_number": 7,
+              "type": "response.output_item.done"
+            },
+            {
+              "response_id_sha256": "9cbbbce3924493c41b1a2390e88f85ae39cc947751022fbaf1b58b8aa10bddce",
+              "sequence_number": 8,
+              "type": "response.completed"
+            }
+          ],
+          "events_sha256": "db99b660e7cae6e14fdcd8e3a7750228f111b31217ae0115281b670db047e3ca",
+          "rejection_reason": null,
+          "schema": "actenon-airlock/responses-observation/v1",
+          "terminal_status": "completed",
+          "validated_usage": {
+            "cache_creation_input_tokens": 0,
+            "cache_read_input_tokens": 10,
+            "input_tokens": 90,
+            "output_tokens": 20
+          }
+        },
         "outcome": "COMMITTED"
       },
       {
@@ -50,6 +204,81 @@
           "cache_read_input_tokens": 10,
           "input_tokens": 90,
           "output_tokens": 20
+        },
+        "inference_observation": {
+          "body_sha256": "d4072e03f26c4b1c7014486440b31ec8e1413e6e62c4c360dba6f51376938820",
+          "checked_event": 7,
+          "checked_event_metadata": {
+            "response_id_sha256": "006a94a1999acde6368d3aa6adf495d15731967b12e2398f23ddb1d8e56407b5",
+            "sequence_number": 7,
+            "type": "response.completed"
+          },
+          "checked_sequence_number": 7,
+          "event_count": 8,
+          "events": [
+            {
+              "response_id_sha256": "006a94a1999acde6368d3aa6adf495d15731967b12e2398f23ddb1d8e56407b5",
+              "sequence_number": 0,
+              "type": "response.created"
+            },
+            {
+              "item_id_sha256": "f8c53bd3866d4822377e53015ed4533834b2ba9e300d02d80bf3b51bc3682917",
+              "item_type": "message",
+              "output_index": 0,
+              "sequence_number": 1,
+              "type": "response.output_item.added"
+            },
+            {
+              "content_index": 0,
+              "item_id_sha256": "f8c53bd3866d4822377e53015ed4533834b2ba9e300d02d80bf3b51bc3682917",
+              "output_index": 0,
+              "sequence_number": 2,
+              "type": "response.content_part.added"
+            },
+            {
+              "content_index": 0,
+              "item_id_sha256": "f8c53bd3866d4822377e53015ed4533834b2ba9e300d02d80bf3b51bc3682917",
+              "output_index": 0,
+              "sequence_number": 3,
+              "type": "response.output_text.delta"
+            },
+            {
+              "content_index": 0,
+              "item_id_sha256": "f8c53bd3866d4822377e53015ed4533834b2ba9e300d02d80bf3b51bc3682917",
+              "output_index": 0,
+              "sequence_number": 4,
+              "type": "response.output_text.done"
+            },
+            {
+              "content_index": 0,
+              "item_id_sha256": "f8c53bd3866d4822377e53015ed4533834b2ba9e300d02d80bf3b51bc3682917",
+              "output_index": 0,
+              "sequence_number": 5,
+              "type": "response.content_part.done"
+            },
+            {
+              "item_id_sha256": "f8c53bd3866d4822377e53015ed4533834b2ba9e300d02d80bf3b51bc3682917",
+              "item_type": "message",
+              "output_index": 0,
+              "sequence_number": 6,
+              "type": "response.output_item.done"
+            },
+            {
+              "response_id_sha256": "006a94a1999acde6368d3aa6adf495d15731967b12e2398f23ddb1d8e56407b5",
+              "sequence_number": 7,
+              "type": "response.completed"
+            }
+          ],
+          "events_sha256": "cb5c20170da2decc9b583ea06c17dddb6bfa806d2760869bee81eb9b70cad555",
+          "rejection_reason": null,
+          "schema": "actenon-airlock/responses-observation/v1",
+          "terminal_status": "completed",
+          "validated_usage": {
+            "cache_creation_input_tokens": 0,
+            "cache_read_input_tokens": 10,
+            "input_tokens": 90,
+            "output_tokens": 20
+          }
         },
         "outcome": "COMMITTED"
       }
@@ -70,6 +299,86 @@
         "inference_reserved_microusd": 509795,
         "inference_cost_microusd": 509795,
         "inference_usage": null,
+        "inference_observation": {
+          "body_sha256": "cd4c5f1196857fb15e258462b35f99622f8e5390c69c3c925995bcc887d78ec5",
+          "checked_event": 0,
+          "checked_event_metadata": {
+            "response_id_sha256": "9cbbbce3924493c41b1a2390e88f85ae39cc947751022fbaf1b58b8aa10bddce",
+            "sequence_number": 0,
+            "type": "response.created"
+          },
+          "checked_sequence_number": 0,
+          "event_count": 9,
+          "events": [
+            {
+              "response_id_sha256": "9cbbbce3924493c41b1a2390e88f85ae39cc947751022fbaf1b58b8aa10bddce",
+              "sequence_number": 0,
+              "type": "response.created"
+            },
+            {
+              "response_id_sha256": "9cbbbce3924493c41b1a2390e88f85ae39cc947751022fbaf1b58b8aa10bddce",
+              "sequence_number": 1,
+              "type": "response.in_progress"
+            },
+            {
+              "item_id_sha256": "f8c53bd3866d4822377e53015ed4533834b2ba9e300d02d80bf3b51bc3682917",
+              "item_type": "message",
+              "output_index": 0,
+              "sequence_number": 2,
+              "type": "response.output_item.added"
+            },
+            {
+              "content_index": 0,
+              "item_id_sha256": "f8c53bd3866d4822377e53015ed4533834b2ba9e300d02d80bf3b51bc3682917",
+              "output_index": 0,
+              "sequence_number": 3,
+              "type": "response.content_part.added"
+            },
+            {
+              "content_index": 0,
+              "item_id_sha256": "f8c53bd3866d4822377e53015ed4533834b2ba9e300d02d80bf3b51bc3682917",
+              "output_index": 0,
+              "sequence_number": 4,
+              "type": "response.output_text.delta"
+            },
+            {
+              "content_index": 0,
+              "item_id_sha256": "f8c53bd3866d4822377e53015ed4533834b2ba9e300d02d80bf3b51bc3682917",
+              "output_index": 0,
+              "sequence_number": 5,
+              "type": "response.output_text.done"
+            },
+            {
+              "content_index": 0,
+              "item_id_sha256": "f8c53bd3866d4822377e53015ed4533834b2ba9e300d02d80bf3b51bc3682917",
+              "output_index": 0,
+              "sequence_number": 6,
+              "type": "response.content_part.done"
+            },
+            {
+              "item_id_sha256": "f8c53bd3866d4822377e53015ed4533834b2ba9e300d02d80bf3b51bc3682917",
+              "item_type": "message",
+              "output_index": 0,
+              "sequence_number": 7,
+              "type": "response.output_item.done"
+            },
+            {
+              "response_id_sha256": "9cbbbce3924493c41b1a2390e88f85ae39cc947751022fbaf1b58b8aa10bddce",
+              "sequence_number": 8,
+              "type": "response.completed"
+            }
+          ],
+          "events_sha256": "db99b660e7cae6e14fdcd8e3a7750228f111b31217ae0115281b670db047e3ca",
+          "rejected_field": "parameters",
+          "rejection_reason": "response-tools",
+          "schema": "actenon-airlock/responses-observation/v1",
+          "terminal_status": "completed",
+          "tool_path": [
+            0
+          ],
+          "tool_rejection_reason": "definition",
+          "validation_stage": "response-tool-echo"
+        },
         "outcome": "AMBIGUOUS"
       }
     ]
@@ -89,6 +398,205 @@
         "inference_reserved_microusd": 509795,
         "inference_cost_microusd": 509795,
         "inference_usage": null,
+        "inference_observation": {
+          "body_sha256": "a0e3a1ea5405f0d86cdc3a8689128f8f380b89999bf9b0a241f0664f08c40d93",
+          "checked_event": 0,
+          "checked_event_metadata": {
+            "response_id_sha256": "9cbbbce3924493c41b1a2390e88f85ae39cc947751022fbaf1b58b8aa10bddce",
+            "sequence_number": 0,
+            "type": "response.created"
+          },
+          "checked_sequence_number": 0,
+          "event_count": 9,
+          "events": [
+            {
+              "response_id_sha256": "9cbbbce3924493c41b1a2390e88f85ae39cc947751022fbaf1b58b8aa10bddce",
+              "sequence_number": 0,
+              "type": "response.created"
+            },
+            {
+              "response_id_sha256": "9cbbbce3924493c41b1a2390e88f85ae39cc947751022fbaf1b58b8aa10bddce",
+              "sequence_number": 1,
+              "type": "response.in_progress"
+            },
+            {
+              "item_id_sha256": "f8c53bd3866d4822377e53015ed4533834b2ba9e300d02d80bf3b51bc3682917",
+              "item_type": "message",
+              "output_index": 0,
+              "sequence_number": 2,
+              "type": "response.output_item.added"
+            },
+            {
+              "content_index": 0,
+              "item_id_sha256": "f8c53bd3866d4822377e53015ed4533834b2ba9e300d02d80bf3b51bc3682917",
+              "output_index": 0,
+              "sequence_number": 3,
+              "type": "response.content_part.added"
+            },
+            {
+              "content_index": 0,
+              "item_id_sha256": "f8c53bd3866d4822377e53015ed4533834b2ba9e300d02d80bf3b51bc3682917",
+              "output_index": 0,
+              "sequence_number": 4,
+              "type": "response.output_text.delta"
+            },
+            {
+              "content_index": 0,
+              "item_id_sha256": "f8c53bd3866d4822377e53015ed4533834b2ba9e300d02d80bf3b51bc3682917",
+              "output_index": 0,
+              "sequence_number": 5,
+              "type": "response.output_text.done"
+            },
+            {
+              "content_index": 0,
+              "item_id_sha256": "f8c53bd3866d4822377e53015ed4533834b2ba9e300d02d80bf3b51bc3682917",
+              "output_index": 0,
+              "sequence_number": 6,
+              "type": "response.content_part.done"
+            },
+            {
+              "item_id_sha256": "f8c53bd3866d4822377e53015ed4533834b2ba9e300d02d80bf3b51bc3682917",
+              "item_type": "message",
+              "output_index": 0,
+              "sequence_number": 7,
+              "type": "response.output_item.done"
+            },
+            {
+              "response_id_sha256": "9cbbbce3924493c41b1a2390e88f85ae39cc947751022fbaf1b58b8aa10bddce",
+              "sequence_number": 8,
+              "type": "response.completed"
+            }
+          ],
+          "events_sha256": "db99b660e7cae6e14fdcd8e3a7750228f111b31217ae0115281b670db047e3ca",
+          "rejected_field": "allowed_callers",
+          "rejection_reason": "response-tools",
+          "schema": "actenon-airlock/responses-observation/v1",
+          "terminal_status": "completed",
+          "tool_path": [
+            0
+          ],
+          "tool_rejection_reason": "caller-mode",
+          "validation_stage": "response-tool-echo"
+        },
+        "outcome": "AMBIGUOUS"
+      }
+    ]
+  },
+  "repaired_unknown": {
+    "first_outcome": "AMBIGUOUS",
+    "after_first_microusd": 509795,
+    "second_ok": false,
+    "second_outcome": null,
+    "second_reason": "Model spend bound reached for this run",
+    "replay_refused": true,
+    "dispatched": 1,
+    "total_accounted_microusd": 509795,
+    "integrity_ok": true,
+    "observations": [
+      {
+        "inference_reserved_microusd": 509795,
+        "inference_cost_microusd": 509795,
+        "inference_usage": null,
+        "inference_observation": {
+          "body_sha256": "e5fb2e20023c1bd17799f47119a96a4caf8fe9aed83242ec3fd524c71b95fdad",
+          "checked_event": 0,
+          "checked_event_metadata": {
+            "response_id_sha256": "9cbbbce3924493c41b1a2390e88f85ae39cc947751022fbaf1b58b8aa10bddce",
+            "sequence_number": 0,
+            "type": "response.created"
+          },
+          "checked_sequence_number": 0,
+          "event_count": 9,
+          "events": [
+            {
+              "response_id_sha256": "9cbbbce3924493c41b1a2390e88f85ae39cc947751022fbaf1b58b8aa10bddce",
+              "sequence_number": 0,
+              "type": "response.created"
+            },
+            {
+              "response_id_sha256": "9cbbbce3924493c41b1a2390e88f85ae39cc947751022fbaf1b58b8aa10bddce",
+              "sequence_number": 1,
+              "type": "response.in_progress"
+            },
+            {
+              "item_id_sha256": "f8c53bd3866d4822377e53015ed4533834b2ba9e300d02d80bf3b51bc3682917",
+              "item_type": "message",
+              "output_index": 0,
+              "sequence_number": 2,
+              "type": "response.output_item.added"
+            },
+            {
+              "content_index": 0,
+              "item_id_sha256": "f8c53bd3866d4822377e53015ed4533834b2ba9e300d02d80bf3b51bc3682917",
+              "output_index": 0,
+              "sequence_number": 3,
+              "type": "response.content_part.added"
+            },
+            {
+              "content_index": 0,
+              "item_id_sha256": "f8c53bd3866d4822377e53015ed4533834b2ba9e300d02d80bf3b51bc3682917",
+              "output_index": 0,
+              "sequence_number": 4,
+              "type": "response.output_text.delta"
+            },
+            {
+              "content_index": 0,
+              "item_id_sha256": "f8c53bd3866d4822377e53015ed4533834b2ba9e300d02d80bf3b51bc3682917",
+              "output_index": 0,
+              "sequence_number": 5,
+              "type": "response.output_text.done"
+            },
+            {
+              "content_index": 0,
+              "item_id_sha256": "f8c53bd3866d4822377e53015ed4533834b2ba9e300d02d80bf3b51bc3682917",
+              "output_index": 0,
+              "sequence_number": 6,
+              "type": "response.content_part.done"
+            },
+            {
+              "item_id_sha256": "f8c53bd3866d4822377e53015ed4533834b2ba9e300d02d80bf3b51bc3682917",
+              "item_type": "message",
+              "output_index": 0,
+              "sequence_number": 7,
+              "type": "response.output_item.done"
+            },
+            {
+              "response_id_sha256": "9cbbbce3924493c41b1a2390e88f85ae39cc947751022fbaf1b58b8aa10bddce",
+              "sequence_number": 8,
+              "type": "response.completed"
+            }
+          ],
+          "events_sha256": "db99b660e7cae6e14fdcd8e3a7750228f111b31217ae0115281b670db047e3ca",
+          "rejected_field": "tools",
+          "rejection_reason": "response-tools",
+          "schema": "actenon-airlock/responses-observation/v1",
+          "terminal_status": "completed",
+          "tool_path": [
+            0
+          ],
+          "tool_rejection_reason": "unsupported-field",
+          "unexpected_field_count": 40,
+          "unexpected_fields": [
+            "sha256:00ff332a93d487ebce8bf7dcae0639b3ca9ccb352f27b3ffb23284725a28ee64",
+            "sha256:068f9781ace994e45350a6fd58e45d0e574771111a47a86d7de447e7e0e0e12b",
+            "sha256:0c96fa8e5f23a8dd64066d14921808bb75cf4caa439bd7f1f772c9064bf363e6",
+            "sha256:1471ef7b9bd05f252e45f959ba7df0e92f7ab70038203b8f07ab056f6188dbc0",
+            "sha256:182355dc19e9d1d8998088a0977edf23d658b244ca73657738510d3e09a97863",
+            "sha256:1bebf2b0eb2bcdc1748824249b99053b952985ba7cd89e256642867bb28de5e8",
+            "sha256:2107bc51e47ecef3943730b532624a225444241e955af00d1a3a124129d30873",
+            "sha256:2c6a350573be859fb2b6c353826ee6fad64e2cba6132f32e88766c15d927a4bc",
+            "sha256:2d04481bf63fbf8e5513c64bd54a2d3c54b2c1bd486d868cce58e3cb06332ac3",
+            "sha256:2edb332441850e8ed01d06b85619c2037cee7004772c79e55cfe53fc78c22ada",
+            "sha256:3126f0208412756ea47d5b3849f7aa364c55ee8f3a96923851caa95d0be36445",
+            "sha256:33d91815a39d948c0dfc0dfc93394910be0d9a4c6a1d72d20eeaa37151cc01a9",
+            "sha256:4c009f4fda0e8af37312e86d49b98fba33a5996d9b370634d9657f86da708005",
+            "sha256:542cc2bdf950560dd808f5169272b986b0a258e701d1e162696f0d725062847c",
+            "sha256:6c40a509c21a43e5aa63cd719df9dfa88ffa5c15f6d9f940e18fe87addd4cacf",
+            "sha256:6c515982a6bb760102f1b58e24b06e920716e43ee510341034c53ea4ba331188"
+          ],
+          "unexpected_fields_truncated": true,
+          "validation_stage": "response-tool-echo"
+        },
         "outcome": "AMBIGUOUS"
       }
     ]
@@ -108,6 +616,76 @@
         "inference_reserved_microusd": 509795,
         "inference_cost_microusd": 509795,
         "inference_usage": null,
+        "inference_observation": {
+          "body_sha256": "494646f94f00587bd7f688d27f89446eddece1a5566b2631a2c7bac49fcf6529",
+          "checked_event": 7,
+          "checked_event_metadata": {
+            "item_id_sha256": "f8c53bd3866d4822377e53015ed4533834b2ba9e300d02d80bf3b51bc3682917",
+            "item_type": "message",
+            "output_index": 0,
+            "sequence_number": 7,
+            "type": "response.output_item.done"
+          },
+          "checked_sequence_number": 7,
+          "event_count": 8,
+          "events": [
+            {
+              "response_id_sha256": "9cbbbce3924493c41b1a2390e88f85ae39cc947751022fbaf1b58b8aa10bddce",
+              "sequence_number": 0,
+              "type": "response.created"
+            },
+            {
+              "response_id_sha256": "9cbbbce3924493c41b1a2390e88f85ae39cc947751022fbaf1b58b8aa10bddce",
+              "sequence_number": 1,
+              "type": "response.in_progress"
+            },
+            {
+              "item_id_sha256": "f8c53bd3866d4822377e53015ed4533834b2ba9e300d02d80bf3b51bc3682917",
+              "item_type": "message",
+              "output_index": 0,
+              "sequence_number": 2,
+              "type": "response.output_item.added"
+            },
+            {
+              "content_index": 0,
+              "item_id_sha256": "f8c53bd3866d4822377e53015ed4533834b2ba9e300d02d80bf3b51bc3682917",
+              "output_index": 0,
+              "sequence_number": 3,
+              "type": "response.content_part.added"
+            },
+            {
+              "content_index": 0,
+              "item_id_sha256": "f8c53bd3866d4822377e53015ed4533834b2ba9e300d02d80bf3b51bc3682917",
+              "output_index": 0,
+              "sequence_number": 4,
+              "type": "response.output_text.delta"
+            },
+            {
+              "content_index": 0,
+              "item_id_sha256": "f8c53bd3866d4822377e53015ed4533834b2ba9e300d02d80bf3b51bc3682917",
+              "output_index": 0,
+              "sequence_number": 5,
+              "type": "response.output_text.done"
+            },
+            {
+              "content_index": 0,
+              "item_id_sha256": "f8c53bd3866d4822377e53015ed4533834b2ba9e300d02d80bf3b51bc3682917",
+              "output_index": 0,
+              "sequence_number": 6,
+              "type": "response.content_part.done"
+            },
+            {
+              "item_id_sha256": "f8c53bd3866d4822377e53015ed4533834b2ba9e300d02d80bf3b51bc3682917",
+              "item_type": "message",
+              "output_index": 0,
+              "sequence_number": 7,
+              "type": "response.output_item.done"
+            }
+          ],
+          "events_sha256": "116ff03d9f9d12a03e83d9a344cf3ce167d737ca7e6e64f51b8da96b5efcfc41",
+          "rejection_reason": "terminal-missing",
+          "schema": "actenon-airlock/responses-observation/v1"
+        },
         "outcome": "AMBIGUOUS"
       }
     ]
