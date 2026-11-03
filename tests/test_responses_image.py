@@ -6,8 +6,8 @@ import pytest
 from responses_fixture import ScriptedProvider
 from responses_full_fixture import EIGHT, full_response
 from test_responses_inference import PROFILE, REQUEST, SECRET, configure, message
-from test_responses_tool_echo import observe
 from test_responses_observation import wire
+from test_responses_tool_echo import observe
 
 from actenon_airlock import responses_inference as contract
 from actenon_airlock.common import AirlockError

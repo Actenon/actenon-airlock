@@ -9,7 +9,7 @@ from __future__ import annotations
 
 import hashlib
 import json
-from dataclasses import dataclass
+from dataclasses import dataclass, replace
 
 from actenon.core.json import loads_no_duplicate_keys
 
@@ -1074,7 +1074,7 @@ class ResponsesObservation(Observation):
     diagnostics: dict | None = None
 
 
-def observe(status, body, request):
+def _observe_authoritative(status, body, request):
     trace = _Trace(body)
     try:
         _require(len(body) <= 4 * 1024 * 1024, "response-byte-bound")
@@ -1100,3 +1100,20 @@ def observe(status, body, request):
     except (ValueError, KeyError, TypeError, AttributeError, IndexError, RecursionError):
         trace.data["rejection_reason"] = "malformed-response"
     return ResponsesObservation(diagnostics=trace.data)
+
+
+def observe(status, body, request):
+    # Complete the immutable authority/accounting decision first. Diagnostics
+    # cannot provide a verdict, alter usage, replay, dispatch or release a hold.
+    result = _observe_authoritative(status, body, request)
+    from .responses_observatory import inspect_response
+
+    try:
+        diagnostic = inspect_response(status, body, request)
+    except Exception:
+        # Diagnostic bugs/resource failures must not change an established
+        # verdict, and exception strings may contain private provider content.
+        diagnostic = {"authoritative": False, "unavailable": True}
+    return replace(
+        result, diagnostics={**(result.diagnostics or {}), "contract_observatory": diagnostic}
+    )
