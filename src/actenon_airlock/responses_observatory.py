@@ -71,6 +71,8 @@ class _Inspection:
     def issue(self, stage, reason, path=(), fields=None, detail=None):
         # All stage/reason/path strings are literals or trusted validator codes.
         # No provider value or provider-selected path component is copied here.
+        if len(path) > MAX_PATH or (fields and len(fields) > MAX_FIELDS):
+            self.truncated = True
         record = {"stage": stage, "reason": reason, "path": list(path[:MAX_PATH])}
         if fields:
             record["fields"] = fields[:MAX_FIELDS]

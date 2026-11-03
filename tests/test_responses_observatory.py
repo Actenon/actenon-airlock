@@ -256,3 +256,14 @@ def test_exhausted_diagnostic_work_budget_cannot_downgrade_valid_response(monkey
     assert result.confirmed and result.usage["output_tokens"] == 20
     report = result.diagnostics["contract_observatory"]
     assert report["probes"] == 1 and report["truncated"]
+
+
+def test_unknown_property_catalogue_is_bounded_and_reports_truncation():
+    seq = full_response()
+    seq[-1]["response"].update({f"synthetic-secret-{i}": "private" for i in range(40)})
+    result = observe(EIGHT, seq)
+    report = result.diagnostics["contract_observatory"]
+    issue = next(i for i in report["issues"] if i["reason"] == "response-schema")
+    assert len(issue["fields"]) == 4 and report["truncated"]
+    assert all(value.startswith("sha256:") and len(value) == 71 for value in issue["fields"])
+    assert "synthetic-secret" not in json.dumps(result.diagnostics)
