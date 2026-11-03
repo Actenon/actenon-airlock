@@ -1,0 +1,119 @@
+{
+  "sdk_version": "2.54.0",
+  "sdk_response_source_sha256": "38c562a4c9a104cae472bf2e9af097bad9311fad82906b1de8cf61a78b717cb1",
+  "sdk_response_fields": [
+    "background",
+    "completed_at",
+    "conversation",
+    "created_at",
+    "error",
+    "id",
+    "incomplete_details",
+    "instructions",
+    "max_output_tokens",
+    "max_tool_calls",
+    "metadata",
+    "model",
+    "moderation",
+    "object",
+    "output",
+    "parallel_tool_calls",
+    "previous_response_id",
+    "prompt",
+    "prompt_cache_key",
+    "prompt_cache_options",
+    "prompt_cache_retention",
+    "reasoning",
+    "safety_identifier",
+    "service_tier",
+    "status",
+    "temperature",
+    "text",
+    "tool_choice",
+    "tools",
+    "top_logprobs",
+    "top_p",
+    "truncation",
+    "usage",
+    "user"
+  ],
+  "airlock_response_fields_before": [
+    "access_programs",
+    "background",
+    "completed_at",
+    "created_at",
+    "error",
+    "id",
+    "incomplete_details",
+    "instructions",
+    "max_output_tokens",
+    "max_tool_calls",
+    "metadata",
+    "model",
+    "object",
+    "output",
+    "parallel_tool_calls",
+    "previous_response_id",
+    "prompt",
+    "prompt_cache_key",
+    "prompt_cache_retention",
+    "reasoning",
+    "safety_identifier",
+    "service_tier",
+    "status",
+    "store",
+    "temperature",
+    "text",
+    "tool_choice",
+    "tools",
+    "top_logprobs",
+    "top_p",
+    "truncation",
+    "usage",
+    "user"
+  ],
+  "sdk_only": [
+    "conversation",
+    "moderation",
+    "prompt_cache_options"
+  ],
+  "airlock_only": [
+    "access_programs",
+    "store"
+  ],
+  "candidate_types": {
+    "conversation": "typing.Optional[openai.types.responses.response.Conversation]",
+    "moderation": "typing.Optional[openai.types.responses.response.Moderation]",
+    "prompt_cache_options": "typing.Optional[openai.types.responses.response.PromptCacheOptions]"
+  },
+  "nested_fields": {
+    "Conversation": {
+      "id": "<class 'str'>"
+    },
+    "Moderation": {
+      "input": "typing.Union[openai.types.responses.response.ModerationInputModerationResult, openai.types.responses.response.ModerationInputError]",
+      "output": "typing.Union[openai.types.responses.response.ModerationOutputModerationResult, openai.types.responses.response.ModerationOutputError]"
+    },
+    "PromptCacheOptions": {
+      "mode": "typing.Literal['implicit', 'explicit']",
+      "ttl": "typing.Literal['30m']"
+    }
+  },
+  "usage_source_sha256": "10254bc2ea19f6fa9fc701dcc187a9991e8888b2613f37577570f581c1d0e998",
+  "usage_fields": {
+    "ResponseUsage": {
+      "input_tokens": "<class 'int'>",
+      "input_tokens_details": "<class 'openai.types.responses.response_usage.InputTokensDetails'>",
+      "output_tokens": "<class 'int'>",
+      "output_tokens_details": "<class 'openai.types.responses.response_usage.OutputTokensDetails'>",
+      "total_tokens": "<class 'int'>"
+    },
+    "InputTokensDetails": {
+      "cache_write_tokens": "<class 'int'>",
+      "cached_tokens": "<class 'int'>"
+    },
+    "OutputTokensDetails": {
+      "reasoning_tokens": "<class 'int'>"
+    }
+  }
+}
