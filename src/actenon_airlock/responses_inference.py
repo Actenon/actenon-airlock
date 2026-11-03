@@ -1106,9 +1106,9 @@ def observe(status, body, request):
     # Complete the immutable authority/accounting decision first. Diagnostics
     # cannot provide a verdict, alter usage, replay, dispatch or release a hold.
     result = _observe_authoritative(status, body, request)
-    from .responses_observatory import inspect_response
-
     try:
+        from .responses_observatory import inspect_response
+
         diagnostic = inspect_response(status, body, request)
     except Exception:
         # Diagnostic bugs/resource failures must not change an established

@@ -225,3 +225,34 @@ def test_documented_but_unsupported_names_are_public_identifiers_only(field):
         field in i.get("fields", []) for i in result.diagnostics["contract_observatory"]["issues"]
     )
     assert "synthetic-secret" not in json.dumps(result.diagnostics)
+
+
+@pytest.mark.parametrize("valid", [True, False])
+def test_missing_diagnostic_module_cannot_change_authority(monkeypatch, valid):
+    import builtins
+
+    original = builtins.__import__
+
+    def isolated_import(name, *args, **kwargs):
+        if name == "responses_observatory":
+            raise ImportError("synthetic-secret-import-failure")
+        return original(name, *args, **kwargs)
+
+    monkeypatch.setattr(builtins, "__import__", isolated_import)
+    result = observe(EIGHT, full_response() if valid else defects("image-hosted"))
+    assert result.confirmed is valid
+    assert result.diagnostics["contract_observatory"] == {
+        "authoritative": False,
+        "unavailable": True,
+    }
+    assert "synthetic-secret" not in json.dumps(result.diagnostics)
+
+
+def test_exhausted_diagnostic_work_budget_cannot_downgrade_valid_response(monkeypatch):
+    from actenon_airlock import responses_observatory
+
+    monkeypatch.setattr(responses_observatory, "MAX_PROBES", 1)
+    result = observe(EIGHT, full_response())
+    assert result.confirmed and result.usage["output_tokens"] == 20
+    report = result.diagnostics["contract_observatory"]
+    assert report["probes"] == 1 and report["truncated"]
