@@ -1,0 +1,23 @@
+{
+  "emergency_stop": null,
+  "integrity_ok": true,
+  "receipts": 2,
+  "completeness": "UNANCHORED",
+  "refused": 1,
+  "refusal_reasons": [
+    "Model spend bound reached for this run"
+  ],
+  "independently_observed": {},
+  "runtime_claims": {},
+  "unresolved_effects": [],
+  "inference": {
+    "dispatched": 0,
+    "confirmed": 0,
+    "unconfirmed": 0,
+    "retries_held": 0
+  },
+  "model_spend": {
+    "estimated_microusd": 0,
+    "declined_calls": 0
+  }
+}

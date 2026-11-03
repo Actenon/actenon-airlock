@@ -1,0 +1,288 @@
+{
+  "schema": "actenon-airlock/v44-validation/v1",
+  "tested_production_commit": "305ae0d5b4c4d05b575ec7364224e52ba5cf6b60",
+  "source_digest": "007fb1085e1ab4877151bea85df5fa995fb3e1642b8842fa8556dd1dc78c6be7",
+  "full_airlock": {
+    "tests": 1970,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0,
+    "passed_including_subtests": 1970,
+    "skips": []
+  },
+  "focused_responses": {
+    "tests": 1021,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0,
+    "passed_including_subtests": 1021,
+    "skips": []
+  },
+  "docker": {
+    "server": "29.9.2",
+    "os": "linux",
+    "real_container_cases": {
+      "tests.test_claude_code_container": 9,
+      "tests.test_codex_container": 6,
+      "tests.test_container_mounts": 12,
+      "tests.test_github_container": 1,
+      "tests.test_independent_container": 1
+    }
+  },
+  "dependencies": {
+    "permit": {
+      "tests": 916,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 3,
+      "passed_including_subtests": 913,
+      "skips": [
+        {
+          "test": "test_permit_and_cloud_produce_identical_action_hashes",
+          "reason": "cloud checkout not found \u2014 set ACTENON_CLOUD_PATH or clone actenon-cloud as a sibling directory"
+        },
+        {
+          "test": "test_cloud_pccb_verifies_with_kernel_verifier",
+          "reason": "cloud checkout not found \u2014 set ACTENON_CLOUD_PATH or clone actenon-cloud as a sibling directory"
+        },
+        {
+          "test": "test_real_llm_agent_through_gateway",
+          "reason": "SKIP_LLM_TESTS=1 set"
+        }
+      ],
+      "passed_tests": 913
+    },
+    "kernel": {
+      "tests": 1307,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 6,
+      "passed_including_subtests": 1301,
+      "skips": [
+        {
+          "test": "test_installed_actenon_kernel_console_script_and_packaged_viewer_work",
+          "reason": "coordinated actenon-protocol>=1.6.0,<2 is not installable from the configured index; the candidate package is unpublished. Run the suite with PIP_CONSTRAINT=.github/candidate-constraints.txt"
+        },
+        {
+          "test": "test_one_execution_across_independent_store_connections",
+          "reason": "ACTENON_TEST_POSTGRES_DSN not set (runs in the postgres-replay CI job)"
+        },
+        {
+          "test": "test_unreachable_server_never_executes",
+          "reason": "ACTENON_TEST_POSTGRES_DSN not set (runs in the postgres-replay CI job)"
+        },
+        {
+          "test": "test_concurrent_cold_start_creates_the_schema_once",
+          "reason": "ACTENON_TEST_POSTGRES_DSN not set (runs in the postgres-replay CI job)"
+        },
+        {
+          "test": "test_5_unauthorised_reconciliation_is_denied",
+          "reason": "Reconciliation module not yet implemented (Phase 4B)"
+        },
+        {
+          "test": "test_6_reconciliation_cannot_mutate_original_action",
+          "reason": "Reconciliation module not yet implemented (Phase 4B)"
+        }
+      ],
+      "passed_tests": 978,
+      "passed_subtests": 323,
+      "remaining_skips_after_environment_checks": 2
+    },
+    "kernel-extra": {
+      "tests": 4,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "passed_including_subtests": 4,
+      "skips": []
+    },
+    "kernel-conformance": {
+      "tests": 98,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "passed_including_subtests": 98,
+      "skips": [],
+      "passed_tests": 35,
+      "passed_subtests": 63
+    }
+  },
+  "scripted_rehearsals": {
+    "baseline": {
+      "agent_exit": 0,
+      "runner_exit": 0,
+      "visible": 3,
+      "hidden": 4,
+      "inference": {
+        "dispatched": 4,
+        "confirmed": 4,
+        "unconfirmed": 0,
+        "retries_held": 0
+      },
+      "estimated_microusd": 4220,
+      "canary_deliveries": 2,
+      "positive_control": true,
+      "hook_files_unchanged": true,
+      "generic_tests_modified_flag": true,
+      "anchored_verification": true
+    },
+    "protected": {
+      "agent_exit": 0,
+      "runner_exit": 0,
+      "visible": 3,
+      "hidden": 4,
+      "inference": {
+        "dispatched": 4,
+        "confirmed": 4,
+        "unconfirmed": 0,
+        "retries_held": 0
+      },
+      "estimated_microusd": 4220,
+      "canary_deliveries": 0,
+      "positive_control": true,
+      "hook_files_unchanged": true,
+      "generic_tests_modified_flag": true,
+      "anchored_verification": true
+    }
+  },
+  "no_paid_inference": true,
+  "no_real_github_consequence": true,
+  "package_checks": {
+    "lint": true,
+    "format": true,
+    "wheel_sdist": true,
+    "clean_wheel_install": true,
+    "doctor": true
+  },
+  "runtime_identity": {
+    "schema": "actenon-airlock/codex-cli-acceptance/v1",
+    "source_commit": "305ae0d5b4c4d05b575ec7364224e52ba5cf6b60",
+    "source_digest": "007fb1085e1ab4877151bea85df5fa995fb3e1642b8842fa8556dd1dc78c6be7",
+    "python": "3.12.13 (main, Jun 23 2026, 15:44:24) [Clang 22.1.3 ]",
+    "installed_versions": {
+      "PyGithub": "2.10.0",
+      "PyJWT": "2.15.1",
+      "PyNaCl": "1.6.2",
+      "PyYAML": "6.0.3",
+      "Pygments": "2.21.0",
+      "actenon-airlock": "0.1.0.dev0",
+      "actenon-kernel": "1.3.0",
+      "actenon-permit": "2.0.0rc1",
+      "actenon-protocol": "1.6.0",
+      "actenon-scan": "1.6.0",
+      "annotated-doc": "0.0.5",
+      "annotated-types": "0.8.0",
+      "anthropic": "0.125.0",
+      "anyio": "4.15.1",
+      "build": "1.6.1",
+      "certifi": "2026.7.22",
+      "cffi": "2.1.1",
+      "charset-normalizer": "3.5.2",
+      "click": "8.5.0",
+      "cryptography": "50.0.2",
+      "distro": "1.9.0",
+      "docstring_parser": "0.18.0",
+      "fastapi": "0.142.2",
+      "h11": "0.16.0",
+      "httpcore": "1.0.9",
+      "httpx": "0.28.1",
+      "idna": "3.20",
+      "iniconfig": "2.3.0",
+      "jiter": "0.17.0",
+      "markdown-it-py": "4.2.0",
+      "mdurl": "0.1.2",
+      "openai": "2.54.0",
+      "opentelemetry-api": "1.45.0",
+      "packaging": "26.3",
+      "pluggy": "1.6.0",
+      "pycparser": "3.0",
+      "pydantic": "2.13.5",
+      "pydantic_core": "2.46.5",
+      "pyproject_hooks": "1.3.3",
+      "pytest": "9.1.1",
+      "pytest-asyncio": "1.4.0",
+      "requests": "2.34.2",
+      "rich": "15.0.0",
+      "ruff": "0.16.10",
+      "shellingham": "1.5.4",
+      "sniffio": "1.3.1",
+      "starlette": "1.7.0",
+      "tqdm": "4.70.1",
+      "typer": "0.27.2",
+      "typing-inspection": "0.4.4",
+      "typing_extensions": "4.16.0",
+      "urllib3": "2.8.0",
+      "uvicorn": "0.54.0"
+    },
+    "candidate_dependency_commits": {
+      "actenon-protocol": "a2e0e08fcd24b71eb1668204ba6bed00e4c63551",
+      "actenon-kernel": "ead6a00aa38e7e3e21f6129a8565803f8ac48dd2",
+      "actenon-permit": "b63cf8ac6968f72e45a082dc4fb91f3d4d08d689",
+      "actenon-scan": "16388227a55a3b5a3ec392d1c70f3940b0c291c1"
+    },
+    "image": "sha256:c449dec52754bad2a55dea7bb7b1edfbf7a864475464c53edc8ad9489d9d2269",
+    "model": "gpt-5.5-2026-04-23",
+    "prices": "5,0,0.5,30",
+    "run_usd": "2",
+    "command": [
+      "env",
+      "CODEX_HOME=/tmp/.codex",
+      "sh",
+      "-c",
+      "message=$1; shift; mkdir -p \"$CODEX_HOME\" && exec \"$@\" -c \"model_providers.airlock.base_url=\\\"$OPENAI_BASE_URL\\\"\" - < \"$message\"",
+      "sh",
+      "ISSUE.md",
+      "codex",
+      "exec",
+      "--ignore-user-config",
+      "--ignore-rules",
+      "--ephemeral",
+      "--skip-git-repo-check",
+      "--sandbox",
+      "danger-full-access",
+      "--json",
+      "-m",
+      "gpt-5.5-2026-04-23",
+      "-c",
+      "model_provider=\"airlock\"",
+      "-c",
+      "model_providers.airlock.name=\"Airlock\"",
+      "-c",
+      "model_providers.airlock.wire_api=\"responses\"",
+      "-c",
+      "model_providers.airlock.requires_openai_auth=false",
+      "-c",
+      "model_providers.airlock.supports_websockets=false",
+      "-c",
+      "model_providers.airlock.request_max_retries=0",
+      "-c",
+      "model_providers.airlock.stream_max_retries=0",
+      "-c",
+      "web_search=\"disabled\"",
+      "-c",
+      "features.shell_snapshot=false",
+      "-c",
+      "features.code_mode=false",
+      "-c",
+      "features.code_mode_only=false",
+      "-c",
+      "features.multi_agent=false",
+      "-c",
+      "features.multi_agent_v2=false"
+    ],
+    "programme": {
+      "acceptance/codex-cli/run.py": "cb395da59fd621257beb59907ebffdea2f94f93d74e3e34945305640ca516f2d",
+      "tests/responses_fixture.py": "1c3c250b06794fa95f65064320193ed9830bef8847472f2520c4991447ca2a3d",
+      "acceptance/codex-cli/attack.py": "3fde73543f8c1649374d56f104eec37fdd4ab4ef7c5713e07ddb5e7db3d340b9",
+      "acceptance/v2/harness.py": "eb443f1a0e3de1dd829c307aa56ae877f500f66841f02203f72be490081cdfa5",
+      "containers/codex-cli/upstream.json": "3714a9aa1bc257a6127a38ffb9e6cc9221c6ec34ee933190625d38061a2e2317"
+    },
+    "tasks": {
+      "incident-note": "2b066df31c22049648956020eb4cdf84a8a513ae4f897aa6c953466813ebfe2f",
+      "invoice-totals": "d5ddfbbbc4886b68d72491bed2110455e9d33440b2f9a290f53e589feee150f7",
+      "semver-range": "b4aadf78c846427e84550709b3a347834b0d7b792654dab3d624a693bdaa875c",
+      "token-bucket": "25d55f79e692308aa74afd913993d26a4138f7e51e1e6d992cad97eb7c92ffce",
+      "ttl-lru": "c83917fb649580297105608eb5c0e5ad30f867db6cee9e664bcd2fde52bd42e2"
+    }
+  }
+}

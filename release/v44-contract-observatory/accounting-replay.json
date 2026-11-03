@@ -1,0 +1,2303 @@
+{
+  "original_commit": "208163b8e69058ae2906081893af5db072b45b2a",
+  "billing": "Synthetic reviewed-price accounting; no provider billing.",
+  "original_image": {
+    "first_outcome": "AMBIGUOUS",
+    "after_first_microusd": 509795,
+    "second_ok": false,
+    "second_outcome": null,
+    "second_reason": "Model spend bound reached for this run",
+    "replay_refused": true,
+    "dispatched": 1,
+    "total_accounted_microusd": 509795,
+    "integrity_ok": true,
+    "observations": [
+      {
+        "inference_reserved_microusd": 509795,
+        "inference_cost_microusd": 509795,
+        "inference_usage": null,
+        "inference_observation": {
+          "body_sha256": "44e004f5c911315cc6a168519db56bdb0259a7a326004846686fc7eb45b6d6a3",
+          "checked_event": 0,
+          "checked_event_metadata": {
+            "response_id_sha256": "9cbbbce3924493c41b1a2390e88f85ae39cc947751022fbaf1b58b8aa10bddce",
+            "sequence_number": 0,
+            "type": "response.created"
+          },
+          "checked_sequence_number": 0,
+          "event_count": 9,
+          "events": [
+            {
+              "response_id_sha256": "9cbbbce3924493c41b1a2390e88f85ae39cc947751022fbaf1b58b8aa10bddce",
+              "sequence_number": 0,
+              "type": "response.created"
+            },
+            {
+              "response_id_sha256": "9cbbbce3924493c41b1a2390e88f85ae39cc947751022fbaf1b58b8aa10bddce",
+              "sequence_number": 1,
+              "type": "response.in_progress"
+            },
+            {
+              "item_id_sha256": "f8c53bd3866d4822377e53015ed4533834b2ba9e300d02d80bf3b51bc3682917",
+              "item_type": "message",
+              "output_index": 0,
+              "sequence_number": 2,
+              "type": "response.output_item.added"
+            },
+            {
+              "content_index": 0,
+              "item_id_sha256": "f8c53bd3866d4822377e53015ed4533834b2ba9e300d02d80bf3b51bc3682917",
+              "output_index": 0,
+              "sequence_number": 3,
+              "type": "response.content_part.added"
+            },
+            {
+              "content_index": 0,
+              "item_id_sha256": "f8c53bd3866d4822377e53015ed4533834b2ba9e300d02d80bf3b51bc3682917",
+              "output_index": 0,
+              "sequence_number": 4,
+              "type": "response.output_text.delta"
+            },
+            {
+              "content_index": 0,
+              "item_id_sha256": "f8c53bd3866d4822377e53015ed4533834b2ba9e300d02d80bf3b51bc3682917",
+              "output_index": 0,
+              "sequence_number": 5,
+              "type": "response.output_text.done"
+            },
+            {
+              "content_index": 0,
+              "item_id_sha256": "f8c53bd3866d4822377e53015ed4533834b2ba9e300d02d80bf3b51bc3682917",
+              "output_index": 0,
+              "sequence_number": 6,
+              "type": "response.content_part.done"
+            },
+            {
+              "item_id_sha256": "f8c53bd3866d4822377e53015ed4533834b2ba9e300d02d80bf3b51bc3682917",
+              "item_type": "message",
+              "output_index": 0,
+              "sequence_number": 7,
+              "type": "response.output_item.done"
+            },
+            {
+              "response_id_sha256": "9cbbbce3924493c41b1a2390e88f85ae39cc947751022fbaf1b58b8aa10bddce",
+              "sequence_number": 8,
+              "type": "response.completed"
+            }
+          ],
+          "events_sha256": "db99b660e7cae6e14fdcd8e3a7750228f111b31217ae0115281b670db047e3ca",
+          "rejection_reason": "response-schema",
+          "schema": "actenon-airlock/responses-observation/v1",
+          "terminal_status": "completed",
+          "unexpected_field_count": 1,
+          "unexpected_fields": [
+            "image"
+          ],
+          "unexpected_fields_truncated": false,
+          "validation_stage": "response-object"
+        },
+        "outcome": "AMBIGUOUS"
+      }
+    ]
+  },
+  "repaired_enabled": {
+    "first_outcome": "COMMITTED",
+    "after_first_microusd": 1055,
+    "second_ok": true,
+    "second_outcome": "COMMITTED",
+    "second_reason": null,
+    "replay_refused": false,
+    "dispatched": 2,
+    "total_accounted_microusd": 2110,
+    "integrity_ok": true,
+    "observations": [
+      {
+        "inference_reserved_microusd": 509795,
+        "inference_cost_microusd": 1055,
+        "inference_usage": {
+          "cache_creation_input_tokens": 0,
+          "cache_read_input_tokens": 10,
+          "input_tokens": 90,
+          "output_tokens": 20
+        },
+        "inference_observation": {
+          "body_sha256": "44e004f5c911315cc6a168519db56bdb0259a7a326004846686fc7eb45b6d6a3",
+          "checked_event": 8,
+          "checked_event_metadata": {
+            "response_id_sha256": "9cbbbce3924493c41b1a2390e88f85ae39cc947751022fbaf1b58b8aa10bddce",
+            "sequence_number": 8,
+            "type": "response.completed"
+          },
+          "checked_sequence_number": 8,
+          "contract_observatory": {
+            "authoritative": false,
+            "events_inspected": 9,
+            "issues": [],
+            "limits": {
+              "bytes": 4194304,
+              "depth": 24,
+              "events": 256,
+              "fields_per_issue": 4,
+              "issues": 32,
+              "lines": 4096,
+              "path": 10,
+              "probes": 512,
+              "report_bytes": 16384,
+              "structural_tokens": 8192
+            },
+            "probes": 204,
+            "schema": "actenon-airlock/responses-contract-observatory/v1",
+            "truncated": false
+          },
+          "event_count": 9,
+          "events": [
+            {
+              "response_id_sha256": "9cbbbce3924493c41b1a2390e88f85ae39cc947751022fbaf1b58b8aa10bddce",
+              "sequence_number": 0,
+              "type": "response.created"
+            },
+            {
+              "response_id_sha256": "9cbbbce3924493c41b1a2390e88f85ae39cc947751022fbaf1b58b8aa10bddce",
+              "sequence_number": 1,
+              "type": "response.in_progress"
+            },
+            {
+              "item_id_sha256": "f8c53bd3866d4822377e53015ed4533834b2ba9e300d02d80bf3b51bc3682917",
+              "item_type": "message",
+              "output_index": 0,
+              "sequence_number": 2,
+              "type": "response.output_item.added"
+            },
+            {
+              "content_index": 0,
+              "item_id_sha256": "f8c53bd3866d4822377e53015ed4533834b2ba9e300d02d80bf3b51bc3682917",
+              "output_index": 0,
+              "sequence_number": 3,
+              "type": "response.content_part.added"
+            },
+            {
+              "content_index": 0,
+              "item_id_sha256": "f8c53bd3866d4822377e53015ed4533834b2ba9e300d02d80bf3b51bc3682917",
+              "output_index": 0,
+              "sequence_number": 4,
+              "type": "response.output_text.delta"
+            },
+            {
+              "content_index": 0,
+              "item_id_sha256": "f8c53bd3866d4822377e53015ed4533834b2ba9e300d02d80bf3b51bc3682917",
+              "output_index": 0,
+              "sequence_number": 5,
+              "type": "response.output_text.done"
+            },
+            {
+              "content_index": 0,
+              "item_id_sha256": "f8c53bd3866d4822377e53015ed4533834b2ba9e300d02d80bf3b51bc3682917",
+              "output_index": 0,
+              "sequence_number": 6,
+              "type": "response.content_part.done"
+            },
+            {
+              "item_id_sha256": "f8c53bd3866d4822377e53015ed4533834b2ba9e300d02d80bf3b51bc3682917",
+              "item_type": "message",
+              "output_index": 0,
+              "sequence_number": 7,
+              "type": "response.output_item.done"
+            },
+            {
+              "response_id_sha256": "9cbbbce3924493c41b1a2390e88f85ae39cc947751022fbaf1b58b8aa10bddce",
+              "sequence_number": 8,
+              "type": "response.completed"
+            }
+          ],
+          "events_sha256": "db99b660e7cae6e14fdcd8e3a7750228f111b31217ae0115281b670db047e3ca",
+          "rejection_reason": null,
+          "schema": "actenon-airlock/responses-observation/v1",
+          "terminal_status": "completed",
+          "validated_usage": {
+            "cache_creation_input_tokens": 0,
+            "cache_read_input_tokens": 10,
+            "input_tokens": 90,
+            "output_tokens": 20
+          }
+        },
+        "outcome": "COMMITTED"
+      },
+      {
+        "inference_reserved_microusd": 509925,
+        "inference_cost_microusd": 1055,
+        "inference_usage": {
+          "cache_creation_input_tokens": 0,
+          "cache_read_input_tokens": 10,
+          "input_tokens": 90,
+          "output_tokens": 20
+        },
+        "inference_observation": {
+          "body_sha256": "44e004f5c911315cc6a168519db56bdb0259a7a326004846686fc7eb45b6d6a3",
+          "checked_event": 8,
+          "checked_event_metadata": {
+            "response_id_sha256": "9cbbbce3924493c41b1a2390e88f85ae39cc947751022fbaf1b58b8aa10bddce",
+            "sequence_number": 8,
+            "type": "response.completed"
+          },
+          "checked_sequence_number": 8,
+          "contract_observatory": {
+            "authoritative": false,
+            "events_inspected": 9,
+            "issues": [],
+            "limits": {
+              "bytes": 4194304,
+              "depth": 24,
+              "events": 256,
+              "fields_per_issue": 4,
+              "issues": 32,
+              "lines": 4096,
+              "path": 10,
+              "probes": 512,
+              "report_bytes": 16384,
+              "structural_tokens": 8192
+            },
+            "probes": 204,
+            "schema": "actenon-airlock/responses-contract-observatory/v1",
+            "truncated": false
+          },
+          "event_count": 9,
+          "events": [
+            {
+              "response_id_sha256": "9cbbbce3924493c41b1a2390e88f85ae39cc947751022fbaf1b58b8aa10bddce",
+              "sequence_number": 0,
+              "type": "response.created"
+            },
+            {
+              "response_id_sha256": "9cbbbce3924493c41b1a2390e88f85ae39cc947751022fbaf1b58b8aa10bddce",
+              "sequence_number": 1,
+              "type": "response.in_progress"
+            },
+            {
+              "item_id_sha256": "f8c53bd3866d4822377e53015ed4533834b2ba9e300d02d80bf3b51bc3682917",
+              "item_type": "message",
+              "output_index": 0,
+              "sequence_number": 2,
+              "type": "response.output_item.added"
+            },
+            {
+              "content_index": 0,
+              "item_id_sha256": "f8c53bd3866d4822377e53015ed4533834b2ba9e300d02d80bf3b51bc3682917",
+              "output_index": 0,
+              "sequence_number": 3,
+              "type": "response.content_part.added"
+            },
+            {
+              "content_index": 0,
+              "item_id_sha256": "f8c53bd3866d4822377e53015ed4533834b2ba9e300d02d80bf3b51bc3682917",
+              "output_index": 0,
+              "sequence_number": 4,
+              "type": "response.output_text.delta"
+            },
+            {
+              "content_index": 0,
+              "item_id_sha256": "f8c53bd3866d4822377e53015ed4533834b2ba9e300d02d80bf3b51bc3682917",
+              "output_index": 0,
+              "sequence_number": 5,
+              "type": "response.output_text.done"
+            },
+            {
+              "content_index": 0,
+              "item_id_sha256": "f8c53bd3866d4822377e53015ed4533834b2ba9e300d02d80bf3b51bc3682917",
+              "output_index": 0,
+              "sequence_number": 6,
+              "type": "response.content_part.done"
+            },
+            {
+              "item_id_sha256": "f8c53bd3866d4822377e53015ed4533834b2ba9e300d02d80bf3b51bc3682917",
+              "item_type": "message",
+              "output_index": 0,
+              "sequence_number": 7,
+              "type": "response.output_item.done"
+            },
+            {
+              "response_id_sha256": "9cbbbce3924493c41b1a2390e88f85ae39cc947751022fbaf1b58b8aa10bddce",
+              "sequence_number": 8,
+              "type": "response.completed"
+            }
+          ],
+          "events_sha256": "db99b660e7cae6e14fdcd8e3a7750228f111b31217ae0115281b670db047e3ca",
+          "rejection_reason": null,
+          "schema": "actenon-airlock/responses-observation/v1",
+          "terminal_status": "completed",
+          "validated_usage": {
+            "cache_creation_input_tokens": 0,
+            "cache_read_input_tokens": 10,
+            "input_tokens": 90,
+            "output_tokens": 20
+          }
+        },
+        "outcome": "COMMITTED"
+      }
+    ]
+  },
+  "repaired_disabled": {
+    "first_outcome": "COMMITTED",
+    "after_first_microusd": 1055,
+    "second_ok": true,
+    "second_outcome": "COMMITTED",
+    "second_reason": null,
+    "replay_refused": false,
+    "dispatched": 2,
+    "total_accounted_microusd": 2110,
+    "integrity_ok": true,
+    "observations": [
+      {
+        "inference_reserved_microusd": 509795,
+        "inference_cost_microusd": 1055,
+        "inference_usage": {
+          "cache_creation_input_tokens": 0,
+          "cache_read_input_tokens": 10,
+          "input_tokens": 90,
+          "output_tokens": 20
+        },
+        "inference_observation": {
+          "body_sha256": "d93cc1f804b32682113bfafeb30a49939db1ce189a710bc95282b72cb0b1de99",
+          "checked_event": 8,
+          "checked_event_metadata": {
+            "response_id_sha256": "9cbbbce3924493c41b1a2390e88f85ae39cc947751022fbaf1b58b8aa10bddce",
+            "sequence_number": 8,
+            "type": "response.completed"
+          },
+          "checked_sequence_number": 8,
+          "contract_observatory": {
+            "authoritative": false,
+            "events_inspected": 9,
+            "issues": [],
+            "limits": {
+              "bytes": 4194304,
+              "depth": 24,
+              "events": 256,
+              "fields_per_issue": 4,
+              "issues": 32,
+              "lines": 4096,
+              "path": 10,
+              "probes": 512,
+              "report_bytes": 16384,
+              "structural_tokens": 8192
+            },
+            "probes": 204,
+            "schema": "actenon-airlock/responses-contract-observatory/v1",
+            "truncated": false
+          },
+          "event_count": 9,
+          "events": [
+            {
+              "response_id_sha256": "9cbbbce3924493c41b1a2390e88f85ae39cc947751022fbaf1b58b8aa10bddce",
+              "sequence_number": 0,
+              "type": "response.created"
+            },
+            {
+              "response_id_sha256": "9cbbbce3924493c41b1a2390e88f85ae39cc947751022fbaf1b58b8aa10bddce",
+              "sequence_number": 1,
+              "type": "response.in_progress"
+            },
+            {
+              "item_id_sha256": "f8c53bd3866d4822377e53015ed4533834b2ba9e300d02d80bf3b51bc3682917",
+              "item_type": "message",
+              "output_index": 0,
+              "sequence_number": 2,
+              "type": "response.output_item.added"
+            },
+            {
+              "content_index": 0,
+              "item_id_sha256": "f8c53bd3866d4822377e53015ed4533834b2ba9e300d02d80bf3b51bc3682917",
+              "output_index": 0,
+              "sequence_number": 3,
+              "type": "response.content_part.added"
+            },
+            {
+              "content_index": 0,
+              "item_id_sha256": "f8c53bd3866d4822377e53015ed4533834b2ba9e300d02d80bf3b51bc3682917",
+              "output_index": 0,
+              "sequence_number": 4,
+              "type": "response.output_text.delta"
+            },
+            {
+              "content_index": 0,
+              "item_id_sha256": "f8c53bd3866d4822377e53015ed4533834b2ba9e300d02d80bf3b51bc3682917",
+              "output_index": 0,
+              "sequence_number": 5,
+              "type": "response.output_text.done"
+            },
+            {
+              "content_index": 0,
+              "item_id_sha256": "f8c53bd3866d4822377e53015ed4533834b2ba9e300d02d80bf3b51bc3682917",
+              "output_index": 0,
+              "sequence_number": 6,
+              "type": "response.content_part.done"
+            },
+            {
+              "item_id_sha256": "f8c53bd3866d4822377e53015ed4533834b2ba9e300d02d80bf3b51bc3682917",
+              "item_type": "message",
+              "output_index": 0,
+              "sequence_number": 7,
+              "type": "response.output_item.done"
+            },
+            {
+              "response_id_sha256": "9cbbbce3924493c41b1a2390e88f85ae39cc947751022fbaf1b58b8aa10bddce",
+              "sequence_number": 8,
+              "type": "response.completed"
+            }
+          ],
+          "events_sha256": "db99b660e7cae6e14fdcd8e3a7750228f111b31217ae0115281b670db047e3ca",
+          "rejection_reason": null,
+          "schema": "actenon-airlock/responses-observation/v1",
+          "terminal_status": "completed",
+          "validated_usage": {
+            "cache_creation_input_tokens": 0,
+            "cache_read_input_tokens": 10,
+            "input_tokens": 90,
+            "output_tokens": 20
+          }
+        },
+        "outcome": "COMMITTED"
+      },
+      {
+        "inference_reserved_microusd": 509925,
+        "inference_cost_microusd": 1055,
+        "inference_usage": {
+          "cache_creation_input_tokens": 0,
+          "cache_read_input_tokens": 10,
+          "input_tokens": 90,
+          "output_tokens": 20
+        },
+        "inference_observation": {
+          "body_sha256": "44e004f5c911315cc6a168519db56bdb0259a7a326004846686fc7eb45b6d6a3",
+          "checked_event": 8,
+          "checked_event_metadata": {
+            "response_id_sha256": "9cbbbce3924493c41b1a2390e88f85ae39cc947751022fbaf1b58b8aa10bddce",
+            "sequence_number": 8,
+            "type": "response.completed"
+          },
+          "checked_sequence_number": 8,
+          "contract_observatory": {
+            "authoritative": false,
+            "events_inspected": 9,
+            "issues": [],
+            "limits": {
+              "bytes": 4194304,
+              "depth": 24,
+              "events": 256,
+              "fields_per_issue": 4,
+              "issues": 32,
+              "lines": 4096,
+              "path": 10,
+              "probes": 512,
+              "report_bytes": 16384,
+              "structural_tokens": 8192
+            },
+            "probes": 204,
+            "schema": "actenon-airlock/responses-contract-observatory/v1",
+            "truncated": false
+          },
+          "event_count": 9,
+          "events": [
+            {
+              "response_id_sha256": "9cbbbce3924493c41b1a2390e88f85ae39cc947751022fbaf1b58b8aa10bddce",
+              "sequence_number": 0,
+              "type": "response.created"
+            },
+            {
+              "response_id_sha256": "9cbbbce3924493c41b1a2390e88f85ae39cc947751022fbaf1b58b8aa10bddce",
+              "sequence_number": 1,
+              "type": "response.in_progress"
+            },
+            {
+              "item_id_sha256": "f8c53bd3866d4822377e53015ed4533834b2ba9e300d02d80bf3b51bc3682917",
+              "item_type": "message",
+              "output_index": 0,
+              "sequence_number": 2,
+              "type": "response.output_item.added"
+            },
+            {
+              "content_index": 0,
+              "item_id_sha256": "f8c53bd3866d4822377e53015ed4533834b2ba9e300d02d80bf3b51bc3682917",
+              "output_index": 0,
+              "sequence_number": 3,
+              "type": "response.content_part.added"
+            },
+            {
+              "content_index": 0,
+              "item_id_sha256": "f8c53bd3866d4822377e53015ed4533834b2ba9e300d02d80bf3b51bc3682917",
+              "output_index": 0,
+              "sequence_number": 4,
+              "type": "response.output_text.delta"
+            },
+            {
+              "content_index": 0,
+              "item_id_sha256": "f8c53bd3866d4822377e53015ed4533834b2ba9e300d02d80bf3b51bc3682917",
+              "output_index": 0,
+              "sequence_number": 5,
+              "type": "response.output_text.done"
+            },
+            {
+              "content_index": 0,
+              "item_id_sha256": "f8c53bd3866d4822377e53015ed4533834b2ba9e300d02d80bf3b51bc3682917",
+              "output_index": 0,
+              "sequence_number": 6,
+              "type": "response.content_part.done"
+            },
+            {
+              "item_id_sha256": "f8c53bd3866d4822377e53015ed4533834b2ba9e300d02d80bf3b51bc3682917",
+              "item_type": "message",
+              "output_index": 0,
+              "sequence_number": 7,
+              "type": "response.output_item.done"
+            },
+            {
+              "response_id_sha256": "9cbbbce3924493c41b1a2390e88f85ae39cc947751022fbaf1b58b8aa10bddce",
+              "sequence_number": 8,
+              "type": "response.completed"
+            }
+          ],
+          "events_sha256": "db99b660e7cae6e14fdcd8e3a7750228f111b31217ae0115281b670db047e3ca",
+          "rejection_reason": null,
+          "schema": "actenon-airlock/responses-observation/v1",
+          "terminal_status": "completed",
+          "validated_usage": {
+            "cache_creation_input_tokens": 0,
+            "cache_read_input_tokens": 10,
+            "input_tokens": 90,
+            "output_tokens": 20
+          }
+        },
+        "outcome": "COMMITTED"
+      }
+    ]
+  },
+  "repaired_partial": {
+    "first_outcome": "AMBIGUOUS",
+    "after_first_microusd": 509795,
+    "second_ok": false,
+    "second_outcome": null,
+    "second_reason": "Model spend bound reached for this run",
+    "replay_refused": true,
+    "dispatched": 1,
+    "total_accounted_microusd": 509795,
+    "integrity_ok": true,
+    "observations": [
+      {
+        "inference_reserved_microusd": 509795,
+        "inference_cost_microusd": 509795,
+        "inference_usage": null,
+        "inference_observation": {
+          "body_sha256": "4dcec6181a937be985f118e8d46124430f4569fd3799ce84be463e791ce7112a",
+          "checked_event": 7,
+          "checked_event_metadata": {
+            "item_id_sha256": "f8c53bd3866d4822377e53015ed4533834b2ba9e300d02d80bf3b51bc3682917",
+            "item_type": "message",
+            "output_index": 0,
+            "sequence_number": 7,
+            "type": "response.output_item.done"
+          },
+          "checked_sequence_number": 7,
+          "contract_observatory": {
+            "authoritative": false,
+            "events_inspected": 8,
+            "issues": [
+              {
+                "path": [],
+                "reason": "terminal-missing",
+                "stage": "completion"
+              },
+              {
+                "path": [],
+                "reason": "terminal-missing",
+                "stage": "stream-integrity"
+              }
+            ],
+            "limits": {
+              "bytes": 4194304,
+              "depth": 24,
+              "events": 256,
+              "fields_per_issue": 4,
+              "issues": 32,
+              "lines": 4096,
+              "path": 10,
+              "probes": 512,
+              "report_bytes": 16384,
+              "structural_tokens": 8192
+            },
+            "probes": 135,
+            "schema": "actenon-airlock/responses-contract-observatory/v1",
+            "truncated": false
+          },
+          "event_count": 8,
+          "events": [
+            {
+              "response_id_sha256": "9cbbbce3924493c41b1a2390e88f85ae39cc947751022fbaf1b58b8aa10bddce",
+              "sequence_number": 0,
+              "type": "response.created"
+            },
+            {
+              "response_id_sha256": "9cbbbce3924493c41b1a2390e88f85ae39cc947751022fbaf1b58b8aa10bddce",
+              "sequence_number": 1,
+              "type": "response.in_progress"
+            },
+            {
+              "item_id_sha256": "f8c53bd3866d4822377e53015ed4533834b2ba9e300d02d80bf3b51bc3682917",
+              "item_type": "message",
+              "output_index": 0,
+              "sequence_number": 2,
+              "type": "response.output_item.added"
+            },
+            {
+              "content_index": 0,
+              "item_id_sha256": "f8c53bd3866d4822377e53015ed4533834b2ba9e300d02d80bf3b51bc3682917",
+              "output_index": 0,
+              "sequence_number": 3,
+              "type": "response.content_part.added"
+            },
+            {
+              "content_index": 0,
+              "item_id_sha256": "f8c53bd3866d4822377e53015ed4533834b2ba9e300d02d80bf3b51bc3682917",
+              "output_index": 0,
+              "sequence_number": 4,
+              "type": "response.output_text.delta"
+            },
+            {
+              "content_index": 0,
+              "item_id_sha256": "f8c53bd3866d4822377e53015ed4533834b2ba9e300d02d80bf3b51bc3682917",
+              "output_index": 0,
+              "sequence_number": 5,
+              "type": "response.output_text.done"
+            },
+            {
+              "content_index": 0,
+              "item_id_sha256": "f8c53bd3866d4822377e53015ed4533834b2ba9e300d02d80bf3b51bc3682917",
+              "output_index": 0,
+              "sequence_number": 6,
+              "type": "response.content_part.done"
+            },
+            {
+              "item_id_sha256": "f8c53bd3866d4822377e53015ed4533834b2ba9e300d02d80bf3b51bc3682917",
+              "item_type": "message",
+              "output_index": 0,
+              "sequence_number": 7,
+              "type": "response.output_item.done"
+            }
+          ],
+          "events_sha256": "116ff03d9f9d12a03e83d9a344cf3ce167d737ca7e6e64f51b8da96b5efcfc41",
+          "rejection_reason": "terminal-missing",
+          "schema": "actenon-airlock/responses-observation/v1"
+        },
+        "outcome": "AMBIGUOUS"
+      }
+    ]
+  },
+  "repaired_bad_image": {
+    "first_outcome": "AMBIGUOUS",
+    "after_first_microusd": 509795,
+    "second_ok": false,
+    "second_outcome": null,
+    "second_reason": "Model spend bound reached for this run",
+    "replay_refused": true,
+    "dispatched": 1,
+    "total_accounted_microusd": 509795,
+    "integrity_ok": true,
+    "observations": [
+      {
+        "inference_reserved_microusd": 509795,
+        "inference_cost_microusd": 509795,
+        "inference_usage": null,
+        "inference_observation": {
+          "body_sha256": "7acdc547a7351e4c0d7b230dace940598d89d48be743bfed066c4e3de453350f",
+          "checked_event": 8,
+          "checked_event_metadata": {
+            "response_id_sha256": "9cbbbce3924493c41b1a2390e88f85ae39cc947751022fbaf1b58b8aa10bddce",
+            "sequence_number": 8,
+            "type": "response.completed"
+          },
+          "checked_sequence_number": 8,
+          "contract_observatory": {
+            "authoritative": false,
+            "events_inspected": 9,
+            "issues": [
+              {
+                "path": [
+                  "events",
+                  8,
+                  "response",
+                  "image"
+                ],
+                "reason": "response-image-schema",
+                "stage": "response-image"
+              }
+            ],
+            "limits": {
+              "bytes": 4194304,
+              "depth": 24,
+              "events": 256,
+              "fields_per_issue": 4,
+              "issues": 32,
+              "lines": 4096,
+              "path": 10,
+              "probes": 512,
+              "report_bytes": 16384,
+              "structural_tokens": 8192
+            },
+            "probes": 204,
+            "schema": "actenon-airlock/responses-contract-observatory/v1",
+            "truncated": false
+          },
+          "event_count": 9,
+          "events": [
+            {
+              "response_id_sha256": "9cbbbce3924493c41b1a2390e88f85ae39cc947751022fbaf1b58b8aa10bddce",
+              "sequence_number": 0,
+              "type": "response.created"
+            },
+            {
+              "response_id_sha256": "9cbbbce3924493c41b1a2390e88f85ae39cc947751022fbaf1b58b8aa10bddce",
+              "sequence_number": 1,
+              "type": "response.in_progress"
+            },
+            {
+              "item_id_sha256": "f8c53bd3866d4822377e53015ed4533834b2ba9e300d02d80bf3b51bc3682917",
+              "item_type": "message",
+              "output_index": 0,
+              "sequence_number": 2,
+              "type": "response.output_item.added"
+            },
+            {
+              "content_index": 0,
+              "item_id_sha256": "f8c53bd3866d4822377e53015ed4533834b2ba9e300d02d80bf3b51bc3682917",
+              "output_index": 0,
+              "sequence_number": 3,
+              "type": "response.content_part.added"
+            },
+            {
+              "content_index": 0,
+              "item_id_sha256": "f8c53bd3866d4822377e53015ed4533834b2ba9e300d02d80bf3b51bc3682917",
+              "output_index": 0,
+              "sequence_number": 4,
+              "type": "response.output_text.delta"
+            },
+            {
+              "content_index": 0,
+              "item_id_sha256": "f8c53bd3866d4822377e53015ed4533834b2ba9e300d02d80bf3b51bc3682917",
+              "output_index": 0,
+              "sequence_number": 5,
+              "type": "response.output_text.done"
+            },
+            {
+              "content_index": 0,
+              "item_id_sha256": "f8c53bd3866d4822377e53015ed4533834b2ba9e300d02d80bf3b51bc3682917",
+              "output_index": 0,
+              "sequence_number": 6,
+              "type": "response.content_part.done"
+            },
+            {
+              "item_id_sha256": "f8c53bd3866d4822377e53015ed4533834b2ba9e300d02d80bf3b51bc3682917",
+              "item_type": "message",
+              "output_index": 0,
+              "sequence_number": 7,
+              "type": "response.output_item.done"
+            },
+            {
+              "response_id_sha256": "9cbbbce3924493c41b1a2390e88f85ae39cc947751022fbaf1b58b8aa10bddce",
+              "sequence_number": 8,
+              "type": "response.completed"
+            }
+          ],
+          "events_sha256": "db99b660e7cae6e14fdcd8e3a7750228f111b31217ae0115281b670db047e3ca",
+          "rejected_field": "image",
+          "rejection_reason": "response-image-schema",
+          "schema": "actenon-airlock/responses-observation/v1",
+          "terminal_status": "completed",
+          "validation_stage": "response-image"
+        },
+        "outcome": "AMBIGUOUS"
+      }
+    ]
+  },
+  "repaired_hosted_only": {
+    "first_outcome": "AMBIGUOUS",
+    "after_first_microusd": 509795,
+    "second_ok": false,
+    "second_outcome": null,
+    "second_reason": "Model spend bound reached for this run",
+    "replay_refused": true,
+    "dispatched": 1,
+    "total_accounted_microusd": 509795,
+    "integrity_ok": true,
+    "observations": [
+      {
+        "inference_reserved_microusd": 509795,
+        "inference_cost_microusd": 509795,
+        "inference_usage": null,
+        "inference_observation": {
+          "body_sha256": "92965a05bb1ca5c3b3eb38a686177a4c9516aa79acf560017d264fc9e8dfb0be",
+          "checked_event": 8,
+          "checked_event_metadata": {
+            "response_id_sha256": "9cbbbce3924493c41b1a2390e88f85ae39cc947751022fbaf1b58b8aa10bddce",
+            "sequence_number": 8,
+            "type": "response.completed"
+          },
+          "checked_sequence_number": 8,
+          "contract_observatory": {
+            "authoritative": false,
+            "events_inspected": 9,
+            "issues": [
+              {
+                "path": [
+                  "events",
+                  8,
+                  "response",
+                  "tool_usage"
+                ],
+                "reason": "response-hosted-tool-usage",
+                "stage": "hosted-usage"
+              },
+              {
+                "path": [
+                  "events",
+                  8,
+                  "response",
+                  "tool_usage",
+                  "image_gen",
+                  "output_tokens"
+                ],
+                "reason": "response-hosted-tool-usage",
+                "stage": "hosted-usage"
+              }
+            ],
+            "limits": {
+              "bytes": 4194304,
+              "depth": 24,
+              "events": 256,
+              "fields_per_issue": 4,
+              "issues": 32,
+              "lines": 4096,
+              "path": 10,
+              "probes": 512,
+              "report_bytes": 16384,
+              "structural_tokens": 8192
+            },
+            "probes": 204,
+            "schema": "actenon-airlock/responses-contract-observatory/v1",
+            "truncated": false
+          },
+          "event_count": 9,
+          "events": [
+            {
+              "response_id_sha256": "9cbbbce3924493c41b1a2390e88f85ae39cc947751022fbaf1b58b8aa10bddce",
+              "sequence_number": 0,
+              "type": "response.created"
+            },
+            {
+              "response_id_sha256": "9cbbbce3924493c41b1a2390e88f85ae39cc947751022fbaf1b58b8aa10bddce",
+              "sequence_number": 1,
+              "type": "response.in_progress"
+            },
+            {
+              "item_id_sha256": "f8c53bd3866d4822377e53015ed4533834b2ba9e300d02d80bf3b51bc3682917",
+              "item_type": "message",
+              "output_index": 0,
+              "sequence_number": 2,
+              "type": "response.output_item.added"
+            },
+            {
+              "content_index": 0,
+              "item_id_sha256": "f8c53bd3866d4822377e53015ed4533834b2ba9e300d02d80bf3b51bc3682917",
+              "output_index": 0,
+              "sequence_number": 3,
+              "type": "response.content_part.added"
+            },
+            {
+              "content_index": 0,
+              "item_id_sha256": "f8c53bd3866d4822377e53015ed4533834b2ba9e300d02d80bf3b51bc3682917",
+              "output_index": 0,
+              "sequence_number": 4,
+              "type": "response.output_text.delta"
+            },
+            {
+              "content_index": 0,
+              "item_id_sha256": "f8c53bd3866d4822377e53015ed4533834b2ba9e300d02d80bf3b51bc3682917",
+              "output_index": 0,
+              "sequence_number": 5,
+              "type": "response.output_text.done"
+            },
+            {
+              "content_index": 0,
+              "item_id_sha256": "f8c53bd3866d4822377e53015ed4533834b2ba9e300d02d80bf3b51bc3682917",
+              "output_index": 0,
+              "sequence_number": 6,
+              "type": "response.content_part.done"
+            },
+            {
+              "item_id_sha256": "f8c53bd3866d4822377e53015ed4533834b2ba9e300d02d80bf3b51bc3682917",
+              "item_type": "message",
+              "output_index": 0,
+              "sequence_number": 7,
+              "type": "response.output_item.done"
+            },
+            {
+              "response_id_sha256": "9cbbbce3924493c41b1a2390e88f85ae39cc947751022fbaf1b58b8aa10bddce",
+              "sequence_number": 8,
+              "type": "response.completed"
+            }
+          ],
+          "events_sha256": "db99b660e7cae6e14fdcd8e3a7750228f111b31217ae0115281b670db047e3ca",
+          "rejected_field": "tool_usage.image_gen.output_tokens",
+          "rejection_reason": "response-hosted-tool-usage",
+          "schema": "actenon-airlock/responses-observation/v1",
+          "terminal_status": "completed",
+          "validation_stage": "response-tool-usage"
+        },
+        "outcome": "AMBIGUOUS"
+      }
+    ]
+  },
+  "repaired_unknown_billing": {
+    "first_outcome": "AMBIGUOUS",
+    "after_first_microusd": 509795,
+    "second_ok": false,
+    "second_outcome": null,
+    "second_reason": "Model spend bound reached for this run",
+    "replay_refused": true,
+    "dispatched": 1,
+    "total_accounted_microusd": 509795,
+    "integrity_ok": true,
+    "observations": [
+      {
+        "inference_reserved_microusd": 509795,
+        "inference_cost_microusd": 509795,
+        "inference_usage": null,
+        "inference_observation": {
+          "body_sha256": "c6819d536908bf5050f82f218ce741675acf8eef75b3873f53bca965dc058feb",
+          "checked_event": 8,
+          "checked_event_metadata": {
+            "response_id_sha256": "9cbbbce3924493c41b1a2390e88f85ae39cc947751022fbaf1b58b8aa10bddce",
+            "sequence_number": 8,
+            "type": "response.completed"
+          },
+          "checked_sequence_number": 8,
+          "contract_observatory": {
+            "authoritative": false,
+            "events_inspected": 9,
+            "issues": [
+              {
+                "path": [
+                  "events",
+                  8,
+                  "response",
+                  "usage"
+                ],
+                "reason": "usage-schema",
+                "stage": "usage"
+              },
+              {
+                "fields": [
+                  "sha256:8e22a49cea663bdc43556d2a778f29104f9a91bdbb034c6f20bf241f8b7ec6e5"
+                ],
+                "path": [
+                  "events",
+                  8,
+                  "response",
+                  "usage"
+                ],
+                "reason": "unexpected-fields",
+                "stage": "usage"
+              }
+            ],
+            "limits": {
+              "bytes": 4194304,
+              "depth": 24,
+              "events": 256,
+              "fields_per_issue": 4,
+              "issues": 32,
+              "lines": 4096,
+              "path": 10,
+              "probes": 512,
+              "report_bytes": 16384,
+              "structural_tokens": 8192
+            },
+            "probes": 204,
+            "schema": "actenon-airlock/responses-contract-observatory/v1",
+            "truncated": false
+          },
+          "event_count": 9,
+          "events": [
+            {
+              "response_id_sha256": "9cbbbce3924493c41b1a2390e88f85ae39cc947751022fbaf1b58b8aa10bddce",
+              "sequence_number": 0,
+              "type": "response.created"
+            },
+            {
+              "response_id_sha256": "9cbbbce3924493c41b1a2390e88f85ae39cc947751022fbaf1b58b8aa10bddce",
+              "sequence_number": 1,
+              "type": "response.in_progress"
+            },
+            {
+              "item_id_sha256": "f8c53bd3866d4822377e53015ed4533834b2ba9e300d02d80bf3b51bc3682917",
+              "item_type": "message",
+              "output_index": 0,
+              "sequence_number": 2,
+              "type": "response.output_item.added"
+            },
+            {
+              "content_index": 0,
+              "item_id_sha256": "f8c53bd3866d4822377e53015ed4533834b2ba9e300d02d80bf3b51bc3682917",
+              "output_index": 0,
+              "sequence_number": 3,
+              "type": "response.content_part.added"
+            },
+            {
+              "content_index": 0,
+              "item_id_sha256": "f8c53bd3866d4822377e53015ed4533834b2ba9e300d02d80bf3b51bc3682917",
+              "output_index": 0,
+              "sequence_number": 4,
+              "type": "response.output_text.delta"
+            },
+            {
+              "content_index": 0,
+              "item_id_sha256": "f8c53bd3866d4822377e53015ed4533834b2ba9e300d02d80bf3b51bc3682917",
+              "output_index": 0,
+              "sequence_number": 5,
+              "type": "response.output_text.done"
+            },
+            {
+              "content_index": 0,
+              "item_id_sha256": "f8c53bd3866d4822377e53015ed4533834b2ba9e300d02d80bf3b51bc3682917",
+              "output_index": 0,
+              "sequence_number": 6,
+              "type": "response.content_part.done"
+            },
+            {
+              "item_id_sha256": "f8c53bd3866d4822377e53015ed4533834b2ba9e300d02d80bf3b51bc3682917",
+              "item_type": "message",
+              "output_index": 0,
+              "sequence_number": 7,
+              "type": "response.output_item.done"
+            },
+            {
+              "response_id_sha256": "9cbbbce3924493c41b1a2390e88f85ae39cc947751022fbaf1b58b8aa10bddce",
+              "sequence_number": 8,
+              "type": "response.completed"
+            }
+          ],
+          "events_sha256": "db99b660e7cae6e14fdcd8e3a7750228f111b31217ae0115281b670db047e3ca",
+          "rejection_reason": "usage-schema",
+          "schema": "actenon-airlock/responses-observation/v1",
+          "terminal_status": "completed"
+        },
+        "outcome": "AMBIGUOUS"
+      }
+    ]
+  },
+  "repaired_unknown-tools": {
+    "first_outcome": "AMBIGUOUS",
+    "after_first_microusd": 509795,
+    "second_ok": false,
+    "second_outcome": null,
+    "second_reason": "Model spend bound reached for this run",
+    "replay_refused": true,
+    "dispatched": 1,
+    "total_accounted_microusd": 509795,
+    "integrity_ok": true,
+    "observations": [
+      {
+        "inference_reserved_microusd": 509795,
+        "inference_cost_microusd": 509795,
+        "inference_usage": null,
+        "inference_observation": {
+          "body_sha256": "8ea1b1421426d715f36fe5b443bd451700c4baecc4d7c97697169c7acdc65f79",
+          "checked_event": 8,
+          "checked_event_metadata": {
+            "response_id_sha256": "9cbbbce3924493c41b1a2390e88f85ae39cc947751022fbaf1b58b8aa10bddce",
+            "sequence_number": 8,
+            "type": "response.completed"
+          },
+          "checked_sequence_number": 8,
+          "contract_observatory": {
+            "authoritative": false,
+            "events_inspected": 9,
+            "issues": [
+              {
+                "fields": [
+                  "sha256:0fa89a441e30e4a909e486e7ca12754838cf70d29470a70de390c7df3efa6dec"
+                ],
+                "path": [
+                  "events",
+                  8,
+                  "response"
+                ],
+                "reason": "response-schema",
+                "stage": "response-object"
+              },
+              {
+                "detail": "definition",
+                "path": [
+                  "events",
+                  8,
+                  "response",
+                  "tools"
+                ],
+                "reason": "response-tools",
+                "stage": "tool-echo"
+              },
+              {
+                "detail": "definition",
+                "path": [
+                  "events",
+                  8,
+                  "response",
+                  "tools",
+                  0
+                ],
+                "reason": "response-tools",
+                "stage": "tool-echo"
+              }
+            ],
+            "limits": {
+              "bytes": 4194304,
+              "depth": 24,
+              "events": 256,
+              "fields_per_issue": 4,
+              "issues": 32,
+              "lines": 4096,
+              "path": 10,
+              "probes": 512,
+              "report_bytes": 16384,
+              "structural_tokens": 8192
+            },
+            "probes": 204,
+            "schema": "actenon-airlock/responses-contract-observatory/v1",
+            "truncated": false
+          },
+          "event_count": 9,
+          "events": [
+            {
+              "response_id_sha256": "9cbbbce3924493c41b1a2390e88f85ae39cc947751022fbaf1b58b8aa10bddce",
+              "sequence_number": 0,
+              "type": "response.created"
+            },
+            {
+              "response_id_sha256": "9cbbbce3924493c41b1a2390e88f85ae39cc947751022fbaf1b58b8aa10bddce",
+              "sequence_number": 1,
+              "type": "response.in_progress"
+            },
+            {
+              "item_id_sha256": "f8c53bd3866d4822377e53015ed4533834b2ba9e300d02d80bf3b51bc3682917",
+              "item_type": "message",
+              "output_index": 0,
+              "sequence_number": 2,
+              "type": "response.output_item.added"
+            },
+            {
+              "content_index": 0,
+              "item_id_sha256": "f8c53bd3866d4822377e53015ed4533834b2ba9e300d02d80bf3b51bc3682917",
+              "output_index": 0,
+              "sequence_number": 3,
+              "type": "response.content_part.added"
+            },
+            {
+              "content_index": 0,
+              "item_id_sha256": "f8c53bd3866d4822377e53015ed4533834b2ba9e300d02d80bf3b51bc3682917",
+              "output_index": 0,
+              "sequence_number": 4,
+              "type": "response.output_text.delta"
+            },
+            {
+              "content_index": 0,
+              "item_id_sha256": "f8c53bd3866d4822377e53015ed4533834b2ba9e300d02d80bf3b51bc3682917",
+              "output_index": 0,
+              "sequence_number": 5,
+              "type": "response.output_text.done"
+            },
+            {
+              "content_index": 0,
+              "item_id_sha256": "f8c53bd3866d4822377e53015ed4533834b2ba9e300d02d80bf3b51bc3682917",
+              "output_index": 0,
+              "sequence_number": 6,
+              "type": "response.content_part.done"
+            },
+            {
+              "item_id_sha256": "f8c53bd3866d4822377e53015ed4533834b2ba9e300d02d80bf3b51bc3682917",
+              "item_type": "message",
+              "output_index": 0,
+              "sequence_number": 7,
+              "type": "response.output_item.done"
+            },
+            {
+              "response_id_sha256": "9cbbbce3924493c41b1a2390e88f85ae39cc947751022fbaf1b58b8aa10bddce",
+              "sequence_number": 8,
+              "type": "response.completed"
+            }
+          ],
+          "events_sha256": "db99b660e7cae6e14fdcd8e3a7750228f111b31217ae0115281b670db047e3ca",
+          "rejection_reason": "response-schema",
+          "schema": "actenon-airlock/responses-observation/v1",
+          "terminal_status": "completed",
+          "unexpected_field_count": 1,
+          "unexpected_fields": [
+            "sha256:0fa89a441e30e4a909e486e7ca12754838cf70d29470a70de390c7df3efa6dec"
+          ],
+          "unexpected_fields_truncated": false,
+          "validation_stage": "response-object"
+        },
+        "outcome": "AMBIGUOUS"
+      }
+    ]
+  },
+  "repaired_image-usage": {
+    "first_outcome": "AMBIGUOUS",
+    "after_first_microusd": 509795,
+    "second_ok": false,
+    "second_outcome": null,
+    "second_reason": "Model spend bound reached for this run",
+    "replay_refused": true,
+    "dispatched": 1,
+    "total_accounted_microusd": 509795,
+    "integrity_ok": true,
+    "observations": [
+      {
+        "inference_reserved_microusd": 509795,
+        "inference_cost_microusd": 509795,
+        "inference_usage": null,
+        "inference_observation": {
+          "body_sha256": "da19bf80f677ae69c48a98a0936af753553c2e35a04197fd2531d2f85eccefac",
+          "checked_event": 8,
+          "checked_event_metadata": {
+            "response_id_sha256": "9cbbbce3924493c41b1a2390e88f85ae39cc947751022fbaf1b58b8aa10bddce",
+            "sequence_number": 8,
+            "type": "response.completed"
+          },
+          "checked_sequence_number": 8,
+          "contract_observatory": {
+            "authoritative": false,
+            "events_inspected": 9,
+            "issues": [
+              {
+                "path": [
+                  "events",
+                  8,
+                  "response",
+                  "usage"
+                ],
+                "reason": "usage-total",
+                "stage": "usage"
+              }
+            ],
+            "limits": {
+              "bytes": 4194304,
+              "depth": 24,
+              "events": 256,
+              "fields_per_issue": 4,
+              "issues": 32,
+              "lines": 4096,
+              "path": 10,
+              "probes": 512,
+              "report_bytes": 16384,
+              "structural_tokens": 8192
+            },
+            "probes": 204,
+            "schema": "actenon-airlock/responses-contract-observatory/v1",
+            "truncated": false
+          },
+          "event_count": 9,
+          "events": [
+            {
+              "response_id_sha256": "9cbbbce3924493c41b1a2390e88f85ae39cc947751022fbaf1b58b8aa10bddce",
+              "sequence_number": 0,
+              "type": "response.created"
+            },
+            {
+              "response_id_sha256": "9cbbbce3924493c41b1a2390e88f85ae39cc947751022fbaf1b58b8aa10bddce",
+              "sequence_number": 1,
+              "type": "response.in_progress"
+            },
+            {
+              "item_id_sha256": "f8c53bd3866d4822377e53015ed4533834b2ba9e300d02d80bf3b51bc3682917",
+              "item_type": "message",
+              "output_index": 0,
+              "sequence_number": 2,
+              "type": "response.output_item.added"
+            },
+            {
+              "content_index": 0,
+              "item_id_sha256": "f8c53bd3866d4822377e53015ed4533834b2ba9e300d02d80bf3b51bc3682917",
+              "output_index": 0,
+              "sequence_number": 3,
+              "type": "response.content_part.added"
+            },
+            {
+              "content_index": 0,
+              "item_id_sha256": "f8c53bd3866d4822377e53015ed4533834b2ba9e300d02d80bf3b51bc3682917",
+              "output_index": 0,
+              "sequence_number": 4,
+              "type": "response.output_text.delta"
+            },
+            {
+              "content_index": 0,
+              "item_id_sha256": "f8c53bd3866d4822377e53015ed4533834b2ba9e300d02d80bf3b51bc3682917",
+              "output_index": 0,
+              "sequence_number": 5,
+              "type": "response.output_text.done"
+            },
+            {
+              "content_index": 0,
+              "item_id_sha256": "f8c53bd3866d4822377e53015ed4533834b2ba9e300d02d80bf3b51bc3682917",
+              "output_index": 0,
+              "sequence_number": 6,
+              "type": "response.content_part.done"
+            },
+            {
+              "item_id_sha256": "f8c53bd3866d4822377e53015ed4533834b2ba9e300d02d80bf3b51bc3682917",
+              "item_type": "message",
+              "output_index": 0,
+              "sequence_number": 7,
+              "type": "response.output_item.done"
+            },
+            {
+              "response_id_sha256": "9cbbbce3924493c41b1a2390e88f85ae39cc947751022fbaf1b58b8aa10bddce",
+              "sequence_number": 8,
+              "type": "response.completed"
+            }
+          ],
+          "events_sha256": "db99b660e7cae6e14fdcd8e3a7750228f111b31217ae0115281b670db047e3ca",
+          "rejection_reason": "usage-total",
+          "schema": "actenon-airlock/responses-observation/v1",
+          "terminal_status": "completed"
+        },
+        "outcome": "AMBIGUOUS"
+      }
+    ]
+  },
+  "repaired_image-hosted": {
+    "first_outcome": "AMBIGUOUS",
+    "after_first_microusd": 509795,
+    "second_ok": false,
+    "second_outcome": null,
+    "second_reason": "Model spend bound reached for this run",
+    "replay_refused": true,
+    "dispatched": 1,
+    "total_accounted_microusd": 509795,
+    "integrity_ok": true,
+    "observations": [
+      {
+        "inference_reserved_microusd": 509795,
+        "inference_cost_microusd": 509795,
+        "inference_usage": null,
+        "inference_observation": {
+          "body_sha256": "6d12333c2654f57672ec7e370e0391cd578671771bfbd277f2563da888dd6b2f",
+          "checked_event": 8,
+          "checked_event_metadata": {
+            "response_id_sha256": "9cbbbce3924493c41b1a2390e88f85ae39cc947751022fbaf1b58b8aa10bddce",
+            "sequence_number": 8,
+            "type": "response.completed"
+          },
+          "checked_sequence_number": 8,
+          "contract_observatory": {
+            "authoritative": false,
+            "events_inspected": 9,
+            "issues": [
+              {
+                "path": [
+                  "events",
+                  8,
+                  "response",
+                  "image"
+                ],
+                "reason": "response-image-policy",
+                "stage": "response-image"
+              },
+              {
+                "path": [
+                  "events",
+                  8,
+                  "response",
+                  "tool_usage"
+                ],
+                "reason": "response-hosted-tool-usage",
+                "stage": "hosted-usage"
+              },
+              {
+                "path": [
+                  "events",
+                  8,
+                  "response",
+                  "tool_usage",
+                  "web_search",
+                  "num_requests"
+                ],
+                "reason": "response-hosted-tool-usage",
+                "stage": "hosted-usage"
+              }
+            ],
+            "limits": {
+              "bytes": 4194304,
+              "depth": 24,
+              "events": 256,
+              "fields_per_issue": 4,
+              "issues": 32,
+              "lines": 4096,
+              "path": 10,
+              "probes": 512,
+              "report_bytes": 16384,
+              "structural_tokens": 8192
+            },
+            "probes": 204,
+            "schema": "actenon-airlock/responses-contract-observatory/v1",
+            "truncated": false
+          },
+          "event_count": 9,
+          "events": [
+            {
+              "response_id_sha256": "9cbbbce3924493c41b1a2390e88f85ae39cc947751022fbaf1b58b8aa10bddce",
+              "sequence_number": 0,
+              "type": "response.created"
+            },
+            {
+              "response_id_sha256": "9cbbbce3924493c41b1a2390e88f85ae39cc947751022fbaf1b58b8aa10bddce",
+              "sequence_number": 1,
+              "type": "response.in_progress"
+            },
+            {
+              "item_id_sha256": "f8c53bd3866d4822377e53015ed4533834b2ba9e300d02d80bf3b51bc3682917",
+              "item_type": "message",
+              "output_index": 0,
+              "sequence_number": 2,
+              "type": "response.output_item.added"
+            },
+            {
+              "content_index": 0,
+              "item_id_sha256": "f8c53bd3866d4822377e53015ed4533834b2ba9e300d02d80bf3b51bc3682917",
+              "output_index": 0,
+              "sequence_number": 3,
+              "type": "response.content_part.added"
+            },
+            {
+              "content_index": 0,
+              "item_id_sha256": "f8c53bd3866d4822377e53015ed4533834b2ba9e300d02d80bf3b51bc3682917",
+              "output_index": 0,
+              "sequence_number": 4,
+              "type": "response.output_text.delta"
+            },
+            {
+              "content_index": 0,
+              "item_id_sha256": "f8c53bd3866d4822377e53015ed4533834b2ba9e300d02d80bf3b51bc3682917",
+              "output_index": 0,
+              "sequence_number": 5,
+              "type": "response.output_text.done"
+            },
+            {
+              "content_index": 0,
+              "item_id_sha256": "f8c53bd3866d4822377e53015ed4533834b2ba9e300d02d80bf3b51bc3682917",
+              "output_index": 0,
+              "sequence_number": 6,
+              "type": "response.content_part.done"
+            },
+            {
+              "item_id_sha256": "f8c53bd3866d4822377e53015ed4533834b2ba9e300d02d80bf3b51bc3682917",
+              "item_type": "message",
+              "output_index": 0,
+              "sequence_number": 7,
+              "type": "response.output_item.done"
+            },
+            {
+              "response_id_sha256": "9cbbbce3924493c41b1a2390e88f85ae39cc947751022fbaf1b58b8aa10bddce",
+              "sequence_number": 8,
+              "type": "response.completed"
+            }
+          ],
+          "events_sha256": "db99b660e7cae6e14fdcd8e3a7750228f111b31217ae0115281b670db047e3ca",
+          "rejected_field": "image",
+          "rejection_reason": "response-image-policy",
+          "schema": "actenon-airlock/responses-observation/v1",
+          "terminal_status": "completed",
+          "validation_stage": "response-image"
+        },
+        "outcome": "AMBIGUOUS"
+      }
+    ]
+  },
+  "repaired_incomplete-output": {
+    "first_outcome": "AMBIGUOUS",
+    "after_first_microusd": 509795,
+    "second_ok": false,
+    "second_outcome": null,
+    "second_reason": "Model spend bound reached for this run",
+    "replay_refused": true,
+    "dispatched": 1,
+    "total_accounted_microusd": 509795,
+    "integrity_ok": true,
+    "observations": [
+      {
+        "inference_reserved_microusd": 509795,
+        "inference_cost_microusd": 509795,
+        "inference_usage": null,
+        "inference_observation": {
+          "body_sha256": "cfc5bbb276d530283355d380b711c9b07ff7de1305eee327b8d36edc2d9d0eda",
+          "checked_event": 8,
+          "checked_event_metadata": {
+            "response_id_sha256": "9cbbbce3924493c41b1a2390e88f85ae39cc947751022fbaf1b58b8aa10bddce",
+            "sequence_number": 8,
+            "type": "response.incomplete"
+          },
+          "checked_sequence_number": 8,
+          "contract_observatory": {
+            "authoritative": false,
+            "events_inspected": 9,
+            "issues": [
+              {
+                "path": [
+                  "events",
+                  8,
+                  "response",
+                  "output",
+                  0
+                ],
+                "reason": "output-item-schema",
+                "stage": "output"
+              },
+              {
+                "path": [],
+                "reason": "terminal-missing",
+                "stage": "completion"
+              },
+              {
+                "path": [],
+                "reason": "response-not-completed",
+                "stage": "stream-integrity"
+              }
+            ],
+            "limits": {
+              "bytes": 4194304,
+              "depth": 24,
+              "events": 256,
+              "fields_per_issue": 4,
+              "issues": 32,
+              "lines": 4096,
+              "path": 10,
+              "probes": 512,
+              "report_bytes": 16384,
+              "structural_tokens": 8192
+            },
+            "probes": 204,
+            "schema": "actenon-airlock/responses-contract-observatory/v1",
+            "truncated": false
+          },
+          "event_count": 9,
+          "events": [
+            {
+              "response_id_sha256": "9cbbbce3924493c41b1a2390e88f85ae39cc947751022fbaf1b58b8aa10bddce",
+              "sequence_number": 0,
+              "type": "response.created"
+            },
+            {
+              "response_id_sha256": "9cbbbce3924493c41b1a2390e88f85ae39cc947751022fbaf1b58b8aa10bddce",
+              "sequence_number": 1,
+              "type": "response.in_progress"
+            },
+            {
+              "item_id_sha256": "f8c53bd3866d4822377e53015ed4533834b2ba9e300d02d80bf3b51bc3682917",
+              "item_type": "message",
+              "output_index": 0,
+              "sequence_number": 2,
+              "type": "response.output_item.added"
+            },
+            {
+              "content_index": 0,
+              "item_id_sha256": "f8c53bd3866d4822377e53015ed4533834b2ba9e300d02d80bf3b51bc3682917",
+              "output_index": 0,
+              "sequence_number": 3,
+              "type": "response.content_part.added"
+            },
+            {
+              "content_index": 0,
+              "item_id_sha256": "f8c53bd3866d4822377e53015ed4533834b2ba9e300d02d80bf3b51bc3682917",
+              "output_index": 0,
+              "sequence_number": 4,
+              "type": "response.output_text.delta"
+            },
+            {
+              "content_index": 0,
+              "item_id_sha256": "f8c53bd3866d4822377e53015ed4533834b2ba9e300d02d80bf3b51bc3682917",
+              "output_index": 0,
+              "sequence_number": 5,
+              "type": "response.output_text.done"
+            },
+            {
+              "content_index": 0,
+              "item_id_sha256": "f8c53bd3866d4822377e53015ed4533834b2ba9e300d02d80bf3b51bc3682917",
+              "output_index": 0,
+              "sequence_number": 6,
+              "type": "response.content_part.done"
+            },
+            {
+              "item_id_sha256": "f8c53bd3866d4822377e53015ed4533834b2ba9e300d02d80bf3b51bc3682917",
+              "item_type": "message",
+              "output_index": 0,
+              "sequence_number": 7,
+              "type": "response.output_item.done"
+            },
+            {
+              "response_id_sha256": "9cbbbce3924493c41b1a2390e88f85ae39cc947751022fbaf1b58b8aa10bddce",
+              "sequence_number": 8,
+              "type": "response.incomplete"
+            }
+          ],
+          "events_sha256": "3fe92f146b71543db2522e08cdf2680a66a6267fbc03c58556ec70fb71aa6cf2",
+          "rejection_reason": "response-not-completed",
+          "schema": "actenon-airlock/responses-observation/v1",
+          "terminal_status": "incomplete"
+        },
+        "outcome": "AMBIGUOUS"
+      }
+    ]
+  },
+  "repaired_strict-state": {
+    "first_outcome": "AMBIGUOUS",
+    "after_first_microusd": 509795,
+    "second_ok": false,
+    "second_outcome": null,
+    "second_reason": "Model spend bound reached for this run",
+    "replay_refused": true,
+    "dispatched": 1,
+    "total_accounted_microusd": 509795,
+    "integrity_ok": true,
+    "observations": [
+      {
+        "inference_reserved_microusd": 509795,
+        "inference_cost_microusd": 509795,
+        "inference_usage": null,
+        "inference_observation": {
+          "body_sha256": "c390dfc5ee4ef62299db2162d8c62126a81d4e3bd7665d184367ef015fcd035a",
+          "checked_event": 8,
+          "checked_event_metadata": {
+            "response_id_sha256": "9cbbbce3924493c41b1a2390e88f85ae39cc947751022fbaf1b58b8aa10bddce",
+            "sequence_number": 8,
+            "type": "response.completed"
+          },
+          "checked_sequence_number": 8,
+          "contract_observatory": {
+            "authoritative": false,
+            "events_inspected": 9,
+            "issues": [
+              {
+                "path": [
+                  "events",
+                  8,
+                  "response",
+                  "conversation"
+                ],
+                "reason": "response-unsupported-metadata",
+                "stage": "response-metadata"
+              },
+              {
+                "detail": "field-type",
+                "path": [
+                  "events",
+                  8,
+                  "response",
+                  "tools"
+                ],
+                "reason": "response-tools",
+                "stage": "tool-echo"
+              },
+              {
+                "detail": "field-type",
+                "path": [
+                  "events",
+                  8,
+                  "response",
+                  "tools",
+                  0
+                ],
+                "reason": "response-tools",
+                "stage": "tool-echo"
+              },
+              {
+                "path": [
+                  "events",
+                  8,
+                  "response",
+                  "conversation"
+                ],
+                "reason": "metadata-changed",
+                "stage": "response-metadata"
+              }
+            ],
+            "limits": {
+              "bytes": 4194304,
+              "depth": 24,
+              "events": 256,
+              "fields_per_issue": 4,
+              "issues": 32,
+              "lines": 4096,
+              "path": 10,
+              "probes": 512,
+              "report_bytes": 16384,
+              "structural_tokens": 8192
+            },
+            "probes": 204,
+            "schema": "actenon-airlock/responses-contract-observatory/v1",
+            "truncated": false
+          },
+          "event_count": 9,
+          "events": [
+            {
+              "response_id_sha256": "9cbbbce3924493c41b1a2390e88f85ae39cc947751022fbaf1b58b8aa10bddce",
+              "sequence_number": 0,
+              "type": "response.created"
+            },
+            {
+              "response_id_sha256": "9cbbbce3924493c41b1a2390e88f85ae39cc947751022fbaf1b58b8aa10bddce",
+              "sequence_number": 1,
+              "type": "response.in_progress"
+            },
+            {
+              "item_id_sha256": "f8c53bd3866d4822377e53015ed4533834b2ba9e300d02d80bf3b51bc3682917",
+              "item_type": "message",
+              "output_index": 0,
+              "sequence_number": 2,
+              "type": "response.output_item.added"
+            },
+            {
+              "content_index": 0,
+              "item_id_sha256": "f8c53bd3866d4822377e53015ed4533834b2ba9e300d02d80bf3b51bc3682917",
+              "output_index": 0,
+              "sequence_number": 3,
+              "type": "response.content_part.added"
+            },
+            {
+              "content_index": 0,
+              "item_id_sha256": "f8c53bd3866d4822377e53015ed4533834b2ba9e300d02d80bf3b51bc3682917",
+              "output_index": 0,
+              "sequence_number": 4,
+              "type": "response.output_text.delta"
+            },
+            {
+              "content_index": 0,
+              "item_id_sha256": "f8c53bd3866d4822377e53015ed4533834b2ba9e300d02d80bf3b51bc3682917",
+              "output_index": 0,
+              "sequence_number": 5,
+              "type": "response.output_text.done"
+            },
+            {
+              "content_index": 0,
+              "item_id_sha256": "f8c53bd3866d4822377e53015ed4533834b2ba9e300d02d80bf3b51bc3682917",
+              "output_index": 0,
+              "sequence_number": 6,
+              "type": "response.content_part.done"
+            },
+            {
+              "item_id_sha256": "f8c53bd3866d4822377e53015ed4533834b2ba9e300d02d80bf3b51bc3682917",
+              "item_type": "message",
+              "output_index": 0,
+              "sequence_number": 7,
+              "type": "response.output_item.done"
+            },
+            {
+              "response_id_sha256": "9cbbbce3924493c41b1a2390e88f85ae39cc947751022fbaf1b58b8aa10bddce",
+              "sequence_number": 8,
+              "type": "response.completed"
+            }
+          ],
+          "events_sha256": "db99b660e7cae6e14fdcd8e3a7750228f111b31217ae0115281b670db047e3ca",
+          "rejected_field": "conversation",
+          "rejection_reason": "response-unsupported-metadata",
+          "schema": "actenon-airlock/responses-observation/v1",
+          "terminal_status": "completed",
+          "validation_stage": "response-metadata"
+        },
+        "outcome": "AMBIGUOUS"
+      }
+    ]
+  },
+  "repaired_changed": {
+    "first_outcome": "AMBIGUOUS",
+    "after_first_microusd": 509795,
+    "second_ok": false,
+    "second_outcome": null,
+    "second_reason": "Model spend bound reached for this run",
+    "replay_refused": true,
+    "dispatched": 1,
+    "total_accounted_microusd": 509795,
+    "integrity_ok": true,
+    "observations": [
+      {
+        "inference_reserved_microusd": 509795,
+        "inference_cost_microusd": 509795,
+        "inference_usage": null,
+        "inference_observation": {
+          "body_sha256": "d241039b0a1debd84af3cf5607fe05cf7ef2937c124d5d1df3f99d22e5c92812",
+          "checked_event": 1,
+          "checked_event_metadata": {
+            "response_id_sha256": "9cbbbce3924493c41b1a2390e88f85ae39cc947751022fbaf1b58b8aa10bddce",
+            "sequence_number": 1,
+            "type": "response.in_progress"
+          },
+          "checked_sequence_number": 1,
+          "contract_observatory": {
+            "authoritative": false,
+            "events_inspected": 9,
+            "issues": [
+              {
+                "path": [
+                  "events",
+                  1,
+                  "response",
+                  "image"
+                ],
+                "reason": "response-image-mismatch",
+                "stage": "response-image"
+              },
+              {
+                "path": [
+                  "events",
+                  8,
+                  "response",
+                  "model"
+                ],
+                "reason": "response-model",
+                "stage": "response-metadata"
+              },
+              {
+                "detail": "identity",
+                "path": [
+                  "events",
+                  8,
+                  "response",
+                  "tools"
+                ],
+                "reason": "response-tools",
+                "stage": "tool-echo"
+              },
+              {
+                "detail": "identity",
+                "path": [
+                  "events",
+                  8,
+                  "response",
+                  "tools",
+                  1
+                ],
+                "reason": "response-tools",
+                "stage": "tool-echo"
+              },
+              {
+                "path": [
+                  "events",
+                  8,
+                  "response",
+                  "id"
+                ],
+                "reason": "response-id-mismatch",
+                "stage": "response-identity"
+              },
+              {
+                "path": [],
+                "reason": "response-model",
+                "stage": "stream-integrity"
+              }
+            ],
+            "limits": {
+              "bytes": 4194304,
+              "depth": 24,
+              "events": 256,
+              "fields_per_issue": 4,
+              "issues": 32,
+              "lines": 4096,
+              "path": 10,
+              "probes": 512,
+              "report_bytes": 16384,
+              "structural_tokens": 8192
+            },
+            "probes": 203,
+            "schema": "actenon-airlock/responses-contract-observatory/v1",
+            "truncated": false
+          },
+          "event_count": 9,
+          "events": [
+            {
+              "response_id_sha256": "9cbbbce3924493c41b1a2390e88f85ae39cc947751022fbaf1b58b8aa10bddce",
+              "sequence_number": 0,
+              "type": "response.created"
+            },
+            {
+              "response_id_sha256": "9cbbbce3924493c41b1a2390e88f85ae39cc947751022fbaf1b58b8aa10bddce",
+              "sequence_number": 1,
+              "type": "response.in_progress"
+            },
+            {
+              "item_id_sha256": "f8c53bd3866d4822377e53015ed4533834b2ba9e300d02d80bf3b51bc3682917",
+              "item_type": "message",
+              "output_index": 0,
+              "sequence_number": 2,
+              "type": "response.output_item.added"
+            },
+            {
+              "content_index": 0,
+              "item_id_sha256": "f8c53bd3866d4822377e53015ed4533834b2ba9e300d02d80bf3b51bc3682917",
+              "output_index": 0,
+              "sequence_number": 3,
+              "type": "response.content_part.added"
+            },
+            {
+              "content_index": 0,
+              "item_id_sha256": "f8c53bd3866d4822377e53015ed4533834b2ba9e300d02d80bf3b51bc3682917",
+              "output_index": 0,
+              "sequence_number": 4,
+              "type": "response.output_text.delta"
+            },
+            {
+              "content_index": 0,
+              "item_id_sha256": "f8c53bd3866d4822377e53015ed4533834b2ba9e300d02d80bf3b51bc3682917",
+              "output_index": 0,
+              "sequence_number": 5,
+              "type": "response.output_text.done"
+            },
+            {
+              "content_index": 0,
+              "item_id_sha256": "f8c53bd3866d4822377e53015ed4533834b2ba9e300d02d80bf3b51bc3682917",
+              "output_index": 0,
+              "sequence_number": 6,
+              "type": "response.content_part.done"
+            },
+            {
+              "item_id_sha256": "f8c53bd3866d4822377e53015ed4533834b2ba9e300d02d80bf3b51bc3682917",
+              "item_type": "message",
+              "output_index": 0,
+              "sequence_number": 7,
+              "type": "response.output_item.done"
+            },
+            {
+              "response_id_sha256": "d90dd9de9b46798b7680134e179ec5ab9e49839b6540f535bdd8d22fcaef4731",
+              "sequence_number": 8,
+              "type": "response.completed"
+            }
+          ],
+          "events_sha256": "a84f01f2a295e606e4f4f48be5cbf5c40f83390faf28e3fe36868a89665caa13",
+          "rejected_field": "image",
+          "rejection_reason": "response-image-mismatch",
+          "schema": "actenon-airlock/responses-observation/v1",
+          "terminal_status": "completed",
+          "validation_stage": "response-image"
+        },
+        "outcome": "AMBIGUOUS"
+      }
+    ]
+  },
+  "repaired_billing": {
+    "first_outcome": "AMBIGUOUS",
+    "after_first_microusd": 509795,
+    "second_ok": false,
+    "second_outcome": null,
+    "second_reason": "Model spend bound reached for this run",
+    "replay_refused": true,
+    "dispatched": 1,
+    "total_accounted_microusd": 509795,
+    "integrity_ok": true,
+    "observations": [
+      {
+        "inference_reserved_microusd": 509795,
+        "inference_cost_microusd": 509795,
+        "inference_usage": null,
+        "inference_observation": {
+          "body_sha256": "18ce3bd66805e7377a7df0f01f280faf8a1b8d7ad449df58571d02132ad75509",
+          "checked_event": 8,
+          "checked_event_metadata": {
+            "response_id_sha256": "9cbbbce3924493c41b1a2390e88f85ae39cc947751022fbaf1b58b8aa10bddce",
+            "sequence_number": 8,
+            "type": "response.completed"
+          },
+          "checked_sequence_number": 8,
+          "contract_observatory": {
+            "authoritative": false,
+            "events_inspected": 9,
+            "issues": [
+              {
+                "fields": [
+                  "sha256:a47c7ddb3964fb8b8dd2566c67b8bc61c05944574dfcf0a5b3f4e3a11c29c995"
+                ],
+                "path": [
+                  "events",
+                  8,
+                  "response",
+                  "tool_usage"
+                ],
+                "reason": "response-tool-usage-schema",
+                "stage": "hosted-usage"
+              },
+              {
+                "fields": [
+                  "sha256:a47c7ddb3964fb8b8dd2566c67b8bc61c05944574dfcf0a5b3f4e3a11c29c995"
+                ],
+                "path": [
+                  "events",
+                  8,
+                  "response",
+                  "tool_usage"
+                ],
+                "reason": "unexpected-fields",
+                "stage": "hosted-usage"
+              },
+              {
+                "path": [
+                  "events",
+                  8,
+                  "response",
+                  "usage"
+                ],
+                "reason": "usage-schema",
+                "stage": "usage"
+              },
+              {
+                "fields": [
+                  "sha256:8e22a49cea663bdc43556d2a778f29104f9a91bdbb034c6f20bf241f8b7ec6e5"
+                ],
+                "path": [
+                  "events",
+                  8,
+                  "response",
+                  "usage"
+                ],
+                "reason": "unexpected-fields",
+                "stage": "usage"
+              }
+            ],
+            "limits": {
+              "bytes": 4194304,
+              "depth": 24,
+              "events": 256,
+              "fields_per_issue": 4,
+              "issues": 32,
+              "lines": 4096,
+              "path": 10,
+              "probes": 512,
+              "report_bytes": 16384,
+              "structural_tokens": 8192
+            },
+            "probes": 204,
+            "schema": "actenon-airlock/responses-contract-observatory/v1",
+            "truncated": false
+          },
+          "event_count": 9,
+          "events": [
+            {
+              "response_id_sha256": "9cbbbce3924493c41b1a2390e88f85ae39cc947751022fbaf1b58b8aa10bddce",
+              "sequence_number": 0,
+              "type": "response.created"
+            },
+            {
+              "response_id_sha256": "9cbbbce3924493c41b1a2390e88f85ae39cc947751022fbaf1b58b8aa10bddce",
+              "sequence_number": 1,
+              "type": "response.in_progress"
+            },
+            {
+              "item_id_sha256": "f8c53bd3866d4822377e53015ed4533834b2ba9e300d02d80bf3b51bc3682917",
+              "item_type": "message",
+              "output_index": 0,
+              "sequence_number": 2,
+              "type": "response.output_item.added"
+            },
+            {
+              "content_index": 0,
+              "item_id_sha256": "f8c53bd3866d4822377e53015ed4533834b2ba9e300d02d80bf3b51bc3682917",
+              "output_index": 0,
+              "sequence_number": 3,
+              "type": "response.content_part.added"
+            },
+            {
+              "content_index": 0,
+              "item_id_sha256": "f8c53bd3866d4822377e53015ed4533834b2ba9e300d02d80bf3b51bc3682917",
+              "output_index": 0,
+              "sequence_number": 4,
+              "type": "response.output_text.delta"
+            },
+            {
+              "content_index": 0,
+              "item_id_sha256": "f8c53bd3866d4822377e53015ed4533834b2ba9e300d02d80bf3b51bc3682917",
+              "output_index": 0,
+              "sequence_number": 5,
+              "type": "response.output_text.done"
+            },
+            {
+              "content_index": 0,
+              "item_id_sha256": "f8c53bd3866d4822377e53015ed4533834b2ba9e300d02d80bf3b51bc3682917",
+              "output_index": 0,
+              "sequence_number": 6,
+              "type": "response.content_part.done"
+            },
+            {
+              "item_id_sha256": "f8c53bd3866d4822377e53015ed4533834b2ba9e300d02d80bf3b51bc3682917",
+              "item_type": "message",
+              "output_index": 0,
+              "sequence_number": 7,
+              "type": "response.output_item.done"
+            },
+            {
+              "response_id_sha256": "9cbbbce3924493c41b1a2390e88f85ae39cc947751022fbaf1b58b8aa10bddce",
+              "sequence_number": 8,
+              "type": "response.completed"
+            }
+          ],
+          "events_sha256": "db99b660e7cae6e14fdcd8e3a7750228f111b31217ae0115281b670db047e3ca",
+          "rejected_field": "tool_usage",
+          "rejection_reason": "response-tool-usage-schema",
+          "schema": "actenon-airlock/responses-observation/v1",
+          "terminal_status": "completed",
+          "unexpected_field_count": 1,
+          "unexpected_fields": [
+            "sha256:a47c7ddb3964fb8b8dd2566c67b8bc61c05944574dfcf0a5b3f4e3a11c29c995"
+          ],
+          "unexpected_fields_truncated": false,
+          "validation_stage": "response-tool-usage"
+        },
+        "outcome": "AMBIGUOUS"
+      }
+    ]
+  },
+  "repaired_sequence": {
+    "first_outcome": "AMBIGUOUS",
+    "after_first_microusd": 509795,
+    "second_ok": false,
+    "second_outcome": null,
+    "second_reason": "Model spend bound reached for this run",
+    "replay_refused": true,
+    "dispatched": 1,
+    "total_accounted_microusd": 509795,
+    "integrity_ok": true,
+    "observations": [
+      {
+        "inference_reserved_microusd": 509795,
+        "inference_cost_microusd": 509795,
+        "inference_usage": null,
+        "inference_observation": {
+          "body_sha256": "ebe500c4da708b734234643c2200f17a502a18f95068b67e585722fd3083bd45",
+          "checked_event": 1,
+          "checked_event_metadata": {
+            "response_id_sha256": "9cbbbce3924493c41b1a2390e88f85ae39cc947751022fbaf1b58b8aa10bddce",
+            "sequence_number": 100,
+            "type": "response.in_progress"
+          },
+          "checked_sequence_number": 0,
+          "contract_observatory": {
+            "authoritative": false,
+            "events_inspected": 8,
+            "issues": [
+              {
+                "path": [
+                  "events",
+                  1
+                ],
+                "reason": "event-sequence",
+                "stage": "event"
+              },
+              {
+                "path": [
+                  "events",
+                  1,
+                  "response",
+                  "image"
+                ],
+                "reason": "response-image-schema",
+                "stage": "response-image"
+              },
+              {
+                "path": [
+                  "events",
+                  2
+                ],
+                "reason": "event-sequence",
+                "stage": "event"
+              },
+              {
+                "path": [],
+                "reason": "terminal-missing",
+                "stage": "completion"
+              },
+              {
+                "path": [],
+                "reason": "event-sequence",
+                "stage": "stream-integrity"
+              }
+            ],
+            "limits": {
+              "bytes": 4194304,
+              "depth": 24,
+              "events": 256,
+              "fields_per_issue": 4,
+              "issues": 32,
+              "lines": 4096,
+              "path": 10,
+              "probes": 512,
+              "report_bytes": 16384,
+              "structural_tokens": 8192
+            },
+            "probes": 135,
+            "schema": "actenon-airlock/responses-contract-observatory/v1",
+            "truncated": false
+          },
+          "event_count": 8,
+          "events": [
+            {
+              "response_id_sha256": "9cbbbce3924493c41b1a2390e88f85ae39cc947751022fbaf1b58b8aa10bddce",
+              "sequence_number": 0,
+              "type": "response.created"
+            },
+            {
+              "response_id_sha256": "9cbbbce3924493c41b1a2390e88f85ae39cc947751022fbaf1b58b8aa10bddce",
+              "sequence_number": 100,
+              "type": "response.in_progress"
+            },
+            {
+              "item_id_sha256": "f8c53bd3866d4822377e53015ed4533834b2ba9e300d02d80bf3b51bc3682917",
+              "item_type": "message",
+              "output_index": 0,
+              "sequence_number": 2,
+              "type": "response.output_item.added"
+            },
+            {
+              "content_index": 0,
+              "item_id_sha256": "f8c53bd3866d4822377e53015ed4533834b2ba9e300d02d80bf3b51bc3682917",
+              "output_index": 0,
+              "sequence_number": 3,
+              "type": "response.content_part.added"
+            },
+            {
+              "content_index": 0,
+              "item_id_sha256": "f8c53bd3866d4822377e53015ed4533834b2ba9e300d02d80bf3b51bc3682917",
+              "output_index": 0,
+              "sequence_number": 4,
+              "type": "response.output_text.delta"
+            },
+            {
+              "content_index": 0,
+              "item_id_sha256": "f8c53bd3866d4822377e53015ed4533834b2ba9e300d02d80bf3b51bc3682917",
+              "output_index": 0,
+              "sequence_number": 5,
+              "type": "response.output_text.done"
+            },
+            {
+              "content_index": 0,
+              "item_id_sha256": "f8c53bd3866d4822377e53015ed4533834b2ba9e300d02d80bf3b51bc3682917",
+              "output_index": 0,
+              "sequence_number": 6,
+              "type": "response.content_part.done"
+            },
+            {
+              "item_id_sha256": "f8c53bd3866d4822377e53015ed4533834b2ba9e300d02d80bf3b51bc3682917",
+              "item_type": "message",
+              "output_index": 0,
+              "sequence_number": 7,
+              "type": "response.output_item.done"
+            }
+          ],
+          "events_sha256": "7f6ffe81cdd7ef1b915c488f5bb968557b14295f8922a439a89610047690affa",
+          "rejection_reason": "event-sequence",
+          "schema": "actenon-airlock/responses-observation/v1"
+        },
+        "outcome": "AMBIGUOUS"
+      }
+    ]
+  }
+}

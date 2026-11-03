@@ -1,0 +1,26 @@
+{
+  "emergency_stop": null,
+  "integrity_ok": true,
+  "receipts": 9,
+  "completeness": "UNANCHORED",
+  "refused": 4,
+  "refusal_reasons": [
+    "No protected executor for this request",
+    "No reviewed protected consequence profile for this endpoint"
+  ],
+  "independently_observed": {},
+  "runtime_claims": {
+    "COMMITTED": 2
+  },
+  "unresolved_effects": [],
+  "inference": {
+    "dispatched": 2,
+    "confirmed": 2,
+    "unconfirmed": 0,
+    "retries_held": 0
+  },
+  "model_spend": {
+    "estimated_microusd": 2110,
+    "declined_calls": 0
+  }
+}

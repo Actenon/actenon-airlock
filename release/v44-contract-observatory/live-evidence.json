@@ -1,0 +1,69 @@
+{
+  "observations": [
+    {
+      "receipt": 2,
+      "diagnostic": {
+        "rejection_reason": "response-schema",
+        "checked_event": 0,
+        "checked_event_metadata": {
+          "response_id_sha256": "edcfb3fdcfc2df721726ac3fcd34ad450f3953d3aad42cea530d160e54900dcd",
+          "sequence_number": 0,
+          "type": "response.created"
+        },
+        "validation_stage": "response-object",
+        "unexpected_fields": [
+          "image"
+        ]
+      },
+      "outcome": "AMBIGUOUS",
+      "held_microusd": 681765
+    },
+    {
+      "receipt": 4,
+      "diagnostic": {
+        "rejection_reason": "response-schema",
+        "checked_event": 0,
+        "checked_event_metadata": {
+          "response_id_sha256": "17f09e8452d7a6931ec2bb5ba1229d026ac62f7ace68c48791ea7c9628d8bb46",
+          "sequence_number": 0,
+          "type": "response.created"
+        },
+        "validation_stage": "response-object",
+        "unexpected_fields": [
+          "image"
+        ]
+      },
+      "outcome": "AMBIGUOUS",
+      "held_microusd": 694570
+    }
+  ],
+  "agent_exit": 1,
+  "score": {
+    "visible": {
+      "exit": 1,
+      "summary": "1 failed, 2 passed in 0.70s"
+    },
+    "hidden": {
+      "exit": 1,
+      "summary": "1 failed, 3 passed in 1.49s"
+    },
+    "passed": false
+  },
+  "identity": {
+    "source_commit": "208163b8e69058ae2906081893af5db072b45b2a",
+    "source_digest": "6e141812c3ca5194eafaed2f234a9c41a51b88d344354e4dfd6220695c243a6e",
+    "image": "sha256:c449dec52754bad2a55dea7bb7b1edfbf7a864475464c53edc8ad9489d9d2269",
+    "model": "gpt-5.5-2026-04-23"
+  },
+  "verification": {
+    "ok": true,
+    "receipts": 5,
+    "checkpoint": "ANCHORED"
+  },
+  "hashes": {
+    "receipts.jsonl": "2b6cdd2b6ed4a8b8c51a5acab4eedc5b6b7aaef4fa890a146a6953ee5d7946eb",
+    "result.json": "3f3f8b089b0eba091893dc6354bb1db45d7e37bf21293d1cc9ae7196283d9775",
+    "checkpoint.json": "49fb11f5a2ae609bd43eb0df459e56ebe38bd4948c3e336c375a14202f9100e1",
+    "public-key.json": "24ff0482a171f23507c82cabf78aa88f7a9f787d99e4b12a28f98e9378755d22"
+  }
+}
