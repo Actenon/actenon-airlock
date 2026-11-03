@@ -591,7 +591,7 @@ def _echo_tool(value, path):
     return normalized
 
 
-def _response_tools(echoed, approved, path=()):
+def _response_tools(echoed, approved, path=(), *, strictness=None, scope=()):
     if not isinstance(echoed, list) or not isinstance(approved, list):
         _echo_reject("field-type", path, "tools")
     actual = [_echo_tool(t, (*path, i)) for i, t in enumerate(echoed)]
@@ -616,11 +616,22 @@ def _response_tools(echoed, approved, path=()):
             # Canonical JSON preserves bool/number distinctions and array order.
             if canonical(tool.get(field)) != canonical(other.get(field)):
                 _echo_reject("definition", location, field)
+        if strictness is not None and type(tool.get("strict")) is bool:
+            identity = (*scope, tool["name"])
+            if identity in strictness and strictness[identity] != tool["strict"]:
+                _echo_reject("definition", location, "strict")
+            strictness[identity] = tool["strict"]
         if tool["type"] == "namespace":
-            _response_tools(tool["tools"], other["tools"], location)
+            _response_tools(
+                tool["tools"],
+                other["tools"],
+                location,
+                strictness=strictness,
+                scope=(*scope, tool["name"]),
+            )
 
 
-def _response(response, request):
+def _response(response, request, *, tool_strictness=None):
     _response_schema(response)
     for field in ("presence_penalty", "frequency_penalty"):
         value = response.get(field)
@@ -659,7 +670,7 @@ def _response(response, request):
         # additional_tools retain their original input position and are never
         # silently lifted into this top-level inventory. Omission is no echo;
         # an explicit empty list must match an empty approved list.
-        _response_tools(response["tools"], request.get("tools", []))
+        _response_tools(response["tools"], request.get("tools", []), strictness=tool_strictness)
 
 
 def _usage(response, request):
@@ -862,6 +873,7 @@ def _stream_response(events, request, trace):
     ids = set()
     previous = None
     terminal = None
+    tool_strictness = {}
     for position, event in enumerate(events):
         trace.data["checked_event"] = position
         trace.data["checked_event_metadata"] = trace.records[position]
@@ -881,7 +893,7 @@ def _stream_response(events, request, trace):
         }:
             _require(not set(event) - common - {"response"}, "response-event-schema")
             current = event["response"]
-            _response(current, request)
+            _response(current, request, tool_strictness=tool_strictness)
             _require(current.get("id") == response_id, "response-id-mismatch")
             _require(current.get("model") == request["model"], "response-model-mismatch")
             _require(current.get("object") == "response", "response-object")
