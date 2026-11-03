@@ -149,6 +149,38 @@ def test_ambiguous_approved_duplicates_cannot_be_confirmed_by_an_echo():
     assert not observe(original, stream(echo(original))).confirmed
 
 
+@pytest.mark.parametrize("nested", [False, True])
+@pytest.mark.parametrize("omit_progress", [False, True])
+def test_provider_strict_resolution_cannot_contradict_an_earlier_snapshot(nested, omit_progress):
+    original = [function()]
+    del original[0]["strict"]
+    if nested:
+        original = [{"type": "namespace", "name": "functions", "tools": original}]
+    seq = stream(echo(original))
+    for position, strict in ((0, True), (-1, False)):
+        tools = seq[position]["response"]["tools"]
+        if nested:
+            tools = tools[0]["tools"]
+        tools[0]["strict"] = strict
+    if omit_progress:
+        del seq[1]["response"]["tools"]
+    result = observe(original, seq)
+    assert not result.confirmed and result.usage is None
+    assert result.diagnostics["tool_rejection_reason"] == "definition"
+    assert result.diagnostics["rejected_field"] == "strict"
+
+
+def test_strict_resolution_can_appear_later_and_survive_tool_reordering():
+    original = [function(), function("write_stdin")]
+    for tool in original:
+        del tool["strict"]
+    seq = stream(echo(original))
+    seq[1]["response"]["tools"][0]["strict"] = True
+    seq[-1]["response"]["tools"].reverse()
+    seq[-1]["response"]["tools"][1]["strict"] = True
+    assert observe(original, seq).confirmed
+
+
 MUTATIONS = [
     ("allowed_callers", ["programmatic"], "caller-mode"),
     ("allowed_callers", ["direct", "programmatic"], "caller-mode"),
