@@ -416,7 +416,16 @@ def test_real_codex_continues_with_documented_direct_callers(tmp_path, monkeypat
         for event in seq:
             if "response" in event:
                 event["response"].update(
-                    conversation=None, moderation=None, prompt_cache_options=None
+                    conversation=None,
+                    moderation=None,
+                    prompt_cache_options=None,
+                    presence_penalty=0,
+                    frequency_penalty=0.0,
+                    tool_usage=json.loads(
+                        (
+                            Path(__file__).parent / "fixtures/response-zero-tool-usage.json"
+                        ).read_text()
+                    ),
                 )
         responses.append(httpx.Response(200, content=wire(seq)))
     provider = ScriptedProvider(responses)

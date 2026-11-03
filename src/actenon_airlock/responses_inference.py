@@ -345,8 +345,8 @@ def _output(value, *, partial=False):
             _require(isinstance(args, dict), "function-arguments-object")
 
 
-# Response metadata from the documented direct Responses schema. These fields
-# cannot add outbound authority; returned tools must still pass the local contract.
+# Reviewed Responses fields, including live-observed generation settings. These
+# cannot add outbound authority; returned tools still pass the local contract.
 _RESPONSE_FIELDS = frozenset(
     {
         "id",
@@ -385,6 +385,9 @@ _RESPONSE_FIELDS = frozenset(
         "conversation",
         "moderation",
         "prompt_cache_options",
+        "presence_penalty",
+        "frequency_penalty",
+        "tool_usage",
     }
 )
 
@@ -400,24 +403,111 @@ _NULL_RESPONSE_METADATA = ("conversation", "moderation", "prompt_cache_options")
 _PUBLIC_RESPONSE_FIELDS = _RESPONSE_FIELDS | {"image", "prompt_cache_diagnostics"}
 
 
+def _unexpected_fields(unexpected, catalogue):
+    known = sorted(unexpected & catalogue)
+    hashed = sorted("sha256:" + _hash(name) for name in unexpected - catalogue)
+    return {
+        "unexpected_fields": (known + hashed)[:16],
+        "unexpected_field_count": len(unexpected),
+        "unexpected_fields_truncated": len(unexpected) > 16,
+    }
+
+
 def _response_schema(response):
     diagnostic = {"validation_stage": "response-object"}
     if not isinstance(response, dict):
         raise _Rejected("response-schema", diagnostic=diagnostic)
     unexpected = set(response) - _RESPONSE_FIELDS
     if unexpected:
-        known = sorted(unexpected & _PUBLIC_RESPONSE_FIELDS)
-        hashed = sorted("sha256:" + _hash(name) for name in unexpected - _PUBLIC_RESPONSE_FIELDS)
-        diagnostic.update(
-            unexpected_fields=(known + hashed)[:16],
-            unexpected_field_count=len(unexpected),
-            unexpected_fields_truncated=len(unexpected) > 16,
-        )
+        diagnostic.update(_unexpected_fields(unexpected, _PUBLIC_RESPONSE_FIELDS))
         raise _Rejected("response-schema", diagnostic=diagnostic)
+
+
+# Fixed public nested names for diagnostics; this does not drive acceptance.
+_PUBLIC_TOOL_USAGE_FIELDS = frozenset(
+    {
+        "image_gen",
+        "web_search",
+        "num_requests",
+        "input_tokens",
+        "output_tokens",
+        "total_tokens",
+        "input_tokens_details",
+        "output_tokens_details",
+        "image_tokens",
+        "text_tokens",
+        "cached_tokens",
+        "cached_tokens_details",
+        "cached_image_tokens",
+        "cached_text_tokens",
+    }
+)
+
+
+def _tool_usage_object(value, required, optional, path):
+    # path is composed only from the fixed schema below, never provider strings.
+    diagnostic = {"validation_stage": "response-tool-usage", "rejected_field": path}
+    if not isinstance(value, dict):
+        raise _Rejected("response-tool-usage-schema", diagnostic=diagnostic)
+    unexpected = set(value) - required - optional
+    if unexpected:
+        diagnostic.update(_unexpected_fields(unexpected, _PUBLIC_TOOL_USAGE_FIELDS))
+    if unexpected or required - set(value):
+        raise _Rejected("response-tool-usage-schema", diagnostic=diagnostic)
+    return value
+
+
+def _zero_tool_count(value, path):
+    diagnostic = {"validation_stage": "response-tool-usage", "rejected_field": path}
+    if not _count(value):
+        raise _Rejected("response-tool-usage-schema", diagnostic=diagnostic)
+    if value != 0:
+        # Hosted effects have neither authority nor reviewed prices here. Never
+        # fold them into base-model usage or release a hold using partial prices.
+        raise _Rejected("response-hosted-tool-usage", diagnostic=diagnostic)
+
+
+def _tool_usage(value):
+    usage = _tool_usage_object(value, {"image_gen", "web_search"}, set(), "tool_usage")
+    web = _tool_usage_object(usage["web_search"], {"num_requests"}, set(), "tool_usage.web_search")
+    _zero_tool_count(web["num_requests"], "tool_usage.web_search.num_requests")
+    image = _tool_usage_object(
+        usage["image_gen"],
+        {"input_tokens", "output_tokens", "total_tokens", "input_tokens_details"},
+        {"cached_tokens", "cached_tokens_details", "output_tokens_details"},
+        "tool_usage.image_gen",
+    )
+    for field in ("input_tokens", "output_tokens", "total_tokens", "cached_tokens"):
+        if field in image:
+            _zero_tool_count(image[field], "tool_usage.image_gen." + field)
+    for field, counts in (
+        ("input_tokens_details", ("image_tokens", "text_tokens")),
+        ("output_tokens_details", ("image_tokens", "text_tokens")),
+        ("cached_tokens_details", ("cached_image_tokens", "cached_text_tokens")),
+    ):
+        if field in image:
+            path = "tool_usage.image_gen." + field
+            detail = _tool_usage_object(image[field], set(counts), set(), path)
+            for count in counts:
+                _zero_tool_count(detail[count], path + "." + count)
+    # Missing optional cache counts mean unknown, NOT measured zero. These
+    # counters alone never establish no hosted activity: request/output tool
+    # prohibitions remain mandatory (some provider activity is not counted).
 
 
 def _response(response, request):
     _response_schema(response)
+    for field in ("presence_penalty", "frequency_penalty"):
+        value = response.get(field)
+        # The signed request cannot specify penalties. Accept only unset/default
+        # metadata; exact numeric zero also excludes booleans and nonfinite values.
+        if value is not None and not (type(value) in (int, float) and value == 0):
+            raise _Rejected(
+                "response-unsupported-penalty",
+                diagnostic={"validation_stage": "response-metadata", "rejected_field": field},
+            )
+    if "tool_usage" in response:
+        _tool_usage(response["tool_usage"])
     for field in _NULL_RESPONSE_METADATA:
         if response.get(field) is not None:
             raise _Rejected(
