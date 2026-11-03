@@ -7,11 +7,19 @@ describe features outside the signed no-conversation GPT-5.5 request contract.
 import copy
 import itertools
 import json
+from pathlib import Path
 
 import httpx
 import pytest
 from responses_fixture import ScriptedProvider, events, text
-from test_responses_inference import PROFILE, REQUEST, SECRET, broker, configure, message  # noqa: F401
+from test_responses_inference import (  # noqa: F401
+    PROFILE,
+    REQUEST,
+    SECRET,
+    broker,
+    configure,
+    message,
+)
 from test_responses_observation import wire
 
 from actenon_airlock import responses_inference as contract
@@ -40,8 +48,10 @@ POPULATED = {
 
 def sequence(metadata):
     seq = copy.deepcopy(events([text("Synthetic completion")]))
+    documented = json.loads((Path(__file__).parent / "fixtures/response-metadata.json").read_text())
     for event in seq:
         if "response" in event:
+            event["response"].update(documented)
             event["response"].update(copy.deepcopy(metadata))
     return seq
 
@@ -228,3 +238,34 @@ def test_schema_diagnostic_is_signed_and_console_is_content_free(broker, capsys)
     row["inference_observation"]["unexpected_fields"] = ["forged"]
     state.receipts_path.write_text("".join(json.dumps(r) + "\n" for r in rows))
     assert not state.verify_receipts()["ok"]
+
+
+@pytest.mark.parametrize("metadata", NULL_SHAPES)
+@pytest.mark.parametrize("stream", [True, False])
+def test_documented_zero_cache_writes_confirms_with_complete_sdk_shape(metadata, stream):
+    from openai.types.responses.response import Response
+
+    seq = sequence(metadata)
+    usage = seq[-1]["response"]["usage"]
+    usage["input_tokens_details"]["cache_write_tokens"] = 0
+    usage["output_tokens_details"] = {"reasoning_tokens": 0}
+    # Only a fixture sanity check: SDK acceptance never drives production policy.
+    for event in seq:
+        if "response" in event:
+            Response.model_validate(event["response"])
+    result = observed(seq, stream)
+    assert result.confirmed
+    assert result.usage["cache_creation_input_tokens"] == 0
+
+
+@pytest.mark.parametrize("value", [None, False, True, -1, 1, 101, 0.0, "0", {}, []])
+def test_unpriced_or_malformed_cache_writes_retain_the_reservation(broker, value):  # noqa: F811
+    state, subject, provider = broker
+    seq = sequence(dict.fromkeys(FIELDS))
+    seq[-1]["response"]["usage"]["input_tokens_details"]["cache_write_tokens"] = value
+    provider.steps = [httpx.Response(200, content=wire(seq))]
+    assert subject.handle(message())["outcome"] == "AMBIGUOUS"
+    assert subject.inference_spent == 501335
+    assert not subject.handle(message())["ok"]
+    assert len(provider.requests) == 1
+    assert status(state)["integrity_ok"]

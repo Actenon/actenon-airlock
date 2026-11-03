@@ -393,6 +393,9 @@ def test_codex_artifact_approved_creation_readback_and_lost_ack(tmp_path, monkey
 
 
 def test_real_codex_continues_with_documented_direct_callers(tmp_path, monkeypatch):
+    from responses_fixture import events
+    from test_responses_observation import wire
+
     turns = steps()
     turns[0].insert(
         0,
@@ -407,7 +410,16 @@ def test_real_codex_continues_with_documented_direct_callers(tmp_path, monkeypat
         for value in turn:
             if value["type"] in {"function_call", "custom_tool_call"}:
                 value["caller"] = {"type": "direct"}
-    provider = ScriptedProvider(turns)
+    responses = []
+    for index, turn in enumerate(turns):
+        seq = events(turn, response_id=f"resp_{index}")
+        for event in seq:
+            if "response" in event:
+                event["response"].update(
+                    conversation=None, moderation=None, prompt_cache_options=None
+                )
+        responses.append(httpx.Response(200, content=wire(seq)))
+    provider = ScriptedProvider(responses)
     assert run_agent(tmp_path, monkeypatch, provider) == 0
     assert "return a + b" in (workspace(tmp_path) / "calculator.py").read_text()
     summary = status(State(tmp_path))

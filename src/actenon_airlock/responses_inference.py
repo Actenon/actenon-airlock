@@ -290,6 +290,10 @@ def reservation(size, cap, prices):
 class _Rejected(ValueError):
     """Only fixed, content-free reason codes may enter observation diagnostics."""
 
+    def __init__(self, reason, *, diagnostic=None):
+        super().__init__(reason)
+        self.diagnostic = diagnostic or {}
+
 
 def _require(ok, reason):
     if not ok:
@@ -378,12 +382,48 @@ _RESPONSE_FIELDS = frozenset(
         "service_tier",
         "store",
         "access_programs",
+        "conversation",
+        "moderation",
+        "prompt_cache_options",
     }
 )
 
 
+# Optional in SDK 2.54.0. A populated conversation implies provider-held history;
+# moderation was not requested; prompt_cache_options requires GPT-5.6 or later.
+# Null is the only supported value, at EVERY lifecycle snapshot (including JSON).
+_NULL_RESPONSE_METADATA = ("conversation", "moderation", "prompt_cache_options")
+
+# A fixed public catalogue for diagnostics ONLY, never a source of acceptance.
+# The two additional names appear in the official Responses reference but are
+# outside both the pinned SDK and our contract. Arbitrary names are hashed.
+_PUBLIC_RESPONSE_FIELDS = _RESPONSE_FIELDS | {"image", "prompt_cache_diagnostics"}
+
+
+def _response_schema(response):
+    diagnostic = {"validation_stage": "response-object"}
+    if not isinstance(response, dict):
+        raise _Rejected("response-schema", diagnostic=diagnostic)
+    unexpected = set(response) - _RESPONSE_FIELDS
+    if unexpected:
+        known = sorted(unexpected & _PUBLIC_RESPONSE_FIELDS)
+        hashed = sorted("sha256:" + _hash(name) for name in unexpected - _PUBLIC_RESPONSE_FIELDS)
+        diagnostic.update(
+            unexpected_fields=(known + hashed)[:16],
+            unexpected_field_count=len(unexpected),
+            unexpected_fields_truncated=len(unexpected) > 16,
+        )
+        raise _Rejected("response-schema", diagnostic=diagnostic)
+
+
 def _response(response, request):
-    _require(isinstance(response, dict) and not set(response) - _RESPONSE_FIELDS, "response-schema")
+    _response_schema(response)
+    for field in _NULL_RESPONSE_METADATA:
+        if response.get(field) is not None:
+            raise _Rejected(
+                "response-unsupported-metadata",
+                diagnostic={"validation_stage": "response-metadata", "rejected_field": field},
+            )
     _require(response.get("object") == "response", "response-object")
     _require(response.get("model") == request["model"], "response-model")
     _require(
@@ -445,7 +485,15 @@ def _usage(response, request):
     _require(inp <= len(canonical(request)) + 4096, "usage-input-bound")
     details = usage.get("input_tokens_details", {})
     _require(
-        isinstance(details, dict) and not set(details) - {"cached_tokens"}, "usage-input-details"
+        isinstance(details, dict) and not set(details) - {"cached_tokens", "cache_write_tokens"},
+        "usage-input-details",
+    )
+    # SDK 2.54.0 documents this count even when zero. A positive cache-write
+    # class is outside this reviewed-price contract; never silently price it at 0.
+    _require(
+        type(details.get("cache_write_tokens", 0)) is int
+        and details.get("cache_write_tokens", 0) == 0,
+        "usage-unsupported-cache-write",
     )
     cached = details.get("cached_tokens", 0)
     _require(_count(cached) and cached <= inp, "usage-cache-count")
@@ -791,6 +839,7 @@ def observe(status, body, request):
         return ResponsesObservation(confirmed=True, usage=usage, diagnostics=trace.data)
     except _Rejected as exc:
         trace.data["rejection_reason"] = str(exc)
+        trace.data.update(exc.diagnostic)
     except AirlockError:
         trace.data["rejection_reason"] = "content-schema"
     except (ValueError, KeyError, TypeError, AttributeError, IndexError, RecursionError):
