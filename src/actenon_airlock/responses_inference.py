@@ -388,6 +388,7 @@ _RESPONSE_FIELDS = frozenset(
         "presence_penalty",
         "frequency_penalty",
         "tool_usage",
+        "image",
     }
 )
 
@@ -398,9 +399,9 @@ _RESPONSE_FIELDS = frozenset(
 _NULL_RESPONSE_METADATA = ("conversation", "moderation", "prompt_cache_options")
 
 # A fixed public catalogue for diagnostics ONLY, never a source of acceptance.
-# The two additional names appear in the official Responses reference but are
-# outside both the pinned SDK and our contract. Arbitrary names are hashed.
-_PUBLIC_RESPONSE_FIELDS = _RESPONSE_FIELDS | {"image", "prompt_cache_diagnostics"}
+# This additional name appears in the official Responses reference but remains
+# outside the supported contract. Arbitrary names are hashed.
+_PUBLIC_RESPONSE_FIELDS = _RESPONSE_FIELDS | {"prompt_cache_diagnostics"}
 
 
 def _unexpected_fields(unexpected, catalogue):
@@ -631,8 +632,30 @@ def _response_tools(echoed, approved, path=(), *, strictness=None, scope=()):
             )
 
 
-def _response(response, request, *, tool_strictness=None):
+def _image_metadata(value, policies=None):
+    # Effective response policy, not the request setting (which also has auto).
+    # The documented response object is optional but neither it nor its required
+    # member is nullable. This echo never enables image inputs, outputs or tools.
+    diagnostic = {"validation_stage": "response-image", "rejected_field": "image"}
+    if not isinstance(value, dict) or set(value) != {"context_compression"}:
+        if isinstance(value, dict):
+            diagnostic.update(
+                _unexpected_fields(set(value) - {"context_compression"}, {"context_compression"})
+            )
+        raise _Rejected("response-image-schema", diagnostic=diagnostic)
+    policy = value["context_compression"]
+    if not isinstance(policy, str) or policy not in {"enabled", "disabled"}:
+        raise _Rejected("response-image-policy", diagnostic=diagnostic)
+    if policies is not None:
+        if policies and policy not in policies:
+            raise _Rejected("response-image-mismatch", diagnostic=diagnostic)
+        policies.add(policy)
+
+
+def _response(response, request, *, tool_strictness=None, image_policies=None):
     _response_schema(response)
+    if "image" in response:
+        _image_metadata(response["image"], image_policies)
     for field in ("presence_penalty", "frequency_penalty"):
         value = response.get(field)
         # The signed request cannot specify penalties. Accept only unset/default
@@ -874,6 +897,7 @@ def _stream_response(events, request, trace):
     previous = None
     terminal = None
     tool_strictness = {}
+    image_policies = set()
     for position, event in enumerate(events):
         trace.data["checked_event"] = position
         trace.data["checked_event_metadata"] = trace.records[position]
@@ -893,7 +917,9 @@ def _stream_response(events, request, trace):
         }:
             _require(not set(event) - common - {"response"}, "response-event-schema")
             current = event["response"]
-            _response(current, request, tool_strictness=tool_strictness)
+            _response(
+                current, request, tool_strictness=tool_strictness, image_policies=image_policies
+            )
             _require(current.get("id") == response_id, "response-id-mismatch")
             _require(current.get("model") == request["model"], "response-model-mismatch")
             _require(current.get("object") == "response", "response-object")

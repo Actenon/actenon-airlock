@@ -422,6 +422,7 @@ def test_real_codex_continues_with_documented_direct_callers(tmp_path, monkeypat
                     prompt_cache_options=None,
                     presence_penalty=0,
                     frequency_penalty=0.0,
+                    image={"context_compression": "enabled"},
                     tool_usage=json.loads(
                         (
                             Path(__file__).parent / "fixtures/response-zero-tool-usage.json"
