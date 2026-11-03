@@ -195,3 +195,33 @@ def test_separate_usage_and_tool_echo_errors_do_not_mask_each_other():
     issues = result.diagnostics["contract_observatory"]["issues"]
     assert {"response-tools", "usage-missing"} <= {i["reason"] for i in issues}
     assert any(i["path"][-1] == 1 and i["stage"] == "tool-echo" for i in issues)
+    assert {"field-type", "identity"} <= {i.get("detail") for i in issues}
+
+
+def test_supported_namespace_strictness_and_reordered_echo_have_no_false_diagnostics():
+    from responses_tool_echo_fixture import echo, function, stream
+
+    inventory = [{"type": "namespace", "name": "functions", "tools": [function()]}, function()]
+    del inventory[0]["tools"][0]["strict"]
+    del inventory[1]["strict"]
+    returned = echo(inventory)
+    returned[0]["tools"][0]["strict"] = False
+    returned[1]["strict"] = True
+    seq = stream(returned)
+    seq[-1]["response"]["tools"].reverse()
+    result = observe(inventory, seq)
+    assert result.confirmed
+    assert result.diagnostics["contract_observatory"]["issues"] == []
+
+
+@pytest.mark.parametrize("field", ["output_text", "prompt_cache_diagnostics"])
+def test_documented_but_unsupported_names_are_public_identifiers_only(field):
+    seq = full_response()
+    seq[-1]["response"][field] = "synthetic-secret-value"
+    result = observe(EIGHT, seq)
+    assert not result.confirmed
+    assert result.diagnostics["unexpected_fields"] == [field]
+    assert any(
+        field in i.get("fields", []) for i in result.diagnostics["contract_observatory"]["issues"]
+    )
+    assert "synthetic-secret" not in json.dumps(result.diagnostics)

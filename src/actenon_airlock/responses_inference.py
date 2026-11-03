@@ -399,9 +399,9 @@ _RESPONSE_FIELDS = frozenset(
 _NULL_RESPONSE_METADATA = ("conversation", "moderation", "prompt_cache_options")
 
 # A fixed public catalogue for diagnostics ONLY, never a source of acceptance.
-# This additional name appears in the official Responses reference but remains
-# outside the supported contract. Arbitrary names are hashed.
-_PUBLIC_RESPONSE_FIELDS = _RESPONSE_FIELDS | {"prompt_cache_diagnostics"}
+# These additional names appear in the official Responses reference but remain
+# outside the supported wire contract. Arbitrary names are hashed.
+_PUBLIC_RESPONSE_FIELDS = _RESPONSE_FIELDS | {"prompt_cache_diagnostics", "output_text"}
 
 
 def _unexpected_fields(unexpected, catalogue):

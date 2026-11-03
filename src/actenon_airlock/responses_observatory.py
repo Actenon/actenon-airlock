@@ -68,12 +68,14 @@ class _Inspection:
         self.metadata = {}
         self.identity = None
 
-    def issue(self, stage, reason, path=(), fields=None):
+    def issue(self, stage, reason, path=(), fields=None, detail=None):
         # All stage/reason/path strings are literals or trusted validator codes.
         # No provider value or provider-selected path component is copied here.
         record = {"stage": stage, "reason": reason, "path": list(path[:MAX_PATH])}
         if fields:
             record["fields"] = fields[:MAX_FIELDS]
+        if detail:
+            record["detail"] = detail
         if record not in self.issues:
             if len(self.issues) >= MAX_ISSUES:
                 self.truncated = True
@@ -98,7 +100,13 @@ class _Inspection:
         except contract._Rejected as exc:
             # _Rejected carries only fixed reason codes. Never copy str() of
             # parser, SDK, provider or arbitrary exceptions into a receipt.
-            self.issue(stage, str(exc), path, exc.diagnostic.get("unexpected_fields"))
+            self.issue(
+                stage,
+                str(exc),
+                path,
+                exc.diagnostic.get("unexpected_fields"),
+                exc.diagnostic.get("tool_rejection_reason"),
+            )
         except (AirlockError, ValueError, TypeError, KeyError, AttributeError, IndexError):
             self.issue(stage, "structure-invalid", path)
 
@@ -179,7 +187,7 @@ class _Inspection:
                 continue
             other = by_name.get(tool["name"])
             if other is None:
-                self.issue("tool-echo", "response-tools", location)
+                self.issue("tool-echo", "response-tools", location, detail="identity")
             else:
                 self.probe("tool-echo", location, contract._response_tools, [tool], [other])
                 if tool.get("type") == "namespace":
