@@ -255,7 +255,13 @@ class InferenceDispatch(HttpDispatch):
     def receipt_fields(self):
         if not self.reserved:
             return {}
-        fields = {"inference_cost_microusd": self.charged}
+        fields = {
+            "inference_cost_microusd": self.charged,
+            "inference_reserved_microusd": self.reserved,
+        }
+        diagnostics = getattr(self.observation, "diagnostics", None)
+        if diagnostics is not None:
+            fields["inference_observation"] = diagnostics
         if self.observation is not None and self.observation.usage is not None:
             fields["inference_usage"] = self.observation.usage
         if self.observation is not None and self.observation.declined:
