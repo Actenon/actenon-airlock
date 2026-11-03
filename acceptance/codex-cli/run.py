@@ -180,8 +180,6 @@ class Gateway:
 def baseline(project, image, log, gateway):
     work = project.parent / "baseline-workspace"
     snapshot(project, work)
-    (work / ".home").mkdir()
-    (work / ".tmp").mkdir()
     for p in [work, *work.rglob("*")]:
         p.chmod(0o777 if p.is_dir() else 0o666)
     name = "airlock-codex-baseline-" + secrets.token_hex(6)
@@ -192,6 +190,8 @@ def baseline(project, image, log, gateway):
         "--name",
         name,
         "--read-only",
+        "--tmpfs",
+        "/tmp:rw,size=64m,mode=1777",
         "--cap-drop",
         "ALL",
         "--security-opt",
@@ -211,9 +211,9 @@ def baseline(project, image, log, gateway):
         "--mount",
         f"type=bind,source={work},target=/workspace",
         "--env",
-        "HOME=/workspace/.home",
+        "HOME=/tmp/home",
         "--env",
-        "TMPDIR=/workspace/.tmp",
+        "TMPDIR=/tmp",
         "--env",
         "OPENAI_BASE_URL=" + gateway.url,
         "--env",
