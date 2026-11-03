@@ -495,6 +495,131 @@ def _tool_usage(value):
     # prohibitions remain mandatory (some provider activity is not counted).
 
 
+# Inbound echoes have a separate schema from outbound tools(). These defaults
+# never become request fields, tool grants, or inputs to consequence dispatch.
+_ECHO_BASE = {"type", "name", "description"}
+_ECHO_DEFAULTS = {"allowed_callers", "defer_loading", "async"}
+_ECHO_FUNCTION = _ECHO_BASE | _ECHO_DEFAULTS | {"parameters", "strict", "output_schema"}
+_ECHO_CUSTOM = _ECHO_BASE | _ECHO_DEFAULTS | {"format"}
+_ECHO_NAMESPACE = _ECHO_BASE | {"tools"}
+_PUBLIC_ECHO_FIELDS = _ECHO_FUNCTION | _ECHO_CUSTOM | _ECHO_NAMESPACE | {"syntax", "definition"}
+
+
+def _echo_reject(reason, path, field, unexpected=None):
+    # path contains bounded-depth list indices, field/reason fixed identifiers.
+    diagnostic = {
+        "validation_stage": "response-tool-echo",
+        "tool_rejection_reason": reason,
+        "tool_path": list(path),
+        "rejected_field": field,
+    }
+    if unexpected:
+        diagnostic.update(_unexpected_fields(unexpected, _PUBLIC_ECHO_FIELDS))
+    raise _Rejected("response-tools", diagnostic=diagnostic)
+
+
+def _echo_object(value, allowed, path, field):
+    if not isinstance(value, dict):
+        _echo_reject("field-type", path, field)
+    unexpected = set(value) - allowed
+    if unexpected:
+        _echo_reject("unsupported-field", path, field, unexpected)
+
+
+def _echo_tool(value, path):
+    if not isinstance(value, dict) or not isinstance(value.get("type"), str):
+        _echo_reject("field-type", path, "type")
+    kind = value["type"]
+    fields = {"function": _ECHO_FUNCTION, "custom": _ECHO_CUSTOM, "namespace": _ECHO_NAMESPACE}
+    if kind not in fields or (kind == "namespace" and len(path) > 1):
+        _echo_reject("unsupported-type", path, "type")
+    _echo_object(value, fields[kind], path, "tools")
+    if not _identifier(value.get("name")):
+        _echo_reject("field-type", path, "name")
+    description = value.get("description")
+    if description is not None and not isinstance(description, str):
+        _echo_reject("field-type", path, "description")
+    normalized = {"type": kind, "name": value["name"], "description": description or ""}
+    if kind == "namespace":
+        normalized["tools"] = value.get("tools")
+        return normalized
+    callers = value.get("allowed_callers")
+    if callers is not None:
+        if not isinstance(callers, list) or any(not isinstance(c, str) for c in callers):
+            _echo_reject("field-type", path, "allowed_callers")
+        if callers != ["direct"]:
+            _echo_reject("caller-mode", path, "allowed_callers")
+    deferred = value.get("defer_loading")
+    if deferred is not None and type(deferred) is not bool:
+        _echo_reject("field-type", path, "defer_loading")
+    if deferred is True:
+        _echo_reject("deferred-loading", path, "defer_loading")
+    # Current docs define async as optional boolean, not nullable. Unlike the
+    # pinned SDK's nullable defer_loading, explicit null is not a reviewed echo.
+    asynchronous = value.get("async", False)
+    if type(asynchronous) is not bool:
+        _echo_reject("field-type", path, "async")
+    if asynchronous:
+        _echo_reject("async-execution", path, "async")
+    if kind == "function":
+        output_schema = value.get("output_schema")
+        if output_schema is not None:
+            _echo_reject(
+                "output-schema" if isinstance(output_schema, dict) else "field-type",
+                path,
+                "output_schema",
+            )
+        if not isinstance(value.get("parameters"), dict):
+            _echo_reject("field-type", path, "parameters")
+        strict = value.get("strict")
+        if strict is not None and type(strict) is not bool:
+            _echo_reject("field-type", path, "strict")
+        normalized.update(parameters=value["parameters"], strict=strict)
+    else:
+        fmt = value.get("format")
+        if fmt is None:
+            fmt = {"type": "text"}
+        _echo_object(fmt, {"type", "syntax", "definition"}, path, "format")
+        if fmt.get("type") == "text":
+            _echo_object(fmt, {"type"}, path, "format")
+        elif fmt.get("type") == "grammar":
+            if not isinstance(fmt.get("syntax"), str) or not isinstance(fmt.get("definition"), str):
+                _echo_reject("field-type", path, "format")
+        else:
+            _echo_reject("definition", path, "format")
+        normalized["format"] = fmt
+    return normalized
+
+
+def _response_tools(echoed, approved, path=()):
+    if not isinstance(echoed, list) or not isinstance(approved, list):
+        _echo_reject("field-type", path, "tools")
+    actual = [_echo_tool(t, (*path, i)) for i, t in enumerate(echoed)]
+    expected = [_echo_tool(t, (*path, i)) for i, t in enumerate(approved)]
+    for inventory in (actual, expected):
+        if len({t["name"] for t in inventory}) != len(inventory):
+            _echo_reject("duplicate-identity", path, "name")
+    if len(actual) != len(expected):
+        _echo_reject("count", path, "tools")
+    by_name = {t["name"]: t for t in expected}
+    for index, tool in enumerate(actual):
+        location = (*path, index)
+        other = by_name.get(tool["name"])
+        if other is None or tool["type"] != other["type"]:
+            _echo_reject("identity", location, "name")
+        for field in ("description", "parameters", "format", "strict"):
+            # An omitted request strictness explicitly leaves resolution to the
+            # provider. Boolean resolution is safe only with identical schema;
+            # no arbitrary provider schema normalization is authorized here.
+            if field == "strict" and other.get(field) is None:
+                continue
+            # Canonical JSON preserves bool/number distinctions and array order.
+            if canonical(tool.get(field)) != canonical(other.get(field)):
+                _echo_reject("definition", location, field)
+        if tool["type"] == "namespace":
+            _response_tools(tool["tools"], other["tools"], location)
+
+
 def _response(response, request):
     _response_schema(response)
     for field in ("presence_penalty", "frequency_penalty"):
@@ -529,10 +654,12 @@ def _response(response, request):
             and response["max_output_tokens"] == request["max_output_tokens"],
             "response-output-cap",
         )
-    try:
-        tools(response.get("tools", []))
-    except AirlockError as exc:
-        raise _Rejected("response-tools") from exc
+    if "tools" in response:
+        # This is the echo of request.tools, not a new grant. Inline
+        # additional_tools retain their original input position and are never
+        # silently lifted into this top-level inventory. Omission is no echo;
+        # an explicit empty list must match an empty approved list.
+        _response_tools(response["tools"], request.get("tools", []))
 
 
 def _usage(response, request):

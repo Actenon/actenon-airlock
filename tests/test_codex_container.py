@@ -394,6 +394,7 @@ def test_codex_artifact_approved_creation_readback_and_lost_ack(tmp_path, monkey
 
 def test_real_codex_continues_with_documented_direct_callers(tmp_path, monkeypatch):
     from responses_fixture import events
+    from responses_tool_echo_fixture import echo
     from test_responses_observation import wire
 
     turns = steps()
@@ -410,7 +411,7 @@ def test_real_codex_continues_with_documented_direct_callers(tmp_path, monkeypat
         for value in turn:
             if value["type"] in {"function_call", "custom_tool_call"}:
                 value["caller"] = {"type": "direct"}
-    responses = []
+    sequences = []
     for index, turn in enumerate(turns):
         seq = events(turn, response_id=f"resp_{index}")
         for event in seq:
@@ -427,8 +428,22 @@ def test_real_codex_continues_with_documented_direct_callers(tmp_path, monkeypat
                         ).read_text()
                     ),
                 )
-        responses.append(httpx.Response(200, content=wire(seq)))
-    provider = ScriptedProvider(responses)
+        sequences.append(seq)
+
+    class EchoProvider(ScriptedProvider):
+        def __call__(self, request):
+            index = len(self.requests)
+            inventory = json.loads(request.content)["tools"]
+            assert inventory  # Exercise the unchanged CLI's actual definitions.
+            returned = echo(inventory)
+            returned.reverse()  # Tool identity is independent of inventory order.
+            for event in sequences[index]:
+                if "response" in event:
+                    event["response"]["tools"] = returned
+            self.steps[index] = httpx.Response(200, content=wire(sequences[index]))
+            return super().__call__(request)
+
+    provider = EchoProvider([None] * len(sequences))
     assert run_agent(tmp_path, monkeypatch, provider) == 0
     assert "return a + b" in (workspace(tmp_path) / "calculator.py").read_text()
     summary = status(State(tmp_path))

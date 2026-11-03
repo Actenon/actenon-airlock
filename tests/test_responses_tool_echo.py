@@ -132,6 +132,23 @@ def test_omitted_strict_may_resolve_only_without_schema_changes(strict):
     assert observe(original, stream(returned)).confirmed
 
 
+@pytest.mark.parametrize("strict", [None, False, 0, "true", "absent"])
+def test_explicit_strict_enforcement_cannot_be_removed(strict):
+    original = [function()]
+    original[0]["strict"] = True
+    returned = echo(original)
+    if strict == "absent":
+        del returned[0]["strict"]
+    else:
+        returned[0]["strict"] = strict
+    assert not observe(original, stream(returned)).confirmed
+
+
+def test_ambiguous_approved_duplicates_cannot_be_confirmed_by_an_echo():
+    original = [function(), function()]
+    assert not observe(original, stream(echo(original))).confirmed
+
+
 MUTATIONS = [
     ("allowed_callers", ["programmatic"], "caller-mode"),
     ("allowed_callers", ["direct", "programmatic"], "caller-mode"),
@@ -329,7 +346,9 @@ def test_new_echo_fields_never_expand_outbound_authority(broker, kind, field, va
 
 @pytest.mark.parametrize("location", ["tool", "namespace", "format", "parameters"])
 def test_secret_names_values_and_definitions_never_enter_signed_diagnostics(
-    broker, capsys, location  # noqa: F811
+    broker,  # noqa: F811
+    capsys,
+    location,
 ):
     state, subject, provider = broker
     original = [custom()] if location == "format" else [function()]
@@ -358,3 +377,60 @@ def test_secret_names_values_and_definitions_never_enter_signed_diagnostics(
     diag["tool_rejection_reason"] = "forged"
     state.receipts_path.write_text("".join(json.dumps(r) + "\n" for r in rows))
     assert not state.verify_receipts()["ok"]
+
+
+@pytest.mark.parametrize(
+    "case",
+    [
+        "schema",
+        "added",
+        "caller",
+        "deferred",
+        "async",
+        "output-schema",
+        "format",
+        "partial",
+        "usage",
+    ],
+)
+def test_unsupported_echo_keeps_reservation_and_replay_ownership(tmp_path, monkeypatch, case):
+    monkeypatch.setenv("OPENAI_API_KEY", SECRET)
+    seq = stream(echo(EIGHT))
+    final = seq[-1]["response"]
+    if case == "schema":
+        final["tools"][0]["parameters"] = {}
+    elif case == "added":
+        final["tools"].append(function("create_goal"))
+    elif case == "caller":
+        seq[1]["response"]["tools"][0]["allowed_callers"] = ["programmatic"]
+    elif case in ("deferred", "async"):
+        final["tools"][0]["defer_loading" if case == "deferred" else "async"] = True
+    elif case == "output-schema":
+        final["tools"][0]["output_schema"] = {"type": "object"}
+    elif case == "format":
+        final["tools"][-1]["format"] = {"type": "text"}
+    elif case == "partial":
+        seq.pop()
+    else:
+        final["usage"]["total_tokens"] = 0
+    state = configure(tmp_path, "0.7")
+    provider = ScriptedProvider([httpx.Response(200, content=wire(seq))])
+    subject = ProtectedBroker(state, discover(tmp_path), state.approved()["credential_bindings"])
+    subject.http.close()
+    subject.http = httpx.Client(transport=httpx.MockTransport(provider))
+    try:
+        assert subject.handle(message(tools=EIGHT))["outcome"] == "AMBIGUOUS"
+        assert subject.inference_spent == 509795
+        assert not subject.handle(
+            message(
+                tools=EIGHT, client_metadata={"session_id": "changed"}, prompt_cache_key="changed"
+            )
+        )["ok"]
+        continuation = subject.handle(message(tools=EIGHT, instructions="Continue"))
+        assert not continuation["ok"]
+        assert continuation["reason"] == "Model spend bound reached for this run"
+        assert subject.inference_spent == 509795
+        assert len(provider.requests) == 1
+        assert state.verify_receipts()["ok"] and status(state)["integrity_ok"]
+    finally:
+        subject.close()
