@@ -234,3 +234,125 @@ def test_malformed_framing_is_unconfirmed(change):
     assert not contract.observe(
         200, change(wire(events([text("done")]))), {**REQUEST, "max_output_tokens": 16000}
     ).confirmed
+
+
+def resequence(seq):
+    return [{**event, "sequence_number": i} for i, event in enumerate(seq)]
+
+
+def test_interleaved_items_use_output_indices_not_completion_arrival_order():
+    seq = events([output(), {**tool("second", "pwd"), "caller": {"type": "direct"}}])
+    first_done = seq.pop(4)
+    seq.insert(-1, first_done)
+    assert observe(resequence(seq)).confirmed
+
+
+@pytest.mark.parametrize(
+    "case",
+    [
+        "no-added",
+        "no-input-events",
+        "unknown-response-field",
+        "initial-input",
+        "duplicate-call-id",
+        "usage-details",
+        "response-hosted-tools",
+        "caller-extra",
+        "input-over-bound",
+    ],
+)
+def test_additional_contradictions_hold(case):
+    seq = copy.deepcopy(events([output()]))
+    response = seq[-1]["response"]
+    if case == "no-added":
+        seq.pop(1)
+    elif case == "no-input-events":
+        seq = [e for e in seq if "function_call_arguments" not in e["type"]]
+    elif case == "unknown-response-field":
+        response["unreviewed_extension"] = True
+    elif case == "initial-input":
+        seq[1]["item"]["arguments"] = "ignored-initial-input"
+    elif case == "duplicate-call-id":
+        seq = events([output(), {**output(), "id": "second"}])
+    elif case == "usage-details":
+        response["usage"]["output_tokens_details"] = {"reasoning_tokens": 21}
+    elif case == "response-hosted-tools":
+        response["tools"] = [{"type": "web_search"}]
+    elif case == "caller-extra":
+        response["output"][0]["caller"]["secret_extension"] = "untrusted"
+    elif case == "input-over-bound":
+        response["usage"].update(input_tokens=999999, total_tokens=1000019)
+    result = observe(resequence(seq))
+    assert not result.confirmed and result.usage is None
+
+
+def test_diagnostics_keep_only_structural_metadata_and_hashes(broker):  # noqa: F811
+    state, subject, provider = broker
+    secret = "synthetic-sensitive-response-value"
+    value = {**output(), "id": secret, "call_id": secret, "arguments": json.dumps({"cmd": secret})}
+    seq = events([value], response_id=secret)
+    provider.steps = [httpx.Response(200, content=wire(seq))]
+    assert subject.handle(message())["outcome"] == "COMMITTED"
+    row = [
+        r
+        for r in [json.loads(line) for line in state.receipts_path.read_text().splitlines()]
+        if r.get("stage") == "response-received"
+    ][0]
+    diag = row["inference_observation"]
+    assert secret not in json.dumps(diag)
+    assert diag["event_count"] == len(seq)
+    assert diag["terminal_status"] == "completed"
+    assert diag["rejection_reason"] is None
+    assert diag["validated_usage"] == row["inference_usage"]
+    assert row["inference_reserved_microusd"] > row["inference_cost_microusd"] == 1055
+    assert diag["events"][1]["item_type"] == "function_call"
+    assert diag["events"][1]["sequence_number"] == 1
+    assert len(diag["events"][1]["item_id_sha256"]) == 64
+
+
+def test_rejection_reason_is_precise_and_content_free():
+    result = observe(damaged("delta-id"))
+    assert result.diagnostics["rejection_reason"] == "event-item-id"
+    assert result.diagnostics["checked_sequence_number"] == 2
+    seq = events([output()])
+    seq[2]["type"] = "untrusted-event-name-containing-a-secret"
+    result = observe(seq)
+    assert result.diagnostics["rejection_reason"] == "unsupported-event-type"
+    assert "untrusted-event-name" not in json.dumps(result.diagnostics)
+
+
+def test_diagnostics_are_bounded_without_discarding_validation():
+    seq = events([text("x" * 300)])
+    delta = seq[3]
+    seq[3:4] = [{**delta, "delta": "x"} for _ in range(300)]
+    result = observe(resequence(seq))
+    assert result.confirmed
+    assert len(result.diagnostics["events"]) == 256
+    assert result.diagnostics["events_truncated"]
+    assert result.diagnostics["event_count"] == len(seq)
+    seq[-1]["response"]["usage"]["output_tokens"] = -1
+    assert not observe(resequence(seq)).confirmed
+
+
+def test_failure_after_dispatch_before_observation_retains_reservation(broker, monkeypatch):  # noqa: F811
+    state, subject, provider = broker
+
+    def crash(*args):
+        raise RuntimeError("synthetic interruption before observation")
+
+    monkeypatch.setattr(contract, "observe", crash)
+    assert subject.handle(message())["outcome"] == "AMBIGUOUS"
+    assert len(provider.requests) == 1
+    assert subject.inference_spent == contract.reservation(
+        len(provider.requests[0].content), 16000, PROFILE["price_microusd_per_mtok"]
+    )
+    assert not subject.handle(message())["ok"]
+    assert len(provider.requests) == 1
+    assert status(state)["integrity_ok"]
+
+
+def test_caller_extension_does_not_expand_outbound_history():
+    from actenon_airlock.common import AirlockError
+
+    with pytest.raises(AirlockError, match="local tool call fields"):
+        contract.check_request(json.dumps({**REQUEST, "input": [output()]}).encode(), PROFILE)
