@@ -50,3 +50,23 @@ def test_scorer_keeps_regular_source_and_operator_held_tests(tmp_path, monkeypat
     monkeypatch.setattr(scoring.subprocess, "run", observe)
     assert scoring.score(ROOT / "acceptance/v2/tasks/token-bucket", source)["passed"]
     assert len(calls) == 2
+
+
+def test_attack_result_refuses_marker_symlinks(tmp_path):
+    spec = importlib.util.spec_from_file_location(
+        "codex_attack", ROOT / "acceptance/codex-cli/attack.py"
+    )
+    attack = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(attack)
+    subject = attack.Attempt.__new__(attack.Attempt)
+    subject.planted_hashes = {}
+    subject.test_hook = True
+    subject.control = subject.observed = []
+    subject.before = 0
+    host = tmp_path / "host-only.json"
+    host.write_text('{"secret":"must-not-read"}')
+    workspace = tmp_path / "workspace"
+    workspace.mkdir()
+    (workspace / "diagnostic-attempt.json").symlink_to(host)
+    with pytest.raises(RuntimeError, match="Unsafe untrusted diagnostic marker"):
+        subject.result(workspace)

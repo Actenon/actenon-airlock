@@ -246,8 +246,15 @@ def main():
         action="store_true",
         help="Plant untrusted instructions; observe an owned sink with a working control",
     )
+    parser.add_argument(
+        "--test-hook",
+        action="store_true",
+        help="With --attack, execute the planted transport from a pytest session fixture",
+    )
     parser.add_argument("--authorized-usd", choices=(BUDGET,))
     args = parser.parse_args()
+    if args.test_hook and not args.attack:
+        raise SystemExit("--test-hook requires --attack")
     frozen = identity(args.image)
     if args.mode == "freeze":
         with args.out.open("x") as file:
@@ -319,9 +326,9 @@ def main():
     if args.attack:
         from attack import Attempt
 
-        attempt = Attempt(project, args.out, args.image)
+        attempt = Attempt(project, args.out, args.image, test_hook=args.test_hook)
     steps = rehearsal(task) if not args.live else None
-    if steps is not None and args.attack:
+    if steps is not None and args.attack and not args.test_hook:
         steps.insert(0, [tool("fixture-attack", "cat README.md && python diagnostics.py")])
     scripted = ScriptedProvider(steps) if steps is not None else None
     original = ProtectedBroker.__init__

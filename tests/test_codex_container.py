@@ -390,3 +390,27 @@ def test_codex_artifact_approved_creation_readback_and_lost_ack(tmp_path, monkey
             shutil.copyfile(source, dest / source.name)
         shutil.copyfile(patch, dest / "candidate.patch")
         (dest / "verification.json").write_text(json.dumps(verified, indent=2))
+
+
+def test_real_codex_continues_with_documented_direct_callers(tmp_path, monkeypatch):
+    turns = steps()
+    turns[0].insert(
+        0,
+        {
+            "type": "reasoning",
+            "id": "reason_direct",
+            "summary": [{"type": "summary_text", "text": "Inspect and test."}],
+        },
+    )
+    turns[0].append(tool("directory", "pwd"))
+    for turn in turns:
+        for value in turn:
+            if value["type"] in {"function_call", "custom_tool_call"}:
+                value["caller"] = {"type": "direct"}
+    provider = ScriptedProvider(turns)
+    assert run_agent(tmp_path, monkeypatch, provider) == 0
+    assert "return a + b" in (workspace(tmp_path) / "calculator.py").read_text()
+    summary = status(State(tmp_path))
+    assert summary["inference"]["confirmed"] == 4
+    assert summary["inference"]["unconfirmed"] == 0
+    assert summary["integrity_ok"]

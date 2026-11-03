@@ -356,3 +356,50 @@ def test_caller_extension_does_not_expand_outbound_history():
 
     with pytest.raises(AirlockError, match="local tool call fields"):
         contract.check_request(json.dumps({**REQUEST, "input": [output()]}).encode(), PROFILE)
+
+
+def test_diagnostics_are_covered_by_receipt_signature(broker):  # noqa: F811
+    state, subject, provider = broker
+    assert subject.handle(message())["outcome"] == "COMMITTED"
+    rows = [json.loads(line) for line in state.receipts_path.read_text().splitlines()]
+    assert state.verify_receipts()["ok"]
+    rows[-1]["inference_observation"]["rejection_reason"] = "forged"
+    state.receipts_path.write_text("".join(json.dumps(row) + "\n" for row in rows))
+    assert not state.verify_receipts()["ok"]
+    from actenon_airlock.common import AirlockError
+
+    with pytest.raises(AirlockError, match="Receipt journal is invalid"):
+        subject.handle(message())
+    assert len(provider.requests) == 1
+
+
+def test_reasoning_content_stream_and_transport_padding():
+    value = {
+        "type": "reasoning",
+        "id": "reasoning-content",
+        "summary": [{"type": "summary_text", "text": "synthetic reasoning"}],
+    }
+    seq = events([value])
+    for event in seq:
+        event["type"] = (
+            event["type"]
+            .replace("reasoning_summary_part", "content_part")
+            .replace("reasoning_summary_text", "reasoning_text")
+        )
+        if "summary_index" in event:
+            event["content_index"] = event.pop("summary_index")
+        if "part" in event:
+            event["part"]["type"] = "reasoning_text"
+        if "item" in event:
+            current = event["item"]
+            current["content"] = current.pop("summary")
+            current["summary"] = []
+            for part in current["content"]:
+                part["type"] = "reasoning_text"
+        if event["type"].endswith("delta"):
+            event["obfuscation"] = "synthetic-padding-must-not-be-logged"
+    body = (b": keepalive\n\n" + wire(seq)).replace(b"\n", b"\r\n")
+    result = contract.observe(200, body, {**REQUEST, "max_output_tokens": 16000})
+    assert result.confirmed
+    assert "synthetic reasoning" not in json.dumps(result.diagnostics)
+    assert "synthetic-padding" not in json.dumps(result.diagnostics)

@@ -507,6 +507,7 @@ class _Trace:
             "event_count": 0,
         }
         self.hash = hashlib.sha256()
+        self.records = []
 
     def record(self, event):
         kind = event.get("type")
@@ -550,6 +551,7 @@ class _Trace:
                 else "invalid"
             )
         self.hash.update(json.dumps(record, sort_keys=True).encode() + b"\n")
+        self.records.append(record)
         self.data["event_count"] += 1
         if len(self.data["events"]) < 256:
             self.data["events"].append(record)
@@ -597,6 +599,7 @@ def _stream_response(events, request, trace):
     terminal = None
     for position, event in enumerate(events):
         trace.data["checked_event"] = position
+        trace.data["checked_event_metadata"] = trace.records[position]
         kind = event.get("type")
         _require(isinstance(kind, str) and kind in _EVENTS, "unsupported-event-type")
         seq = event.get("sequence_number")
