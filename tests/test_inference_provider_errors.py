@@ -26,9 +26,9 @@ def errors():
     return provider_errors
 
 
-FAKE = "sk-proj-SYNTHETICfakeKEYvalue0123456789abcdefSECRETtail"
+FAKE = "sk-proj-SYNTHETICfakeKEYvalue0123456789abcdefQz7Xw9"
 MASKED = SECRET[:8] + "*" * 20 + SECRET[-4:]
-FRAGMENTS = (SECRET, SECRET[:8], SECRET[-4:], FAKE, FAKE[:8], FAKE[-4:], "****", "secret")
+FRAGMENTS = (SECRET, MASKED, SECRET[:8] + "*", FAKE, FAKE[:12], FAKE[-6:], "****", "secret")
 
 
 def openai_error(code, message="details", kind="invalid_request_error"):
