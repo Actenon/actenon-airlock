@@ -33,6 +33,10 @@ SWALLOWED = (
     "~/src/actenon-audit/live-codex/1-baseline-v4-4 --live --authorized-usd 2"
 )
 MODEL = "gpt-5.5-2026-04-23"
+# Synthetic Anthropic-shaped values: right charset and an "sk-" prefix, so the
+# generic checks alone would accept them and send them to OpenAI.
+ANTHROPIC_API = "sk-ant-api03-" + "Zy9Xw8Vu7Ts6Rq5Po4Nm3Lk2Ji1Hg0Fe" * 3 + "-AbCdEfAA"
+ANTHROPIC_OAUTH = "sk-ant-oat01-" + "Qw2Er3Ty4Ui5Op6As7Df8Gh9Jk0Lz" * 3 + "-XcVbNmAA"
 
 
 @pytest.mark.parametrize(
@@ -50,6 +54,9 @@ MODEL = "gpt-5.5-2026-04-23"
         ("pk-" + "a" * 60, "unexpected-prefix"),
         ("sk-" + "a" * 30 + "/bin/python", "unexpected-characters"),
         ("scripted-codex-no-real-credential", "unexpected-prefix"),
+        (ANTHROPIC_API, "anthropic-key"),
+        (ANTHROPIC_OAUTH, "anthropic-key"),
+        ("SK-ANT-" + "a" * 40, "anthropic-key"),
     ],
 )
 def test_malformed_credentials_are_refused_locally(value, reason):
@@ -160,7 +167,7 @@ def run_live(env_key, tmp_path):
     return result, out
 
 
-@pytest.mark.parametrize("value", [SWALLOWED, "", None, "sk-short"])
+@pytest.mark.parametrize("value", [SWALLOWED, "", None, "sk-short", ANTHROPIC_API])
 def test_live_runner_refuses_bad_credentials_before_any_work(tmp_path, value):
     result, out = run_live(value, tmp_path)
     assert result.returncode != 0
@@ -169,3 +176,21 @@ def test_live_runner_refuses_bad_credentials_before_any_work(tmp_path, value):
     if value:
         assert value not in result.stdout + result.stderr
         assert "acceptance/codex-cli" not in result.stderr.split("refused", 1)[-1]
+
+
+def test_anthropic_key_is_refused_before_any_request(monkeypatch):
+    sent = []
+
+    def record(request):
+        sent.append(request)
+        return httpx.Response(401)
+
+    with pytest.raises(preflight.CredentialRefused, match="Anthropic") as refused:
+        preflight.supervisor_credential(ANTHROPIC_API)
+    assert ANTHROPIC_API not in str(refused.value) and ANTHROPIC_API[-8:] not in str(refused.value)
+    assert sent == []
+    # authenticate() itself also refuses, so no caller can send it to OpenAI.
+    client = httpx.Client(transport=httpx.MockTransport(record))
+    with pytest.raises(preflight.CredentialRefused, match="Anthropic"):
+        preflight.authenticate(ANTHROPIC_API, MODEL, client=client)
+    assert sent == []
