@@ -1,0 +1,297 @@
+* Creating isolated environment: venv+pip...
+* Installing packages in isolated environment:
+  - setuptools>=77
+  - wheel
+* Getting build dependencies for sdist...
+running egg_info
+writing src/actenon_airlock.egg-info/PKG-INFO
+writing dependency_links to src/actenon_airlock.egg-info/dependency_links.txt
+writing entry points to src/actenon_airlock.egg-info/entry_points.txt
+writing requirements to src/actenon_airlock.egg-info/requires.txt
+writing top-level names to src/actenon_airlock.egg-info/top_level.txt
+reading manifest file 'src/actenon_airlock.egg-info/SOURCES.txt'
+reading manifest template 'MANIFEST.in'
+adding license file 'LICENSE'
+writing manifest file 'src/actenon_airlock.egg-info/SOURCES.txt'
+* Installed build dependency versions:
+  - setuptools==84.2.1
+  - wheel==0.48.0
+* Building sdist...
+running sdist
+running egg_info
+writing src/actenon_airlock.egg-info/PKG-INFO
+writing dependency_links to src/actenon_airlock.egg-info/dependency_links.txt
+writing entry points to src/actenon_airlock.egg-info/entry_points.txt
+writing requirements to src/actenon_airlock.egg-info/requires.txt
+writing top-level names to src/actenon_airlock.egg-info/top_level.txt
+reading manifest file 'src/actenon_airlock.egg-info/SOURCES.txt'
+reading manifest template 'MANIFEST.in'
+adding license file 'LICENSE'
+writing manifest file 'src/actenon_airlock.egg-info/SOURCES.txt'
+running check
+creating actenon_airlock-0.1.0.dev0
+creating actenon_airlock-0.1.0.dev0/containers
+creating actenon_airlock-0.1.0.dev0/containers/claude-code
+creating actenon_airlock-0.1.0.dev0/containers/codex-cli
+creating actenon_airlock-0.1.0.dev0/src/actenon_airlock
+creating actenon_airlock-0.1.0.dev0/src/actenon_airlock.egg-info
+creating actenon_airlock-0.1.0.dev0/tests
+copying files to actenon_airlock-0.1.0.dev0...
+copying LICENSE -> actenon_airlock-0.1.0.dev0
+copying MANIFEST.in -> actenon_airlock-0.1.0.dev0
+copying README.md -> actenon_airlock-0.1.0.dev0
+copying pyproject.toml -> actenon_airlock-0.1.0.dev0
+copying containers/Dockerfile.claude-code -> actenon_airlock-0.1.0.dev0/containers
+copying containers/Dockerfile.codex-cli -> actenon_airlock-0.1.0.dev0/containers
+copying containers/Dockerfile.compute -> actenon_airlock-0.1.0.dev0/containers
+copying containers/claude-code/package-lock.json -> actenon_airlock-0.1.0.dev0/containers/claude-code
+copying containers/claude-code/package.json -> actenon_airlock-0.1.0.dev0/containers/claude-code
+copying containers/codex-cli/install.py -> actenon_airlock-0.1.0.dev0/containers/codex-cli
+copying containers/codex-cli/upstream.json -> actenon_airlock-0.1.0.dev0/containers/codex-cli
+copying src/actenon_airlock/__init__.py -> actenon_airlock-0.1.0.dev0/src/actenon_airlock
+copying src/actenon_airlock/adapters.py -> actenon_airlock-0.1.0.dev0/src/actenon_airlock
+copying src/actenon_airlock/agent_inference.py -> actenon_airlock-0.1.0.dev0/src/actenon_airlock
+copying src/actenon_airlock/agents.py -> actenon_airlock-0.1.0.dev0/src/actenon_airlock
+copying src/actenon_airlock/broker.py -> actenon_airlock-0.1.0.dev0/src/actenon_airlock
+copying src/actenon_airlock/ciso_proof.py -> actenon_airlock-0.1.0.dev0/src/actenon_airlock
+copying src/actenon_airlock/cli.py -> actenon_airlock-0.1.0.dev0/src/actenon_airlock
+copying src/actenon_airlock/common.py -> actenon_airlock-0.1.0.dev0/src/actenon_airlock
+copying src/actenon_airlock/contained_agent.py -> actenon_airlock-0.1.0.dev0/src/actenon_airlock
+copying src/actenon_airlock/contained_bridge.py -> actenon_airlock-0.1.0.dev0/src/actenon_airlock
+copying src/actenon_airlock/demo.py -> actenon_airlock-0.1.0.dev0/src/actenon_airlock
+copying src/actenon_airlock/evidence.py -> actenon_airlock-0.1.0.dev0/src/actenon_airlock
+copying src/actenon_airlock/github_consequence.py -> actenon_airlock-0.1.0.dev0/src/actenon_airlock
+copying src/actenon_airlock/github_observer.py -> actenon_airlock-0.1.0.dev0/src/actenon_airlock
+copying src/actenon_airlock/github_runtime.py -> actenon_airlock-0.1.0.dev0/src/actenon_airlock
+copying src/actenon_airlock/manifest.py -> actenon_airlock-0.1.0.dev0/src/actenon_airlock
+copying src/actenon_airlock/model_constraints.py -> actenon_airlock-0.1.0.dev0/src/actenon_airlock
+copying src/actenon_airlock/protect.py -> actenon_airlock-0.1.0.dev0/src/actenon_airlock
+copying src/actenon_airlock/protected.py -> actenon_airlock-0.1.0.dev0/src/actenon_airlock
+copying src/actenon_airlock/reconciliation.py -> actenon_airlock-0.1.0.dev0/src/actenon_airlock
+copying src/actenon_airlock/recovery.py -> actenon_airlock-0.1.0.dev0/src/actenon_airlock
+copying src/actenon_airlock/responses_inference.py -> actenon_airlock-0.1.0.dev0/src/actenon_airlock
+copying src/actenon_airlock/responses_observatory.py -> actenon_airlock-0.1.0.dev0/src/actenon_airlock
+copying src/actenon_airlock/state.py -> actenon_airlock-0.1.0.dev0/src/actenon_airlock
+copying src/actenon_airlock/synthetic_anthropic.py -> actenon_airlock-0.1.0.dev0/src/actenon_airlock
+copying src/actenon_airlock/synthetic_github.py -> actenon_airlock-0.1.0.dev0/src/actenon_airlock
+copying src/actenon_airlock/wire.py -> actenon_airlock-0.1.0.dev0/src/actenon_airlock
+copying src/actenon_airlock/worker.py -> actenon_airlock-0.1.0.dev0/src/actenon_airlock
+copying src/actenon_airlock/workflow.py -> actenon_airlock-0.1.0.dev0/src/actenon_airlock
+copying src/actenon_airlock.egg-info/PKG-INFO -> actenon_airlock-0.1.0.dev0/src/actenon_airlock.egg-info
+copying src/actenon_airlock.egg-info/SOURCES.txt -> actenon_airlock-0.1.0.dev0/src/actenon_airlock.egg-info
+copying src/actenon_airlock.egg-info/dependency_links.txt -> actenon_airlock-0.1.0.dev0/src/actenon_airlock.egg-info
+copying src/actenon_airlock.egg-info/entry_points.txt -> actenon_airlock-0.1.0.dev0/src/actenon_airlock.egg-info
+copying src/actenon_airlock.egg-info/requires.txt -> actenon_airlock-0.1.0.dev0/src/actenon_airlock.egg-info
+copying src/actenon_airlock.egg-info/top_level.txt -> actenon_airlock-0.1.0.dev0/src/actenon_airlock.egg-info
+copying tests/test_acceptance_v2_classification.py -> actenon_airlock-0.1.0.dev0/tests
+copying tests/test_adapters.py -> actenon_airlock-0.1.0.dev0/tests
+copying tests/test_agent_inference.py -> actenon_airlock-0.1.0.dev0/tests
+copying tests/test_authority.py -> actenon_airlock-0.1.0.dev0/tests
+copying tests/test_broker.py -> actenon_airlock-0.1.0.dev0/tests
+copying tests/test_candidate_admission.py -> actenon_airlock-0.1.0.dev0/tests
+copying tests/test_ci.py -> actenon_airlock-0.1.0.dev0/tests
+copying tests/test_ciso_unicorn_proof.py -> actenon_airlock-0.1.0.dev0/tests
+copying tests/test_claude_code_acceptance.py -> actenon_airlock-0.1.0.dev0/tests
+copying tests/test_claude_code_container.py -> actenon_airlock-0.1.0.dev0/tests
+copying tests/test_codex_acceptance.py -> actenon_airlock-0.1.0.dev0/tests
+copying tests/test_codex_container.py -> actenon_airlock-0.1.0.dev0/tests
+copying tests/test_container_mounts.py -> actenon_airlock-0.1.0.dev0/tests
+copying tests/test_effect_durability.py -> actenon_airlock-0.1.0.dev0/tests
+copying tests/test_github_approval.py -> actenon_airlock-0.1.0.dev0/tests
+copying tests/test_github_consequence.py -> actenon_airlock-0.1.0.dev0/tests
+copying tests/test_github_container.py -> actenon_airlock-0.1.0.dev0/tests
+copying tests/test_github_observer.py -> actenon_airlock-0.1.0.dev0/tests
+copying tests/test_github_observer_cli.py -> actenon_airlock-0.1.0.dev0/tests
+copying tests/test_github_protected_integration.py -> actenon_airlock-0.1.0.dev0/tests
+copying tests/test_guided_workflow.py -> actenon_airlock-0.1.0.dev0/tests
+copying tests/test_http_effects.py -> actenon_airlock-0.1.0.dev0/tests
+copying tests/test_independent_authority.py -> actenon_airlock-0.1.0.dev0/tests
+copying tests/test_independent_canonical.py -> actenon_airlock-0.1.0.dev0/tests
+copying tests/test_independent_container.py -> actenon_airlock-0.1.0.dev0/tests
+copying tests/test_independent_headers.py -> actenon_airlock-0.1.0.dev0/tests
+copying tests/test_independent_recovery.py -> actenon_airlock-0.1.0.dev0/tests
+copying tests/test_launcher.py -> actenon_airlock-0.1.0.dev0/tests
+copying tests/test_legacy_upgrade.py -> actenon_airlock-0.1.0.dev0/tests
+copying tests/test_local_effects.py -> actenon_airlock-0.1.0.dev0/tests
+copying tests/test_model_endpoints.py -> actenon_airlock-0.1.0.dev0/tests
+copying tests/test_model_repeat.py -> actenon_airlock-0.1.0.dev0/tests
+copying tests/test_model_timeouts.py -> actenon_airlock-0.1.0.dev0/tests
+copying tests/test_offline_evidence.py -> actenon_airlock-0.1.0.dev0/tests
+copying tests/test_protect.py -> actenon_airlock-0.1.0.dev0/tests
+copying tests/test_protected.py -> actenon_airlock-0.1.0.dev0/tests
+copying tests/test_protected_provider_authority.py -> actenon_airlock-0.1.0.dev0/tests
+copying tests/test_provider_sdks.py -> actenon_airlock-0.1.0.dev0/tests
+copying tests/test_receipt_concurrency.py -> actenon_airlock-0.1.0.dev0/tests
+copying tests/test_receipt_prefix_cache.py -> actenon_airlock-0.1.0.dev0/tests
+copying tests/test_reconciliation.py -> actenon_airlock-0.1.0.dev0/tests
+copying tests/test_release_workflow.py -> actenon_airlock-0.1.0.dev0/tests
+copying tests/test_response_schema_compatibility.py -> actenon_airlock-0.1.0.dev0/tests
+copying tests/test_responses_image.py -> actenon_airlock-0.1.0.dev0/tests
+copying tests/test_responses_inference.py -> actenon_airlock-0.1.0.dev0/tests
+copying tests/test_responses_live_metadata.py -> actenon_airlock-0.1.0.dev0/tests
+copying tests/test_responses_observation.py -> actenon_airlock-0.1.0.dev0/tests
+copying tests/test_responses_observatory.py -> actenon_airlock-0.1.0.dev0/tests
+copying tests/test_responses_tool_echo.py -> actenon_airlock-0.1.0.dev0/tests
+copying tests/test_source_identity.py -> actenon_airlock-0.1.0.dev0/tests
+copying tests/test_supervisor_attack_surface.py -> actenon_airlock-0.1.0.dev0/tests
+Writing actenon_airlock-0.1.0.dev0/setup.cfg
+Creating tar archive
+removing 'actenon_airlock-0.1.0.dev0' (and everything under it)
+* Building wheel from sdist
+* Creating isolated environment: venv+pip...
+* Installing packages in isolated environment:
+  - setuptools>=77
+  - wheel
+* Getting build dependencies for wheel...
+running egg_info
+writing src/actenon_airlock.egg-info/PKG-INFO
+writing dependency_links to src/actenon_airlock.egg-info/dependency_links.txt
+writing entry points to src/actenon_airlock.egg-info/entry_points.txt
+writing requirements to src/actenon_airlock.egg-info/requires.txt
+writing top-level names to src/actenon_airlock.egg-info/top_level.txt
+reading manifest file 'src/actenon_airlock.egg-info/SOURCES.txt'
+reading manifest template 'MANIFEST.in'
+adding license file 'LICENSE'
+writing manifest file 'src/actenon_airlock.egg-info/SOURCES.txt'
+* Installed build dependency versions:
+  - setuptools==84.2.1
+  - wheel==0.48.0
+* Building wheel...
+running bdist_wheel
+running build
+running build_py
+creating build/lib/actenon_airlock
+copying src/actenon_airlock/github_consequence.py -> build/lib/actenon_airlock
+copying src/actenon_airlock/worker.py -> build/lib/actenon_airlock
+copying src/actenon_airlock/github_observer.py -> build/lib/actenon_airlock
+copying src/actenon_airlock/recovery.py -> build/lib/actenon_airlock
+copying src/actenon_airlock/responses_observatory.py -> build/lib/actenon_airlock
+copying src/actenon_airlock/manifest.py -> build/lib/actenon_airlock
+copying src/actenon_airlock/reconciliation.py -> build/lib/actenon_airlock
+copying src/actenon_airlock/agent_inference.py -> build/lib/actenon_airlock
+copying src/actenon_airlock/model_constraints.py -> build/lib/actenon_airlock
+copying src/actenon_airlock/responses_inference.py -> build/lib/actenon_airlock
+copying src/actenon_airlock/protected.py -> build/lib/actenon_airlock
+copying src/actenon_airlock/__init__.py -> build/lib/actenon_airlock
+copying src/actenon_airlock/github_runtime.py -> build/lib/actenon_airlock
+copying src/actenon_airlock/agents.py -> build/lib/actenon_airlock
+copying src/actenon_airlock/synthetic_anthropic.py -> build/lib/actenon_airlock
+copying src/actenon_airlock/wire.py -> build/lib/actenon_airlock
+copying src/actenon_airlock/cli.py -> build/lib/actenon_airlock
+copying src/actenon_airlock/common.py -> build/lib/actenon_airlock
+copying src/actenon_airlock/protect.py -> build/lib/actenon_airlock
+copying src/actenon_airlock/contained_agent.py -> build/lib/actenon_airlock
+copying src/actenon_airlock/contained_bridge.py -> build/lib/actenon_airlock
+copying src/actenon_airlock/ciso_proof.py -> build/lib/actenon_airlock
+copying src/actenon_airlock/workflow.py -> build/lib/actenon_airlock
+copying src/actenon_airlock/broker.py -> build/lib/actenon_airlock
+copying src/actenon_airlock/demo.py -> build/lib/actenon_airlock
+copying src/actenon_airlock/synthetic_github.py -> build/lib/actenon_airlock
+copying src/actenon_airlock/evidence.py -> build/lib/actenon_airlock
+copying src/actenon_airlock/state.py -> build/lib/actenon_airlock
+copying src/actenon_airlock/adapters.py -> build/lib/actenon_airlock
+running egg_info
+writing src/actenon_airlock.egg-info/PKG-INFO
+writing dependency_links to src/actenon_airlock.egg-info/dependency_links.txt
+writing entry points to src/actenon_airlock.egg-info/entry_points.txt
+writing requirements to src/actenon_airlock.egg-info/requires.txt
+writing top-level names to src/actenon_airlock.egg-info/top_level.txt
+reading manifest file 'src/actenon_airlock.egg-info/SOURCES.txt'
+reading manifest template 'MANIFEST.in'
+adding license file 'LICENSE'
+writing manifest file 'src/actenon_airlock.egg-info/SOURCES.txt'
+installing to build/bdist.macosx-11.0-arm64/wheel
+running install
+running install_lib
+creating build/bdist.macosx-11.0-arm64/wheel
+creating build/bdist.macosx-11.0-arm64/wheel/actenon_airlock
+copying build/lib/actenon_airlock/github_consequence.py -> build/bdist.macosx-11.0-arm64/wheel/./actenon_airlock
+copying build/lib/actenon_airlock/worker.py -> build/bdist.macosx-11.0-arm64/wheel/./actenon_airlock
+copying build/lib/actenon_airlock/github_observer.py -> build/bdist.macosx-11.0-arm64/wheel/./actenon_airlock
+copying build/lib/actenon_airlock/recovery.py -> build/bdist.macosx-11.0-arm64/wheel/./actenon_airlock
+copying build/lib/actenon_airlock/responses_observatory.py -> build/bdist.macosx-11.0-arm64/wheel/./actenon_airlock
+copying build/lib/actenon_airlock/manifest.py -> build/bdist.macosx-11.0-arm64/wheel/./actenon_airlock
+copying build/lib/actenon_airlock/reconciliation.py -> build/bdist.macosx-11.0-arm64/wheel/./actenon_airlock
+copying build/lib/actenon_airlock/agent_inference.py -> build/bdist.macosx-11.0-arm64/wheel/./actenon_airlock
+copying build/lib/actenon_airlock/model_constraints.py -> build/bdist.macosx-11.0-arm64/wheel/./actenon_airlock
+copying build/lib/actenon_airlock/responses_inference.py -> build/bdist.macosx-11.0-arm64/wheel/./actenon_airlock
+copying build/lib/actenon_airlock/protected.py -> build/bdist.macosx-11.0-arm64/wheel/./actenon_airlock
+copying build/lib/actenon_airlock/__init__.py -> build/bdist.macosx-11.0-arm64/wheel/./actenon_airlock
+copying build/lib/actenon_airlock/github_runtime.py -> build/bdist.macosx-11.0-arm64/wheel/./actenon_airlock
+copying build/lib/actenon_airlock/agents.py -> build/bdist.macosx-11.0-arm64/wheel/./actenon_airlock
+copying build/lib/actenon_airlock/synthetic_anthropic.py -> build/bdist.macosx-11.0-arm64/wheel/./actenon_airlock
+copying build/lib/actenon_airlock/wire.py -> build/bdist.macosx-11.0-arm64/wheel/./actenon_airlock
+copying build/lib/actenon_airlock/cli.py -> build/bdist.macosx-11.0-arm64/wheel/./actenon_airlock
+copying build/lib/actenon_airlock/common.py -> build/bdist.macosx-11.0-arm64/wheel/./actenon_airlock
+copying build/lib/actenon_airlock/protect.py -> build/bdist.macosx-11.0-arm64/wheel/./actenon_airlock
+copying build/lib/actenon_airlock/contained_agent.py -> build/bdist.macosx-11.0-arm64/wheel/./actenon_airlock
+copying build/lib/actenon_airlock/contained_bridge.py -> build/bdist.macosx-11.0-arm64/wheel/./actenon_airlock
+copying build/lib/actenon_airlock/ciso_proof.py -> build/bdist.macosx-11.0-arm64/wheel/./actenon_airlock
+copying build/lib/actenon_airlock/workflow.py -> build/bdist.macosx-11.0-arm64/wheel/./actenon_airlock
+copying build/lib/actenon_airlock/broker.py -> build/bdist.macosx-11.0-arm64/wheel/./actenon_airlock
+copying build/lib/actenon_airlock/demo.py -> build/bdist.macosx-11.0-arm64/wheel/./actenon_airlock
+copying build/lib/actenon_airlock/synthetic_github.py -> build/bdist.macosx-11.0-arm64/wheel/./actenon_airlock
+copying build/lib/actenon_airlock/evidence.py -> build/bdist.macosx-11.0-arm64/wheel/./actenon_airlock
+copying build/lib/actenon_airlock/state.py -> build/bdist.macosx-11.0-arm64/wheel/./actenon_airlock
+copying build/lib/actenon_airlock/adapters.py -> build/bdist.macosx-11.0-arm64/wheel/./actenon_airlock
+running install_data
+creating build/bdist.macosx-11.0-arm64/wheel/actenon_airlock-0.1.0.dev0.data/data
+creating build/bdist.macosx-11.0-arm64/wheel/actenon_airlock-0.1.0.dev0.data/data/share/actenon-airlock/containers
+copying containers/Dockerfile.compute -> build/bdist.macosx-11.0-arm64/wheel/actenon_airlock-0.1.0.dev0.data/data/share/actenon-airlock/containers
+copying containers/Dockerfile.claude-code -> build/bdist.macosx-11.0-arm64/wheel/actenon_airlock-0.1.0.dev0.data/data/share/actenon-airlock/containers
+copying containers/Dockerfile.codex-cli -> build/bdist.macosx-11.0-arm64/wheel/actenon_airlock-0.1.0.dev0.data/data/share/actenon-airlock/containers
+creating build/bdist.macosx-11.0-arm64/wheel/actenon_airlock-0.1.0.dev0.data/data/share/actenon-airlock/containers/claude-code
+copying containers/claude-code/package.json -> build/bdist.macosx-11.0-arm64/wheel/actenon_airlock-0.1.0.dev0.data/data/share/actenon-airlock/containers/claude-code
+copying containers/claude-code/package-lock.json -> build/bdist.macosx-11.0-arm64/wheel/actenon_airlock-0.1.0.dev0.data/data/share/actenon-airlock/containers/claude-code
+creating build/bdist.macosx-11.0-arm64/wheel/actenon_airlock-0.1.0.dev0.data/data/share/actenon-airlock/containers/codex-cli
+copying containers/codex-cli/install.py -> build/bdist.macosx-11.0-arm64/wheel/actenon_airlock-0.1.0.dev0.data/data/share/actenon-airlock/containers/codex-cli
+copying containers/codex-cli/upstream.json -> build/bdist.macosx-11.0-arm64/wheel/actenon_airlock-0.1.0.dev0.data/data/share/actenon-airlock/containers/codex-cli
+running install_egg_info
+Copying src/actenon_airlock.egg-info to build/bdist.macosx-11.0-arm64/wheel/./actenon_airlock-0.1.0.dev0-py3.12.egg-info
+running install_scripts
+creating build/bdist.macosx-11.0-arm64/wheel/actenon_airlock-0.1.0.dev0.dist-info/WHEEL
+creating '/Users/ross/Documents/Codex/2026-11-03/actenon-airlock-v4-live-response-schema/work/v44/verified-dist/.tmp-3usy8eqq/actenon_airlock-0.1.0.dev0-py3-none-any.whl' and adding 'build/bdist.macosx-11.0-arm64/wheel' to it
+adding 'actenon_airlock/__init__.py'
+adding 'actenon_airlock/adapters.py'
+adding 'actenon_airlock/agent_inference.py'
+adding 'actenon_airlock/agents.py'
+adding 'actenon_airlock/broker.py'
+adding 'actenon_airlock/ciso_proof.py'
+adding 'actenon_airlock/cli.py'
+adding 'actenon_airlock/common.py'
+adding 'actenon_airlock/contained_agent.py'
+adding 'actenon_airlock/contained_bridge.py'
+adding 'actenon_airlock/demo.py'
+adding 'actenon_airlock/evidence.py'
+adding 'actenon_airlock/github_consequence.py'
+adding 'actenon_airlock/github_observer.py'
+adding 'actenon_airlock/github_runtime.py'
+adding 'actenon_airlock/manifest.py'
+adding 'actenon_airlock/model_constraints.py'
+adding 'actenon_airlock/protect.py'
+adding 'actenon_airlock/protected.py'
+adding 'actenon_airlock/reconciliation.py'
+adding 'actenon_airlock/recovery.py'
+adding 'actenon_airlock/responses_inference.py'
+adding 'actenon_airlock/responses_observatory.py'
+adding 'actenon_airlock/state.py'
+adding 'actenon_airlock/synthetic_anthropic.py'
+adding 'actenon_airlock/synthetic_github.py'
+adding 'actenon_airlock/wire.py'
+adding 'actenon_airlock/worker.py'
+adding 'actenon_airlock/workflow.py'
+adding 'actenon_airlock-0.1.0.dev0.data/data/share/actenon-airlock/containers/Dockerfile.claude-code'
+adding 'actenon_airlock-0.1.0.dev0.data/data/share/actenon-airlock/containers/Dockerfile.codex-cli'
+adding 'actenon_airlock-0.1.0.dev0.data/data/share/actenon-airlock/containers/Dockerfile.compute'
+adding 'actenon_airlock-0.1.0.dev0.data/data/share/actenon-airlock/containers/claude-code/package-lock.json'
+adding 'actenon_airlock-0.1.0.dev0.data/data/share/actenon-airlock/containers/claude-code/package.json'
+adding 'actenon_airlock-0.1.0.dev0.data/data/share/actenon-airlock/containers/codex-cli/install.py'
+adding 'actenon_airlock-0.1.0.dev0.data/data/share/actenon-airlock/containers/codex-cli/upstream.json'
+adding 'actenon_airlock-0.1.0.dev0.dist-info/licenses/LICENSE'
+adding 'actenon_airlock-0.1.0.dev0.dist-info/METADATA'
+adding 'actenon_airlock-0.1.0.dev0.dist-info/WHEEL'
+adding 'actenon_airlock-0.1.0.dev0.dist-info/entry_points.txt'
+adding 'actenon_airlock-0.1.0.dev0.dist-info/top_level.txt'
+adding 'actenon_airlock-0.1.0.dev0.dist-info/RECORD'
+removing build/bdist.macosx-11.0-arm64/wheel
+Successfully built actenon_airlock-0.1.0.dev0.tar.gz and actenon_airlock-0.1.0.dev0-py3-none-any.whl

@@ -1,0 +1,96 @@
+{
+  "original_commit": "61d8bf190107d84cf6c0eb9c06dfd0bbd0f4a7de",
+  "billing": "Synthetic reviewed-price accounting; no provider billing.",
+  "original_null": {
+    "first_outcome": "AMBIGUOUS",
+    "after_first_microusd": 501335,
+    "second_ok": false,
+    "second_outcome": null,
+    "second_reason": "Model spend bound reached for this run",
+    "replay_refused": true,
+    "dispatched": 1,
+    "total_accounted_microusd": 501335,
+    "integrity_ok": true,
+    "observations": [
+      {
+        "inference_reserved_microusd": 501335,
+        "inference_cost_microusd": 501335,
+        "inference_usage": null,
+        "outcome": "AMBIGUOUS"
+      }
+    ]
+  },
+  "repaired_null": {
+    "first_outcome": "COMMITTED",
+    "after_first_microusd": 1055,
+    "second_ok": true,
+    "second_outcome": "COMMITTED",
+    "second_reason": null,
+    "replay_refused": false,
+    "dispatched": 2,
+    "total_accounted_microusd": 2110,
+    "integrity_ok": true,
+    "observations": [
+      {
+        "inference_reserved_microusd": 501335,
+        "inference_cost_microusd": 1055,
+        "inference_usage": {
+          "cache_creation_input_tokens": 0,
+          "cache_read_input_tokens": 10,
+          "input_tokens": 90,
+          "output_tokens": 20
+        },
+        "outcome": "COMMITTED"
+      },
+      {
+        "inference_reserved_microusd": 501465,
+        "inference_cost_microusd": 1055,
+        "inference_usage": {
+          "cache_creation_input_tokens": 0,
+          "cache_read_input_tokens": 10,
+          "input_tokens": 90,
+          "output_tokens": 20
+        },
+        "outcome": "COMMITTED"
+      }
+    ]
+  },
+  "repaired_populated": {
+    "first_outcome": "AMBIGUOUS",
+    "after_first_microusd": 501335,
+    "second_ok": false,
+    "second_outcome": null,
+    "second_reason": "Model spend bound reached for this run",
+    "replay_refused": true,
+    "dispatched": 1,
+    "total_accounted_microusd": 501335,
+    "integrity_ok": true,
+    "observations": [
+      {
+        "inference_reserved_microusd": 501335,
+        "inference_cost_microusd": 501335,
+        "inference_usage": null,
+        "outcome": "AMBIGUOUS"
+      }
+    ]
+  },
+  "repaired_partial": {
+    "first_outcome": "AMBIGUOUS",
+    "after_first_microusd": 501335,
+    "second_ok": false,
+    "second_outcome": null,
+    "second_reason": "Model spend bound reached for this run",
+    "replay_refused": true,
+    "dispatched": 1,
+    "total_accounted_microusd": 501335,
+    "integrity_ok": true,
+    "observations": [
+      {
+        "inference_reserved_microusd": 501335,
+        "inference_cost_microusd": 501335,
+        "inference_usage": null,
+        "outcome": "AMBIGUOUS"
+      }
+    ]
+  }
+}

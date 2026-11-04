@@ -1,0 +1,23 @@
+{
+  "emergency_stop": null,
+  "integrity_ok": true,
+  "receipts": 3,
+  "completeness": "UNANCHORED",
+  "refused": 0,
+  "refusal_reasons": [],
+  "independently_observed": {},
+  "runtime_claims": {},
+  "unresolved_effects": [
+    "effect_2bb3a6c684b120f1c5ebba46fab4acd30469013fedd879ebadffbc49c97130ba"
+  ],
+  "inference": {
+    "dispatched": 1,
+    "confirmed": 0,
+    "unconfirmed": 1,
+    "retries_held": 0
+  },
+  "model_spend": {
+    "estimated_microusd": 680010,
+    "declined_calls": 0
+  }
+}

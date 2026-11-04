@@ -4,10 +4,21 @@ from __future__ import annotations
 
 import hashlib
 import json
+import os
 import re
 from urllib.parse import unquote, urlsplit
 
 SECRET_NAME = re.compile(r"token|secret|password|passwd|credential|api.?key|private.?key", re.I)
+
+
+# The only variables a trusted host subprocess (Docker client, git, scoring) needs.
+# Supervisor credentials, grant signing keys and everything else stay behind.
+HOST_ENVIRONMENT = ("HOME", "PATH", "TMPDIR", "DOCKER_CONFIG", "DOCKER_CONTEXT", "DOCKER_HOST")
+
+
+def host_environment() -> dict:
+    """An explicit environment for trusted host subprocesses; never inherit wholesale."""
+    return {name: os.environ[name] for name in HOST_ENVIRONMENT if name in os.environ}
 
 
 class AirlockError(RuntimeError):

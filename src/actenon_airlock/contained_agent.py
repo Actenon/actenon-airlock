@@ -165,8 +165,11 @@ def exchange(request, messages):
 
 
 def main():
-    os.makedirs("/workspace/.home", exist_ok=True)
+    # Existing tools persist workspace scratch artifacts here. Runtime HOME and
+    # TMPDIR remain in tmpfs, so agent caches never populate the project snapshot.
     os.makedirs("/workspace/.tmp", exist_ok=True)
+    os.makedirs("/tmp/home", exist_ok=True)
+    os.makedirs("/tmp/.codex", exist_ok=True)
     global MODEL_TARGETS
     with open("/airlock/model-targets.json", encoding="utf-8") as stream:
         MODEL_TARGETS = json.load(stream)

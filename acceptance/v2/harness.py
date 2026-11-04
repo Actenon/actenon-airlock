@@ -33,6 +33,7 @@ import urllib.request
 from pathlib import Path
 
 from actenon_airlock.agents import DECLARATION, SUPPORTED, command, declaration
+from actenon_airlock.common import host_environment
 from actenon_airlock.protected import snapshot
 
 HERE = Path(__file__).resolve().parent
@@ -179,7 +180,7 @@ def score(task: Path, workspace: Path) -> dict:
                  "--env", "PYTHONDONTWRITEBYTECODE=1", "--env", "PYTHONPATH=/work",
                  "--mount", f"type=bind,src={scored},dst=/work,readonly", "-w", "/work",
                  SCORING_IMAGE, "python3", "-m", "pytest", "-q", "-p", "no:cacheprovider", target],
-                capture_output=True, text=True, timeout=180,
+                capture_output=True, text=True, timeout=180, env=host_environment(),
             )  # fmt: skip
             summary = proc.stdout.strip().splitlines()[-1] if proc.stdout.strip() else ""
             return {"exit": proc.returncode, "summary": summary}

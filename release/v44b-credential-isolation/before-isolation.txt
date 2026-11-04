@@ -1,0 +1,149 @@
+FFF.FF..                                                                 [100%]
+=================================== FAILURES ===================================
+____ test_runner_identity_git_and_docker_do_not_inherit_supervisor_secrets _____
+
+probes = <function probes.<locals>.records at 0x10c34f9c0>
+
+    def test_runner_identity_git_and_docker_do_not_inherit_supervisor_secrets(probes):
+        runner = load_runner()
+        frozen = runner.identity("synthetic-image")
+        assert frozen["source_commit"] == "0" * 40  # the probe answered git
+>       assert_isolated(probes(), expect={"git", "docker"})
+
+tests/test_supervisor_credential_isolation.py:122: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+records = [{'tool': 'git', 'sub': ['rev-parse', 'HEAD'], 'env_hits': ['signing', 'supervisor'], 'arg_hits': [], ...}, {'tool': 'docker', 'sub': ['image', 'inspect'], 'env_hits': [], 'arg_hits': [], ...}]
+expect = {'docker', 'git'}
+
+    def assert_isolated(records, *, expect):
+        assert records, "the probe never ran"
+        assert {r["tool"] for r in records} >= expect
+        for record in records:
+>           assert record["env_hits"] == [], record["sub"]
+E           AssertionError: ['rev-parse', 'HEAD']
+E           assert ['signing', 'supervisor'] == []
+E             
+E             Left contains 2 more items, first extra item: 'signing'
+E             Use -v to get more diff
+
+tests/test_supervisor_credential_isolation.py:113: AssertionError
+__________ test_baseline_docker_client_gets_only_the_dummy_credential __________
+
+tmp_path = PosixPath('/private/var/folders/tz/y04t4d0900xdbmz96jp608180000gn/T/pytest-of-ross/pytest-33/test_baseline_docker_client_ge0')
+probes = <function probes.<locals>.records at 0x10c3dc4a0>
+
+    def test_baseline_docker_client_gets_only_the_dummy_credential(tmp_path, probes):
+        runner = load_runner()
+        project = tmp_path / "project"
+        shutil.copytree(ROOT / "acceptance/v2/tasks/token-bucket/repo", project)
+        with (tmp_path / "agent.log").open("w") as log:
+            code, _ = runner.baseline(project, "synthetic-image", log, _Gateway())
+        assert code == 0
+        records = probes()
+>       assert_isolated(records, expect={"docker"})
+
+tests/test_supervisor_credential_isolation.py:137: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+records = [{'tool': 'docker', 'sub': ['run', '--rm'], 'env_hits': ['signing', 'supervisor'], 'arg_hits': [], ...}, {'tool': 'docker', 'sub': ['rm', '-f'], 'env_hits': ['signing', 'supervisor'], 'arg_hits': [], ...}]
+expect = {'docker'}
+
+    def assert_isolated(records, *, expect):
+        assert records, "the probe never ran"
+        assert {r["tool"] for r in records} >= expect
+        for record in records:
+>           assert record["env_hits"] == [], record["sub"]
+E           AssertionError: ['run', '--rm']
+E           assert ['signing', 'supervisor'] == []
+E             
+E             Left contains 2 more items, first extra item: 'signing'
+E             Use -v to get more diff
+
+tests/test_supervisor_credential_isolation.py:113: AssertionError
+__________ test_scoring_containers_do_not_inherit_supervisor_secrets ___________
+
+tmp_path = PosixPath('/private/var/folders/tz/y04t4d0900xdbmz96jp608180000gn/T/pytest-of-ross/pytest-33/test_scoring_containers_do_not0')
+probes = <function probes.<locals>.records at 0x10c3dd120>
+
+    def test_scoring_containers_do_not_inherit_supervisor_secrets(tmp_path, probes):
+        runner = load_runner()
+        work = tmp_path / "work"
+        shutil.copytree(ROOT / "acceptance/v2/tasks/token-bucket/repo", work)
+        runner.scoring.SCORING_IMAGE = "synthetic-image"
+        runner.scoring.score(ROOT / "acceptance/v2/tasks/token-bucket", work)
+>       assert_isolated(probes(), expect={"docker"})
+
+tests/test_supervisor_credential_isolation.py:148: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+records = [{'tool': 'docker', 'sub': ['run', '--rm'], 'env_hits': ['signing', 'supervisor'], 'arg_hits': [], ...}, {'tool': 'docker', 'sub': ['run', '--rm'], 'env_hits': ['signing', 'supervisor'], 'arg_hits': [], ...}]
+expect = {'docker'}
+
+    def assert_isolated(records, *, expect):
+        assert records, "the probe never ran"
+        assert {r["tool"] for r in records} >= expect
+        for record in records:
+>           assert record["env_hits"] == [], record["sub"]
+E           AssertionError: ['run', '--rm']
+E           assert ['signing', 'supervisor'] == []
+E             
+E             Left contains 2 more items, first extra item: 'signing'
+E             Use -v to get more diff
+
+tests/test_supervisor_credential_isolation.py:113: AssertionError
+______ test_supervisor_scope_exposes_the_key_only_to_broker_construction _______
+
+tmp_path = PosixPath('/private/var/folders/tz/y04t4d0900xdbmz96jp608180000gn/T/pytest-of-ross/pytest-33/test_supervisor_scope_exposes_0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x10c30ff20>
+
+    def test_supervisor_scope_exposes_the_key_only_to_broker_construction(tmp_path, monkeypatch):
+        from test_responses_inference import configure, message
+    
+        from actenon_airlock import credential_preflight
+    
+        monkeypatch.delenv("OPENAI_API_KEY", raising=False)
+        state = configure(tmp_path)
+>       with credential_preflight.supervisor_scope("OPENAI_API_KEY", SUPERVISOR):
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AttributeError: module 'actenon_airlock.credential_preflight' has no attribute 'supervisor_scope'
+
+tests/test_supervisor_credential_isolation.py:163: AttributeError
+----------------------------- Captured stdout call -----------------------------
+AIRLOCK AUTHORITY DIFF
+
++ http.post @ api.openai.com/v1/responses
+  Transport: https://api.openai.com/v1/responses
+  Scope: POST to exactly https://api.openai.com/v1/responses
++ Model authority expanded: {"anthropic_betas": [], "contract": "openai-responses-agent/v1", "endpoint": "https://api.openai.com/v1/responses", "max_input_bytes": 200000, "max_output_tokens": 16000, "max_run_microusd": 5000000, "models": ["gpt-5.5"], "price_microusd_per_mtok": {"cache_read": 500000, "cache_write": 0, "input": 5000000, "output": 30000000}, "provider": "openai-responses", "read_timeout_seconds": 540}
+
+Runtime: BLOCKED UNTIL APPROVED
+
+Protected inference constraint (trusted only with --approve):
+{"anthropic_betas": [], "contract": "openai-responses-agent/v1", "endpoint": "https://api.openai.com/v1/responses", "max_input_bytes": 200000, "max_output_tokens": 16000, "max_run_microusd": 5000000, "models": ["gpt-5.5"], "price_microusd_per_mtok": {"cache_read": 500000, "cache_write": 0, "input": 5000000, "output": 30000000}, "provider": "openai-responses", "read_timeout_seconds": 540}
+
+Approved 1 powers. Unresolved powers remain blocked; their calls are denied at runtime with signed receipts.
+_______________ test_supervisor_scope_restores_a_previous_value ________________
+
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x10c4919a0>
+
+    def test_supervisor_scope_restores_a_previous_value(monkeypatch):
+        from actenon_airlock import credential_preflight
+    
+        monkeypatch.setenv("OPENAI_API_KEY", "previous-dummy")
+>       with credential_preflight.supervisor_scope("OPENAI_API_KEY", SUPERVISOR):
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AttributeError: module 'actenon_airlock.credential_preflight' has no attribute 'supervisor_scope'
+
+tests/test_supervisor_credential_isolation.py:191: AttributeError
+==================================== PASSES ====================================
+=========================== short test summary info ============================
+PASSED tests/test_supervisor_credential_isolation.py::test_protected_docker_client_environment_stays_allowlisted
+PASSED tests/test_supervisor_credential_isolation.py::test_protected_contained_agent_never_holds_the_supervisor_key
+PASSED tests/test_supervisor_credential_isolation.py::test_baseline_contained_agent_gets_only_the_dummy_credential
+FAILED tests/test_supervisor_credential_isolation.py::test_runner_identity_git_and_docker_do_not_inherit_supervisor_secrets
+FAILED tests/test_supervisor_credential_isolation.py::test_baseline_docker_client_gets_only_the_dummy_credential
+FAILED tests/test_supervisor_credential_isolation.py::test_scoring_containers_do_not_inherit_supervisor_secrets
+FAILED tests/test_supervisor_credential_isolation.py::test_supervisor_scope_exposes_the_key_only_to_broker_construction
+FAILED tests/test_supervisor_credential_isolation.py::test_supervisor_scope_restores_a_previous_value
+5 failed, 3 passed in 17.02s

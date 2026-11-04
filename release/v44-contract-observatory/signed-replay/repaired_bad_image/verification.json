@@ -1,0 +1,30 @@
+{
+  "schema": "actenon-airlock/offline-verification/v1",
+  "ok": true,
+  "integrity": {
+    "ok": true,
+    "receipts": 4,
+    "verified": 4,
+    "chain_head_sha256": "396c7ffe1dac6adc80cd8035553f9d0ef491679b8047557ff29bb1c6e69b245a",
+    "problems": []
+  },
+  "completeness": {
+    "status": "ANCHORED",
+    "detail": "extends a checkpoint of 4 entries; 0 later entries are not yet anchored",
+    "checkpoint": {
+      "schema": "actenon-airlock/journal-checkpoint/v1",
+      "journal_entries": 4,
+      "chain_head_sha256": "396c7ffe1dac6adc80cd8035553f9d0ef491679b8047557ff29bb1c6e69b245a",
+      "created_at": "2026-11-03T23:48:37.600543+00:00",
+      "signer_key_id": "ed25519-900055e73b3b"
+    }
+  },
+  "provider_truth": {
+    "independently_observed": {},
+    "runtime_claims": {},
+    "unresolved_ambiguous": [
+      "effect_214a72672e4402692470bd56ff9569ac2787585f6e91730e0059497c3f008b33"
+    ],
+    "refusals_without_effect": 1
+  }
+}

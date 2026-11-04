@@ -1,0 +1,27 @@
+{
+ "agent_exit": 1,
+ "provider_requests": 1,
+ "codex_saw_status_401": true,
+ "codex_saw_sanitized_message": false,
+ "observations": [
+  {
+   "rejection_reason": "http-status",
+   "http_status": null,
+   "provider_error_code": null,
+   "provider_error_type": null,
+   "provider_error_body": null
+  }
+ ],
+ "outcomes": [
+  "AMBIGUOUS"
+ ],
+ "files_scanned": 24,
+ "leaks": {
+  "console": [
+   "<43-char leak marker>",
+   "<32-char leak marker>",
+   "<10-char leak marker>",
+   "<4-char leak marker>"
+  ]
+ }
+}

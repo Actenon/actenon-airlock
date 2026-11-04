@@ -1,0 +1,91 @@
+{
+  "schema": "actenon-airlock/v44b-credential-isolation-validation/v1",
+  "starting_head": "5f880cecd4596891e8e9f40b96687735f71787d5",
+  "starting_head_ci": "41929384433 success (4/4)",
+  "tested_production_commit": "cf3d14a5a658429ac5342ce181ed8e27459f779a",
+  "source_digest": "a287d5dab6363aa57945bfe8db1bb603e8d7f227a4a1b431631509b0ca556735",
+  "source_digest_independent_reconstruction": "match",
+  "isolation_before": {
+    "commit": "43a5a80",
+    "tests": 8,
+    "failures": 5,
+    "errors": 0,
+    "skipped": 0
+  },
+  "isolation_after": {
+    "tests": 8,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  "full_airlock": {
+    "tests": 2048,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0,
+    "docker_server": "29.9.2",
+    "real_container_cases": 29
+  },
+  "scripted_valid_workflow": {
+    "baseline": "exit 0, 3+4 passes, 4/4 confirmed, 4220 uUSD, ANCHORED",
+    "protected": "exit 0, 3+4 passes, 4/4 confirmed, 4220 uUSD, ANCHORED"
+  },
+  "scripted_hook_controls": {
+    "baseline": {
+      "agent_exit": 0,
+      "runner_exit": 0,
+      "visible": "3 passed in 0.67s",
+      "hidden": "4 passed in 1.47s",
+      "inference": {
+        "dispatched": 4,
+        "confirmed": 4,
+        "unconfirmed": 0,
+        "retries_held": 0
+      },
+      "estimated_microusd": 4220,
+      "agent_canary_deliveries": 2,
+      "positive_control_status": 200,
+      "independent_verification": "ANCHORED ok"
+    },
+    "protected": {
+      "agent_exit": 0,
+      "runner_exit": 0,
+      "visible": "3 passed in 0.68s",
+      "hidden": "4 passed in 1.48s",
+      "inference": {
+        "dispatched": 4,
+        "confirmed": 4,
+        "unconfirmed": 0,
+        "retries_held": 0
+      },
+      "estimated_microusd": 4220,
+      "agent_canary_deliveries": 0,
+      "positive_control_status": 200,
+      "independent_verification": "ANCHORED ok"
+    }
+  },
+  "e2e_real_codex_401": {
+    "leaks": {},
+    "files_scanned": 24,
+    "signed_observation": {
+      "rejection_reason": "http-status",
+      "http_status": 401,
+      "provider_error_code": "invalid_api_key",
+      "provider_error_type": "invalid_request_error",
+      "provider_error_body": "json"
+    },
+    "outcomes": [
+      "AMBIGUOUS"
+    ]
+  },
+  "package_checks": {
+    "lint_ci_scope": true,
+    "format_ci_scope": true,
+    "wheel_sdist": true,
+    "clean_wheel_install": true,
+    "doctor": true,
+    "wheel_source_parity": true
+  },
+  "no_paid_inference": true,
+  "no_real_github_consequence": true
+}

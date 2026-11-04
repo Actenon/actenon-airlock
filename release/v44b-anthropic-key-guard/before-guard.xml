@@ -1,0 +1,114 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="0" failures="5" skipped="0" tests="30" time="1.079" timestamp="2026-11-04T23:28:10.241272+00:00" hostname="Rosss-MacBook-Air.local"><testcase classname="tests.test_credential_preflight" name="test_malformed_credentials_are_refused_locally[None-missing]" time="0.000" /><testcase classname="tests.test_credential_preflight" name="test_malformed_credentials_are_refused_locally[-empty]" time="0.000" /><testcase classname="tests.test_credential_preflight" name="test_malformed_credentials_are_refused_locally[.venv/bin/python acceptance/codex-cli/run.py baseline --task token-bucket --image sha256:c449dec52754bad2a55dea7bb7b1edfbf7a864475464c53edc8ad9489d9d2269 --config ~/src/actenon-audit/live-codex/v44-frozen-candidate.json --out ~/src/actenon-audit/live-codex/1-baseline-v4-4 --live --authorized-usd 2-whitespace]" time="0.000" /><testcase classname="tests.test_credential_preflight" name="test_malformed_credentials_are_refused_locally[ sk-proj-A1b2C3d4E5f6G7h8A1b2C3d4E5f6G7h8A1b2C3d4E5f6G7h8A1b2C3d4E5f6G7h8A1b2C3d4E5f6G7h8A1b2C3d4E5f6G7h8-whitespace]" time="0.000" /><testcase classname="tests.test_credential_preflight" name="test_malformed_credentials_are_refused_locally[sk-proj-A1b2C3d4E5f6G7h8A1b2C3d4E5f6G7h8A1b2C3d4E5f6G7h8A1b2C3d4E5f6G7h8A1b2C3d4E5f6G7h8A1b2C3d4E5f6G7h8\n-whitespace]" time="0.000" /><testcase classname="tests.test_credential_preflight" name="test_malformed_credentials_are_refused_locally[sk-proj-A1b2C3d4E5f6\x00G7h8A1b2C3d4E5f6G7h8A1b2C3d4E5f6G7h8A1b2C3d4E5f6G7h8A1b2C3d4E5f6G7h8A1b2C3d4E5f6G7h8-control-characters]" time="0.000" /><testcase classname="tests.test_credential_preflight" name="test_malformed_credentials_are_refused_locally[sk-proj-A1b2C3d4E5f6G7h8A1b2C3d4E5f6G7h8A1b2C3d4E5f6G7h8A1b2C3d4E5f6G7h8A1b2C3d4E5f6G7h8A1b2C3d4E5f6G7h8\xe9-non-ascii]" time="0.000" /><testcase classname="tests.test_credential_preflight" name="test_malformed_credentials_are_refused_locally[sk-short-too-short]" time="0.000" /><testcase classname="tests.test_credential_preflight" name="test_malformed_credentials_are_refused_locally[sk-aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa-too-long]" time="0.000" /><testcase classname="tests.test_credential_preflight" name="test_malformed_credentials_are_refused_locally[pk-aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa-unexpected-prefix]" time="0.000" /><testcase classname="tests.test_credential_preflight" name="test_malformed_credentials_are_refused_locally[sk-aaaaaaaaaaaaaaaaaaaaaaaaaaaaaa/bin/python-unexpected-characters]" time="0.000" /><testcase classname="tests.test_credential_preflight" name="test_malformed_credentials_are_refused_locally[scripted-codex-no-real-credential-unexpected-prefix]" time="0.000" /><testcase classname="tests.test_credential_preflight" name="test_malformed_credentials_are_refused_locally[sk-ant-api03-Zy9Xw8Vu7Ts6Rq5Po4Nm3Lk2Ji1Hg0FeZy9Xw8Vu7Ts6Rq5Po4Nm3Lk2Ji1Hg0FeZy9Xw8Vu7Ts6Rq5Po4Nm3Lk2Ji1Hg0Fe-AbCdEfAA-anthropic-key]" time="0.000"><failure message="AssertionError: assert 'anthropic-key' in []&#10; +  where [] = &lt;function format_problems at 0x10bcea2a0&gt;('sk-ant-api03-Zy9Xw8Vu7Ts6Rq5Po4Nm3Lk2Ji1Hg0FeZy9Xw8Vu7Ts6Rq5Po4Nm3Lk2Ji1Hg0FeZy9Xw8Vu7Ts6Rq5Po4Nm3Lk2Ji1Hg0Fe-AbCdEfAA')&#10; +    where &lt;function format_problems at 0x10bcea2a0&gt; = preflight.format_problems">value = 'sk-ant-api03-Zy9Xw8Vu7Ts6Rq5Po4Nm3Lk2Ji1Hg0FeZy9Xw8Vu7Ts6Rq5Po4Nm3Lk2Ji1Hg0FeZy9Xw8Vu7Ts6Rq5Po4Nm3Lk2Ji1Hg0Fe-AbCdEfAA'
+reason = 'anthropic-key'
+
+    @pytest.mark.parametrize(
+        "value,reason",
+        [
+            (None, "missing"),
+            ("", "empty"),
+            (SWALLOWED, "whitespace"),
+            (" " + GOOD, "whitespace"),
+            (GOOD + "\n", "whitespace"),
+            (GOOD[:20] + "\x00" + GOOD[20:], "control-characters"),
+            (GOOD + "é", "non-ascii"),
+            ("sk-short", "too-short"),
+            ("sk-" + "a" * 600, "too-long"),
+            ("pk-" + "a" * 60, "unexpected-prefix"),
+            ("sk-" + "a" * 30 + "/bin/python", "unexpected-characters"),
+            ("scripted-codex-no-real-credential", "unexpected-prefix"),
+            (ANTHROPIC_API, "anthropic-key"),
+            (ANTHROPIC_OAUTH, "anthropic-key"),
+            ("SK-ANT-" + "a" * 40, "anthropic-key"),
+        ],
+    )
+    def test_malformed_credentials_are_refused_locally(value, reason):
+&gt;       assert reason in preflight.format_problems(value)
+E       AssertionError: assert 'anthropic-key' in []
+E        +  where [] = &lt;function format_problems at 0x10bcea2a0&gt;('sk-ant-api03-Zy9Xw8Vu7Ts6Rq5Po4Nm3Lk2Ji1Hg0FeZy9Xw8Vu7Ts6Rq5Po4Nm3Lk2Ji1Hg0FeZy9Xw8Vu7Ts6Rq5Po4Nm3Lk2Ji1Hg0Fe-AbCdEfAA')
+E        +    where &lt;function format_problems at 0x10bcea2a0&gt; = preflight.format_problems
+
+tests/test_credential_preflight.py:63: AssertionError</failure></testcase><testcase classname="tests.test_credential_preflight" name="test_malformed_credentials_are_refused_locally[sk-ant-oat01-Qw2Er3Ty4Ui5Op6As7Df8Gh9Jk0LzQw2Er3Ty4Ui5Op6As7Df8Gh9Jk0LzQw2Er3Ty4Ui5Op6As7Df8Gh9Jk0Lz-XcVbNmAA-anthropic-key]" time="0.000"><failure message="AssertionError: assert 'anthropic-key' in []&#10; +  where [] = &lt;function format_problems at 0x10bcea2a0&gt;('sk-ant-oat01-Qw2Er3Ty4Ui5Op6As7Df8Gh9Jk0LzQw2Er3Ty4Ui5Op6As7Df8Gh9Jk0LzQw2Er3Ty4Ui5Op6As7Df8Gh9Jk0Lz-XcVbNmAA')&#10; +    where &lt;function format_problems at 0x10bcea2a0&gt; = preflight.format_problems">value = 'sk-ant-oat01-Qw2Er3Ty4Ui5Op6As7Df8Gh9Jk0LzQw2Er3Ty4Ui5Op6As7Df8Gh9Jk0LzQw2Er3Ty4Ui5Op6As7Df8Gh9Jk0Lz-XcVbNmAA'
+reason = 'anthropic-key'
+
+    @pytest.mark.parametrize(
+        "value,reason",
+        [
+            (None, "missing"),
+            ("", "empty"),
+            (SWALLOWED, "whitespace"),
+            (" " + GOOD, "whitespace"),
+            (GOOD + "\n", "whitespace"),
+            (GOOD[:20] + "\x00" + GOOD[20:], "control-characters"),
+            (GOOD + "é", "non-ascii"),
+            ("sk-short", "too-short"),
+            ("sk-" + "a" * 600, "too-long"),
+            ("pk-" + "a" * 60, "unexpected-prefix"),
+            ("sk-" + "a" * 30 + "/bin/python", "unexpected-characters"),
+            ("scripted-codex-no-real-credential", "unexpected-prefix"),
+            (ANTHROPIC_API, "anthropic-key"),
+            (ANTHROPIC_OAUTH, "anthropic-key"),
+            ("SK-ANT-" + "a" * 40, "anthropic-key"),
+        ],
+    )
+    def test_malformed_credentials_are_refused_locally(value, reason):
+&gt;       assert reason in preflight.format_problems(value)
+E       AssertionError: assert 'anthropic-key' in []
+E        +  where [] = &lt;function format_problems at 0x10bcea2a0&gt;('sk-ant-oat01-Qw2Er3Ty4Ui5Op6As7Df8Gh9Jk0LzQw2Er3Ty4Ui5Op6As7Df8Gh9Jk0LzQw2Er3Ty4Ui5Op6As7Df8Gh9Jk0Lz-XcVbNmAA')
+E        +    where &lt;function format_problems at 0x10bcea2a0&gt; = preflight.format_problems
+
+tests/test_credential_preflight.py:63: AssertionError</failure></testcase><testcase classname="tests.test_credential_preflight" name="test_malformed_credentials_are_refused_locally[SK-ANT-aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa-anthropic-key]" time="0.000"><failure message="AssertionError: assert 'anthropic-key' in ['unexpected-prefix']&#10; +  where ['unexpected-prefix'] = &lt;function format_problems at 0x10bcea2a0&gt;('SK-ANT-aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa')&#10; +    where &lt;function format_problems at 0x10bcea2a0&gt; = preflight.format_problems">value = 'SK-ANT-aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa'
+reason = 'anthropic-key'
+
+    @pytest.mark.parametrize(
+        "value,reason",
+        [
+            (None, "missing"),
+            ("", "empty"),
+            (SWALLOWED, "whitespace"),
+            (" " + GOOD, "whitespace"),
+            (GOOD + "\n", "whitespace"),
+            (GOOD[:20] + "\x00" + GOOD[20:], "control-characters"),
+            (GOOD + "é", "non-ascii"),
+            ("sk-short", "too-short"),
+            ("sk-" + "a" * 600, "too-long"),
+            ("pk-" + "a" * 60, "unexpected-prefix"),
+            ("sk-" + "a" * 30 + "/bin/python", "unexpected-characters"),
+            ("scripted-codex-no-real-credential", "unexpected-prefix"),
+            (ANTHROPIC_API, "anthropic-key"),
+            (ANTHROPIC_OAUTH, "anthropic-key"),
+            ("SK-ANT-" + "a" * 40, "anthropic-key"),
+        ],
+    )
+    def test_malformed_credentials_are_refused_locally(value, reason):
+&gt;       assert reason in preflight.format_problems(value)
+E       AssertionError: assert 'anthropic-key' in ['unexpected-prefix']
+E        +  where ['unexpected-prefix'] = &lt;function format_problems at 0x10bcea2a0&gt;('SK-ANT-aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa')
+E        +    where &lt;function format_problems at 0x10bcea2a0&gt; = preflight.format_problems
+
+tests/test_credential_preflight.py:63: AssertionError</failure></testcase><testcase classname="tests.test_credential_preflight" name="test_a_plausible_key_passes_the_local_check" time="0.000" /><testcase classname="tests.test_credential_preflight" name="test_authentication_check_is_one_promptless_model_lookup" time="0.000" /><testcase classname="tests.test_credential_preflight" name="test_failed_authentication_reports_fixed_vocabulary_only[401-body0-rejected-invalid_api_key]" time="0.000" /><testcase classname="tests.test_credential_preflight" name="test_failed_authentication_reports_fixed_vocabulary_only[403-body1-rejected-None]" time="0.000" /><testcase classname="tests.test_credential_preflight" name="test_failed_authentication_reports_fixed_vocabulary_only[404-body2-model-unavailable-None]" time="0.000" /><testcase classname="tests.test_credential_preflight" name="test_failed_authentication_reports_fixed_vocabulary_only[429-body3-unavailable-None]" time="0.000" /><testcase classname="tests.test_credential_preflight" name="test_failed_authentication_reports_fixed_vocabulary_only[500-proxy sk-proj-A1b2C3d4E5f6G7h8A1b2C3d4E5f6G7h8A1b2C3d4E5f6G7h8A1b2C3d4E5f6G7h8A1b2C3d4E5f6G7h8A1b2C3d4E5f6G7h8-unavailable-None]" time="0.000" /><testcase classname="tests.test_credential_preflight" name="test_unreachable_provider_never_reports_exception_text" time="0.000" /><testcase classname="tests.test_credential_preflight" name="test_credential_file_must_be_private_regular_and_single_line" time="0.001" /><testcase classname="tests.test_credential_preflight" name="test_live_runner_refuses_bad_credentials_before_any_work[.venv/bin/python acceptance/codex-cli/run.py baseline --task token-bucket --image sha256:c449dec52754bad2a55dea7bb7b1edfbf7a864475464c53edc8ad9489d9d2269 --config ~/src/actenon-audit/live-codex/v44-frozen-candidate.json --out ~/src/actenon-audit/live-codex/1-baseline-v4-4 --live --authorized-usd 2]" time="0.184" /><testcase classname="tests.test_credential_preflight" name="test_live_runner_refuses_bad_credentials_before_any_work[]" time="0.186" /><testcase classname="tests.test_credential_preflight" name="test_live_runner_refuses_bad_credentials_before_any_work[None]" time="0.184" /><testcase classname="tests.test_credential_preflight" name="test_live_runner_refuses_bad_credentials_before_any_work[sk-short]" time="0.233" /><testcase classname="tests.test_credential_preflight" name="test_live_runner_refuses_bad_credentials_before_any_work[sk-ant-api03-Zy9Xw8Vu7Ts6Rq5Po4Nm3Lk2Ji1Hg0FeZy9Xw8Vu7Ts6Rq5Po4Nm3Lk2Ji1Hg0FeZy9Xw8Vu7Ts6Rq5Po4Nm3Lk2Ji1Hg0Fe-AbCdEfAA]" time="0.232"><failure message="assert 'credential' in 'traceback (most recent call last):\n  file &quot;/users/ross/src/actenon-audit/airlock-pr23/acceptance/codex-cli/run.py&quot;, ...r operation failed: &quot; + args[0])\nactenon_airlock.common.airlockerror: protected mode docker operation failed: image\n'&#10; +  where 'traceback (most recent call last):\n  file &quot;/users/ross/src/actenon-audit/airlock-pr23/acceptance/codex-cli/run.py&quot;, ...r operation failed: &quot; + args[0])\nactenon_airlock.common.airlockerror: protected mode docker operation failed: image\n' = &lt;built-in method lower of str object at 0x7823d21900&gt;()&#10; +    where &lt;built-in method lower of str object at 0x7823d21900&gt; = 'Traceback (most recent call last):\n  File &quot;/Users/ross/src/actenon-audit/airlock-pr23/acceptance/codex-cli/run.py&quot;, ...r operation failed: &quot; + args[0])\nactenon_airlock.common.AirlockError: Protected Mode Docker operation failed: image\n'.lower&#10; +      where 'Traceback (most recent call last):\n  File &quot;/Users/ross/src/actenon-audit/airlock-pr23/acceptance/codex-cli/run.py&quot;, ...r operation failed: &quot; + args[0])\nactenon_airlock.common.AirlockError: Protected Mode Docker operation failed: image\n' = CompletedProcess(args=['/Users/ross/src/actenon-audit/airlock-pr23/.venv/bin/python', '/Users/ross/src/actenon-audit/a... operation failed: &quot; + args[0])\nactenon_airlock.common.AirlockError: Protected Mode Docker operation failed: image\n').stderr">tmp_path = PosixPath('/private/var/folders/tz/y04t4d0900xdbmz96jp608180000gn/T/pytest-of-ross/pytest-43/test_live_runner_refuses_bad_c4')
+value = 'sk-ant-api03-Zy9Xw8Vu7Ts6Rq5Po4Nm3Lk2Ji1Hg0FeZy9Xw8Vu7Ts6Rq5Po4Nm3Lk2Ji1Hg0FeZy9Xw8Vu7Ts6Rq5Po4Nm3Lk2Ji1Hg0Fe-AbCdEfAA'
+
+    @pytest.mark.parametrize("value", [SWALLOWED, "", None, "sk-short", ANTHROPIC_API])
+    def test_live_runner_refuses_bad_credentials_before_any_work(tmp_path, value):
+        result, out = run_live(value, tmp_path)
+        assert result.returncode != 0
+&gt;       assert "credential" in result.stderr.lower()
+E       assert 'credential' in 'traceback (most recent call last):\n  file "/users/ross/src/actenon-audit/airlock-pr23/acceptance/codex-cli/run.py", ...r operation failed: " + args[0])\nactenon_airlock.common.airlockerror: protected mode docker operation failed: image\n'
+E        +  where 'traceback (most recent call last):\n  file "/users/ross/src/actenon-audit/airlock-pr23/acceptance/codex-cli/run.py", ...r operation failed: " + args[0])\nactenon_airlock.common.airlockerror: protected mode docker operation failed: image\n' = &lt;built-in method lower of str object at 0x7823d21900&gt;()
+E        +    where &lt;built-in method lower of str object at 0x7823d21900&gt; = 'Traceback (most recent call last):\n  File "/Users/ross/src/actenon-audit/airlock-pr23/acceptance/codex-cli/run.py", ...r operation failed: " + args[0])\nactenon_airlock.common.AirlockError: Protected Mode Docker operation failed: image\n'.lower
+E        +      where 'Traceback (most recent call last):\n  File "/Users/ross/src/actenon-audit/airlock-pr23/acceptance/codex-cli/run.py", ...r operation failed: " + args[0])\nactenon_airlock.common.AirlockError: Protected Mode Docker operation failed: image\n' = CompletedProcess(args=['/Users/ross/src/actenon-audit/airlock-pr23/.venv/bin/python', '/Users/ross/src/actenon-audit/a... operation failed: " + args[0])\nactenon_airlock.common.AirlockError: Protected Mode Docker operation failed: image\n').stderr
+
+tests/test_credential_preflight.py:174: AssertionError</failure></testcase><testcase classname="tests.test_credential_preflight" name="test_anthropic_key_is_refused_before_any_request" time="0.000"><failure message="Failed: DID NOT RAISE CredentialRefused">monkeypatch = &lt;_pytest.monkeypatch.MonkeyPatch object at 0x10bd590d0&gt;
+
+    def test_anthropic_key_is_refused_before_any_request(monkeypatch):
+        sent = []
+    
+        def record(request):
+            sent.append(request)
+            return httpx.Response(401)
+    
+&gt;       with pytest.raises(preflight.CredentialRefused, match="Anthropic") as refused:
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       Failed: DID NOT RAISE CredentialRefused
+
+tests/test_credential_preflight.py:188: Failed</failure></testcase></testsuite></testsuites>

@@ -1,0 +1,56 @@
+{
+  "observations": [
+    {
+      "receipt": 2,
+      "diagnostic": {
+        "rejection_reason": "response-schema",
+        "checked_event": 0,
+        "checked_event_metadata": {
+          "response_id_sha256": "8881ac275d4187c8e148d379eb3f788bb05ddf67c841748e3b14323627c2dfab",
+          "sequence_number": 0,
+          "type": "response.created"
+        },
+        "unexpected_fields": [
+          "sha256:08cddebc8497c80ff162929c9a3dc3878a7cd855802eb092864dfa536182a419",
+          "sha256:6d0b2264042111e0d5f4058f083e1c4ef190cd3003657fa8015115ab2855be27",
+          "sha256:bedfbed57f7a6b61ee0de6808fb49c1a366eb7543f47f950bdb55a8411b5c9e2"
+        ],
+        "validation_stage": "response-object",
+        "unexpected_field_count": 3
+      },
+      "accounting": {
+        "inference_cost_microusd": 681765,
+        "outcome": "AMBIGUOUS"
+      }
+    },
+    {
+      "receipt": 4,
+      "diagnostic": {
+        "rejection_reason": "response-schema",
+        "checked_event": 0,
+        "checked_event_metadata": {
+          "response_id_sha256": "7d4688b07ea7228a199a1fb0fb073cd4c1b223897193a64ae21b7a77016453bb",
+          "sequence_number": 0,
+          "type": "response.created"
+        },
+        "unexpected_fields": [
+          "sha256:08cddebc8497c80ff162929c9a3dc3878a7cd855802eb092864dfa536182a419",
+          "sha256:6d0b2264042111e0d5f4058f083e1c4ef190cd3003657fa8015115ab2855be27",
+          "sha256:bedfbed57f7a6b61ee0de6808fb49c1a366eb7543f47f950bdb55a8411b5c9e2"
+        ],
+        "validation_stage": "response-object",
+        "unexpected_field_count": 3
+      },
+      "accounting": {
+        "inference_cost_microusd": 697815,
+        "outcome": "AMBIGUOUS"
+      }
+    }
+  ],
+  "hashes": {
+    "receipts.jsonl": "0df357e8d8bf162d68c6f14249215f4cfbde8d7d6480173bbe7b6bd53bce3b88",
+    "result.json": "b3fb7d10487ab70bfe551b147c260c9465f099d83bf2894b012d1a8fa3713661",
+    "checkpoint.json": "2d622aa0bb0405c08666ac30ba5a925aeba5801f4ef456803a6e73330df5cee8",
+    "public-key.json": "8d48c73f91e65be7fe5eae42b910ad71c9dd5ea0f1e88b80a169c11e7c2c80fa"
+  }
+}
