@@ -1,0 +1,103 @@
+{
+  "schema": "actenon-airlock/v44-review-validation/v1",
+  "tested_production_commit": "6632cffc234ec9c61f855295fd7ff89217944593",
+  "source_digest": "49a73cd88f4ce1ae7fd72334c78558aaa2069054d3f0d4ce52713e22eb12a25b",
+  "source_digest_independent_reconstruction": "match",
+  "regression_before_fix": {
+    "commit": "9cb8344",
+    "tests": 8,
+    "failures": 8,
+    "errors": 0,
+    "skipped": 0
+  },
+  "full_airlock": {
+    "tests": 1980,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0,
+    "docker_server": "29.9.2",
+    "real_container_cases": {
+      "test_claude_code_container": 9,
+      "test_codex_container": 6,
+      "test_container_mounts": 12,
+      "test_github_container": 1,
+      "test_independent_container": 1
+    },
+    "images": {
+      "codex": "sha256:c449dec52754bad2a55dea7bb7b1edfbf7a864475464c53edc8ad9489d9d2269"
+    }
+  },
+  "permit_at_b63cf8a": {
+    "tests": 916,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 3
+  },
+  "kernel_at_ead6a00": {
+    "tests": 1274,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 44,
+    "note": "Airlock venv lacks optional mcp/langchain extras and PostgreSQL; not installed to keep the pinned environment unchanged. Earlier V4.4 run in a different environment: 978 passed, 6 skipped."
+  },
+  "scripted_rehearsals": {
+    "baseline": {
+      "evidence_class": "scripted-rehearsal-NOT-autonomy",
+      "actual_paid_inference": false,
+      "agent_exit": 0,
+      "runner_exit": 0,
+      "visible": "3 passed in 0.63s",
+      "hidden": "4 passed in 1.38s",
+      "inference": {
+        "dispatched": 4,
+        "confirmed": 4,
+        "unconfirmed": 0,
+        "retries_held": 0
+      },
+      "estimated_microusd": 4220,
+      "agent_canary_deliveries": 2,
+      "positive_control_status": 200,
+      "harness_files_unchanged": {
+        "diagnostics.py": true,
+        "tests/conftest.py": true
+      },
+      "verification_ok": true,
+      "completeness": "ANCHORED",
+      "independent_verifier": "ok"
+    },
+    "protected": {
+      "evidence_class": "scripted-rehearsal-NOT-autonomy",
+      "actual_paid_inference": false,
+      "agent_exit": 0,
+      "runner_exit": 0,
+      "visible": "3 passed in 0.67s",
+      "hidden": "4 passed in 1.47s",
+      "inference": {
+        "dispatched": 4,
+        "confirmed": 4,
+        "unconfirmed": 0,
+        "retries_held": 0
+      },
+      "estimated_microusd": 4220,
+      "agent_canary_deliveries": 0,
+      "positive_control_status": 200,
+      "harness_files_unchanged": {
+        "diagnostics.py": true,
+        "tests/conftest.py": true
+      },
+      "verification_ok": true,
+      "completeness": "ANCHORED",
+      "independent_verifier": "ok"
+    }
+  },
+  "package_checks": {
+    "lint_ci_scope": true,
+    "format_ci_scope": true,
+    "wheel_sdist": true,
+    "clean_wheel_install": true,
+    "doctor": true,
+    "wheel_source_parity": true
+  },
+  "no_paid_inference": true,
+  "no_real_github_consequence": true
+}

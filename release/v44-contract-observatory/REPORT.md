@@ -52,6 +52,8 @@ The signed test bound is **700,000 micro-USD**. The valid continuation reserves 
 
 ## Source identity discrepancy
 
+> **Correction (2026-11-04):** the origin of 4e724a87 has since been established: no tool ever computed it. It first appears in model-authored evaluator text and was copied into the V4.3 prompt. See `review-2026-11-04/REVIEW.md` §4 and `review-2026-11-04/digest-provenance.json`. The text below is preserved as originally delivered.
+
 The frozen runner hashes sorted package-relative UTF-8 paths, NUL, then raw file bytes under `src/actenon_airlock`, excluding `__pycache__`. Reconstructing those bytes directly from Git objects at `208163b8…` produces **6e141812c3ca5194eafaed2f234a9c41a51b88d344354e4dfd6220695c243a6e**, exactly matching the frozen live result. `historical-source-identity.json` records all 28 source files, blob identities, byte counts and SHA-256 values.
 
 The supplied pre-flight digest **4e724a87ad908baebff0e81c19b027ca54bfbfa3224b75aa54d5807ee1d72cf5** cannot be reproduced. The retained Gemini report now contains the later 6e141812 value; a search of the specified retained evidence/report directories found no occurrence of 4e724a87. The independent test and manifest builder do not supply its original algorithm/file inventory (the builder hardcodes 6e141812). Common alternate path scopes and byte/hash concatenations did not recover it. The owner confirms the earlier report was edited and its hashing procedure was never recorded. Whether it came from a different algorithm, scope, worktree or transcription is **unknown**; there is no basis to claim source drift or tampering. This historical discrepancy is documented, not falsely resolved.
