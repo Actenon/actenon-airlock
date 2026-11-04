@@ -1,6 +1,6 @@
 # V4.4b one-run live baseline — prepared, NOT AUTHORISED
 
-Supersedes the V4.4 freeze for any future run. **Updated after the credential-isolation audit** (`../v44b-credential-isolation/REPORT.md`): the freeze must bind a head at or after `cf3d14a`; any freeze bound to `5f880ce` or earlier is void. Do not reuse `v44-frozen-candidate.json` (`c7143ed`). The new freeze binds the clean final head of this PR after exact-head CI passes, and only `run.py freeze` at that exact commit produces it. Its `source_digest` must equal `python scripts/source_identity.py` at that commit.
+Supersedes the V4.4 freeze for any future run. **Updated after the credential-isolation audit** (`../v44b-credential-isolation/REPORT.md`): the freeze must bind a head at or after `380bcc6` (Anthropic-key guard, `../v44b-anthropic-key-guard/REPORT.md`); any freeze bound to an earlier head, including `cce2404`, is void. The credential must be an **OpenAI** API key. Do not reuse `v44-frozen-candidate.json` (`c7143ed`). The new freeze binds the clean final head of this PR after exact-head CI passes, and only `run.py freeze` at that exact commit produces it. Its `source_digest` must equal `python scripts/source_identity.py` at that commit.
 
 Everything in `../v44-contract-observatory/LIVE_DIAGNOSTIC.md` still applies: one `baseline --task token-bucket` run, unchanged official Codex CLI 0.166.0, `gpt-5.5-2026-04-23`, original task and hidden tests, no retries, no second trial, scoring unchanged. The run must not proceed without:
 
