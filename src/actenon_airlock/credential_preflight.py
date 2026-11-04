@@ -38,6 +38,8 @@ MIN_LENGTH = 20
 MAX_LENGTH = 512
 _BODY = re.compile(r"[A-Za-z0-9_-]+")
 _MODEL = re.compile(r"[A-Za-z0-9][A-Za-z0-9._-]{0,127}")
+# Another provider's credential must never be sent to OpenAI, even to be refused.
+_ANTHROPIC_PREFIX = "sk-ant-"
 
 
 class CredentialRefused(AirlockError):
@@ -63,7 +65,9 @@ def format_problems(value) -> list[str]:
         problems.append("too-short")
     if len(value) > MAX_LENGTH:
         problems.append("too-long")
-    if not value.startswith("sk-"):
+    if value.lower().startswith(_ANTHROPIC_PREFIX):
+        problems.append("anthropic-key")
+    elif not value.startswith("sk-"):
         problems.append("unexpected-prefix")
     elif not _BODY.fullmatch(value[3:]):
         problems.append("unexpected-characters")
@@ -103,6 +107,10 @@ def supervisor_credential(environment_value, credential_file=None) -> str:
         read_credential_file(credential_file) if credential_file is not None else environment_value
     )
     problems = format_problems(value)
+    if "anthropic-key" in problems:
+        raise CredentialRefused(
+            "this is an Anthropic API key; this run needs an OpenAI API key. Nothing was sent"
+        )
     if problems:
         size = f"; {len(value)} characters" if isinstance(value, str) else ""
         raise CredentialRefused(
@@ -134,6 +142,8 @@ def authenticate(key: str, model: str, *, client: httpx.Client | None = None) ->
     """One promptless, non-inference authentication check against the model lookup."""
     if not _MODEL.fullmatch(model):
         raise CredentialRefused("model identifier is not a plain provider model name")
+    if isinstance(key, str) and key.lower().startswith(_ANTHROPIC_PREFIX):
+        raise CredentialRefused("refusing to send an Anthropic API key to OpenAI")
     owned = client is None
     if owned:
         client = httpx.Client(timeout=15.0, follow_redirects=False, trust_env=False)
