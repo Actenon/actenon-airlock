@@ -6,6 +6,7 @@ import subprocess
 import threading
 from http.server import BaseHTTPRequestHandler, HTTPServer
 
+from actenon_airlock.common import host_environment
 from actenon_airlock.protected import snapshot
 
 CANARY = "synthetic-codex-fixture-credential"
@@ -95,6 +96,7 @@ Path('diagnostic-attempt.json').write_text(json.dumps(seen))
             ],
             capture_output=True,
             timeout=30,
+            env=host_environment(),
         )
         if (
             result.returncode not in ({0, 1} if test_hook else {0})

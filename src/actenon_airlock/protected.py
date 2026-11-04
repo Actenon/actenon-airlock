@@ -29,7 +29,7 @@ from actenon_scan.authority import classify_http
 from . import agent_inference, provider_errors, responses_inference
 from .agent_inference import CONTRACT, check_request, cost, reservation
 from .broker import Broker, HttpDispatch
-from .common import AirlockError, canonical, power, validate_url
+from .common import AirlockError, canonical, host_environment, power, validate_url
 from .github_runtime import (
     GitHubCreateDispatch,
     effect_descriptor,
@@ -56,11 +56,7 @@ class Docker:
         self.binary = shutil.which("docker")
         if not self.binary:
             raise AirlockError("Protected Mode requires a running local Linux Docker engine")
-        self.environment = {
-            name: os.environ[name]
-            for name in ("HOME", "PATH", "TMPDIR", "DOCKER_CONFIG", "DOCKER_CONTEXT", "DOCKER_HOST")
-            if name in os.environ
-        }
+        self.environment = host_environment()
         self.host_path_prefix = None
 
     def call(self, args, *, timeout=45):

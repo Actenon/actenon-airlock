@@ -18,6 +18,7 @@ provider message. Results use fixed strings and integer status codes only.
 
 from __future__ import annotations
 
+import contextlib
 import os
 import re
 import stat
@@ -108,6 +109,25 @@ def supervisor_credential(environment_value, credential_file=None) -> str:
             f"malformed credential input ({', '.join(problems)}{size}); nothing was sent"
         )
     return value
+
+
+@contextlib.contextmanager
+def supervisor_scope(name: str, value: str):
+    """Expose a credential in os.environ only while the broker reads it.
+
+    The broker copies bound credentials into its own memory at construction.
+    Keeping the variable out of the process environment otherwise means no
+    later host subprocess can inherit it, whatever its launch path.
+    """
+    previous = os.environ.get(name)
+    os.environ[name] = value
+    try:
+        yield
+    finally:
+        if previous is None:
+            os.environ.pop(name, None)
+        else:
+            os.environ[name] = previous
 
 
 def authenticate(key: str, model: str, *, client: httpx.Client | None = None) -> dict:

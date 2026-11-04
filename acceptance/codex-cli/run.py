@@ -34,10 +34,12 @@ from responses_fixture import ScriptedProvider, text, tool  # noqa: E402
 
 from actenon_airlock.agents import command  # noqa: E402
 from actenon_airlock.cli import main as airlock  # noqa: E402
+from actenon_airlock.common import host_environment  # noqa: E402
 from actenon_airlock.credential_preflight import (  # noqa: E402
     CredentialRefused,
     authenticate,
     supervisor_credential,
+    supervisor_scope,
 )
 from actenon_airlock.manifest import discover  # noqa: E402
 from actenon_airlock.protected import Docker, ProtectedBroker, snapshot  # noqa: E402
@@ -81,7 +83,7 @@ def identity(image):
     return {
         "schema": SCHEMA,
         "source_commit": subprocess.check_output(
-            ["git", "rev-parse", "HEAD"], cwd=ROOT, text=True
+            ["git", "rev-parse", "HEAD"], cwd=ROOT, text=True, env=host_environment()
         ).strip(),
         "source_digest": scoring.digest_tree(ROOT / "src/actenon_airlock"),
         "python": sys.version,
@@ -228,10 +230,10 @@ def baseline(project, image, log, gateway):
     ]
     try:
         return subprocess.run(
-            argv, stdout=log, stderr=subprocess.STDOUT, timeout=1200
+            argv, stdout=log, stderr=subprocess.STDOUT, timeout=1200, env=host_environment()
         ).returncode, work
     finally:
-        subprocess.run(["docker", "rm", "-f", name], capture_output=True)
+        subprocess.run(["docker", "rm", "-f", name], capture_output=True, env=host_environment())
 
 
 def main():
@@ -270,6 +272,10 @@ def main():
     supervised = args.live or args.mode == "preflight"
     if args.credential_file is not None and not supervised:
         raise SystemExit("--credential-file is only for --live or preflight")
+    # The key lives in this variable, NOT in os.environ, so no host subprocess
+    # (git, Docker client, scoring) can inherit it. Only broker construction
+    # sees it, through supervisor_scope below.
+    key = "scripted-codex-no-real-credential"
     if supervised:
         # Local check before any drift check, setup, reservation or dispatch. The
         # credential stays in this supervisor process; messages are fixed text.
@@ -277,7 +283,7 @@ def main():
             key = supervisor_credential(os.environ.get("OPENAI_API_KEY"), args.credential_file)
         except CredentialRefused as exc:
             raise SystemExit(f"Supervisor credential refused: {exc}") from None
-        os.environ["OPENAI_API_KEY"] = key
+    os.environ.pop("OPENAI_API_KEY", None)
     frozen = identity(args.image)
     preflight = None
     if supervised:
@@ -309,9 +315,7 @@ def main():
         return 0
     if args.config and json.loads(args.config.read_text()) != frozen:
         raise SystemExit("Frozen configuration drift; refusing acceptance")
-    if args.live and (
-        not args.config or args.authorized_usd != BUDGET or not os.environ.get("OPENAI_API_KEY")
-    ):
+    if args.live and (not args.config or args.authorized_usd != BUDGET or not key):
         raise SystemExit(
             "Live inference requires frozen config, explicit owner-authorized $2, and supervisor API key"
         )
@@ -321,9 +325,8 @@ def main():
     project = args.out / "project"
     shutil.copytree(task / "repo", project)
     shutil.copyfile(task / "ISSUE.md", project / "ISSUE.md")
-    if not args.live:
-        # No credential discovery or forwarding from the engineering environment.
-        os.environ["OPENAI_API_KEY"] = "scripted-codex-no-real-credential"
+    # Scripted runs never use an engineering-environment credential: `key` is the
+    # fixed scripted value unless --live validated a supervisor credential.
     assert (
         airlock(
             [
@@ -381,7 +384,8 @@ def main():
     original = ProtectedBroker.__init__
 
     def initialize(self, *a, **kw):
-        original(self, *a, **kw)
+        with supervisor_scope("OPENAI_API_KEY", key):
+            original(self, *a, **kw)
         if scripted:
             self.http.close()
 
