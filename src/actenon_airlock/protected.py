@@ -26,7 +26,7 @@ from actenon_permit.model import Budget, Grant, Scopes
 from actenon_protocol.effects import effect_identity
 from actenon_scan.authority import classify_http
 
-from . import agent_inference, responses_inference
+from . import agent_inference, provider_errors, responses_inference
 from .agent_inference import CONTRACT, check_request, cost, reservation
 from .broker import Broker, HttpDispatch
 from .common import AirlockError, canonical, power, validate_url
@@ -419,6 +419,27 @@ class ProtectedBroker(Broker):
     def http_deadline(self, url):
         # An agent's reply is released whole, so a trickled stream gets one overall limit.
         return time.monotonic() + self.http_timeout(url) if self.agent_profile(url) else None
+
+    def relay_policy(self, dispatch):
+        # A failed inference-provider reply is untrusted text that can echo
+        # masked credential fragments the exact-secret redaction cannot match.
+        # The agent gets the status and a fixed local error; the signed
+        # observation (already made from the received bytes) is unaffected.
+        status = dispatch.response.get("status")
+        if status == 200:
+            return
+        profile = self.agent_profile(dispatch.url)
+        if profile is not None:
+            flavour = "anthropic" if profile.get("provider") == "anthropic" else "openai"
+        elif dispatch.url in self.model_transports:
+            flavour = self.model_transports[dispatch.url]
+        else:
+            return
+        received = base64.b64decode(dispatch.response.get("body", ""), validate=True)
+        code, headers, content = provider_errors.sanitized_reply(status, received, flavour)
+        dispatch.response.update(
+            status=code, headers=headers, body=base64.b64encode(content).decode()
+        )
 
     def agent_profile(self, url):
         profile = self.approval.get("protected_model", {})
