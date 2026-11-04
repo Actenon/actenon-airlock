@@ -13,6 +13,7 @@ from dataclasses import dataclass, replace
 
 from actenon.core.json import loads_no_duplicate_keys
 
+from . import provider_errors
 from .agent_inference import MAX_INPUT_BYTES, PRICES, Observation, cost
 from .common import AirlockError, canonical
 
@@ -1076,13 +1077,17 @@ class ResponsesObservation(Observation):
 
 def _observe_authoritative(status, body, request):
     trace = _Trace(body)
+    # Integer status and allowlisted code/type only; never provider text. This
+    # explains a failure; it does not change confirmation, decline or usage.
+    trace.data.update(provider_errors.status_diagnostic(status, body))
     try:
         _require(len(body) <= 4 * 1024 * 1024, "response-byte-bound")
         if status == 429:
             error = loads_no_duplicate_keys(body)["error"]
-            return ResponsesObservation(
-                declined=error.get("code") in {"rate_limit_exceeded", "insufficient_quota"}
-            )
+            declined = error.get("code") in {"rate_limit_exceeded", "insufficient_quota"}
+            # Unchanged decline semantics; only the evidence is now retained.
+            trace.data["rejection_reason"] = "provider-declined" if declined else "http-status"
+            return ResponsesObservation(declined=declined, diagnostics=trace.data)
         _require(status == 200, "http-status")
         if request["stream"]:
             response = _stream_response(_events(body, trace), request, trace)

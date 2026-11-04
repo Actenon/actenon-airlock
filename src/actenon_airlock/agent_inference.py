@@ -24,6 +24,7 @@ from dataclasses import dataclass
 
 from actenon.core.json import loads_no_duplicate_keys
 
+from . import provider_errors
 from .common import AirlockError
 
 CONTRACT = "anthropic-agent/v1"
@@ -319,6 +320,8 @@ class Observation:
     confirmed: bool = False
     declined: bool = False
     usage: dict | None = None
+    # Fixed-vocabulary status evidence for failed replies; never authority.
+    diagnostics: dict | None = None
 
 
 def _usage(raw: dict) -> dict | None:
@@ -410,10 +413,11 @@ def _declined(status: int, body: bytes) -> bool:
 
 def observe(status: int, body: bytes, request: dict) -> Observation:
     """Establish inference output, nothing about billing or what happens downstream."""
-    if status in _DECLINED and _declined(status, body):
-        return Observation(declined=True)
     if status != 200:
-        return Observation()
+        diagnostics = provider_errors.status_diagnostic(status, body)
+        if status in _DECLINED and _declined(status, body):
+            return Observation(declined=True, diagnostics=diagnostics)
+        return Observation(diagnostics=diagnostics)
     try:
         read = _stream_usage if request.get("stream") else _message_usage
         usage = read(body, request["model"])
