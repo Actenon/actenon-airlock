@@ -1,0 +1,88 @@
+{
+  "schema": "actenon-airlock/v44-auth-hardening-validation/v1",
+  "tested_production_commit": "53fc2ae5eb6e77d73633368c82382888345c9cfa",
+  "source_digest": "bd7904d2a305b9fe2daa1ff4efb326684bb572b3dbb59d41594a4f508c6fe503",
+  "source_digest_independent_reconstruction": "match",
+  "regression_before_fix": {
+    "commit": "4a61a47",
+    "tests": 60,
+    "failures": 44,
+    "errors": 0,
+    "skipped": 0
+  },
+  "full_airlock": {
+    "tests": 2040,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0,
+    "docker_server": "29.9.2",
+    "real_container_cases": 29
+  },
+  "e2e_real_codex_401": {
+    "before_c7143ed": {
+      "leak_locations": [
+        "console"
+      ],
+      "signed_http_status": null
+    },
+    "after": {
+      "leak_locations": [],
+      "signed_observation": {
+        "rejection_reason": "http-status",
+        "http_status": 401,
+        "provider_error_code": "invalid_api_key",
+        "provider_error_type": "invalid_request_error",
+        "provider_error_body": "json"
+      },
+      "outcomes": [
+        "AMBIGUOUS"
+      ],
+      "files_scanned": 24
+    }
+  },
+  "scripted_rehearsals": {
+    "baseline": {
+      "agent_exit": 0,
+      "runner_exit": 0,
+      "visible": "3 passed in 0.66s",
+      "hidden": "4 passed in 1.49s",
+      "inference": {
+        "dispatched": 4,
+        "confirmed": 4,
+        "unconfirmed": 0,
+        "retries_held": 0
+      },
+      "estimated_microusd": 4220,
+      "agent_canary_deliveries": 2,
+      "positive_control_status": 200,
+      "independent_verification": "ANCHORED ok"
+    },
+    "protected": {
+      "agent_exit": 0,
+      "runner_exit": 0,
+      "visible": "3 passed in 0.68s",
+      "hidden": "4 passed in 1.48s",
+      "inference": {
+        "dispatched": 4,
+        "confirmed": 4,
+        "unconfirmed": 0,
+        "retries_held": 0
+      },
+      "estimated_microusd": 4220,
+      "agent_canary_deliveries": 0,
+      "positive_control_status": 200,
+      "independent_verification": "ANCHORED ok"
+    }
+  },
+  "package_checks": {
+    "lint_ci_scope": true,
+    "format_ci_scope": true,
+    "wheel_sdist": true,
+    "clean_wheel_install": true,
+    "doctor": true,
+    "wheel_source_parity": true
+  },
+  "v44_failed_trial_evidence_unchanged": true,
+  "no_paid_inference": true,
+  "no_real_github_consequence": true
+}
