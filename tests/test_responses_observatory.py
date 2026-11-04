@@ -163,7 +163,8 @@ def test_inspection_is_bounded_and_does_not_expose_values(case):
         body = b"[" + b"0," * 10000 + b"0]"
         request["stream"] = False
     elif case == "events":
-        body = wire([{"type": "synthetic-secret", "sequence_number": i} for i in range(300)])
+        events = range(diagnostic.MAX_EVENTS + 44)
+        body = wire([{"type": "synthetic-secret", "sequence_number": i} for i in events])
     elif case == "issues":
         body = wire(
             [{"type": "response.created", "sequence_number": i, "response": {}} for i in range(100)]

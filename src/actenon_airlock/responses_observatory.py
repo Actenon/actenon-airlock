@@ -17,10 +17,16 @@ from . import responses_inference as contract
 from .common import AirlockError
 
 MAX_BYTES = 4 * 1024 * 1024
-MAX_EVENTS = 256
-MAX_LINES = 4096
+# Patch-writing turns stream about one delta per output token, so a valid
+# response can far exceed the 42-68 events seen in live first turns. Frames
+# up to MAX_EVENTS are inspected in order; later frames are skipped lexically
+# except lifecycle snapshots, which carry the terminal metadata and usage.
+MAX_EVENTS = 4096
+MAX_LATE_LIFECYCLE = 4
+MAX_LINES = 65536
 MAX_DEPTH = 24
-MAX_NODES = 8192
+MAX_NODES = 8192  # per JSON document (one SSE frame, a JSON body or the request)
+MAX_TOTAL_NODES = 131072  # cumulative across all parsed frames
 MAX_ISSUES = 32
 MAX_PATH = 10
 MAX_FIELDS = 4
@@ -61,7 +67,13 @@ class _Inspection:
         self.request = request
         self.issues = []
         self.truncated = False
+        # Some frames were never inspected (skipped after a cap, oversized, or
+        # past a scan limit). Conclusions that need the whole sequence are then
+        # disclosed as not inspected instead of being reported as defects.
+        self.incomplete = False
         self.events = 0
+        self.skipped = 0
+        self.nodes = 0
         self.probes = 0
         self.strictness = {}
         self.policies = set()
@@ -266,7 +278,7 @@ class _Inspection:
             if not contract._count(value.get(name)):
                 self.issue("usage", "usage-count", (*path, name))
 
-    def stream(self, events):
+    def stream(self, events, gaps=frozenset()):
         previous = None
         terminal = False
         projected = []
@@ -276,9 +288,12 @@ class _Inspection:
             if not isinstance(kind, str) or kind not in contract._EVENTS:
                 self.issue("event", "unsupported-event-type", path)
                 continue
-            if index == 0 and kind != "response.created":
+            if index == 0 and kind != "response.created" and 0 not in gaps:
                 self.issue("event", "stream-created-missing", path)
             number = event.get("sequence_number")
+            # Continuity cannot be judged across frames that were not inspected.
+            if index in gaps:
+                previous = None
             if not contract._count(number) or (previous is not None and number != previous + 1):
                 self.issue("event", "event-sequence", path)
             previous = number if contract._count(number) else None
@@ -312,7 +327,14 @@ class _Inspection:
                 )
             projected.append(event)
         if not terminal:
-            self.issue("completion", "terminal-missing")
+            # A terminal event may lie in frames that were never inspected.
+            self.issue(
+                "completion", "terminal-not-inspected" if self.incomplete else "terminal-missing"
+            )
+        if self.incomplete:
+            # Delta/done and item consistency need every frame; do not guess.
+            self.issue("inspection", "stream-integrity-not-inspected")
+            return
         trace = contract._Trace(b"")
         for event in projected:
             trace.record(event)
@@ -327,13 +349,16 @@ class _Inspection:
             "issues": self.issues,
             "truncated": self.truncated,
             "events_inspected": self.events,
+            "events_skipped": self.skipped,
             "probes": self.probes,
             "limits": {
                 "bytes": MAX_BYTES,
                 "events": MAX_EVENTS,
+                "late_lifecycle_events": MAX_LATE_LIFECYCLE,
                 "lines": MAX_LINES,
                 "depth": MAX_DEPTH,
                 "structural_tokens": MAX_NODES,
+                "total_structural_tokens": MAX_TOTAL_NODES,
                 "issues": MAX_ISSUES,
                 "path": MAX_PATH,
                 "fields_per_issue": MAX_FIELDS,
@@ -373,37 +398,75 @@ def _guard(body):
             nodes += 1
         if depth > MAX_DEPTH or nodes > MAX_NODES:
             raise _Limit
+    return nodes
 
 
-def _parse(data):
-    _guard(data.encode() if isinstance(data, str) else data)
+def _parse(data, inspection=None):
+    nodes = _guard(data.encode() if isinstance(data, str) else data)
+    if inspection is not None:
+        # Cumulative budget: per-frame guards alone would allow many frames.
+        inspection.nodes += nodes
+        if inspection.nodes > MAX_TOTAL_NODES:
+            raise _Limit
     value = loads_no_duplicate_keys(data)
     json.dumps(value, allow_nan=False)
     return value
 
 
 def _frames(body, inspection):
-    frames = []
+    # Returns retained frames and the indices that follow uninspected frames.
+    # Retention is at most MAX_EVENTS + MAX_LATE_LIFECYCLE frames; all other
+    # work is a single bounded line scan over at most MAX_BYTES.
+    frames, gaps = [], set()
     data, name = [], None
-    for index, line in enumerate(io.StringIO(body.decode("utf-8"))):
-        if index >= MAX_LINES or len(frames) >= MAX_EVENTS:
-            inspection.truncated = True
+    late = 0
+    stopped = False
+
+    def skip():
+        inspection.skipped += 1
+        inspection.incomplete = inspection.truncated = True
+        gaps.add(len(frames))
+
+    def finish():
+        nonlocal late, stopped
+        position = ("events", len(frames))
+        capped = len(frames) - late >= MAX_EVENTS
+        if capped:
             inspection.issue("parse", "inspection-limit")
+            # After the cap only named lifecycle snapshots are parsed. Their
+            # metadata and usage are the evidence a failed response most needs.
+            if name not in _LIFECYCLE or late >= MAX_LATE_LIFECYCLE:
+                skip()
+                return
+        try:
+            value = _parse("\n".join(data), inspection)
+            if not isinstance(value, dict):
+                raise ValueError
+        except _Limit:
+            inspection.issue("parse", "inspection-limit", position)
+            if inspection.nodes > MAX_TOTAL_NODES:
+                stopped = True
+            skip()
+            return
+        except (ValueError, TypeError):
+            inspection.issue("parse", "malformed-response", position)
+            skip()
+            return
+        if name is not None and name != value.get("type"):
+            inspection.issue("parse", "sse-event-name-mismatch", position)
+        late += capped
+        frames.append(value)
+
+    for index, line in enumerate(io.StringIO(body.decode("utf-8"))):
+        if index >= MAX_LINES or stopped:
+            inspection.issue("parse", "inspection-limit")
+            inspection.incomplete = inspection.truncated = True
+            data, name = [], None  # An unfinished frame here is not a defect.
             break
         line = line.rstrip("\r\n")
         if not line:
             if data or name is not None:
-                try:
-                    value = _parse("\n".join(data))
-                    if not isinstance(value, dict):
-                        raise ValueError
-                    if name is not None and name != value.get("type"):
-                        inspection.issue(
-                            "parse", "sse-event-name-mismatch", ("events", len(frames))
-                        )
-                    frames.append(value)
-                except (ValueError, TypeError):
-                    inspection.issue("parse", "malformed-response", ("events", len(frames)))
+                finish()
             data, name = [], None
         elif line.startswith("data:"):
             data.append(line[5:].removeprefix(" "))
@@ -414,19 +477,20 @@ def _frames(body, inspection):
     if data or name is not None:
         inspection.issue("parse", "sse-partial-frame")
     inspection.events = len(frames)
-    return frames
+    return frames, frozenset(gaps)
 
 
 def inspect_response(status, body, request):
     inspection = _Inspection(request)
     try:
-        _guard(body)
+        if len(body) > MAX_BYTES:
+            raise _Limit
         # The approved request also bounds comparisons against private schemas.
         _guard(contract.canonical(request))
         if status != 200:
             inspection.issue("transport", "http-status")
         elif request["stream"]:
-            inspection.stream(_frames(body, inspection))
+            inspection.stream(*_frames(body, inspection))
         else:
             response = _parse(body)
             inspection.response(response, ("response",))

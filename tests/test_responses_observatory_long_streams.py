@@ -106,6 +106,24 @@ def test_oversized_frame_does_not_hide_independent_terminal_defects():
     assert "synthetic-secret" not in json.dumps(result.diagnostics)
 
 
+def test_skipped_first_frame_is_not_reported_as_missing_created():
+    seq = long_stream(10)
+    seq[0]["synthetic-secret"] = json.loads("[" * 40 + "0" + "]" * 40)
+    report = diagnostic.inspect_response(200, wire(seq), approved())
+    assert "stream-created-missing" not in reasons(report)
+    assert "inspection-limit" in reasons(report) and report["truncated"]
+
+
+def test_events_skipped_after_cap_are_disclosed_and_retention_is_bounded():
+    seq = long_stream(diagnostic.MAX_EVENTS + 100)
+    report = diagnostic.inspect_response(200, wire(seq), approved())
+    assert report["events_inspected"] == diagnostic.MAX_EVENTS + 1  # + terminal snapshot
+    assert report["events_skipped"] == len(seq) - report["events_inspected"]
+    assert {"inspection-limit", "stream-integrity-not-inspected"} <= reasons(report)
+    assert "terminal-missing" not in reasons(report)
+    assert "terminal-not-inspected" not in reasons(report)
+
+
 def test_maximum_size_delta_stream_is_bounded():
     # Unnamed-frame and named-frame floods near the 4 MiB authoritative bound.
     frame = b'event: response.output_text.delta\ndata: {"type":"response.output_text.delta"}\n\n'
