@@ -1,0 +1,137 @@
+FFFFFFFF                                                                 [100%]
+=================================== FAILURES ===================================
+_____________ test_long_valid_stream_has_no_false_diagnostics[300] _____________
+
+deltas = 300
+
+    @pytest.mark.parametrize("deltas", [300, 1200, 3000])
+    def test_long_valid_stream_has_no_false_diagnostics(deltas):
+        result = observe(EIGHT, long_stream(deltas))
+        assert result.confirmed
+        report = result.diagnostics["contract_observatory"]
+>       assert report["issues"] == []
+E       AssertionError: assert [{'stage': 'p..., 'path': []}] == []
+E         
+E         Left contains 3 more items, first extra item: {'stage': 'parse', 'reason': 'inspection-limit', 'path': []}
+E         Use -v to get more diff
+
+tests/test_responses_observatory_long_streams.py:56: AssertionError
+____________ test_long_valid_stream_has_no_false_diagnostics[1200] _____________
+
+deltas = 1200
+
+    @pytest.mark.parametrize("deltas", [300, 1200, 3000])
+    def test_long_valid_stream_has_no_false_diagnostics(deltas):
+        result = observe(EIGHT, long_stream(deltas))
+        assert result.confirmed
+        report = result.diagnostics["contract_observatory"]
+>       assert report["issues"] == []
+E       AssertionError: assert [{'stage': 'p..., 'path': []}] == []
+E         
+E         Left contains one more item: {'stage': 'parse', 'reason': 'inspection-limit', 'path': []}
+E         Use -v to get more diff
+
+tests/test_responses_observatory_long_streams.py:56: AssertionError
+____________ test_long_valid_stream_has_no_false_diagnostics[3000] _____________
+
+deltas = 3000
+
+    @pytest.mark.parametrize("deltas", [300, 1200, 3000])
+    def test_long_valid_stream_has_no_false_diagnostics(deltas):
+        result = observe(EIGHT, long_stream(deltas))
+        assert result.confirmed
+        report = result.diagnostics["contract_observatory"]
+>       assert report["issues"] == []
+E       AssertionError: assert [{'stage': 'p..., 'path': []}] == []
+E         
+E         Left contains one more item: {'stage': 'parse', 'reason': 'inspection-limit', 'path': []}
+E         Use -v to get more diff
+
+tests/test_responses_observatory_long_streams.py:56: AssertionError
+__________ test_terminal_snapshot_beyond_event_cap_is_still_inspected __________
+
+    def test_terminal_snapshot_beyond_event_cap_is_still_inspected():
+        seq = long_stream(diagnostic.MAX_EVENTS + 500)
+        final = seq[-1]["response"]
+        final["image"] = {"context_compression": "auto"}
+        final["usage"]["total_tokens"] = 0
+        final["synthetic-secret-name"] = "synthetic-secret-value"
+        result = observe(EIGHT, seq)
+        assert not result.confirmed and result.usage is None
+        report = result.diagnostics["contract_observatory"]
+>       assert {"response-image-policy", "usage-total", "response-schema"} <= reasons(report)
+E       AssertionError: assert {'response-im...'usage-total'} <= {'inspection-limit'}
+E         
+E         Extra items in the left set:
+E         'usage-total'
+E         'response-image-policy'
+E         'response-schema'
+
+tests/test_responses_observatory_long_streams.py:70: AssertionError
+___________ test_uninspected_tail_is_disclosed_not_reported_missing ____________
+
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x10ac28500>
+
+    def test_uninspected_tail_is_disclosed_not_reported_missing(monkeypatch):
+        monkeypatch.setattr(diagnostic, "MAX_LINES", 50)
+        report = diagnostic.inspect_response(200, wire(long_stream(300)), approved())
+        assert report["truncated"]
+>       assert "terminal-missing" not in reasons(report)
+E       AssertionError: assert 'terminal-missing' not in {'inspection-limit', 'sse-partial-frame', 'terminal-missing'}
+E        +  where {'inspection-limit', 'sse-partial-frame', 'terminal-missing'} = reasons({'schema': 'actenon-airlock/responses-contract-observatory/v1', 'authoritative': False, 'issues': [{'stage': 'parse', ...issing', 'path': []}, {'stage': 'stream-integrity', 'reason': 'terminal-missing', 'path': []}], 'truncated': True, ...})
+
+tests/test_responses_observatory_long_streams.py:80: AssertionError
+_______ test_genuinely_missing_terminal_in_long_stream_is_still_reported _______
+
+    def test_genuinely_missing_terminal_in_long_stream_is_still_reported():
+        seq = long_stream(1200)
+        seq.pop()
+        report = diagnostic.inspect_response(200, wire(seq), approved())
+>       assert "terminal-missing" in reasons(report)
+E       AssertionError: assert 'terminal-missing' in {'inspection-limit'}
+E        +  where {'inspection-limit'} = reasons({'schema': 'actenon-airlock/responses-contract-observatory/v1', 'authoritative': False, 'issues': [{'stage': 'parse', 'reason': 'inspection-limit', 'path': []}], 'truncated': True, ...})
+
+tests/test_responses_observatory_long_streams.py:88: AssertionError
+_______ test_oversized_frame_does_not_hide_independent_terminal_defects ________
+
+    def test_oversized_frame_does_not_hide_independent_terminal_defects():
+        seq = long_stream(10)
+        bad = {"type": "response.output_text.delta", "sequence_number": 0}
+        bad["synthetic-secret"] = json.loads("[" * 40 + "0" + "]" * 40)
+        seq.insert(5, bad)
+        for number, event in enumerate(seq):
+            event["sequence_number"] = number
+        seq[-1]["response"]["tool_usage"]["web_search"]["num_requests"] = 1
+        result = observe(EIGHT, seq)
+        assert not result.confirmed
+        report = result.diagnostics["contract_observatory"]
+        assert "inspection-limit" in reasons(report)
+>       assert "response-hosted-tool-usage" in reasons(report)
+E       AssertionError: assert 'response-hosted-tool-usage' in {'inspection-limit'}
+E        +  where {'inspection-limit'} = reasons({'schema': 'actenon-airlock/responses-contract-observatory/v1', 'authoritative': False, 'issues': [{'stage': 'parse', 'reason': 'inspection-limit', 'path': []}], 'truncated': True, ...})
+
+tests/test_responses_observatory_long_streams.py:104: AssertionError
+__________________ test_maximum_size_delta_stream_is_bounded ___________________
+
+    def test_maximum_size_delta_stream_is_bounded():
+        # Unnamed-frame and named-frame floods near the 4 MiB authoritative bound.
+        frame = b'event: response.output_text.delta\ndata: {"type":"response.output_text.delta"}\n\n'
+        body = frame * ((diagnostic.MAX_BYTES - 1) // len(frame))
+        report = diagnostic.inspect_response(200, body, approved())
+        assert report["truncated"]
+        assert len(json.dumps(report).encode()) <= diagnostic.MAX_REPORT_BYTES
+>       assert report["events_inspected"] <= diagnostic.MAX_EVENTS + diagnostic.MAX_LATE_LIFECYCLE
+                                                                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AttributeError: module 'actenon_airlock.responses_observatory' has no attribute 'MAX_LATE_LIFECYCLE'
+
+tests/test_responses_observatory_long_streams.py:116: AttributeError
+=========================== short test summary info ============================
+FAILED tests/test_responses_observatory_long_streams.py::test_long_valid_stream_has_no_false_diagnostics[300]
+FAILED tests/test_responses_observatory_long_streams.py::test_long_valid_stream_has_no_false_diagnostics[1200]
+FAILED tests/test_responses_observatory_long_streams.py::test_long_valid_stream_has_no_false_diagnostics[3000]
+FAILED tests/test_responses_observatory_long_streams.py::test_terminal_snapshot_beyond_event_cap_is_still_inspected
+FAILED tests/test_responses_observatory_long_streams.py::test_uninspected_tail_is_disclosed_not_reported_missing
+FAILED tests/test_responses_observatory_long_streams.py::test_genuinely_missing_terminal_in_long_stream_is_still_reported
+FAILED tests/test_responses_observatory_long_streams.py::test_oversized_frame_does_not_hide_independent_terminal_defects
+FAILED tests/test_responses_observatory_long_streams.py::test_maximum_size_delta_stream_is_bounded
+8 failed in 0.17s
