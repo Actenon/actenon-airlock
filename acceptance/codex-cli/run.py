@@ -34,6 +34,11 @@ from responses_fixture import ScriptedProvider, text, tool  # noqa: E402
 
 from actenon_airlock.agents import command  # noqa: E402
 from actenon_airlock.cli import main as airlock  # noqa: E402
+from actenon_airlock.credential_preflight import (  # noqa: E402
+    CredentialRefused,
+    authenticate,
+    supervisor_credential,
+)
 from actenon_airlock.manifest import discover  # noqa: E402
 from actenon_airlock.protected import Docker, ProtectedBroker, snapshot  # noqa: E402
 from actenon_airlock.state import State  # noqa: E402
@@ -231,9 +236,9 @@ def baseline(project, image, log, gateway):
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("mode", choices=("freeze", "baseline", "protected"))
+    parser.add_argument("mode", choices=("freeze", "baseline", "protected", "preflight"))
     parser.add_argument("--image", required=True)
-    parser.add_argument("--out", type=Path, required=True)
+    parser.add_argument("--out", type=Path)
     parser.add_argument(
         "--task",
         choices=tuple(p.name for p in (ROOT / "acceptance/v2/tasks").iterdir() if p.is_dir()),
@@ -252,10 +257,52 @@ def main():
         help="With --attack, execute the planted transport from a pytest session fixture",
     )
     parser.add_argument("--authorized-usd", choices=(BUDGET,))
+    parser.add_argument(
+        "--credential-file",
+        type=Path,
+        help="Owner-only one-line file holding the supervisor key (instead of OPENAI_API_KEY)",
+    )
     args = parser.parse_args()
     if args.test_hook and not args.attack:
         raise SystemExit("--test-hook requires --attack")
+    if args.mode != "preflight" and args.out is None:
+        raise SystemExit("--out is required")
+    supervised = args.live or args.mode == "preflight"
+    if args.credential_file is not None and not supervised:
+        raise SystemExit("--credential-file is only for --live or preflight")
+    if supervised:
+        # Local check before any drift check, setup, reservation or dispatch. The
+        # credential stays in this supervisor process; messages are fixed text.
+        try:
+            key = supervisor_credential(os.environ.get("OPENAI_API_KEY"), args.credential_file)
+        except CredentialRefused as exc:
+            raise SystemExit(f"Supervisor credential refused: {exc}") from None
+        os.environ["OPENAI_API_KEY"] = key
     frozen = identity(args.image)
+    preflight = None
+    if supervised:
+        if not args.config or json.loads(args.config.read_text()) != frozen:
+            raise SystemExit("Frozen configuration drift; refusing credential pre-flight")
+        if args.live and args.authorized_usd != BUDGET:
+            raise SystemExit("Live inference requires explicit owner-authorized $2")
+        # One promptless model lookup. Success is a prerequisite, not entitlement.
+        preflight = authenticate(key, MODEL)
+        if preflight["outcome"] != "authenticated":
+            detail = ", ".join(
+                str(preflight[k])
+                for k in ("http_status", "outcome", "provider_error_code")
+                if preflight.get(k) is not None
+            )
+            raise SystemExit(
+                f"Supervisor credential pre-flight failed ({detail}); no inference was dispatched"
+            )
+        if args.mode == "preflight":
+            print(
+                json.dumps(
+                    {"credential_preflight": preflight, "source_commit": frozen["source_commit"]}
+                )
+            )
+            return 0
     if args.mode == "freeze":
         with args.out.open("x") as file:
             json.dump(frozen, file, indent=2)
@@ -398,6 +445,7 @@ def main():
         "score": scoring.score(task, work),
         "airlock": status(State(project)),
         "actual_paid_inference": args.live,
+        "credential_preflight": preflight,
         "attack": attack_result,
         "attack_selection": "real-agent-invoked planted code if attempted"
         if args.live
