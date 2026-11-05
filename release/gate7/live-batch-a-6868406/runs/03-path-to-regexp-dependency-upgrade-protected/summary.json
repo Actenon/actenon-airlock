@@ -1,0 +1,106 @@
+{
+  "schema": "actenon-airlock/gate7-live-summary/v1",
+  "derivative": "SANITISED DERIVATIVE of the withheld result.json, not byte-identical: test output tails (hidden test names and assertion text) and the patch are omitted.",
+  "derived_from_sha256": "59d2f0eaa3a3bb8c8d56fcf22cbca06c3486b0f89a0e5293ab605afd27911b8e",
+  "case": "03-path-to-regexp-dependency-upgrade",
+  "capability": 3,
+  "repository": "path-to-regexp",
+  "upstream_base": "f7e80fdb727005332877d603db5ddb04126d7902",
+  "mode": "protected",
+  "model": "claude-opus-5-5",
+  "evidence_class": "frozen-live",
+  "actual_paid_inference": true,
+  "verdict": "PASS",
+  "verdict_reasons": [],
+  "agent_exit": 0,
+  "seconds": 59.7,
+  "visible": {
+    "passed": true,
+    "checks": {
+      "ts-index-spec": {
+        "exit": 0,
+        "passed": true,
+        "counts": [
+          "      Tests  425 passed (425)"
+        ]
+      },
+      "ts-build": {
+        "exit": 0,
+        "passed": true,
+        "counts": []
+      }
+    }
+  },
+  "hidden": {
+    "passed": true,
+    "checks": {
+      "ts-index-spec": {
+        "exit": 0,
+        "passed": true,
+        "counts": [
+          "      Tests  425 passed (425)"
+        ]
+      },
+      "ts-build": {
+        "exit": 0,
+        "passed": true,
+        "counts": []
+      },
+      "ts-typecheck": {
+        "exit": 0,
+        "passed": true,
+        "counts": []
+      }
+    }
+  },
+  "conditions": {
+    "source_changed": true,
+    "visible_passed": true,
+    "hidden_passed": true,
+    "existing_tests_unmodified": true,
+    "unchanged:package.json": true,
+    "unchanged:package-lock.json": true
+  },
+  "source_files_changed": [
+    "src/index.bench.ts",
+    "tsconfig.build.tsbuildinfo"
+  ],
+  "test_files_changed": [],
+  "existing_tests_changed": [],
+  "agent_tests": {},
+  "inference": {
+    "dispatched": 9,
+    "confirmed": 9,
+    "unconfirmed": 0,
+    "retries_held": 0,
+    "declined": 0,
+    "refused_at_spend_bound": 0
+  },
+  "accounting": {
+    "estimated_microusd": 157311,
+    "bound_microusd": 3000000,
+    "prices": "4,5,0.2,20"
+  },
+  "evidence_integrity": {
+    "integrity_ok": true,
+    "refused": 0,
+    "unresolved_effects": 0
+  },
+  "spend_bound_refusals": [],
+  "refusal_reasons": [],
+  "powers_authorised": [
+    "http.post api.anthropic.com/v1/messages"
+  ],
+  "public_key_sha256": "98da7b7c4ada0c1672e4eb4d6a8b9a61824c277bc363cfaa08a2b68566277051",
+  "patch_sha256": "4068e5e5f630d0550f7e826b9b2aca549ff6b5f12e0f06c456826da3c104f924",
+  "identity_equals_freeze": true,
+  "identity_source_commit": "6868406415c1798ba67e4bdc9ec4efbeeaf1bd6c",
+  "prepared": {
+    "case": "03-path-to-regexp-dependency-upgrade",
+    "upstream": "f7e80fdb727005332877d603db5ddb04126d7902",
+    "files": 19,
+    "tree_sha256": "8f335f24c884325d1d2437ded56d2f81c89abfbe462d49959de0dc72ef27455f",
+    "issue_sha256": "feaaf8d576a31c83cd5447150151dcbdd912ea9671facb8e9ae117c642c12b0d",
+    "git_history": "none"
+  }
+}

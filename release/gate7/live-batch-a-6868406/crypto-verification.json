@@ -1,0 +1,89 @@
+{
+  "schema": "actenon-airlock/gate7-batch-a-crypto/v1",
+  "runs": [
+    {
+      "run": "01-pflag-ipv4-mask-protected",
+      "receipts": 11,
+      "standalone": "ok",
+      "airlock_verify": true,
+      "checkpoint_entries": 11,
+      "key_pin_matches": true,
+      "signed_microusd": 79937,
+      "recorded_microusd": 79937,
+      "published_copies_byte_identical": true
+    },
+    {
+      "run": "02-click-argument-name-collision-protected",
+      "receipts": 17,
+      "standalone": "ok",
+      "airlock_verify": true,
+      "checkpoint_entries": 17,
+      "key_pin_matches": true,
+      "signed_microusd": 119793,
+      "recorded_microusd": 119793,
+      "published_copies_byte_identical": true
+    },
+    {
+      "run": "03-path-to-regexp-dependency-upgrade-protected",
+      "receipts": 19,
+      "standalone": "ok",
+      "airlock_verify": true,
+      "checkpoint_entries": 19,
+      "key_pin_matches": true,
+      "signed_microusd": 157311,
+      "recorded_microusd": 157311,
+      "published_copies_byte_identical": true
+    },
+    {
+      "run": "04-pflag-custom-bool-flags-protected",
+      "receipts": 17,
+      "standalone": "ok",
+      "airlock_verify": true,
+      "checkpoint_entries": 17,
+      "key_pin_matches": true,
+      "signed_microusd": 162087,
+      "recorded_microusd": 162087,
+      "published_copies_byte_identical": true
+    },
+    {
+      "run": "05-click-tempfile-pager-regression-protected",
+      "receipts": 19,
+      "standalone": "ok",
+      "airlock_verify": true,
+      "checkpoint_entries": 19,
+      "key_pin_matches": true,
+      "signed_microusd": 161608,
+      "recorded_microusd": 161608,
+      "published_copies_byte_identical": true
+    },
+    {
+      "run": "06-click-style-color-validation-protected",
+      "receipts": 21,
+      "standalone": "ok",
+      "airlock_verify": true,
+      "checkpoint_entries": 21,
+      "key_pin_matches": true,
+      "signed_microusd": 183738,
+      "recorded_microusd": 183738,
+      "published_copies_byte_identical": true
+    },
+    {
+      "run": "07-pflag-string-map-whitespace-protected",
+      "receipts": 19,
+      "standalone": "ok",
+      "airlock_verify": true,
+      "checkpoint_entries": 19,
+      "key_pin_matches": true,
+      "signed_microusd": 164604,
+      "recorded_microusd": 164604,
+      "published_copies_byte_identical": true
+    }
+  ],
+  "total_receipts": 123,
+  "total_signed_microusd": 1029078,
+  "verifiers": [
+    "airlock verify-evidence --journal --public-key --checkpoint",
+    "standalone Ed25519 verifier (cryptography only; from release/gate5-anthropic-live/build_evidence.py)"
+  ],
+  "key_pin_source": "KEY-PIN line printed before each agent ran, captured in the withheld runner log"
+}

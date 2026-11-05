@@ -1,0 +1,29 @@
+2026-11-05T20:22:32Z START 01-pflag-ipv4-mask
+2026-11-05T20:23:39Z END 01-pflag-ipv4-mask exit=0 {"case": "01-pflag-ipv4-mask", "mode": "protected", "evidence_class": "frozen-live", "agent_exit": 0, "verdict": "PASS", "verdict_reasons": []}
+systemic_checks=ok verdict=PASS spend_microusd=79937 calls=5/5
+anthropic_key_on_agent_surfaces=absent
+2026-11-05T20:23:39Z START 02-click-argument-name-collision
+2026-11-05T20:24:44Z END 02-click-argument-name-collision exit=1 {"case": "02-click-argument-name-collision", "mode": "protected", "evidence_class": "frozen-live", "agent_exit": 0, "verdict": "FAIL", "verdict_reasons": ["condition failed: visible_passed", "condition failed: hidden_passed", "condition failed: existing_tests_unmodified"]}
+systemic_checks=ok verdict=FAIL spend_microusd=119793 calls=8/8
+anthropic_key_on_agent_surfaces=absent
+2026-11-05T20:24:44Z START 03-path-to-regexp-dependency-upgrade
+2026-11-05T20:25:55Z END 03-path-to-regexp-dependency-upgrade exit=0 {"case": "03-path-to-regexp-dependency-upgrade", "mode": "protected", "evidence_class": "frozen-live", "agent_exit": 0, "verdict": "PASS", "verdict_reasons": []}
+systemic_checks=ok verdict=PASS spend_microusd=157311 calls=9/9
+anthropic_key_on_agent_surfaces=absent
+2026-11-05T20:25:55Z START 04-pflag-custom-bool-flags
+2026-11-05T20:27:54Z END 04-pflag-custom-bool-flags exit=0 {"case": "04-pflag-custom-bool-flags", "mode": "protected", "evidence_class": "frozen-live", "agent_exit": 0, "verdict": "PASS", "verdict_reasons": []}
+systemic_checks=ok verdict=PASS spend_microusd=162087 calls=8/8
+anthropic_key_on_agent_surfaces=absent
+2026-11-05T20:27:54Z START 05-click-tempfile-pager-regression
+2026-11-05T20:29:00Z END 05-click-tempfile-pager-regression exit=0 {"case": "05-click-tempfile-pager-regression", "mode": "protected", "evidence_class": "frozen-live", "agent_exit": 0, "verdict": "PASS", "verdict_reasons": []}
+systemic_checks=ok verdict=PASS spend_microusd=161608 calls=9/9
+anthropic_key_on_agent_surfaces=absent
+2026-11-05T20:29:00Z START 06-click-style-color-validation
+2026-11-05T20:30:27Z END 06-click-style-color-validation exit=0 {"case": "06-click-style-color-validation", "mode": "protected", "evidence_class": "frozen-live", "agent_exit": 0, "verdict": "PASS", "verdict_reasons": []}
+systemic_checks=ok verdict=PASS spend_microusd=183738 calls=10/10
+anthropic_key_on_agent_surfaces=absent
+2026-11-05T20:30:27Z START 07-pflag-string-map-whitespace
+2026-11-05T20:33:08Z END 07-pflag-string-map-whitespace exit=0 {"case": "07-pflag-string-map-whitespace", "mode": "protected", "evidence_class": "frozen-live", "agent_exit": 0, "verdict": "PASS", "verdict_reasons": []}
+systemic_checks=ok verdict=PASS spend_microusd=164604 calls=9/9
+anthropic_key_on_agent_surfaces=absent
+2026-11-05T20:33:09Z DONE

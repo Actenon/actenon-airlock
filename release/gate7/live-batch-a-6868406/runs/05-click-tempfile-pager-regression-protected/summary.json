@@ -1,0 +1,92 @@
+{
+  "schema": "actenon-airlock/gate7-live-summary/v1",
+  "derivative": "SANITISED DERIVATIVE of the withheld result.json, not byte-identical: test output tails (hidden test names and assertion text) and the patch are omitted.",
+  "derived_from_sha256": "8e77de656b8096d33b1ee7773b98f3a2115f7c1fff35b8758b53c90dc0347d96",
+  "case": "05-click-tempfile-pager-regression",
+  "capability": 5,
+  "repository": "click",
+  "upstream_base": "9c4dfdaebe0e6b2aabc566eb81f6f10eb5cd6ea1",
+  "mode": "protected",
+  "model": "claude-opus-5-5",
+  "evidence_class": "frozen-live",
+  "actual_paid_inference": true,
+  "verdict": "PASS",
+  "verdict_reasons": [],
+  "agent_exit": 0,
+  "seconds": 49.1,
+  "visible": {
+    "passed": true,
+    "checks": {
+      "pytest": {
+        "exit": 0,
+        "passed": true,
+        "counts": [
+          "1957 passed, 24 skipped, 31000 deselected, 1 xfailed in 5.46s"
+        ]
+      }
+    }
+  },
+  "hidden": {
+    "passed": true,
+    "checks": {
+      "pytest": {
+        "exit": 0,
+        "passed": true,
+        "counts": [
+          "1957 passed, 24 skipped, 31000 deselected, 1 xfailed in 4.00s"
+        ]
+      }
+    }
+  },
+  "conditions": {
+    "source_changed": true,
+    "visible_passed": true,
+    "hidden_passed": true,
+    "existing_tests_unmodified": true
+  },
+  "source_files_changed": [
+    "src/click/_termui_impl.py"
+  ],
+  "test_files_changed": [
+    "tests/test_termui.py"
+  ],
+  "existing_tests_changed": [],
+  "agent_tests": {},
+  "inference": {
+    "dispatched": 9,
+    "confirmed": 9,
+    "unconfirmed": 0,
+    "retries_held": 0,
+    "declined": 0,
+    "refused_at_spend_bound": 0
+  },
+  "accounting": {
+    "estimated_microusd": 161608,
+    "bound_microusd": 3000000,
+    "prices": "4,5,0.2,20"
+  },
+  "evidence_integrity": {
+    "integrity_ok": true,
+    "refused": 0,
+    "unresolved_effects": 0
+  },
+  "spend_bound_refusals": [],
+  "refusal_reasons": [],
+  "powers_authorised": [
+    "filesystem.write /dev/null",
+    "http.post api.anthropic.com/v1/messages",
+    "process.exec xdg-open"
+  ],
+  "public_key_sha256": "36e829ded95ea8517eaed9fc635e9cdd5807428b552d720a58a8ad5225092705",
+  "patch_sha256": "d4ff55416cb139c782731755c07dc54f693aca8355e9478cf53250c293a62f53",
+  "identity_equals_freeze": true,
+  "identity_source_commit": "6868406415c1798ba67e4bdc9ec4efbeeaf1bd6c",
+  "prepared": {
+    "case": "05-click-tempfile-pager-regression",
+    "upstream": "9c4dfdaebe0e6b2aabc566eb81f6f10eb5cd6ea1",
+    "files": 165,
+    "tree_sha256": "33c0b492fa7d3081e75b8f9ff37a11d5d3410fe352c1025c1622cadf466ce18a",
+    "issue_sha256": "484b98c4310f1df5bec687423448571ac1f6e60839fc3c4dab3494e903dbd1a9",
+    "git_history": "none"
+  }
+}

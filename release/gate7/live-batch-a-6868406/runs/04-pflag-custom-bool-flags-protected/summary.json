@@ -1,0 +1,85 @@
+{
+  "schema": "actenon-airlock/gate7-live-summary/v1",
+  "derivative": "SANITISED DERIVATIVE of the withheld result.json, not byte-identical: test output tails (hidden test names and assertion text) and the patch are omitted.",
+  "derived_from_sha256": "42fc29ad2f70ffb071220d8421bf9585984544ae3360977db801fb29f99f19ca",
+  "case": "04-pflag-custom-bool-flags",
+  "capability": 4,
+  "repository": "pflag",
+  "upstream_base": "6404d8209615987d23eafd5c38207dc343a5881e",
+  "mode": "protected",
+  "model": "claude-opus-5-5",
+  "evidence_class": "frozen-live",
+  "actual_paid_inference": true,
+  "verdict": "PASS",
+  "verdict_reasons": [],
+  "agent_exit": 0,
+  "seconds": 80.6,
+  "visible": {
+    "passed": true,
+    "checks": {
+      "go-test": {
+        "exit": 0,
+        "passed": true,
+        "counts": []
+      }
+    }
+  },
+  "hidden": {
+    "passed": true,
+    "checks": {
+      "go-test": {
+        "exit": 0,
+        "passed": true,
+        "counts": []
+      }
+    }
+  },
+  "conditions": {
+    "source_changed": true,
+    "visible_passed": true,
+    "hidden_passed": true,
+    "existing_tests_unmodified": true
+  },
+  "source_files_changed": [
+    "bool.go",
+    "flag.go"
+  ],
+  "test_files_changed": [],
+  "existing_tests_changed": [],
+  "agent_tests": {},
+  "inference": {
+    "dispatched": 8,
+    "confirmed": 8,
+    "unconfirmed": 0,
+    "retries_held": 0,
+    "declined": 0,
+    "refused_at_spend_bound": 0
+  },
+  "accounting": {
+    "estimated_microusd": 162087,
+    "bound_microusd": 3000000,
+    "prices": "4,5,0.2,20"
+  },
+  "evidence_integrity": {
+    "integrity_ok": true,
+    "refused": 0,
+    "unresolved_effects": 0
+  },
+  "spend_bound_refusals": [],
+  "refusal_reasons": [],
+  "powers_authorised": [
+    "http.post api.anthropic.com/v1/messages"
+  ],
+  "public_key_sha256": "71db768978c473c831b17f50f4b32f4ca11ad61347059bc20c85a596edd62c31",
+  "patch_sha256": "f4ba2649383066c5c99158bee5dfa89bea6265733d7db318406b3f41206e88de",
+  "identity_equals_freeze": true,
+  "identity_source_commit": "6868406415c1798ba67e4bdc9ec4efbeeaf1bd6c",
+  "prepared": {
+    "case": "04-pflag-custom-bool-flags",
+    "upstream": "6404d8209615987d23eafd5c38207dc343a5881e",
+    "files": 88,
+    "tree_sha256": "118b35583df0bba2c409d3e859570d731f2036cec5a9c5827e435bf53d01f4c0",
+    "issue_sha256": "169364d55ffebb6d9561ca48d6d70fc587a4a30f8532765836b8f9a6a4f155d4",
+    "git_history": "none"
+  }
+}
