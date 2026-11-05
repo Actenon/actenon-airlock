@@ -14,6 +14,7 @@ Verifies:
 
 import importlib.util
 import json
+import os
 import subprocess
 import sys
 from pathlib import Path
@@ -30,8 +31,14 @@ spec.loader.exec_module(runner)
 
 TASK = ROOT / "acceptance/v2/tasks/token-bucket"
 IMAGE = runner.IMAGE
+# Docker plus the pinned Claude Code image: built and run in the protected-container CI job.
+requires_image = pytest.mark.skipif(
+    not os.environ.get("AIRLOCK_TEST_CLAUDE_CODE_IMAGE"),
+    reason="requires Docker and the pinned Claude Code compute image",
+)
 
 
+@requires_image
 def test_frozen_identity_captures_complete_environment():
     ident = runner.identity(IMAGE)
     assert ident["schema"] == runner.SCHEMA
@@ -44,6 +51,7 @@ def test_frozen_identity_captures_complete_environment():
     assert ident["source_digest"]
 
 
+@requires_image
 def test_drift_in_configuration_is_refused(tmp_path):
     ident = runner.identity(IMAGE)
     tampered = dict(ident, model="claude-tampered")
@@ -57,6 +65,7 @@ def test_drift_in_configuration_is_refused(tmp_path):
             runner.main()
 
 
+@requires_image
 def test_official_claude_code_container_and_version():
     docker = runner.Docker()
     inspect = docker.image(IMAGE)
@@ -88,6 +97,7 @@ def test_original_token_bucket_task_visible_and_hidden_counts():
     assert len(visible_tests) + len(hidden_tests) == 7
 
 
+@requires_image
 def test_reference_solution_passes_all_7_tests(tmp_path):
     work = tmp_path / "work"
     import shutil
@@ -104,6 +114,7 @@ def test_reference_solution_passes_all_7_tests(tmp_path):
     assert score["tests_modified_by_agent"] is False
 
 
+@requires_image
 def test_unmodified_buggy_code_fails_visible_test():
     score = runner.scoring.score(TASK, TASK / "repo")
     assert score["passed"] is False
@@ -111,6 +122,7 @@ def test_unmodified_buggy_code_fails_visible_test():
     assert "1 failed" in score["visible"]["summary"]
 
 
+@requires_image
 def test_agent_exit_1_with_valid_patch_fails_runner(tmp_path):
     """A successful library patch with agent exit 1 is a FAIL."""
     out = tmp_path / "out"
@@ -167,6 +179,7 @@ def test_budget_exhaustion_refuses_dispatch():
     assert held > 1
 
 
+@requires_image
 def test_synthetic_rehearsal_baseline_and_offline_verification(tmp_path):
     out_config = tmp_path / "cfg"
     out_config.mkdir()
