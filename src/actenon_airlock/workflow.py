@@ -336,7 +336,10 @@ def _count_verdict(counts: dict | None, accept_skips: bool = False) -> tuple[str
     if not counts["tests"]:
         return NO_TESTS_RAN, "no tests ran"
     if counts["failed"]:
-        return TESTS_FAILED, f"{counts['failed']} of {counts['tests']} tests failed"
+        return (
+            TESTS_FAILED,
+            f"{counts['failed']} of {counts['tests']} test{'s' if counts['tests'] != 1 else ''} failed",
+        )
     if counts["skipped"] and not counts["passed"]:
         return ALL_SKIPPED, f"all {counts['tests']} tests were skipped, so nothing was checked"
     if counts["skipped"] and not accept_skips:
@@ -346,7 +349,7 @@ def _count_verdict(counts: dict | None, accept_skips: bool = False) -> tuple[str
         )
     if counts["skipped"]:
         return TESTS_PASSED, f"{counts['passed']} passed, {counts['skipped']} skipped (accepted)"
-    return TESTS_PASSED, f"{counts['tests']} tests passed"
+    return TESTS_PASSED, f"{counts['tests']} test{'s' if counts['tests'] != 1 else ''} passed"
 
 
 def _junit_verdict(report: Path, accept_skips: bool = False) -> tuple[str, str]:

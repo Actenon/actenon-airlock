@@ -84,15 +84,19 @@ if relay:
 
 
 # Honest about what the real thing needs: a project, a key, and money you approve.
-NEXT_STEP = """That is Airlock. To try it with a real agent on your own project:
+NEXT_STEP = r"""That is Airlock. To try it with a real agent, make a practice project with one bug
+(or cd into a project of your own and skip to the last two lines):
 
-  cd path/to/your-project
-  export ANTHROPIC_API_KEY=...      # or OPENAI_API_KEY for Codex; it never enters the container
-  airlock protect "Fix the failing test"
+  mkdir -p ~/airlock-practice && cd ~/airlock-practice
+  printf 'def add(a, b):\n    return a - b\n' > calculator.py
+  printf 'from calculator import add\n\n\ndef test_add():\n    assert add(2, 3) == 5\n' > test_calculator.py
+  mkdir -p ~/airlock-practice-tests && cp test_calculator.py ~/airlock-practice-tests/
+  export ANTHROPIC_API_KEY=...      # your key; it never enters the container
+  airlock protect --tests ~/airlock-practice-tests "Fix the failing test"
 
-Unlike this demo, that calls a real model and costs money. Airlock first shows you the
-spend limit per run ($2.00 unless you choose another) and runs nothing until you approve.
-Your project is never changed: you get a patch to review."""
+Unlike this demo, that calls a real model and costs money: a few cents for this project.
+Airlock first shows you the spend limit per run ($2.00 unless you choose another) and runs
+nothing until you approve. Your project is never changed: you get a patch to review."""
 
 
 def _project(root: Path) -> Path:

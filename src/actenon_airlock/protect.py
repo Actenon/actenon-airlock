@@ -163,7 +163,7 @@ def report(
     spent = activity["model_spend"]["estimated_microusd"]
     limit = int(Decimal(spend_limit.lstrip("$")) * 1_000_000)
     print(
-        f"  Model     {calls['dispatched']} call(s), about {_usd(spent)} of {spend_limit}"
+        f"  Model     {calls['dispatched']} call(s), about {_usd(spent)} of {_usd(limit)}"
         f" (estimate from signed usage; {_usd(max(limit - spent, 0))} left)"
     )
     if stopped:
@@ -251,9 +251,7 @@ def protect(args, root: Path, run) -> int:
             return proposed
         print(f"\n{agent} will run in a sealed container with a copy of this project.\n")
         print(review.getvalue().strip())
-        print(f"\nPrices used for the spend bound, USD per million tokens: {prices}")
-        print("(input, cache write, cache read, output). Check them against your provider.")
-        print(f"{credential} stays on this machine, outside the container.\n")
+        print("\nCheck the prices above against your provider before you approve.\n")
         if not (args.approve or _ask()):
             print("Nothing was approved and nothing ran.")
             return 2
@@ -270,8 +268,15 @@ def protect(args, root: Path, run) -> int:
     receipts = status(state)["receipts"] if state.receipts_path.exists() else 0
     print(f"\n{agent} is working. Ctrl-C stops it, and nothing it did leaves the container.\n")
     task_path.write_text(args.task + "\n")
+    from datetime import UTC, datetime
+
+    from .progress import live_progress
+
+    log = state.local / "logs" / f"protect-{datetime.now(UTC):%Y%m%dT%H%M%SZ}.log"
     try:
-        code = run(["work", "--path", str(root), "--message-file", TASK_FILE, "--image", image])
+        with live_progress(log):
+            code = run(["work", "--path", str(root), "--message-file", TASK_FILE, "--image", image])
+        print(f"\nFull agent transcript: {log.relative_to(root)}")
         finished = _new_run(state, earlier)
         if finished is None:
             print("The run did not finish, so there is no result.")
@@ -292,7 +297,10 @@ def protect(args, root: Path, run) -> int:
             state, sha256, args.tests.resolve(), image=image,
             accept_skips=args.accept_skips, allow_config_change=args.allow_config_change,
         )  # fmt: skip
-        verdict = f"{result['verdict']}: {result['detail']}"
+        from .workflow import OUTCOMES
+
+        outcome = OUTCOMES.get(result["verdict"], result["verdict"])
+        verdict = f"{outcome}: {result['detail']}"
         passed = result["verdict"] == TESTS_PASSED
     patch = None
     if manifest:

@@ -101,8 +101,11 @@ def test_the_review_says_what_the_agent_gets(project, monkeypatch, capsys):
     monkeypatch.setattr("sys.stdin", stream)
     protect(project, "--max-run-usd", "3.50")
     shown = capsys.readouterr().out
-    assert MODEL in shown and "$3.50" in shown and PRICES in shown
-    assert "no network" in shown and "ANTHROPIC_API_KEY stays on this machine" in shown
+    assert MODEL in shown and "$3.50" in shown
+    # Prices are shown once, in words: input, cache write, cache read and output.
+    assert "input $2.00, cache write $2.50, cache read $0.20, output $10.00" in shown
+    assert shown.count("Prices for the spend bound") == 1
+    assert "no network" in shown and "the agent never sees it" in shown
 
 
 def test_a_changed_bound_needs_approval_again(project):
@@ -231,7 +234,8 @@ def test_failing_tests_fail_the_command(project, monkeypatch, capsys, tmp_path):
         lambda *args, **options: {"verdict": "TESTS_FAILED", "detail": "1 of 2 tests did not pass"},
     )
     assert protect(project, "--approve", "--tests", str(tmp_path)) == 2
-    assert "TESTS_FAILED" in capsys.readouterr().out
+    shown = capsys.readouterr().out
+    assert "Checks    FAIL:" in shown and "your checks did not pass (FAIL)" in shown
 
 
 def test_the_agent_gets_the_projects_docs_and_can_change_them(tmp_path):
@@ -375,8 +379,17 @@ def test_protect_takes_a_task_to_a_reviewed_patch(tmp_path, monkeypatch, capsys)
         + ["--tests", str(trusted), "--approve", "Fix add so the tests pass"]
     )
     shown = capsys.readouterr().out
+    if os.environ.get("AIRLOCK_SHOW_PROTECT_OUTPUT"):
+        Path(os.environ["AIRLOCK_SHOW_PROTECT_OUTPUT"]).write_text(shown)
     assert code == 0, shown
-    assert "RESULT" in shown and "TESTS_PASSED" in shown and "git apply" in shown
+    assert "RESULT" in shown and "Checks    PASS: 1 test passed" in shown and "git apply" in shown
+    # The real container's stream became short lines; the raw stream is in the log only.
+    assert '{"type"' not in shown and "AIRLOCK ALLOW" not in shown
+    for line in ("started   ", "reading   AIRLOCK_TASK.md", "editing   calculator.py",
+                 "running   Look around", "The agent says: Fixed."):  # fmt: skip
+        assert line in shown, line
+    log = next(Path(root, ".airlock/local/logs").glob("protect-*.log")).read_text()
+    assert '"type":"system"' in log and "AIRLOCK ALLOW" in log
     assert "modified calculator.py" in " ".join(shown.split())
     assert "Refused   0 attempt(s)" in shown
     assert (root / "calculator.py").read_text() == original
@@ -409,7 +422,7 @@ def test_the_demo_runs_with_its_control_and_cleans_up(capsys):
     assert "1 file created on GitHub, confirmed independently" in shown
     assert "Outcome    CONFIRMED (from airlock explain)" in shown
     assert "claims nothing" not in shown
-    assert "cd path/to/your-project" in shown and "costs money" in shown
+    assert "mkdir -p ~/airlock-practice" in shown and "costs money" in shown
     assert networks() == before
 
 
@@ -432,6 +445,51 @@ def test_protect_refuses_a_home_folder_before_anything_else(tmp_path, monkeypatc
 def test_the_demo_says_what_the_real_thing_needs():
     from actenon_airlock.demo import NEXT_STEP
 
-    assert "cd path/to/your-project" in NEXT_STEP
+    assert "path/to" not in NEXT_STEP  # every line can be pasted as it is
+    assert "mkdir -p ~/airlock-practice && cd ~/airlock-practice" in NEXT_STEP
+    assert 'airlock protect --tests ~/airlock-practice-tests "Fix the failing test"' in NEXT_STEP
     assert "ANTHROPIC_API_KEY" in NEXT_STEP and "never enters the container" in NEXT_STEP
-    assert "costs money" in NEXT_STEP and "runs nothing until you approve" in NEXT_STEP
+    words = " ".join(NEXT_STEP.split())
+    assert "costs money" in words and "runs nothing until you approve" in words
+
+
+STREAM = [
+    '{"type":"system","subtype":"init","model":"claude-opus-5-5","tools":["Bash"]}',
+    '{"type":"assistant","message":{"content":[{"type":"tool_use","name":"Bash",'
+    '"input":{"command":"python -m pytest -q","description":"Run the tests"}}]}}',
+    '{"type":"user","message":{"content":[{"type":"tool_result","content":'
+    '"F\\nFAILED test_calculator.py::test_add - assert -1 == 5\\n1 failed in 0.01s"}]}}',
+    '{"type":"assistant","message":{"content":[{"type":"tool_use","name":"Edit",'
+    '"input":{"file_path":"/workspace/calculator.py"}}]}}',
+    '{"type":"result","num_turns":4,"result":"I fixed the failing test."}',
+]
+
+
+def test_a_run_shows_short_progress_and_keeps_the_full_transcript(project, monkeypatch, capsys):
+    def launch(root, command, *, image):
+        run = State(root).local / "runs" / "protected_fake"
+        shutil.copytree(root, run / "workspace", ignore=shutil.ignore_patterns(".airlock"))
+        (run / "workspace" / "calculator.py").write_text("def add(a, b):\n    return a + b\n")
+        (run / "result.json").write_text(json.dumps({"exit_code": 0}))
+        # The way the real run writes: the container on fd 1, the supervisor on stderr.
+        for line in STREAM[:3]:
+            os.write(1, (line + "\n").encode())
+        print("AIRLOCK ALLOW http.post @ https://api.anthropic.com/v1/messages: x [r1]",
+              file=sys.stderr)  # fmt: skip
+        subprocess.run([sys.executable, "-c", f"print({STREAM[3]!r}); print({STREAM[4]!r})"])
+        return 0
+
+    monkeypatch.setattr("actenon_airlock.protected.launch_protected", launch)
+    assert protect(project, "--approve") == 0
+    shown = capsys.readouterr().out
+    assert '{"type"' not in shown and "AIRLOCK ALLOW" not in shown
+    for line in ("started   claude-opus-5-5", "running   Run the tests", "→ 1 failed in 0.01s",
+                 "editing   calculator.py", "The agent says: I fixed the failing test.",
+                 "its own words", "Full agent transcript: .airlock/local/logs/protect-"):  # fmt: skip
+        assert line in shown, line
+    logs = list((project / ".airlock/local/logs").glob("protect-*.log"))
+    assert len(logs) == 1 and oct(logs[0].stat().st_mode)[-3:] == "600"
+    raw = logs[0].read_text()
+    assert all(line in raw for line in STREAM) and "AIRLOCK ALLOW" in raw
+    # The receipt that follows is Airlock's, printed normally.
+    assert "RESULT" in shown and "Changed   1 file(s)" in shown
