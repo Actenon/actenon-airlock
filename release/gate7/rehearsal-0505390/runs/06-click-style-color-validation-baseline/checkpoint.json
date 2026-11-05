@@ -1,0 +1,10 @@
+{
+  "payload": {
+    "schema": "actenon-airlock/journal-checkpoint/v1",
+    "journal_entries": 10,
+    "chain_head_sha256": "284bc10de51b5c9d68c57d3236074c1533754babdcf969c622a514b38d55576f",
+    "created_at": "2026-11-05T19:57:56.170944+00:00",
+    "signer_key_id": "ed25519-3944a1a9cdaf"
+  },
+  "signature": "ZGXpv+8TgKw6/NOxC0/PVeapL73vMALcj2EZaY8WXnYgb6FbNX7a7E1XBqXNGNV9Bju9gmBPhjAgcr55biDIAg=="
+}

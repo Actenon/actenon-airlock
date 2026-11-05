@@ -1,0 +1,54 @@
+--- a/string_to_string.go
++++ b/string_to_string.go
+@@ -88,7 +88,7 @@
+ 		panic(err)
+ 	}
+ 	w.Flush()
+-	return "[" + strings.TrimSpace(buf.String()) + "]"
++	return "[" + strings.TrimSuffix(buf.String(), "\n") + "]"
+ }
+ 
+ // GetStringToString return the map value of a flag with the given name from f. The returned map shares memory with the
+--- a/string_to_string_test.go
++++ b/string_to_string_test.go
+@@ -388,6 +388,40 @@
+ 	}
+ }
+ 
++func TestS2SStringPreservesTrailingWhitespace(t *testing.T) {
++	for _, tc := range []struct {
++		name, value, expected string
++	}{
++		{"space", "value ", "[key=value ]"},
++		{"tab", "value\t", "[key=value\t]"},
++		{"unicode_space", "value ", "[key=value ]"},
++		{"whitespace_only", " \t ", "[key= \t ]"},
++		{"plain", "value", "[key=value]"},
++		{"empty", "", "[key=]"},
++		{"quoted_comma", "a,b ", "[\"key=a,b \"]"},
++		{"quoted_newline", "line\nend ", "[\"key=line\nend \"]"},
++	} {
++		t.Run(tc.name, func(t *testing.T) {
++			for _, useDefault := range []bool{true, false} {
++				f := NewFlagSet("test", ContinueOnError)
++				defaults := map[string]string{}
++				if useDefault {
++					defaults["key"] = tc.value
++				}
++				f.StringToString("map", defaults, "")
++				if !useDefault {
++					if err := f.Set("map", "key="+tc.value); err != nil {
++						t.Fatal(err)
++					}
++				}
++				if got := f.Lookup("map").Value.String(); got != tc.expected {
++					t.Errorf("default=%t: expected %q, got %q", useDefault, tc.expected, got)
++				}
++			}
++		})
++	}
++}
++
+ func TestS2SCalledTwice(t *testing.T) {
+ 	var s2s map[string]string
+ 	f := setUpS2SFlagSet(&s2s)

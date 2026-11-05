@@ -1,0 +1,577 @@
+{
+  "schema": "actenon-airlock/gate7-evidence-manifest/v1",
+  "source": "../gate7-evidence/clean-0505390",
+  "files": [
+    {
+      "path": "prestate.json",
+      "sha256": "ecb6dd9dccd56c80d9406e17489b296aa57f72c8d9a7bde2a289e3c1175bfeb6",
+      "bytes": 38428,
+      "provenance": "byte copy of the as-run original"
+    },
+    {
+      "path": "runs/01-pflag-ipv4-mask-baseline/agent.patch",
+      "sha256": "c1f4bd6245568d5012112619eed668157951ed1d8854f420309beab89c91d736",
+      "bytes": 313,
+      "provenance": "byte copy of the as-run original"
+    },
+    {
+      "path": "runs/01-pflag-ipv4-mask-baseline/checkpoint.json",
+      "sha256": "8390d69d48da0fb457118cb7e87a076a60f75cb9083917195f021eae8b29d682",
+      "bytes": 402,
+      "provenance": "byte copy of the as-run original"
+    },
+    {
+      "path": "runs/01-pflag-ipv4-mask-baseline/public-key.json",
+      "sha256": "1501e84d6f1da76eb91b798024878e234d50e12ae5aa49ec42c6d4694d667e6a",
+      "bytes": 55,
+      "provenance": "byte copy of the as-run original"
+    },
+    {
+      "path": "runs/01-pflag-ipv4-mask-baseline/receipts.jsonl",
+      "sha256": "a9219ea0c239a9a87bc857176987a2a98a376e79740d9f5c0d1cdff8facf084f",
+      "bytes": 53870,
+      "provenance": "byte copy of the as-run original"
+    },
+    {
+      "path": "runs/01-pflag-ipv4-mask-baseline/result.json",
+      "sha256": "ef5fd44899218fa4f9f4b4a8ae6d85b5200d71224c4e169fbde2bf1be7fcb5da",
+      "bytes": 8039,
+      "provenance": "byte copy of the as-run original"
+    },
+    {
+      "path": "runs/01-pflag-ipv4-mask-protected/agent.patch",
+      "sha256": "c1f4bd6245568d5012112619eed668157951ed1d8854f420309beab89c91d736",
+      "bytes": 313,
+      "provenance": "byte copy of the as-run original"
+    },
+    {
+      "path": "runs/01-pflag-ipv4-mask-protected/checkpoint.json",
+      "sha256": "f025181c6660cea629fda42b0b6c3b2d33b0a159ca9d52680c6bffd2c6d6d155",
+      "bytes": 402,
+      "provenance": "byte copy of the as-run original"
+    },
+    {
+      "path": "runs/01-pflag-ipv4-mask-protected/public-key.json",
+      "sha256": "e6112d64e49fce0bcb31ed9892a0aaf39b7cad8aa17f00f2e2123ad56901d4d4",
+      "bytes": 55,
+      "provenance": "byte copy of the as-run original"
+    },
+    {
+      "path": "runs/01-pflag-ipv4-mask-protected/receipts.jsonl",
+      "sha256": "baf9f73a334e3ca6804f875294b6ba89366d97a1687b662b8276936750483a7c",
+      "bytes": 57181,
+      "provenance": "byte copy of the as-run original"
+    },
+    {
+      "path": "runs/01-pflag-ipv4-mask-protected/result.json",
+      "sha256": "4e1039457e82591d733f932bfddf57960085cfea53a74484a3b415c9bbc16408",
+      "bytes": 8041,
+      "provenance": "byte copy of the as-run original"
+    },
+    {
+      "path": "runs/02-click-argument-name-collision-baseline/agent.patch",
+      "sha256": "8de53668ef76363bf460964bf88c197f19872c8cb07d25dd987ebca2844f84c3",
+      "bytes": 4099,
+      "provenance": "byte copy of the as-run original"
+    },
+    {
+      "path": "runs/02-click-argument-name-collision-baseline/checkpoint.json",
+      "sha256": "0ecc77537d5333c8270e1adfc2b06bdc1345b354a5bb005184df44684d03b3a1",
+      "bytes": 403,
+      "provenance": "byte copy of the as-run original"
+    },
+    {
+      "path": "runs/02-click-argument-name-collision-baseline/public-key.json",
+      "sha256": "032a88746aa709910f12014e26e2817de02f6c6f4571365a2e7524d4dc5eeee3",
+      "bytes": 55,
+      "provenance": "byte copy of the as-run original"
+    },
+    {
+      "path": "runs/02-click-argument-name-collision-baseline/receipts.jsonl",
+      "sha256": "d510891610c80080a08b0ad7957f18a2fdbb8d94c7e8164e5225dccab296b967",
+      "bytes": 113793,
+      "provenance": "byte copy of the as-run original"
+    },
+    {
+      "path": "runs/02-click-argument-name-collision-baseline/result.json",
+      "sha256": "2ae58efda356d38a2e64f6fc69e31e7373d112ae462ab48a1989e68ab37ab960",
+      "bytes": 8941,
+      "provenance": "byte copy of the as-run original"
+    },
+    {
+      "path": "runs/02-click-argument-name-collision-protected/agent.patch",
+      "sha256": "8de53668ef76363bf460964bf88c197f19872c8cb07d25dd987ebca2844f84c3",
+      "bytes": 4099,
+      "provenance": "byte copy of the as-run original"
+    },
+    {
+      "path": "runs/02-click-argument-name-collision-protected/checkpoint.json",
+      "sha256": "223490a26a12805bc596d2e5d4a3646ea99afa92b1da461f5b5da978f1fbd03a",
+      "bytes": 403,
+      "provenance": "byte copy of the as-run original"
+    },
+    {
+      "path": "runs/02-click-argument-name-collision-protected/public-key.json",
+      "sha256": "73aced0c254c4f444b28529fdc0438e79eff56873d006539d24b81451f0b7941",
+      "bytes": 55,
+      "provenance": "byte copy of the as-run original"
+    },
+    {
+      "path": "runs/02-click-argument-name-collision-protected/receipts.jsonl",
+      "sha256": "d9fc9e7b6358e6267c347395b17fc025f358f002ebae02d137710aad2f68c606",
+      "bytes": 121776,
+      "provenance": "byte copy of the as-run original"
+    },
+    {
+      "path": "runs/02-click-argument-name-collision-protected/result.json",
+      "sha256": "ea1d736a333e68d57ca39d93004df685ff1e922d4417b248532b52504b84c5e6",
+      "bytes": 8942,
+      "provenance": "byte copy of the as-run original"
+    },
+    {
+      "path": "runs/03-path-to-regexp-dependency-upgrade-baseline/agent.patch",
+      "sha256": "0181f3ca22dc7206e4808c22fa1e20c6c296d1ed06662a60fbc7c8c220fe5a7d",
+      "bytes": 2570,
+      "provenance": "byte copy of the as-run original"
+    },
+    {
+      "path": "runs/03-path-to-regexp-dependency-upgrade-baseline/checkpoint.json",
+      "sha256": "a6d7f74ec6a396dbed868485b1ef3724a8bc33350ba8c601812f8ff62e57d6ae",
+      "bytes": 403,
+      "provenance": "byte copy of the as-run original"
+    },
+    {
+      "path": "runs/03-path-to-regexp-dependency-upgrade-baseline/public-key.json",
+      "sha256": "b58dad5c802fc631fa600e63bc0a2f2f4deb9ad3e11c55e0d85db6221e67a9a1",
+      "bytes": 55,
+      "provenance": "byte copy of the as-run original"
+    },
+    {
+      "path": "runs/03-path-to-regexp-dependency-upgrade-baseline/receipts.jsonl",
+      "sha256": "e9ca05491f5f673ff9368bc5a65bc47926824ae52a26f0430bd7cda6b10c5d76",
+      "bytes": 67353,
+      "provenance": "byte copy of the as-run original"
+    },
+    {
+      "path": "runs/03-path-to-regexp-dependency-upgrade-baseline/result.json",
+      "sha256": "080f891cd384bfbd94fd06b1660ac01edb97c02d59dc40212335893e96c6f449",
+      "bytes": 9062,
+      "provenance": "byte copy of the as-run original"
+    },
+    {
+      "path": "runs/03-path-to-regexp-dependency-upgrade-protected/agent.patch",
+      "sha256": "0181f3ca22dc7206e4808c22fa1e20c6c296d1ed06662a60fbc7c8c220fe5a7d",
+      "bytes": 2570,
+      "provenance": "byte copy of the as-run original"
+    },
+    {
+      "path": "runs/03-path-to-regexp-dependency-upgrade-protected/checkpoint.json",
+      "sha256": "e0853324faa01a2935ff15e9f011e10c525efa2211c599b21f6b2662a092d3df",
+      "bytes": 403,
+      "provenance": "byte copy of the as-run original"
+    },
+    {
+      "path": "runs/03-path-to-regexp-dependency-upgrade-protected/public-key.json",
+      "sha256": "5c7a76630ad66f66ef57e76d268c5dafd02f18bc4cdcf5a772cb546291528591",
+      "bytes": 55,
+      "provenance": "byte copy of the as-run original"
+    },
+    {
+      "path": "runs/03-path-to-regexp-dependency-upgrade-protected/receipts.jsonl",
+      "sha256": "0f29538bbcf19bcc191cda69d77f12f4fa4abe717cf862aed8ca4e0a996ff37b",
+      "bytes": 70700,
+      "provenance": "byte copy of the as-run original"
+    },
+    {
+      "path": "runs/03-path-to-regexp-dependency-upgrade-protected/result.json",
+      "sha256": "f7b23dea50fb0422c6b86c85f282018bb0b44d590e6b6cca11b6a4117f3b585b",
+      "bytes": 9063,
+      "provenance": "byte copy of the as-run original"
+    },
+    {
+      "path": "runs/04-pflag-custom-bool-flags-baseline/agent.patch",
+      "sha256": "72175513a421e55440ffa0826447be99e8cad9e94dc1340532ca1c669484721e",
+      "bytes": 1423,
+      "provenance": "byte copy of the as-run original"
+    },
+    {
+      "path": "runs/04-pflag-custom-bool-flags-baseline/checkpoint.json",
+      "sha256": "5dea533a8e3daa9e589a08952c46b07bd1ab990009dfe8b292ce069e3f982564",
+      "bytes": 403,
+      "provenance": "byte copy of the as-run original"
+    },
+    {
+      "path": "runs/04-pflag-custom-bool-flags-baseline/public-key.json",
+      "sha256": "26ef440a7d4ce4284cf6d884eeaa722af957823401ff4f24c4c8f3cbeb8d7305",
+      "bytes": 55,
+      "provenance": "byte copy of the as-run original"
+    },
+    {
+      "path": "runs/04-pflag-custom-bool-flags-baseline/receipts.jsonl",
+      "sha256": "df21bea8b5738e793853de0cd09ba58b4e476d4b8467f4a0b2038dc7eeb173c8",
+      "bytes": 67353,
+      "provenance": "byte copy of the as-run original"
+    },
+    {
+      "path": "runs/04-pflag-custom-bool-flags-baseline/result.json",
+      "sha256": "68870d8811eb72f17b8a3c350297ef7a24e106b63162c968ed71fbd0906c814d",
+      "bytes": 8140,
+      "provenance": "byte copy of the as-run original"
+    },
+    {
+      "path": "runs/04-pflag-custom-bool-flags-protected/agent.patch",
+      "sha256": "72175513a421e55440ffa0826447be99e8cad9e94dc1340532ca1c669484721e",
+      "bytes": 1423,
+      "provenance": "byte copy of the as-run original"
+    },
+    {
+      "path": "runs/04-pflag-custom-bool-flags-protected/checkpoint.json",
+      "sha256": "e4c16ba61d6f866d1f208e1fad71bf15da00810474b0415d08af08562cc5ec7c",
+      "bytes": 403,
+      "provenance": "byte copy of the as-run original"
+    },
+    {
+      "path": "runs/04-pflag-custom-bool-flags-protected/public-key.json",
+      "sha256": "9cf5f009a38ce972f9bfdb58a5bb82724e3840157d7c691092ffd314e816c3af",
+      "bytes": 55,
+      "provenance": "byte copy of the as-run original"
+    },
+    {
+      "path": "runs/04-pflag-custom-bool-flags-protected/receipts.jsonl",
+      "sha256": "92eb829618770432c587412e58dee359db47801202aafcf0a19074aa956955f7",
+      "bytes": 70680,
+      "provenance": "byte copy of the as-run original"
+    },
+    {
+      "path": "runs/04-pflag-custom-bool-flags-protected/result.json",
+      "sha256": "a2bc7477ec7c1fa7a10becd26e02c00b8e62f40969b0f5020cf4230073bdd38e",
+      "bytes": 8143,
+      "provenance": "byte copy of the as-run original"
+    },
+    {
+      "path": "runs/05-click-tempfile-pager-regression-baseline/agent.patch",
+      "sha256": "a9752056b60fce5101243107bc68be3d1e9b9c741bb5aec8eba627d2836d174c",
+      "bytes": 1518,
+      "provenance": "byte copy of the as-run original"
+    },
+    {
+      "path": "runs/05-click-tempfile-pager-regression-baseline/checkpoint.json",
+      "sha256": "f1d2c4961bfc5c1faf0ea12eddb1b235bfd0083ecb1b42f319f7fc04546a8311",
+      "bytes": 402,
+      "provenance": "byte copy of the as-run original"
+    },
+    {
+      "path": "runs/05-click-tempfile-pager-regression-baseline/public-key.json",
+      "sha256": "f990ce6cc8b6973e2f5e5ce0aa593b0789740b96a6eb09a360ae29ced88ff805",
+      "bytes": 55,
+      "provenance": "byte copy of the as-run original"
+    },
+    {
+      "path": "runs/05-click-tempfile-pager-regression-baseline/receipts.jsonl",
+      "sha256": "5efca01f586b712c686aaf8037ec549ba16a5a7dc7627d32e9f4bd4c78450bca",
+      "bytes": 91022,
+      "provenance": "byte copy of the as-run original"
+    },
+    {
+      "path": "runs/05-click-tempfile-pager-regression-baseline/result.json",
+      "sha256": "10df74772f125dfa162ff700f44bac008639170a500121b8ee9351fc20fb906e",
+      "bytes": 8838,
+      "provenance": "byte copy of the as-run original"
+    },
+    {
+      "path": "runs/05-click-tempfile-pager-regression-protected/agent.patch",
+      "sha256": "a9752056b60fce5101243107bc68be3d1e9b9c741bb5aec8eba627d2836d174c",
+      "bytes": 1518,
+      "provenance": "byte copy of the as-run original"
+    },
+    {
+      "path": "runs/05-click-tempfile-pager-regression-protected/checkpoint.json",
+      "sha256": "592012e0aeee021088d9d3d0562c8d6bbd4977c4bb36d32f5374998354ca497a",
+      "bytes": 402,
+      "provenance": "byte copy of the as-run original"
+    },
+    {
+      "path": "runs/05-click-tempfile-pager-regression-protected/public-key.json",
+      "sha256": "9cbe51f085bfb881666c973762b80bcebfda5e58d5f11b9e03e39dccb4985745",
+      "bytes": 55,
+      "provenance": "byte copy of the as-run original"
+    },
+    {
+      "path": "runs/05-click-tempfile-pager-regression-protected/receipts.jsonl",
+      "sha256": "6c649b30680413ffc5ca73cfb86f59709c9f8b3d390371fbc7b92470d21df01f",
+      "bytes": 99009,
+      "provenance": "byte copy of the as-run original"
+    },
+    {
+      "path": "runs/05-click-tempfile-pager-regression-protected/result.json",
+      "sha256": "6d0adbe1a99d2ad123aecdd2c57b4a01322d2c853459f119d6237bbd0a36ab3b",
+      "bytes": 8840,
+      "provenance": "byte copy of the as-run original"
+    },
+    {
+      "path": "runs/06-click-style-color-validation-baseline/agent.patch",
+      "sha256": "d39713e62daf1a18f4257ef4a8fab4327c10efaae8e28a72253db55b4f948909",
+      "bytes": 5812,
+      "provenance": "byte copy of the as-run original"
+    },
+    {
+      "path": "runs/06-click-style-color-validation-baseline/checkpoint.json",
+      "sha256": "e2cf39c3e60fe1185582111dcdaca4fd965845d48c6322ae5d2ebb07d5761ef2",
+      "bytes": 403,
+      "provenance": "byte copy of the as-run original"
+    },
+    {
+      "path": "runs/06-click-style-color-validation-baseline/public-key.json",
+      "sha256": "307b03dbc1d146e49a194a9b55c92f352f8fb897a0377d86a63d0369d4dcca58",
+      "bytes": 55,
+      "provenance": "byte copy of the as-run original"
+    },
+    {
+      "path": "runs/06-click-style-color-validation-baseline/receipts.jsonl",
+      "sha256": "624c6072e7d2e39ba49e73e293637c0fdd541b9ae326d45a18e419757498bc87",
+      "bytes": 113793,
+      "provenance": "byte copy of the as-run original"
+    },
+    {
+      "path": "runs/06-click-style-color-validation-baseline/result.json",
+      "sha256": "56cb4e2115e3b1dc1966eb39c968ec02a416e2c36c9c4b2213ad5c4a9ed327f9",
+      "bytes": 10218,
+      "provenance": "byte copy of the as-run original"
+    },
+    {
+      "path": "runs/06-click-style-color-validation-protected/agent.patch",
+      "sha256": "d39713e62daf1a18f4257ef4a8fab4327c10efaae8e28a72253db55b4f948909",
+      "bytes": 5812,
+      "provenance": "byte copy of the as-run original"
+    },
+    {
+      "path": "runs/06-click-style-color-validation-protected/checkpoint.json",
+      "sha256": "d7cb6f746cd1cfc443a3d9a254957a17218c52d156ebb9540f982d295e2509d3",
+      "bytes": 403,
+      "provenance": "byte copy of the as-run original"
+    },
+    {
+      "path": "runs/06-click-style-color-validation-protected/public-key.json",
+      "sha256": "6bf6cffd3999a37d9c039f052d77b5cce9b2317d0290d267ee2a5175544140c4",
+      "bytes": 55,
+      "provenance": "byte copy of the as-run original"
+    },
+    {
+      "path": "runs/06-click-style-color-validation-protected/receipts.jsonl",
+      "sha256": "043bf8647a059f85cc344b6c584e34f99055ccbc45975d6fc9d557cf9e131265",
+      "bytes": 121774,
+      "provenance": "byte copy of the as-run original"
+    },
+    {
+      "path": "runs/06-click-style-color-validation-protected/result.json",
+      "sha256": "d23d4c5d0b25c9d8ce3ffa436d2fba6c8a5e4cbfa3013b83fbe1501bb4a7d6d5",
+      "bytes": 10221,
+      "provenance": "byte copy of the as-run original"
+    },
+    {
+      "path": "runs/07-pflag-string-map-whitespace-baseline/agent.patch",
+      "sha256": "fce6346456cc99d97973bb6a42c47e0a0542e6b658cd8d5cbdf8fd030e7701f4",
+      "bytes": 1591,
+      "provenance": "byte copy of the as-run original"
+    },
+    {
+      "path": "runs/07-pflag-string-map-whitespace-baseline/checkpoint.json",
+      "sha256": "4b80560e2e5ad01a009757976cbae33626d8f083898ee81dae6f608d07bd1525",
+      "bytes": 403,
+      "provenance": "byte copy of the as-run original"
+    },
+    {
+      "path": "runs/07-pflag-string-map-whitespace-baseline/public-key.json",
+      "sha256": "72662d2fa6da3f6bf6a1b19016fc6406e33486a21487e1ed139c92afdcf3dfcb",
+      "bytes": 55,
+      "provenance": "byte copy of the as-run original"
+    },
+    {
+      "path": "runs/07-pflag-string-map-whitespace-baseline/receipts.jsonl",
+      "sha256": "981e4acf967682a0041458ed0df1f8577f8330ee309d03aa6ccbf599790a290b",
+      "bytes": 80836,
+      "provenance": "byte copy of the as-run original"
+    },
+    {
+      "path": "runs/07-pflag-string-map-whitespace-baseline/result.json",
+      "sha256": "8ce26e93ee0a923398af82e6a34a57b7f14616885ca76d74801c740f7d18968e",
+      "bytes": 9207,
+      "provenance": "byte copy of the as-run original"
+    },
+    {
+      "path": "runs/07-pflag-string-map-whitespace-protected/agent.patch",
+      "sha256": "fce6346456cc99d97973bb6a42c47e0a0542e6b658cd8d5cbdf8fd030e7701f4",
+      "bytes": 1591,
+      "provenance": "byte copy of the as-run original"
+    },
+    {
+      "path": "runs/07-pflag-string-map-whitespace-protected/checkpoint.json",
+      "sha256": "292522aec3bcae7c7539c783629c95f187e81a4e052eff91795ae29ebbc61e65",
+      "bytes": 403,
+      "provenance": "byte copy of the as-run original"
+    },
+    {
+      "path": "runs/07-pflag-string-map-whitespace-protected/public-key.json",
+      "sha256": "b593c6ac6be7072ae32b4a00ac897ca2e426dad68fcffa684cca52b151561d27",
+      "bytes": 55,
+      "provenance": "byte copy of the as-run original"
+    },
+    {
+      "path": "runs/07-pflag-string-map-whitespace-protected/receipts.jsonl",
+      "sha256": "3d53ca6173922d942b008787c3a9daa84ac118dba4ad3c5d05abd39efc675b3d",
+      "bytes": 84171,
+      "provenance": "byte copy of the as-run original"
+    },
+    {
+      "path": "runs/07-pflag-string-map-whitespace-protected/result.json",
+      "sha256": "0583f769ad2b67bf2a691bcc8b50a4b7e88ba2d0d8a5b0402197bb848b59b86a",
+      "bytes": 9207,
+      "provenance": "byte copy of the as-run original"
+    },
+    {
+      "path": "runs/08-path-to-regexp-spend-bound-protected/agent.patch",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0,
+      "provenance": "byte copy of the as-run original"
+    },
+    {
+      "path": "runs/08-path-to-regexp-spend-bound-protected/checkpoint.json",
+      "sha256": "4694c4c83dca1ea580ccb79822a5ade1b7d80e4c41a14a1d762051f42cc22379",
+      "bytes": 403,
+      "provenance": "byte copy of the as-run original"
+    },
+    {
+      "path": "runs/08-path-to-regexp-spend-bound-protected/public-key.json",
+      "sha256": "f6870635c116d349f34d0dc7e6a301522e04f22ac227078c0e5065a2185b4357",
+      "bytes": 55,
+      "provenance": "byte copy of the as-run original"
+    },
+    {
+      "path": "runs/08-path-to-regexp-spend-bound-protected/receipts.jsonl",
+      "sha256": "c801b08253fb0309f2a2c28c1054d20827be1e405801c4b77d59ebf55e2f37db",
+      "bytes": 59692,
+      "provenance": "byte copy of the as-run original"
+    },
+    {
+      "path": "runs/08-path-to-regexp-spend-bound-protected/result.json",
+      "sha256": "2d2ac0cc1d6dea1abba80acccf65d7a895154ccda0a011facfc103b4d89feea2",
+      "bytes": 8979,
+      "provenance": "byte copy of the as-run original"
+    },
+    {
+      "path": "runs/09-click-short-help-reviewed-publish-protected/CONSEQUENCE.md",
+      "sha256": "4c98d00fd5708d4ea3cb7784894d5126149a311ccaffc9d8bf25c45ad983fda7",
+      "bytes": 4377,
+      "provenance": "byte copy of the as-run original"
+    },
+    {
+      "path": "runs/09-click-short-help-reviewed-publish-protected/agent.patch",
+      "sha256": "1ac4aee25180dac71d55377a645c85fef765d8f27e8ef3f578a9c5252ca0175e",
+      "bytes": 2399,
+      "provenance": "byte copy of the as-run original"
+    },
+    {
+      "path": "runs/09-click-short-help-reviewed-publish-protected/checkpoint.json",
+      "sha256": "22c749f7b8579063aaaab19d8a4df55d9caafa04a89129e1cb37c8b3fb729eea",
+      "bytes": 403,
+      "provenance": "byte copy of the as-run original"
+    },
+    {
+      "path": "runs/09-click-short-help-reviewed-publish-protected/public-key.json",
+      "sha256": "b072b40cf6c102fe485ab368509a3ec8e0472d1d18fe779e15bf1d20f29d5d9a",
+      "bytes": 55,
+      "provenance": "byte copy of the as-run original"
+    },
+    {
+      "path": "runs/09-click-short-help-reviewed-publish-protected/receipts.jsonl",
+      "sha256": "29c85426a4cd8e5da024a76fb0bbb4c3013a55a0888da297176224d80cda410c",
+      "bytes": 208633,
+      "provenance": "byte copy of the as-run original"
+    },
+    {
+      "path": "runs/09-click-short-help-reviewed-publish-protected/result.json",
+      "sha256": "7cdea15a1be10493d2ee1be56b60dd87f41547b519d6641618db9024918980b9",
+      "bytes": 9194,
+      "provenance": "byte copy of the as-run original"
+    },
+    {
+      "path": "runs/09-click-short-help-reviewed-publish-protected/reviewed-create.json",
+      "sha256": "c03384e0df2ff11cf6f2806027f8960c87430b84609cdc310842a854bda9cb7d",
+      "bytes": 549,
+      "provenance": "byte copy of the as-run original"
+    },
+    {
+      "path": "runs/10-click-sentinel-ambiguous-publish-protected/CONSEQUENCE.md",
+      "sha256": "2eeafac65a761ebcdce9cc3d87b4e768445f764da5b31026d340780421c27e93",
+      "bytes": 4479,
+      "provenance": "byte copy of the as-run original"
+    },
+    {
+      "path": "runs/10-click-sentinel-ambiguous-publish-protected/agent.patch",
+      "sha256": "60b96f062c3f85a2f3bc73882f2651b24c9c9f8810d9097ca61c85d20b6b5c11",
+      "bytes": 545,
+      "provenance": "byte copy of the as-run original"
+    },
+    {
+      "path": "runs/10-click-sentinel-ambiguous-publish-protected/checkpoint.json",
+      "sha256": "36214f83eb9f08e1d0d41e2f9e599d736ec1a121de2e1852bdb6fbd45419cb35",
+      "bytes": 403,
+      "provenance": "byte copy of the as-run original"
+    },
+    {
+      "path": "runs/10-click-sentinel-ambiguous-publish-protected/public-key.json",
+      "sha256": "0f2edac401fe6aeca1eb66d480235e74475e896e31e2c4a58f6ab01749a3c5c2",
+      "bytes": 55,
+      "provenance": "byte copy of the as-run original"
+    },
+    {
+      "path": "runs/10-click-sentinel-ambiguous-publish-protected/receipts.jsonl",
+      "sha256": "aa3c968c5493a373b7474297bf0169fe10d3153493006a28bc169e9c985a38c6",
+      "bytes": 195395,
+      "provenance": "byte copy of the as-run original"
+    },
+    {
+      "path": "runs/10-click-sentinel-ambiguous-publish-protected/result.json",
+      "sha256": "e5d6b0b22fd6084f98ae879bf3e577257aa03998dea2f5eab0dadfb25aae108c",
+      "bytes": 9239,
+      "provenance": "byte copy of the as-run original"
+    },
+    {
+      "path": "runs/10-click-sentinel-ambiguous-publish-protected/reviewed-create.json",
+      "sha256": "69d716ba6fd06c9f20c489e4d58405d8c251aa70457673b3a8d19f59f5a71711",
+      "bytes": 548,
+      "provenance": "byte copy of the as-run original"
+    }
+  ],
+  "withheld": [
+    "project/ (signing and grant keys, Permit and replay databases, workspace)",
+    "agent.log (transcript; holds upstream file contents)",
+    "trusted-tests/",
+    "provider.json (synthetic GitHub state)",
+    "operator.key"
+  ],
+  "scan": {
+    "patterns": [
+      "anthropic",
+      "authorization-header",
+      "aws",
+      "bearer",
+      "github",
+      "openai",
+      "owner-email",
+      "private-key",
+      "x-api-key"
+    ],
+    "local_secret_values_checked": 36,
+    "findings": [],
+    "local_secret_values": "17 Ed25519 signing private keys (project/.airlock/local/key.json), 17 grant keys (local/grant-key.json) and 2 reconciler keys (operator.key), each checked by value against every published file; reported by name only",
+    "accepted_non_secret_matches": [
+      "key_id and public_key fields: public identifiers carried in every signed receipt and in public-key.json"
+    ]
+  },
+  "evidence_head": "0505390",
+  "superseded_published_alongside": [
+    "../superseded/e5701ba-case03/ (case 3 failed in both modes only on ReDoS timeouts; led to the scoring change in 0505390)",
+    "../superseded/prestate-case08-af3b946-rejected.json (pre-state proof that rejected the first case 8 task; produced from a development tree, before any commit)"
+  ]
+}

@@ -146,6 +146,9 @@ def cmd_run(args, *, live: bool) -> int:
             args.case, out, args.cache, key=inputs["key"], github=inputs["github"],
             interactive=getattr(args, "interactive_approval", False),
         )  # fmt: skip
+        recorded = json.loads((out / "result.json").read_text())
+        recorded["identity"] = frozen
+        (out / "result.json").write_text(json.dumps(recorded, indent=2, default=str) + "\n")
     else:
         started = agent.agent_run(args.case, args.mode, out, args.cache, key=inputs["key"])
         result = started["result"]

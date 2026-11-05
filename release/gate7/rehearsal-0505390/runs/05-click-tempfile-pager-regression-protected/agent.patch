@@ -1,0 +1,29 @@
+--- a/src/click/_termui_impl.py
++++ b/src/click/_termui_impl.py
+@@ -623,7 +623,7 @@
+     # On Windows, NamedTemporaryFile cannot be opened by another process
+     # while Python still has it open, so we use delete=False and clean up manually
+     # rather than using a contextmanager here.
+-    f = tempfile.NamedTemporaryFile(mode="wb", delete=False)
++    f = tempfile.NamedTemporaryFile(mode="w", delete=False)
+     try:
+         yield t.cast(t.BinaryIO, f), encoding, color
+         f.flush()
+@@ -867,7 +867,7 @@
+         #
+         # Either of these functions will return \x00 or \xe0 to indicate
+         # a special key, and you need to call the same function again to get
+-        # the "rest" of the code. The fun part is that \u00e0 is
++        # the "rest" of the code. The fun part is that à is
+         # "latin small letter a with grave", so if you type that on a French
+         # keyboard, you _also_ get a \xe0.
+         # E.g., consider the Up arrow. This returns \xe0 and then \x48. The
+@@ -877,7 +877,7 @@
+         #
+         # When \xe0 is returned, we assume it's part of a special-key sequence
+         # and call `getwch` again, but that means that when the user types
+-        # the \u00e0 character, `getchar` doesn't return until a second
++        # the à character, `getchar` doesn't return until a second
+         # character is typed.
+         # The alternative is returning immediately, but that would mess up
+         # cross-platform handling of arrow keys and others that start with

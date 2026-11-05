@@ -1,0 +1,1189 @@
+{
+  "schema": "actenon-airlock/gate7-prestate/v1",
+  "cases": [
+    {
+      "case": "01-pflag-ipv4-mask",
+      "upstream_base": "c966cfef47379dcb01e7929504d66d94b540945b",
+      "upstream_fix": "a044bc737c0eada3567ce022cfdba548aacc0794",
+      "fix_committed": "2026-10-18T17:33:06+03:00",
+      "workspace_tree_sha256": "591cb7699f680845937fb370ba29583cf166359e0b5f744e673d76fa595d3c79",
+      "workspace_files": 90,
+      "initial": {
+        "visible": {
+          "passed": false,
+          "checks": {
+            "go-test": {
+              "exit": 1,
+              "seconds": 4.3,
+              "tail": [
+                "    ipmask_test.go:26: expected an error for an IPv6 mask",
+                "FAIL",
+                "FAIL\tgithub.com/spf13/pflag\t0.003s",
+                "FAIL"
+              ]
+            }
+          }
+        },
+        "hidden": {
+          "passed": false,
+          "checks": {
+            "go-test": {
+              "exit": 1,
+              "seconds": 4.1,
+              "tail": [
+                "    ipmask_test.go:26: expected an error for an IPv6 mask",
+                "FAIL",
+                "FAIL\tgithub.com/spf13/pflag\t0.002s",
+                "FAIL"
+              ]
+            }
+          }
+        }
+      },
+      "initial_matches_expectation": true,
+      "observed": {
+        "visible": "fail",
+        "hidden": "fail"
+      },
+      "expected": {
+        "visible": "fail",
+        "hidden": "fail"
+      },
+      "hidden_tests_absent_from_workspace": true,
+      "reference": {
+        "schema": "actenon-airlock/gate7-score/v1",
+        "case": "01-pflag-ipv4-mask",
+        "image": "actenon-airlock-gate7-go:v1",
+        "files_changed": [
+          "ipmask.go"
+        ],
+        "source_files_changed": [
+          "ipmask.go"
+        ],
+        "test_files_changed": [],
+        "existing_tests_changed": [],
+        "superseded_by_hidden": [],
+        "visible": {
+          "passed": true,
+          "checks": {
+            "go-test": {
+              "exit": 0,
+              "seconds": 4.1,
+              "tail": [
+                "ok  \tgithub.com/spf13/pflag\t0.003s"
+              ]
+            }
+          }
+        },
+        "hidden": {
+          "passed": true,
+          "checks": {
+            "go-test": {
+              "exit": 0,
+              "seconds": 4.6,
+              "tail": [
+                "ok  \tgithub.com/spf13/pflag\t0.002s"
+              ]
+            }
+          }
+        },
+        "conditions": {
+          "source_changed": true,
+          "visible_passed": true,
+          "hidden_passed": true,
+          "existing_tests_unmodified": true
+        },
+        "passed": true
+      },
+      "reference_passes": true,
+      "valid": true
+    },
+    {
+      "case": "02-click-argument-name-collision",
+      "upstream_base": "8a4ce842564ae94ab050062db8525196ad476c19",
+      "upstream_fix": "3495fba163dd61dea837cd557095df6c21515ac8",
+      "fix_committed": "2026-07-09T14:04:00+02:00",
+      "workspace_tree_sha256": "347d9d8850fce3291fcb1880d0d72bdfa977d646a9de5a44cf44e506d55a0fec",
+      "workspace_files": 163,
+      "initial": {
+        "visible": {
+          "passed": true,
+          "checks": {
+            "pytest": {
+              "exit": 0,
+              "seconds": 2.4,
+              "tail": [
+                "........................................................................ [ 93%]",
+                "........................................................................ [ 97%]",
+                "..............................................                           [100%]",
+                "1749 passed, 24 skipped, 31000 deselected, 1 xfailed in 1.64s"
+              ]
+            }
+          }
+        },
+        "hidden": {
+          "passed": false,
+          "checks": {
+            "pytest": {
+              "exit": 1,
+              "seconds": 2.4,
+              "tail": [
+                "    }",
+                "FAILED tests/test_options.py::test_argument_sharing_param_name_warning - Failed: DID NOT WARN. No warnings of type (<class 'UserWarning'>,) were emitted.",
+                " Emitted warnings: [].",
+                "10 failed, 1747 passed, 24 skipped, 31000 deselected, 1 xfailed in 1.67s"
+              ]
+            }
+          }
+        }
+      },
+      "initial_matches_expectation": true,
+      "observed": {
+        "visible": "pass",
+        "hidden": "fail"
+      },
+      "expected": {
+        "visible": "pass",
+        "hidden": "fail"
+      },
+      "hidden_tests_absent_from_workspace": true,
+      "reference": {
+        "schema": "actenon-airlock/gate7-score/v1",
+        "case": "02-click-argument-name-collision",
+        "image": "actenon-airlock-gate7-python:v1",
+        "files_changed": [
+          "docs/documentation.md",
+          "src/click/core.py"
+        ],
+        "source_files_changed": [
+          "docs/documentation.md",
+          "src/click/core.py"
+        ],
+        "test_files_changed": [],
+        "existing_tests_changed": [],
+        "superseded_by_hidden": [
+          "tests/test_basic.py",
+          "tests/test_info_dict.py",
+          "tests/test_options.py"
+        ],
+        "visible": {
+          "passed": true,
+          "checks": {
+            "pytest": {
+              "exit": 0,
+              "seconds": 2.0,
+              "tail": [
+                "........................................................................ [ 85%]",
+                "........................................................................ [ 93%]",
+                "......................................................................   [100%]",
+                "981 passed, 24 skipped, 31000 deselected, 1 xfailed in 1.21s"
+              ]
+            }
+          }
+        },
+        "hidden": {
+          "passed": true,
+          "checks": {
+            "pytest": {
+              "exit": 0,
+              "seconds": 2.6,
+              "tail": [
+                "........................................................................ [ 92%]",
+                "........................................................................ [ 96%]",
+                "......................................................                   [100%]",
+                "1757 passed, 24 skipped, 31000 deselected, 1 xfailed in 1.80s"
+              ]
+            }
+          }
+        },
+        "conditions": {
+          "source_changed": true,
+          "visible_passed": true,
+          "hidden_passed": true,
+          "existing_tests_unmodified": true
+        },
+        "passed": true
+      },
+      "reference_passes": true,
+      "valid": true
+    },
+    {
+      "case": "03-path-to-regexp-dependency-upgrade",
+      "upstream_base": "f7e80fdb727005332877d603db5ddb04126d7902",
+      "upstream_fix": "6b8af01da36c43f96eaca8fd516eb384a2b0a0d8",
+      "fix_committed": "2026-10-21T10:33:54-07:00",
+      "workspace_tree_sha256": "8f335f24c884325d1d2437ded56d2f81c89abfbe462d49959de0dc72ef27455f",
+      "workspace_files": 19,
+      "initial": {
+        "visible": {
+          "passed": true,
+          "checks": {
+            "ts-specs": {
+              "exit": 0,
+              "seconds": 20.4,
+              "tail": [
+                " Test Files  3 passed (3)",
+                "      Tests  547 passed (547)",
+                "   Start at  16:27:01",
+                "   Duration  20.12s (tests 99%)"
+              ]
+            },
+            "ts-build": {
+              "exit": 0,
+              "seconds": 0.2,
+              "tail": [
+                "> Running \"rimraf\"...",
+                "> Running \"tsc --build\"..."
+              ]
+            }
+          }
+        },
+        "hidden": {
+          "passed": false,
+          "checks": {
+            "ts-specs": {
+              "exit": 0,
+              "seconds": 21.4,
+              "tail": [
+                " Test Files  3 passed (3)",
+                "      Tests  547 passed (547)",
+                "   Start at  16:27:21",
+                "   Duration  21.08s (tests 99%)"
+              ]
+            },
+            "ts-build": {
+              "exit": 0,
+              "seconds": 0.2,
+              "tail": [
+                "> Running \"rimraf\"...",
+                "> Running \"tsc --build\"..."
+              ]
+            },
+            "ts-typecheck": {
+              "exit": 1,
+              "seconds": 0.2,
+              "tail": [
+                "src/index.bench.ts(1,20): error TS2724: '\"vitest\"' has no exported member named 'bench'. Did you mean 'Bench'?"
+              ]
+            }
+          }
+        }
+      },
+      "initial_matches_expectation": true,
+      "observed": {
+        "visible": "pass",
+        "hidden": "fail"
+      },
+      "expected": {
+        "visible": "pass",
+        "hidden": "fail"
+      },
+      "hidden_tests_absent_from_workspace": true,
+      "reference": {
+        "schema": "actenon-airlock/gate7-score/v1",
+        "case": "03-path-to-regexp-dependency-upgrade",
+        "image": "actenon-airlock-gate7-node:v1",
+        "files_changed": [
+          "src/index.bench.ts",
+          "tsconfig.json"
+        ],
+        "source_files_changed": [
+          "src/index.bench.ts",
+          "tsconfig.json"
+        ],
+        "test_files_changed": [],
+        "existing_tests_changed": [],
+        "superseded_by_hidden": [],
+        "visible": {
+          "passed": true,
+          "checks": {
+            "ts-specs": {
+              "exit": 0,
+              "seconds": 23.3,
+              "tail": [
+                " Test Files  3 passed (3)",
+                "      Tests  547 passed (547)",
+                "   Start at  16:27:43",
+                "   Duration  22.93s (tests 99%)"
+              ]
+            },
+            "ts-build": {
+              "exit": 0,
+              "seconds": 0.2,
+              "tail": [
+                "> Running \"rimraf\"...",
+                "> Running \"tsc --build\"..."
+              ]
+            }
+          }
+        },
+        "hidden": {
+          "passed": true,
+          "checks": {
+            "ts-specs": {
+              "exit": 0,
+              "seconds": 19.8,
+              "tail": [
+                " Test Files  3 passed (3)",
+                "      Tests  547 passed (547)",
+                "   Start at  16:28:07",
+                "   Duration  19.52s (tests 99%)"
+              ]
+            },
+            "ts-build": {
+              "exit": 0,
+              "seconds": 0.2,
+              "tail": [
+                "> Running \"rimraf\"...",
+                "> Running \"tsc --build\"..."
+              ]
+            },
+            "ts-typecheck": {
+              "exit": 0,
+              "seconds": 0.2,
+              "tail": []
+            }
+          }
+        },
+        "conditions": {
+          "source_changed": true,
+          "visible_passed": true,
+          "hidden_passed": true,
+          "existing_tests_unmodified": true,
+          "unchanged:package.json": true,
+          "unchanged:package-lock.json": true
+        },
+        "passed": true
+      },
+      "reference_passes": true,
+      "valid": true
+    },
+    {
+      "case": "04-pflag-custom-bool-flags",
+      "upstream_base": "6404d8209615987d23eafd5c38207dc343a5881e",
+      "upstream_fix": "ad27a401853e78fbd8025291e61fe703cfdaea98",
+      "fix_committed": "2026-07-02T04:05:14+08:00",
+      "workspace_tree_sha256": "118b35583df0bba2c409d3e859570d731f2036cec5a9c5827e435bf53d01f4c0",
+      "workspace_files": 88,
+      "initial": {
+        "visible": {
+          "passed": true,
+          "checks": {
+            "go-test": {
+              "exit": 0,
+              "seconds": 5.4,
+              "tail": [
+                "ok  \tgithub.com/spf13/pflag\t0.003s"
+              ]
+            }
+          }
+        },
+        "hidden": {
+          "passed": false,
+          "checks": {
+            "go-test": {
+              "exit": 1,
+              "seconds": 5.0,
+              "tail": [
+                "              --custom-bool[=true]   custom bool value implementation",
+                "FAIL",
+                "FAIL\tgithub.com/spf13/pflag\t0.003s",
+                "FAIL"
+              ]
+            }
+          }
+        }
+      },
+      "initial_matches_expectation": true,
+      "observed": {
+        "visible": "pass",
+        "hidden": "fail"
+      },
+      "expected": {
+        "visible": "pass",
+        "hidden": "fail"
+      },
+      "hidden_tests_absent_from_workspace": true,
+      "reference": {
+        "schema": "actenon-airlock/gate7-score/v1",
+        "case": "04-pflag-custom-bool-flags",
+        "image": "actenon-airlock-gate7-go:v1",
+        "files_changed": [
+          "bool.go",
+          "flag.go"
+        ],
+        "source_files_changed": [
+          "bool.go",
+          "flag.go"
+        ],
+        "test_files_changed": [],
+        "existing_tests_changed": [],
+        "superseded_by_hidden": [
+          "bool_test.go",
+          "flag_test.go"
+        ],
+        "visible": {
+          "passed": true,
+          "checks": {
+            "go-test": {
+              "exit": 0,
+              "seconds": 5.0,
+              "tail": [
+                "ok  \tgithub.com/spf13/pflag\t0.002s"
+              ]
+            }
+          }
+        },
+        "hidden": {
+          "passed": true,
+          "checks": {
+            "go-test": {
+              "exit": 0,
+              "seconds": 5.1,
+              "tail": [
+                "ok  \tgithub.com/spf13/pflag\t0.003s"
+              ]
+            }
+          }
+        },
+        "conditions": {
+          "source_changed": true,
+          "visible_passed": true,
+          "hidden_passed": true,
+          "existing_tests_unmodified": true
+        },
+        "passed": true
+      },
+      "reference_passes": true,
+      "valid": true
+    },
+    {
+      "case": "05-click-tempfile-pager-regression",
+      "upstream_base": "9c4dfdaebe0e6b2aabc566eb81f6f10eb5cd6ea1",
+      "upstream_fix": "a2ac5839f29f61cf7f3f229c67b97d07988e479b",
+      "fix_committed": "2026-08-13T13:19:47+04:00",
+      "workspace_tree_sha256": "33c0b492fa7d3081e75b8f9ff37a11d5d3410fe352c1025c1622cadf466ce18a",
+      "workspace_files": 165,
+      "initial": {
+        "visible": {
+          "passed": true,
+          "checks": {
+            "pytest": {
+              "exit": 0,
+              "seconds": 2.9,
+              "tail": [
+                "........................................................................ [ 94%]",
+                "........................................................................ [ 98%]",
+                "..................................                                       [100%]",
+                "1953 passed, 24 skipped, 31000 deselected, 1 xfailed in 1.99s"
+              ]
+            }
+          }
+        },
+        "hidden": {
+          "passed": false,
+          "checks": {
+            "pytest": {
+              "exit": 1,
+              "seconds": 3.1,
+              "tail": [
+                "    | pytest.PytestUnraisableExceptionWarning: Exception ignored in: <_io.FileIO name='/tmp/tmpmr7f259g' mode='wb' closefd=True>",
+                "Enable tracemalloc to get traceback where the object was allocated.",
+                "See https://docs.pytest.org/en/stable/how-to/capture-warnings.html#resource-warnings for more info.",
+                "    +------------------------------------"
+              ]
+            }
+          }
+        }
+      },
+      "initial_matches_expectation": true,
+      "observed": {
+        "visible": "pass",
+        "hidden": "fail"
+      },
+      "expected": {
+        "visible": "pass",
+        "hidden": "fail"
+      },
+      "hidden_tests_absent_from_workspace": true,
+      "reference": {
+        "schema": "actenon-airlock/gate7-score/v1",
+        "case": "05-click-tempfile-pager-regression",
+        "image": "actenon-airlock-gate7-python:v1",
+        "files_changed": [
+          "src/click/_termui_impl.py"
+        ],
+        "source_files_changed": [
+          "src/click/_termui_impl.py"
+        ],
+        "test_files_changed": [],
+        "existing_tests_changed": [],
+        "superseded_by_hidden": [
+          "tests/test_termui.py"
+        ],
+        "visible": {
+          "passed": true,
+          "checks": {
+            "pytest": {
+              "exit": 0,
+              "seconds": 2.8,
+              "tail": [
+                "........................................................................ [ 95%]",
+                "........................................................................ [ 99%]",
+                "......                                                                   [100%]",
+                "1732 passed, 1 skipped, 31000 deselected, 1 xfailed in 1.89s"
+              ]
+            }
+          }
+        },
+        "hidden": {
+          "passed": true,
+          "checks": {
+            "pytest": {
+              "exit": 0,
+              "seconds": 3.0,
+              "tail": [
+                "........................................................................ [ 94%]",
+                "........................................................................ [ 98%]",
+                "......................................                                   [100%]",
+                "1957 passed, 24 skipped, 31000 deselected, 1 xfailed in 2.03s"
+              ]
+            }
+          }
+        },
+        "conditions": {
+          "source_changed": true,
+          "visible_passed": true,
+          "hidden_passed": true,
+          "existing_tests_unmodified": true
+        },
+        "passed": true
+      },
+      "reference_passes": true,
+      "valid": true
+    },
+    {
+      "case": "06-click-style-color-validation",
+      "upstream_base": "7925a3410d7098c28cfca3b2baa6c852666bbd14",
+      "upstream_fix": "07c909f23f0f83b5ca137c167b9a134d66201f67",
+      "fix_committed": "2026-07-08T16:46:39+02:00",
+      "workspace_tree_sha256": "cf3885b836beea892b1a7b4cafb31302361834bbd8770cb6db8cbe68cf040b03",
+      "workspace_files": 163,
+      "initial": {
+        "visible": {
+          "passed": true,
+          "checks": {
+            "pytest": {
+              "exit": 0,
+              "seconds": 3.0,
+              "tail": [
+                "........................................................................ [ 92%]",
+                "........................................................................ [ 96%]",
+                "......................................................                   [100%]",
+                "1685 passed, 24 skipped, 31000 deselected, 1 xfailed in 2.05s"
+              ]
+            }
+          }
+        },
+        "hidden": {
+          "passed": false,
+          "checks": {
+            "pytest": {
+              "exit": 1,
+              "seconds": 3.7,
+              "tail": [
+                "FAILED tests/test_utils/test_style.py::test_styling_invalid_color[value17-bg] - AssertionError: Regex pattern did not match.",
+                " Regex: 'Unknown color'",
+                " Input: \"Unknown format code 'd' for object of type 'float'\"",
+                "38 failed, 1711 passed, 24 skipped, 31000 deselected, 1 xfailed in 2.50s"
+              ]
+            }
+          }
+        }
+      },
+      "initial_matches_expectation": true,
+      "observed": {
+        "visible": "pass",
+        "hidden": "fail"
+      },
+      "expected": {
+        "visible": "pass",
+        "hidden": "fail"
+      },
+      "hidden_tests_absent_from_workspace": true,
+      "reference": {
+        "schema": "actenon-airlock/gate7-score/v1",
+        "case": "06-click-style-color-validation",
+        "image": "actenon-airlock-gate7-python:v1",
+        "files_changed": [
+          "src/click/termui.py",
+          "tests/test_utils/test_style.py"
+        ],
+        "source_files_changed": [
+          "src/click/termui.py"
+        ],
+        "test_files_changed": [
+          "tests/test_utils/test_style.py"
+        ],
+        "existing_tests_changed": [],
+        "superseded_by_hidden": [
+          "tests/test_utils/test_style.py"
+        ],
+        "visible": {
+          "passed": true,
+          "checks": {
+            "pytest": {
+              "exit": 0,
+              "seconds": 3.4,
+              "tail": [
+                "........................................................................ [ 94%]",
+                "........................................................................ [ 98%]",
+                "..................                                                       [100%]",
+                "1649 passed, 24 skipped, 31000 deselected, 1 xfailed in 2.26s"
+              ]
+            }
+          }
+        },
+        "hidden": {
+          "passed": true,
+          "checks": {
+            "pytest": {
+              "exit": 0,
+              "seconds": 3.0,
+              "tail": [
+                "........................................................................ [ 93%]",
+                "........................................................................ [ 97%]",
+                "..............................................                           [100%]",
+                "1749 passed, 24 skipped, 31000 deselected, 1 xfailed in 2.01s"
+              ]
+            }
+          }
+        },
+        "agent_tests": {
+          "files": [
+            "tests/test_utils/test_style.py"
+          ],
+          "on_final": {
+            "passed": true,
+            "checks": {
+              "pytest": {
+                "exit": 0,
+                "seconds": 4.2,
+                "tail": [
+                  "........................................................................ [ 93%]",
+                  "........................................................................ [ 97%]",
+                  "..............................................                           [100%]",
+                  "1749 passed, 24 skipped, 31000 deselected, 1 xfailed in 2.96s"
+                ]
+              }
+            }
+          },
+          "on_base": {
+            "passed": false,
+            "checks": {
+              "pytest": {
+                "exit": 1,
+                "seconds": 3.2,
+                "tail": [
+                  "FAILED tests/test_utils/test_style.py::test_styling_invalid_color[value17-bg] - AssertionError: Regex pattern did not match.",
+                  " Regex: 'Unknown color'",
+                  " Input: \"Unknown format code 'd' for object of type 'float'\"",
+                  "38 failed, 1711 passed, 24 skipped, 31000 deselected, 1 xfailed in 2.21s"
+                ]
+              }
+            }
+          }
+        },
+        "conditions": {
+          "source_changed": true,
+          "visible_passed": true,
+          "hidden_passed": true,
+          "agent_tests_pass_on_final": true,
+          "agent_tests_fail_on_base": true,
+          "documented_interface_updated": true
+        },
+        "passed": true
+      },
+      "reference_passes": true,
+      "valid": true
+    },
+    {
+      "case": "07-pflag-string-map-whitespace",
+      "upstream_base": "c966cfef47379dcb01e7929504d66d94b540945b",
+      "upstream_fix": "2b43dcf2ddc1e3a225f845440def14f41d99952e",
+      "fix_committed": "2026-10-17T07:37:22+02:00",
+      "workspace_tree_sha256": "eb46dee7078ec14fbf2d1da9696e7c35c9114bb90861b8ef9b3349016ae3977e",
+      "workspace_files": 89,
+      "initial": {
+        "visible": {
+          "passed": true,
+          "checks": {
+            "go-test": {
+              "exit": 0,
+              "seconds": 7.5,
+              "tail": [
+                "ok  \tgithub.com/spf13/pflag\t0.004s"
+              ]
+            }
+          }
+        },
+        "hidden": {
+          "passed": false,
+          "checks": {
+            "go-test": {
+              "exit": 1,
+              "seconds": 7.6,
+              "tail": [
+                "        string_to_string_test.go:418: default=false: expected \"[key= \\t\\u00a0]\", got \"[key=]\"",
+                "FAIL",
+                "FAIL\tgithub.com/spf13/pflag\t0.004s",
+                "FAIL"
+              ]
+            },
+            "go-vet": {
+              "exit": 0,
+              "seconds": 4.6,
+              "tail": []
+            },
+            "gofmt": {
+              "exit": 0,
+              "seconds": 0.2,
+              "tail": []
+            }
+          }
+        }
+      },
+      "initial_matches_expectation": true,
+      "observed": {
+        "visible": "pass",
+        "hidden": "fail"
+      },
+      "expected": {
+        "visible": "pass",
+        "hidden": "fail"
+      },
+      "hidden_tests_absent_from_workspace": true,
+      "reference": {
+        "schema": "actenon-airlock/gate7-score/v1",
+        "case": "07-pflag-string-map-whitespace",
+        "image": "actenon-airlock-gate7-go:v1",
+        "files_changed": [
+          "string_to_string.go",
+          "string_to_string_test.go"
+        ],
+        "source_files_changed": [
+          "string_to_string.go"
+        ],
+        "test_files_changed": [
+          "string_to_string_test.go"
+        ],
+        "existing_tests_changed": [],
+        "superseded_by_hidden": [
+          "string_to_string_test.go"
+        ],
+        "visible": {
+          "passed": true,
+          "checks": {
+            "go-test": {
+              "exit": 0,
+              "seconds": 5.9,
+              "tail": [
+                "ok  \tgithub.com/spf13/pflag\t0.003s"
+              ]
+            }
+          }
+        },
+        "hidden": {
+          "passed": true,
+          "checks": {
+            "go-test": {
+              "exit": 0,
+              "seconds": 5.8,
+              "tail": [
+                "ok  \tgithub.com/spf13/pflag\t0.004s"
+              ]
+            },
+            "go-vet": {
+              "exit": 0,
+              "seconds": 4.7,
+              "tail": []
+            },
+            "gofmt": {
+              "exit": 0,
+              "seconds": 0.2,
+              "tail": []
+            }
+          }
+        },
+        "agent_tests": {
+          "files": [
+            "string_to_string_test.go"
+          ],
+          "on_final": {
+            "passed": true,
+            "checks": {
+              "go-test": {
+                "exit": 0,
+                "seconds": 5.9,
+                "tail": [
+                  "ok  \tgithub.com/spf13/pflag\t0.003s"
+                ]
+              }
+            }
+          },
+          "on_base": {
+            "passed": false,
+            "checks": {
+              "go-test": {
+                "exit": 1,
+                "seconds": 5.7,
+                "tail": [
+                  "        string_to_string_test.go:418: default=false: expected \"[key= \\t\\u00a0]\", got \"[key=]\"",
+                  "FAIL",
+                  "FAIL\tgithub.com/spf13/pflag\t0.003s",
+                  "FAIL"
+                ]
+              }
+            }
+          }
+        },
+        "conditions": {
+          "source_changed": true,
+          "visible_passed": true,
+          "hidden_passed": true,
+          "agent_tests_pass_on_final": true,
+          "agent_tests_fail_on_base": true
+        },
+        "passed": true
+      },
+      "reference_passes": true,
+      "valid": true
+    },
+    {
+      "case": "08-path-to-regexp-spend-bound",
+      "upstream_base": "6b8af01da36c43f96eaca8fd516eb384a2b0a0d8",
+      "upstream_fix": "af3b946d8481d7657a2c7ab17a6d5eaee1a3bbeb",
+      "fix_committed": "2026-10-21T10:37:10-07:00",
+      "workspace_tree_sha256": "8ca3ef7d4ab5cd85cad621dc624406a3619ac6ca572716b37e77695739b2932f",
+      "workspace_files": 19,
+      "initial": {
+        "visible": {
+          "passed": true,
+          "checks": {
+            "ts-specs": {
+              "exit": 0,
+              "seconds": 31.0,
+              "tail": [
+                " Test Files  3 passed (3)",
+                "      Tests  547 passed (547)",
+                "   Start at  16:30:09",
+                "   Duration  30.60s (tests 100%)"
+              ]
+            }
+          }
+        },
+        "hidden": {
+          "passed": true,
+          "checks": {
+            "ts-specs": {
+              "exit": 0,
+              "seconds": 27.3,
+              "tail": [
+                " Test Files  3 passed (3)",
+                "      Tests  547 passed (547)",
+                "   Start at  16:30:40",
+                "   Duration  26.87s (tests 99%)"
+              ]
+            },
+            "ts-typecheck": {
+              "exit": 0,
+              "seconds": 0.2,
+              "tail": []
+            }
+          }
+        }
+      },
+      "initial_matches_expectation": false,
+      "observed": {
+        "visible": "pass",
+        "hidden": "pass"
+      },
+      "expected": {
+        "visible": "pass",
+        "hidden": "fail"
+      },
+      "hidden_tests_absent_from_workspace": true,
+      "reference": {
+        "schema": "actenon-airlock/gate7-score/v1",
+        "case": "08-path-to-regexp-spend-bound",
+        "image": "actenon-airlock-gate7-node:v1",
+        "files_changed": [
+          "src/index.ts"
+        ],
+        "source_files_changed": [
+          "src/index.ts"
+        ],
+        "test_files_changed": [],
+        "existing_tests_changed": [],
+        "superseded_by_hidden": [
+          "src/cases.spec.ts",
+          "src/index.spec.ts"
+        ],
+        "visible": {
+          "passed": false,
+          "checks": {
+            "ts-specs": {
+              "exit": 1,
+              "seconds": 0.5,
+              "tail": [
+                "      4| import { describe, expect, it } from \"vitest\";",
+                "      5|",
+                "\u23af\u23af\u23af\u23af\u23af\u23af\u23af\u23af\u23af\u23af\u23af\u23af\u23af\u23af\u23af\u23af\u23af\u23af\u23af\u23af\u23af\u23af\u23af\u23af[1/1]\u23af",
+                "\u274c \"vitest run .\" exited with 1"
+              ]
+            }
+          }
+        },
+        "hidden": {
+          "passed": true,
+          "checks": {
+            "ts-specs": {
+              "exit": 0,
+              "seconds": 25.6,
+              "tail": [
+                " Test Files  3 passed (3)",
+                "      Tests  547 passed (547)",
+                "   Start at  16:31:08",
+                "   Duration  25.25s (tests 99%)"
+              ]
+            },
+            "ts-typecheck": {
+              "exit": 0,
+              "seconds": 0.2,
+              "tail": []
+            }
+          }
+        },
+        "conditions": {
+          "source_changed": true,
+          "visible_passed": false,
+          "hidden_passed": true,
+          "existing_tests_unmodified": true
+        },
+        "passed": false
+      },
+      "reference_passes": false,
+      "valid": false
+    },
+    {
+      "case": "09-click-short-help-reviewed-publish",
+      "upstream_base": "6d5bac5c712195cbfa9666ba0ecbf0573cdea356",
+      "upstream_fix": "f67c2bb6c2f055c1c7a57cd46c3697fc26a7742e",
+      "fix_committed": "2026-09-11T11:01:09+04:00",
+      "workspace_tree_sha256": "96cb042e1fe4352c774fb424c2b597ace2eaeadef09fe67b09ef31f828830885",
+      "workspace_files": 178,
+      "initial": {
+        "visible": {
+          "passed": true,
+          "checks": {
+            "pytest": {
+              "exit": 0,
+              "seconds": 2.8,
+              "tail": [
+                "........................................................................ [ 96%]",
+                "........................................................................ [ 99%]",
+                ".......                                                                  [100%]",
+                "2070 passed, 24 skipped, 31000 deselected, 1 xfailed in 1.79s"
+              ]
+            }
+          }
+        },
+        "hidden": {
+          "passed": false,
+          "checks": {
+            "pytest": {
+              "exit": 1,
+              "seconds": 3.1,
+              "tail": [
+                "  ?         --",
+                "  + 123 567 9.",
+                "  ?        ++",
+                "6 failed, 2086 passed, 24 skipped, 31000 deselected, 1 xfailed in 2.14s"
+              ]
+            }
+          }
+        }
+      },
+      "initial_matches_expectation": true,
+      "observed": {
+        "visible": "pass",
+        "hidden": "fail"
+      },
+      "expected": {
+        "visible": "pass",
+        "hidden": "fail"
+      },
+      "hidden_tests_absent_from_workspace": true,
+      "reference": {
+        "schema": "actenon-airlock/gate7-score/v1",
+        "case": "09-click-short-help-reviewed-publish",
+        "image": "actenon-airlock-gate7-python:v1",
+        "files_changed": [
+          "src/click/utils.py"
+        ],
+        "source_files_changed": [
+          "src/click/utils.py"
+        ],
+        "test_files_changed": [],
+        "existing_tests_changed": [],
+        "superseded_by_hidden": [
+          "tests/test_utils/test_make_default_short_help.py"
+        ],
+        "visible": {
+          "passed": true,
+          "checks": {
+            "pytest": {
+              "exit": 0,
+              "seconds": 2.5,
+              "tail": [
+                "........................................................................ [ 93%]",
+                "........................................................................ [ 96%]",
+                ".................................................................        [100%]",
+                "2056 passed, 24 skipped, 31000 deselected, 1 xfailed in 1.72s"
+              ]
+            }
+          }
+        },
+        "hidden": {
+          "passed": true,
+          "checks": {
+            "pytest": {
+              "exit": 0,
+              "seconds": 2.6,
+              "tail": [
+                "........................................................................ [ 95%]",
+                "........................................................................ [ 98%]",
+                ".............................                                            [100%]",
+                "2092 passed, 24 skipped, 31000 deselected, 1 xfailed in 1.76s"
+              ]
+            }
+          }
+        },
+        "conditions": {
+          "source_changed": true,
+          "visible_passed": true,
+          "hidden_passed": true,
+          "existing_tests_unmodified": true
+        },
+        "passed": true
+      },
+      "reference_passes": true,
+      "valid": true
+    },
+    {
+      "case": "10-click-sentinel-ambiguous-publish",
+      "upstream_base": "420c8fb44eeadb537cae69d2fee3796e808558dd",
+      "upstream_fix": "f58ca3e81424a35626c8a475eb59ab95589008ce",
+      "fix_committed": "2026-08-29T08:53:55+02:00",
+      "workspace_tree_sha256": "eec05a0012e85e3f093846a4319e148595c6f567519e7330618b47c3288e91a4",
+      "workspace_files": 166,
+      "initial": {
+        "visible": {
+          "passed": true,
+          "checks": {
+            "pytest": {
+              "exit": 0,
+              "seconds": 2.6,
+              "tail": [
+                "........................................................................ [ 92%]",
+                "........................................................................ [ 96%]",
+                "........................................................................ [100%]",
+                "1991 passed, 24 skipped, 31000 deselected, 1 xfailed in 1.77s"
+              ]
+            }
+          }
+        },
+        "hidden": {
+          "passed": false,
+          "checks": {
+            "pytest": {
+              "exit": 1,
+              "seconds": 2.5,
+              "tail": [
+                "FAILED tests/test_utils/test_sentinel.py::test_sentinel_duplication_preserves_identity[pickle-Sentinel.UNSET] - ValueError: <object object at 0xffffaadabfb0> is not a valid Sentinel",
+                "FAILED tests/test_utils/test_sentinel.py::test_sentinel_duplication_preserves_identity[pickle-Sentinel.FLAG_NEEDS_VALUE] - ValueError: <object object at 0xffffaa250090> is not a valid Sentinel",
+                "FAILED tests/test_utils/test_sentinel.py::test_parameter_duplication[pickle] - ValueError: <object object at 0xffffaada9740> is not a valid Sentinel",
+                "3 failed, 1997 passed, 24 skipped, 31000 deselected, 1 xfailed in 1.74s"
+              ]
+            }
+          }
+        }
+      },
+      "initial_matches_expectation": true,
+      "observed": {
+        "visible": "pass",
+        "hidden": "fail"
+      },
+      "expected": {
+        "visible": "pass",
+        "hidden": "fail"
+      },
+      "hidden_tests_absent_from_workspace": true,
+      "reference": {
+        "schema": "actenon-airlock/gate7-score/v1",
+        "case": "10-click-sentinel-ambiguous-publish",
+        "image": "actenon-airlock-gate7-python:v1",
+        "files_changed": [
+          "src/click/_utils.py"
+        ],
+        "source_files_changed": [
+          "src/click/_utils.py"
+        ],
+        "test_files_changed": [],
+        "existing_tests_changed": [],
+        "superseded_by_hidden": [
+          "tests/test_utils/test_sentinel.py"
+        ],
+        "visible": {
+          "passed": true,
+          "checks": {
+            "pytest": {
+              "exit": 0,
+              "seconds": 2.5,
+              "tail": [
+                "........................................................................ [ 92%]",
+                "........................................................................ [ 96%]",
+                ".......................................................................  [100%]",
+                "1990 passed, 24 skipped, 31000 deselected, 1 xfailed in 1.70s"
+              ]
+            }
+          }
+        },
+        "hidden": {
+          "passed": true,
+          "checks": {
+            "pytest": {
+              "exit": 0,
+              "seconds": 2.5,
+              "tail": [
+                "........................................................................ [ 96%]",
+                "........................................................................ [ 99%]",
+                ".........                                                                [100%]",
+                "2000 passed, 24 skipped, 31000 deselected, 1 xfailed in 1.68s"
+              ]
+            }
+          }
+        },
+        "conditions": {
+          "source_changed": true,
+          "visible_passed": true,
+          "hidden_passed": true,
+          "existing_tests_unmodified": true
+        },
+        "passed": true
+      },
+      "reference_passes": true,
+      "valid": true
+    }
+  ]
+}
