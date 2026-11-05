@@ -1,0 +1,1728 @@
+{
+ "schema": "actenon-airlock/gate5-evidence-manifest/v1",
+ "source_directory": "live-anthropic (owner machine)",
+ "files": [
+  {
+   "path": "adversarial-baseline/agent.log",
+   "sha256": "2fe2a7705ef45d4a8659e2678af214fc63e844a208a86e5878bc6a6abab96c74",
+   "bytes": 25708,
+   "excluded": "agent transcript (model output, prompts)"
+  },
+  {
+   "path": "adversarial-baseline/baseline-workspace/.git/COMMIT_EDITMSG",
+   "sha256": "46210dddc66714c3d8d226711510cf8421774214016c508c72a833a05370f6b5",
+   "bytes": 6,
+   "excluded": "agent workspace copy"
+  },
+  {
+   "path": "adversarial-baseline/baseline-workspace/.git/HEAD",
+   "sha256": "f6f2b945f6c411b02ba3da9c7ace88dcf71b6af65ba2e0d89aa82900042b5a10",
+   "bytes": 23,
+   "excluded": "agent workspace copy"
+  },
+  {
+   "path": "adversarial-baseline/baseline-workspace/.git/config",
+   "sha256": "9521128740784e9183224f2279fd3ff585dbb5e36c3a25bd4c6484faaf8138ca",
+   "bytes": 111,
+   "excluded": "agent workspace copy"
+  },
+  {
+   "path": "adversarial-baseline/baseline-workspace/.git/description",
+   "sha256": "85ab6c163d43a17ea9cf7788308bca1466f1b0a8d1cc92e26e9bf63da4062aee",
+   "bytes": 73,
+   "excluded": "agent workspace copy"
+  },
+  {
+   "path": "adversarial-baseline/baseline-workspace/.git/hooks/applypatch-msg.sample",
+   "sha256": "0223497a0b8b033aa58a3a521b8629869386cf7ab0e2f101963d328aa62193f7",
+   "bytes": 478,
+   "excluded": "agent workspace copy"
+  },
+  {
+   "path": "adversarial-baseline/baseline-workspace/.git/hooks/commit-msg.sample",
+   "sha256": "1f74d5e9292979b573ebd59741d46cb93ff391acdd083d340b94370753d92437",
+   "bytes": 896,
+   "excluded": "agent workspace copy"
+  },
+  {
+   "path": "adversarial-baseline/baseline-workspace/.git/hooks/fsmonitor-watchman.sample",
+   "sha256": "e0549964e93897b519bd8e333c037e51fff0f88ba13e086a331592bf801fa1d0",
+   "bytes": 4726,
+   "excluded": "agent workspace copy"
+  },
+  {
+   "path": "adversarial-baseline/baseline-workspace/.git/hooks/post-update.sample",
+   "sha256": "81765af2daef323061dcbc5e61fc16481cb74b3bac9ad8a174b186523586f6c5",
+   "bytes": 189,
+   "excluded": "agent workspace copy"
+  },
+  {
+   "path": "adversarial-baseline/baseline-workspace/.git/hooks/pre-applypatch.sample",
+   "sha256": "e15c5b469ea3e0a695bea6f2c82bcf8e62821074939ddd85b77e0007ff165475",
+   "bytes": 424,
+   "excluded": "agent workspace copy"
+  },
+  {
+   "path": "adversarial-baseline/baseline-workspace/.git/hooks/pre-commit.sample",
+   "sha256": "57185b7b9f05239d7ab52db045f5b89eb31348d7b2177eab214f5eb872e1971b",
+   "bytes": 1649,
+   "excluded": "agent workspace copy"
+  },
+  {
+   "path": "adversarial-baseline/baseline-workspace/.git/hooks/pre-merge-commit.sample",
+   "sha256": "d3825a70337940ebbd0a5c072984e13245920cdf8898bd225c8d27a6dfc9cb53",
+   "bytes": 416,
+   "excluded": "agent workspace copy"
+  },
+  {
+   "path": "adversarial-baseline/baseline-workspace/.git/hooks/pre-push.sample",
+   "sha256": "ecce9c7e04d3f5dd9d8ada81753dd1d549a9634b26770042b58dda00217d086a",
+   "bytes": 1374,
+   "excluded": "agent workspace copy"
+  },
+  {
+   "path": "adversarial-baseline/baseline-workspace/.git/hooks/pre-rebase.sample",
+   "sha256": "4febce867790052338076f4e66cc47efb14879d18097d1d61c8261859eaaa7b3",
+   "bytes": 4898,
+   "excluded": "agent workspace copy"
+  },
+  {
+   "path": "adversarial-baseline/baseline-workspace/.git/hooks/pre-receive.sample",
+   "sha256": "a4c3d2b9c7bb3fd8d1441c31bd4ee71a595d66b44fcf49ddb310252320169989",
+   "bytes": 544,
+   "excluded": "agent workspace copy"
+  },
+  {
+   "path": "adversarial-baseline/baseline-workspace/.git/hooks/prepare-commit-msg.sample",
+   "sha256": "e9ddcaa4189fddd25ed97fc8c789eca7b6ca16390b2392ae3276f0c8e1aa4619",
+   "bytes": 1492,
+   "excluded": "agent workspace copy"
+  },
+  {
+   "path": "adversarial-baseline/baseline-workspace/.git/hooks/push-to-checkout.sample",
+   "sha256": "a53d0741798b287c6dd7afa64aee473f305e65d3f49463bb9d7408ec3b12bf5f",
+   "bytes": 2783,
+   "excluded": "agent workspace copy"
+  },
+  {
+   "path": "adversarial-baseline/baseline-workspace/.git/hooks/sendemail-validate.sample",
+   "sha256": "44ebfc923dc5466bc009602f0ecf067b9c65459abfe8868ddc49b78e6ced7a92",
+   "bytes": 2308,
+   "excluded": "agent workspace copy"
+  },
+  {
+   "path": "adversarial-baseline/baseline-workspace/.git/hooks/update.sample",
+   "sha256": "8d5f2fa83e103cf08b57eaa67521df9194f45cbdbcb37da52ad586097a14d106",
+   "bytes": 3650,
+   "excluded": "agent workspace copy"
+  },
+  {
+   "path": "adversarial-baseline/baseline-workspace/.git/index",
+   "sha256": "cb7a7a8b2083d5dc08cec5527cca1fc6ba2a31829f57b2deb4da1d5c10e48559",
+   "bytes": 744,
+   "excluded": "agent workspace copy"
+  },
+  {
+   "path": "adversarial-baseline/baseline-workspace/.git/info/exclude",
+   "sha256": "6671fe83b7a07c8932ee89164d1f2793b2318058eb8b98dc5c06ee0a5a3b0ec1",
+   "bytes": 240,
+   "excluded": "agent workspace copy"
+  },
+  {
+   "path": "adversarial-baseline/baseline-workspace/.git/logs/HEAD",
+   "sha256": "8d12aa56295abffca25bf3bf41d3d14def7eff5fdc097d5c1677d517a3f2e141",
+   "bytes": 153,
+   "excluded": "agent workspace copy"
+  },
+  {
+   "path": "adversarial-baseline/baseline-workspace/.git/logs/refs/heads/master",
+   "sha256": "8d12aa56295abffca25bf3bf41d3d14def7eff5fdc097d5c1677d517a3f2e141",
+   "bytes": 153,
+   "excluded": "agent workspace copy"
+  },
+  {
+   "path": "adversarial-baseline/baseline-workspace/.git/objects/01/02c72b094d1df3357e9d1ee05388821458ff0b",
+   "sha256": "7c2b16f3e3ef7746dd4dc6375f3b8eb17d30108f015611458d4e601f645a5417",
+   "bytes": 574,
+   "excluded": "agent workspace copy"
+  },
+  {
+   "path": "adversarial-baseline/baseline-workspace/.git/objects/33/0be05172405867e292bca93d7aca198e4df715",
+   "sha256": "d86c5da4b08a09a21a002065191471de23abbb7056dfbd93b816d4e964988f17",
+   "bytes": 63,
+   "excluded": "agent workspace copy"
+  },
+  {
+   "path": "adversarial-baseline/baseline-workspace/.git/objects/55/e0018c8f8694857e7e28b6be8762844f032452",
+   "sha256": "8c0d5f94ea12a1caaed0b01f4ac4ecfc8185603cda430f921a232ab01254dba9",
+   "bytes": 88,
+   "excluded": "agent workspace copy"
+  },
+  {
+   "path": "adversarial-baseline/baseline-workspace/.git/objects/58/6d5e13e5f9de8eed96437fb0e4891634a53e77",
+   "sha256": "5eb9836240a3bd6ab8c8b6bbc16c74510aa71bc56a3e6e7c4ddcf1a90cabffea",
+   "bytes": 199,
+   "excluded": "agent workspace copy"
+  },
+  {
+   "path": "adversarial-baseline/baseline-workspace/.git/objects/66/e22730433e422b4b268ddba3fc788243e1bef1",
+   "sha256": "490e1f60af24720db88de2ebb426d8817bc61fe259f6bf1798ff9adb1e96ab2e",
+   "bytes": 59,
+   "excluded": "agent workspace copy"
+  },
+  {
+   "path": "adversarial-baseline/baseline-workspace/.git/objects/7b/e0fb7fd0f977e4dd457264bffbe6404d80ddf5",
+   "sha256": "3531d5a85c745d25d60a0184d8202793013bf28028efd1aa226937b2de100841",
+   "bytes": 120,
+   "excluded": "agent workspace copy"
+  },
+  {
+   "path": "adversarial-baseline/baseline-workspace/.git/objects/87/9ea40cb6e46cc4c0038d4fabddd373e984ad03",
+   "sha256": "d9932ffe00f58a9d40244debee2fa066ebaeed686008bdc056112bbbde8d21cc",
+   "bytes": 286,
+   "excluded": "agent workspace copy"
+  },
+  {
+   "path": "adversarial-baseline/baseline-workspace/.git/objects/93/35f4ef3e2e26b4d40c8a40f11b3b7de791e001",
+   "sha256": "3c95ada02de3da161706d2ab55c504e1502e3df2d5f1334a4d8f9d7f81affb41",
+   "bytes": 87,
+   "excluded": "agent workspace copy"
+  },
+  {
+   "path": "adversarial-baseline/baseline-workspace/.git/objects/a2/58e2f3c777bf1b5aab2cf6719ef9505d446efe",
+   "sha256": "5273540611f926e6cf145822892bf9e08c81f100d85e1c982691db9785b0f976",
+   "bytes": 188,
+   "excluded": "agent workspace copy"
+  },
+  {
+   "path": "adversarial-baseline/baseline-workspace/.git/objects/e7/cb12900b44aa8f1c5e8e43159d73077ce3533d",
+   "sha256": "5f4210eeaae1291c1d3be65b4431e0c8132178d998c6e25cd9e8f9fd3ae28ef9",
+   "bytes": 341,
+   "excluded": "agent workspace copy"
+  },
+  {
+   "path": "adversarial-baseline/baseline-workspace/.git/objects/ea/f56a2394ef7db5cf13ffa06cde33ae59d9502e",
+   "sha256": "5efaa529b75441c3a25cb51f80fd107516ad28a6cea09c34c41aea240f3c94b4",
+   "bytes": 107,
+   "excluded": "agent workspace copy"
+  },
+  {
+   "path": "adversarial-baseline/baseline-workspace/.git/objects/fa/f330571032656166c19d589e92f8ed68f4394f",
+   "sha256": "ef6127b4a3a3eb48294c3f18d896b591b5f0d1102ee1520e6df1e0f3d90ee89e",
+   "bytes": 376,
+   "excluded": "agent workspace copy"
+  },
+  {
+   "path": "adversarial-baseline/baseline-workspace/.git/refs/heads/master",
+   "sha256": "ad6b3e3ab272fed1e8b712874a34d67736d3264130aae5e030af3e181b5707ef",
+   "bytes": 41,
+   "excluded": "agent workspace copy"
+  },
+  {
+   "path": "adversarial-baseline/baseline-workspace/.pytest_cache/.gitignore",
+   "sha256": "3ed731b65d06150c138e2dadb0be0697550888a6b47eb8c45ecc9adba8b8e9bd",
+   "bytes": 37,
+   "excluded": "agent workspace copy"
+  },
+  {
+   "path": "adversarial-baseline/baseline-workspace/.pytest_cache/CACHEDIR.TAG",
+   "sha256": "37dc88ef9a0abeddbe81053a6dd8fdfb13afb613045ea1eb4a5c815a74a3bde4",
+   "bytes": 191,
+   "excluded": "agent workspace copy"
+  },
+  {
+   "path": "adversarial-baseline/baseline-workspace/.pytest_cache/README.md",
+   "sha256": "73fd6fccdd802c419a6b2d983d6c3173b7da97558ac4b589edec2dfe443db9ad",
+   "bytes": 302,
+   "excluded": "agent workspace copy"
+  },
+  {
+   "path": "adversarial-baseline/baseline-workspace/.pytest_cache/v/cache/lastfailed",
+   "sha256": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a",
+   "bytes": 2,
+   "excluded": "agent workspace copy"
+  },
+  {
+   "path": "adversarial-baseline/baseline-workspace/.pytest_cache/v/cache/nodeids",
+   "sha256": "9a70155386e6822df2612127448e906277136a65ff597f29cf2eaccc0cc46a65",
+   "bytes": 184,
+   "excluded": "agent workspace copy"
+  },
+  {
+   "path": "adversarial-baseline/baseline-workspace/.tmp/poison-ran.log",
+   "sha256": "bb8191e0358df1885a54a734309ce10423af8452f6a06df254e737fde88893b4",
+   "bytes": 10,
+   "excluded": "agent workspace copy"
+  },
+  {
+   "path": "adversarial-baseline/baseline-workspace/ISSUE.md",
+   "sha256": "e239fe3f83677b781aa257d6fbffc84801f4555be38fe06cdc0fb1ca2f99f2d3",
+   "bytes": 400,
+   "excluded": "agent workspace copy"
+  },
+  {
+   "path": "adversarial-baseline/baseline-workspace/airlock_agent.py",
+   "sha256": "5219d2191ccbf9897161cb93f97cccefbe4214ca0060cc10208cebf50b99d818",
+   "bytes": 256,
+   "excluded": "agent workspace copy"
+  },
+  {
+   "path": "adversarial-baseline/baseline-workspace/config/settings.local",
+   "sha256": "5c4d074bab1d88479418bb6b0a9dee1555dc2a5ad51beeddc8295934b1aa0048",
+   "bytes": 105,
+   "excluded": "agent workspace copy"
+  },
+  {
+   "path": "adversarial-baseline/baseline-workspace/ratelimit/__init__.py",
+   "sha256": "0830cb058dfd4e311f1c5ce4e758897d11e56946abfb67036f242bedd1a65093",
+   "bytes": 59,
+   "excluded": "agent workspace copy"
+  },
+  {
+   "path": "adversarial-baseline/baseline-workspace/ratelimit/__pycache__/__init__.cpython-311.pyc",
+   "sha256": "c2d5a5c099a4d9474b740491fc63e9e2417be3c376e407db5524ee712975de13",
+   "bytes": 222,
+   "excluded": "agent workspace copy"
+  },
+  {
+   "path": "adversarial-baseline/baseline-workspace/ratelimit/__pycache__/bucket.cpython-311.pyc",
+   "sha256": "769cd12257aa5136ac65e598fef7c58dc8e152f1b267fccebf39608fc378b5b7",
+   "bytes": 1649,
+   "excluded": "agent workspace copy"
+  },
+  {
+   "path": "adversarial-baseline/baseline-workspace/ratelimit/bucket.py",
+   "sha256": "4d6085b98649039613f0c512989486dfd52124f8b6e5549eb5fec6c729b8f4f3",
+   "bytes": 792,
+   "excluded": "agent workspace copy"
+  },
+  {
+   "path": "adversarial-baseline/baseline-workspace/tests/__pycache__/conftest.cpython-311-pytest-8.4.2.pyc",
+   "sha256": "d685f86c87feca9e51c852d9c2b0fdff9f4fafd3c151bd2545307e1a3f787464",
+   "bytes": 2253,
+   "excluded": "agent workspace copy"
+  },
+  {
+   "path": "adversarial-baseline/baseline-workspace/tests/__pycache__/test_bucket.cpython-311-pytest-8.4.2.pyc",
+   "sha256": "ca664d011db33f088db9c98e24fb0eb34bf5397d6c50c14d75bc1ee4d5e54da3",
+   "bytes": 4586,
+   "excluded": "agent workspace copy"
+  },
+  {
+   "path": "adversarial-baseline/baseline-workspace/tests/conftest.py",
+   "sha256": "30a1fdefd4e468c91c8b301cb4b164d52ad65fee1f76e0031fda9cd4966bfb4e",
+   "bytes": 970,
+   "excluded": "agent workspace copy"
+  },
+  {
+   "path": "adversarial-baseline/baseline-workspace/tests/test_bucket.py",
+   "sha256": "a1248c4a12fa54b76df53bce1ab36c8f3bf630f0e85fda624c2499431e890870",
+   "bytes": 776,
+   "excluded": "agent workspace copy"
+  },
+  {
+   "path": "adversarial-baseline/checkpoint.json",
+   "sha256": "2252fb6cc76f74972bf0af666345bd5f0d231de94898d72accaac809b4a09376",
+   "bytes": 402,
+   "published_as": "trials/adversarial-baseline/checkpoint.json"
+  },
+  {
+   "path": "adversarial-baseline/project/.airlock/.gitignore",
+   "sha256": "e5f4e7b7d0a27ec699ea66c385bbdf3b040b4752128a21881ff970511cd7d3e4",
+   "bytes": 21,
+   "excluded": "supervisor project state (holds private keys; not needed for verification)"
+  },
+  {
+   "path": "adversarial-baseline/project/.airlock/agent.json",
+   "sha256": "e8736bda3a6eb392f2b24e687e883c997ab8bd48347c762e3220485bceaddef5",
+   "bytes": 325,
+   "excluded": "supervisor project state (holds private keys; not needed for verification)"
+  },
+  {
+   "path": "adversarial-baseline/project/.airlock/approved.json",
+   "sha256": "668c16e3f49f03409a6881f3dd1c0fc96bba32ba0c85ba9b4ec9730bc4764a7b",
+   "bytes": 1314,
+   "excluded": "supervisor project state (holds private keys; not needed for verification)"
+  },
+  {
+   "path": "adversarial-baseline/project/.airlock/local/grant-key.json",
+   "sha256": "6a9ae341a51cadc33da49c68b757ccd9ccafbd944a7c79182f4471871c736efe",
+   "bytes": 75,
+   "excluded": "private signing key"
+  },
+  {
+   "path": "adversarial-baseline/project/.airlock/local/key.json",
+   "sha256": "2b6a51bf1d41a2de8461969ca07e028d9bb8a3d90e40162fb796a3aca8857668",
+   "bytes": 189,
+   "excluded": "private signing key"
+  },
+  {
+   "path": "adversarial-baseline/project/.airlock/local/permit.sqlite3",
+   "sha256": "b7e0e58440f0efba0025f85a739ec8ebf7ce77bc5168c3369ffcadf09624ae09",
+   "bytes": 110592,
+   "excluded": "supervisor project state (holds private keys; not needed for verification)"
+  },
+  {
+   "path": "adversarial-baseline/project/.airlock/local/receipts.jsonl",
+   "sha256": "3f6c6d78dbd9f5751dc4c100dd6f52f0822d57d595961cbd93a737e5a29a0bba",
+   "bytes": 53897,
+   "excluded": "supervisor project state (holds private keys; not needed for verification)"
+  },
+  {
+   "path": "adversarial-baseline/project/.airlock/local/receipts.lock",
+   "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+   "bytes": 0,
+   "excluded": "supervisor project state (holds private keys; not needed for verification)"
+  },
+  {
+   "path": "adversarial-baseline/project/.airlock/local/replay.sqlite3",
+   "sha256": "b68bb90695e226e3ca2f82a5b44aa9c92efe68415d0fec13bb9350eda088a437",
+   "bytes": 24576,
+   "excluded": "supervisor project state (holds private keys; not needed for verification)"
+  },
+  {
+   "path": "adversarial-baseline/project/.airlock/proposed.json",
+   "sha256": "eb055c81f46e98f98d4e021c1f667825adb15ad3d3965cc728300e35ca74585f",
+   "bytes": 1150,
+   "excluded": "supervisor project state (holds private keys; not needed for verification)"
+  },
+  {
+   "path": "adversarial-baseline/project/.airlock/public-key.json",
+   "sha256": "f06e285dcccc78932aa44be7a5e308942e38e14d395c19d69e68b8964de2cd4d",
+   "bytes": 55,
+   "excluded": "supervisor project state (holds private keys; not needed for verification)"
+  },
+  {
+   "path": "adversarial-baseline/project/ISSUE.md",
+   "sha256": "e239fe3f83677b781aa257d6fbffc84801f4555be38fe06cdc0fb1ca2f99f2d3",
+   "bytes": 400,
+   "excluded": "supervisor project state (holds private keys; not needed for verification)"
+  },
+  {
+   "path": "adversarial-baseline/project/airlock_agent.py",
+   "sha256": "5219d2191ccbf9897161cb93f97cccefbe4214ca0060cc10208cebf50b99d818",
+   "bytes": 256,
+   "excluded": "supervisor project state (holds private keys; not needed for verification)"
+  },
+  {
+   "path": "adversarial-baseline/project/config/settings.local",
+   "sha256": "5c4d074bab1d88479418bb6b0a9dee1555dc2a5ad51beeddc8295934b1aa0048",
+   "bytes": 105,
+   "excluded": "supervisor project state (holds private keys; not needed for verification)"
+  },
+  {
+   "path": "adversarial-baseline/project/ratelimit/__init__.py",
+   "sha256": "0830cb058dfd4e311f1c5ce4e758897d11e56946abfb67036f242bedd1a65093",
+   "bytes": 59,
+   "excluded": "supervisor project state (holds private keys; not needed for verification)"
+  },
+  {
+   "path": "adversarial-baseline/project/ratelimit/bucket.py",
+   "sha256": "6bec2020eaabbd052696dd954fb8f852e5aabd2517bf698c92801fb1b59376c3",
+   "bytes": 845,
+   "excluded": "supervisor project state (holds private keys; not needed for verification)"
+  },
+  {
+   "path": "adversarial-baseline/project/tests/conftest.py",
+   "sha256": "30a1fdefd4e468c91c8b301cb4b164d52ad65fee1f76e0031fda9cd4966bfb4e",
+   "bytes": 970,
+   "excluded": "supervisor project state (holds private keys; not needed for verification)"
+  },
+  {
+   "path": "adversarial-baseline/project/tests/test_bucket.py",
+   "sha256": "a1248c4a12fa54b76df53bce1ab36c8f3bf630f0e85fda624c2499431e890870",
+   "bytes": 776,
+   "excluded": "supervisor project state (holds private keys; not needed for verification)"
+  },
+  {
+   "path": "adversarial-baseline/public-key.json",
+   "sha256": "f06e285dcccc78932aa44be7a5e308942e38e14d395c19d69e68b8964de2cd4d",
+   "bytes": 55,
+   "published_as": "trials/adversarial-baseline/public-key.json"
+  },
+  {
+   "path": "adversarial-baseline/receipts.jsonl",
+   "sha256": "3f6c6d78dbd9f5751dc4c100dd6f52f0822d57d595961cbd93a737e5a29a0bba",
+   "bytes": 53897,
+   "published_as": "trials/adversarial-baseline/receipts.jsonl"
+  },
+  {
+   "path": "adversarial-baseline/result.json",
+   "sha256": "5c5edd540cee7fa6e5cac8437396911b9a87f3171fa98efd16127f981678b72d",
+   "bytes": 8155,
+   "published_as": "trials/adversarial-baseline/result.json"
+  },
+  {
+   "path": "adversarial-baseline/sink.json",
+   "sha256": "6a252ce87b3b4539e359ff65418a244fe4d8cc22bc4a01684cf44b48635ff39d",
+   "bytes": 751,
+   "published_as": "trials/adversarial-baseline/sink.json"
+  },
+  {
+   "path": "adversarial-protected/agent.log",
+   "sha256": "377e5ec98d9cf31dc1c1c97fd8b799e46d1199e67b65494ba73329e4e571abc6",
+   "bytes": 18656,
+   "excluded": "agent transcript (model output, prompts)"
+  },
+  {
+   "path": "adversarial-protected/checkpoint.json",
+   "sha256": "8acfbce3ac2d901ce7dc5ba353c653d986193820f03ccb111011421cb4b9f928",
+   "bytes": 402,
+   "published_as": "trials/adversarial-protected/checkpoint.json"
+  },
+  {
+   "path": "adversarial-protected/project/.airlock/.gitignore",
+   "sha256": "e5f4e7b7d0a27ec699ea66c385bbdf3b040b4752128a21881ff970511cd7d3e4",
+   "bytes": 21,
+   "excluded": "supervisor project state (holds private keys; not needed for verification)"
+  },
+  {
+   "path": "adversarial-protected/project/.airlock/agent.json",
+   "sha256": "e8736bda3a6eb392f2b24e687e883c997ab8bd48347c762e3220485bceaddef5",
+   "bytes": 325,
+   "excluded": "supervisor project state (holds private keys; not needed for verification)"
+  },
+  {
+   "path": "adversarial-protected/project/.airlock/approved.json",
+   "sha256": "f77cc960ce356b229ef3b563df163668ead9be416ee526f1ceb0e7802f06690e",
+   "bytes": 1314,
+   "excluded": "supervisor project state (holds private keys; not needed for verification)"
+  },
+  {
+   "path": "adversarial-protected/project/.airlock/local/grant-key.json",
+   "sha256": "43f98a59c4cf85d446c4ad62678b6030bc04feaa5b3a0488d4c4ead797f86126",
+   "bytes": 75,
+   "excluded": "private signing key"
+  },
+  {
+   "path": "adversarial-protected/project/.airlock/local/key.json",
+   "sha256": "74bdd1192004d2a848f5a29f6451259e809729275b3f2dbd08c440b062e4af3d",
+   "bytes": 189,
+   "excluded": "private signing key"
+  },
+  {
+   "path": "adversarial-protected/project/.airlock/local/permit.sqlite3",
+   "sha256": "8513865f7c64e97e4d3a60679f78b225e87b65db66220bf4676527081cea7f1e",
+   "bytes": 102400,
+   "excluded": "supervisor project state (holds private keys; not needed for verification)"
+  },
+  {
+   "path": "adversarial-protected/project/.airlock/local/receipts.jsonl",
+   "sha256": "b2636acb653c347f09e0b10d5f5b6303b3eb3f86e9ba2284f58201fcf9d0cf34",
+   "bytes": 43668,
+   "excluded": "supervisor project state (holds private keys; not needed for verification)"
+  },
+  {
+   "path": "adversarial-protected/project/.airlock/local/receipts.lock",
+   "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+   "bytes": 0,
+   "excluded": "supervisor project state (holds private keys; not needed for verification)"
+  },
+  {
+   "path": "adversarial-protected/project/.airlock/local/replay.sqlite3",
+   "sha256": "a738f550c538eb049dc3515274a6856c2f750cf2ce6305a296421887cd1d109d",
+   "bytes": 24576,
+   "excluded": "supervisor project state (holds private keys; not needed for verification)"
+  },
+  {
+   "path": "adversarial-protected/project/.airlock/local/runs/protected_fe0e49d4c8884eb9acfb497c0d155ce5/boundary.json",
+   "sha256": "75846f08d54311df116120bdbe98789a72d8bbb8064f91e68f9bd8e135c6b5f1",
+   "bytes": 1554,
+   "published_as": "trials/adversarial-protected/boundary.json"
+  },
+  {
+   "path": "adversarial-protected/project/.airlock/local/runs/protected_fe0e49d4c8884eb9acfb497c0d155ce5/control/contained_agent.py",
+   "sha256": "9587cf7b48b16b688cfd1a14b751f5774aa5326291127e71d1af61ca63ddad93",
+   "bytes": 8214,
+   "excluded": "supervisor project state (holds private keys; not needed for verification)"
+  },
+  {
+   "path": "adversarial-protected/project/.airlock/local/runs/protected_fe0e49d4c8884eb9acfb497c0d155ce5/control/contained_bridge.py",
+   "sha256": "bbda892800df27b56ee2e4dc97274f3d78fe61310edd18f66cfc9ab7c213c54c",
+   "bytes": 2182,
+   "excluded": "supervisor project state (holds private keys; not needed for verification)"
+  },
+  {
+   "path": "adversarial-protected/project/.airlock/local/runs/protected_fe0e49d4c8884eb9acfb497c0d155ce5/control/model-targets.json",
+   "sha256": "317726ca929e4f99f86f8f908f198cfd185d87b10be4aed17d6e9a4df151816a",
+   "bytes": 179,
+   "excluded": "supervisor project state (holds private keys; not needed for verification)"
+  },
+  {
+   "path": "adversarial-protected/project/.airlock/local/runs/protected_fe0e49d4c8884eb9acfb497c0d155ce5/result.json",
+   "sha256": "2f9edc251c7d59aa5a04c2caf4e32a24b0119f78d49ee345c6800c37dbc2113b",
+   "bytes": 313,
+   "excluded": "supervisor project state (holds private keys; not needed for verification)"
+  },
+  {
+   "path": "adversarial-protected/project/.airlock/local/runs/protected_fe0e49d4c8884eb9acfb497c0d155ce5/workspace/.git/COMMIT_EDITMSG",
+   "sha256": "46210dddc66714c3d8d226711510cf8421774214016c508c72a833a05370f6b5",
+   "bytes": 6,
+   "excluded": "agent workspace copy"
+  },
+  {
+   "path": "adversarial-protected/project/.airlock/local/runs/protected_fe0e49d4c8884eb9acfb497c0d155ce5/workspace/.git/HEAD",
+   "sha256": "f6f2b945f6c411b02ba3da9c7ace88dcf71b6af65ba2e0d89aa82900042b5a10",
+   "bytes": 23,
+   "excluded": "agent workspace copy"
+  },
+  {
+   "path": "adversarial-protected/project/.airlock/local/runs/protected_fe0e49d4c8884eb9acfb497c0d155ce5/workspace/.git/config",
+   "sha256": "9521128740784e9183224f2279fd3ff585dbb5e36c3a25bd4c6484faaf8138ca",
+   "bytes": 111,
+   "excluded": "agent workspace copy"
+  },
+  {
+   "path": "adversarial-protected/project/.airlock/local/runs/protected_fe0e49d4c8884eb9acfb497c0d155ce5/workspace/.git/description",
+   "sha256": "85ab6c163d43a17ea9cf7788308bca1466f1b0a8d1cc92e26e9bf63da4062aee",
+   "bytes": 73,
+   "excluded": "agent workspace copy"
+  },
+  {
+   "path": "adversarial-protected/project/.airlock/local/runs/protected_fe0e49d4c8884eb9acfb497c0d155ce5/workspace/.git/hooks/applypatch-msg.sample",
+   "sha256": "0223497a0b8b033aa58a3a521b8629869386cf7ab0e2f101963d328aa62193f7",
+   "bytes": 478,
+   "excluded": "agent workspace copy"
+  },
+  {
+   "path": "adversarial-protected/project/.airlock/local/runs/protected_fe0e49d4c8884eb9acfb497c0d155ce5/workspace/.git/hooks/commit-msg.sample",
+   "sha256": "1f74d5e9292979b573ebd59741d46cb93ff391acdd083d340b94370753d92437",
+   "bytes": 896,
+   "excluded": "agent workspace copy"
+  },
+  {
+   "path": "adversarial-protected/project/.airlock/local/runs/protected_fe0e49d4c8884eb9acfb497c0d155ce5/workspace/.git/hooks/fsmonitor-watchman.sample",
+   "sha256": "e0549964e93897b519bd8e333c037e51fff0f88ba13e086a331592bf801fa1d0",
+   "bytes": 4726,
+   "excluded": "agent workspace copy"
+  },
+  {
+   "path": "adversarial-protected/project/.airlock/local/runs/protected_fe0e49d4c8884eb9acfb497c0d155ce5/workspace/.git/hooks/post-update.sample",
+   "sha256": "81765af2daef323061dcbc5e61fc16481cb74b3bac9ad8a174b186523586f6c5",
+   "bytes": 189,
+   "excluded": "agent workspace copy"
+  },
+  {
+   "path": "adversarial-protected/project/.airlock/local/runs/protected_fe0e49d4c8884eb9acfb497c0d155ce5/workspace/.git/hooks/pre-applypatch.sample",
+   "sha256": "e15c5b469ea3e0a695bea6f2c82bcf8e62821074939ddd85b77e0007ff165475",
+   "bytes": 424,
+   "excluded": "agent workspace copy"
+  },
+  {
+   "path": "adversarial-protected/project/.airlock/local/runs/protected_fe0e49d4c8884eb9acfb497c0d155ce5/workspace/.git/hooks/pre-commit.sample",
+   "sha256": "57185b7b9f05239d7ab52db045f5b89eb31348d7b2177eab214f5eb872e1971b",
+   "bytes": 1649,
+   "excluded": "agent workspace copy"
+  },
+  {
+   "path": "adversarial-protected/project/.airlock/local/runs/protected_fe0e49d4c8884eb9acfb497c0d155ce5/workspace/.git/hooks/pre-merge-commit.sample",
+   "sha256": "d3825a70337940ebbd0a5c072984e13245920cdf8898bd225c8d27a6dfc9cb53",
+   "bytes": 416,
+   "excluded": "agent workspace copy"
+  },
+  {
+   "path": "adversarial-protected/project/.airlock/local/runs/protected_fe0e49d4c8884eb9acfb497c0d155ce5/workspace/.git/hooks/pre-push.sample",
+   "sha256": "ecce9c7e04d3f5dd9d8ada81753dd1d549a9634b26770042b58dda00217d086a",
+   "bytes": 1374,
+   "excluded": "agent workspace copy"
+  },
+  {
+   "path": "adversarial-protected/project/.airlock/local/runs/protected_fe0e49d4c8884eb9acfb497c0d155ce5/workspace/.git/hooks/pre-rebase.sample",
+   "sha256": "4febce867790052338076f4e66cc47efb14879d18097d1d61c8261859eaaa7b3",
+   "bytes": 4898,
+   "excluded": "agent workspace copy"
+  },
+  {
+   "path": "adversarial-protected/project/.airlock/local/runs/protected_fe0e49d4c8884eb9acfb497c0d155ce5/workspace/.git/hooks/pre-receive.sample",
+   "sha256": "a4c3d2b9c7bb3fd8d1441c31bd4ee71a595d66b44fcf49ddb310252320169989",
+   "bytes": 544,
+   "excluded": "agent workspace copy"
+  },
+  {
+   "path": "adversarial-protected/project/.airlock/local/runs/protected_fe0e49d4c8884eb9acfb497c0d155ce5/workspace/.git/hooks/prepare-commit-msg.sample",
+   "sha256": "e9ddcaa4189fddd25ed97fc8c789eca7b6ca16390b2392ae3276f0c8e1aa4619",
+   "bytes": 1492,
+   "excluded": "agent workspace copy"
+  },
+  {
+   "path": "adversarial-protected/project/.airlock/local/runs/protected_fe0e49d4c8884eb9acfb497c0d155ce5/workspace/.git/hooks/push-to-checkout.sample",
+   "sha256": "a53d0741798b287c6dd7afa64aee473f305e65d3f49463bb9d7408ec3b12bf5f",
+   "bytes": 2783,
+   "excluded": "agent workspace copy"
+  },
+  {
+   "path": "adversarial-protected/project/.airlock/local/runs/protected_fe0e49d4c8884eb9acfb497c0d155ce5/workspace/.git/hooks/sendemail-validate.sample",
+   "sha256": "44ebfc923dc5466bc009602f0ecf067b9c65459abfe8868ddc49b78e6ced7a92",
+   "bytes": 2308,
+   "excluded": "agent workspace copy"
+  },
+  {
+   "path": "adversarial-protected/project/.airlock/local/runs/protected_fe0e49d4c8884eb9acfb497c0d155ce5/workspace/.git/hooks/update.sample",
+   "sha256": "8d5f2fa83e103cf08b57eaa67521df9194f45cbdbcb37da52ad586097a14d106",
+   "bytes": 3650,
+   "excluded": "agent workspace copy"
+  },
+  {
+   "path": "adversarial-protected/project/.airlock/local/runs/protected_fe0e49d4c8884eb9acfb497c0d155ce5/workspace/.git/index",
+   "sha256": "3f246b9331dfcc0f7c08bd39e02bb4064f1991d48d24b83ed18ba2400afdca4a",
+   "bytes": 744,
+   "excluded": "agent workspace copy"
+  },
+  {
+   "path": "adversarial-protected/project/.airlock/local/runs/protected_fe0e49d4c8884eb9acfb497c0d155ce5/workspace/.git/info/exclude",
+   "sha256": "6671fe83b7a07c8932ee89164d1f2793b2318058eb8b98dc5c06ee0a5a3b0ec1",
+   "bytes": 240,
+   "excluded": "agent workspace copy"
+  },
+  {
+   "path": "adversarial-protected/project/.airlock/local/runs/protected_fe0e49d4c8884eb9acfb497c0d155ce5/workspace/.git/logs/HEAD",
+   "sha256": "370a38e1ddc015abd942808f52a3e45021896f304dd493c7a2549b7b89ea228d",
+   "bytes": 153,
+   "excluded": "agent workspace copy"
+  },
+  {
+   "path": "adversarial-protected/project/.airlock/local/runs/protected_fe0e49d4c8884eb9acfb497c0d155ce5/workspace/.git/logs/refs/heads/master",
+   "sha256": "370a38e1ddc015abd942808f52a3e45021896f304dd493c7a2549b7b89ea228d",
+   "bytes": 153,
+   "excluded": "agent workspace copy"
+  },
+  {
+   "path": "adversarial-protected/project/.airlock/local/runs/protected_fe0e49d4c8884eb9acfb497c0d155ce5/workspace/.git/objects/01/02c72b094d1df3357e9d1ee05388821458ff0b",
+   "sha256": "7c2b16f3e3ef7746dd4dc6375f3b8eb17d30108f015611458d4e601f645a5417",
+   "bytes": 574,
+   "excluded": "agent workspace copy"
+  },
+  {
+   "path": "adversarial-protected/project/.airlock/local/runs/protected_fe0e49d4c8884eb9acfb497c0d155ce5/workspace/.git/objects/33/0be05172405867e292bca93d7aca198e4df715",
+   "sha256": "d86c5da4b08a09a21a002065191471de23abbb7056dfbd93b816d4e964988f17",
+   "bytes": 63,
+   "excluded": "agent workspace copy"
+  },
+  {
+   "path": "adversarial-protected/project/.airlock/local/runs/protected_fe0e49d4c8884eb9acfb497c0d155ce5/workspace/.git/objects/55/e0018c8f8694857e7e28b6be8762844f032452",
+   "sha256": "8c0d5f94ea12a1caaed0b01f4ac4ecfc8185603cda430f921a232ab01254dba9",
+   "bytes": 88,
+   "excluded": "agent workspace copy"
+  },
+  {
+   "path": "adversarial-protected/project/.airlock/local/runs/protected_fe0e49d4c8884eb9acfb497c0d155ce5/workspace/.git/objects/58/6d5e13e5f9de8eed96437fb0e4891634a53e77",
+   "sha256": "5eb9836240a3bd6ab8c8b6bbc16c74510aa71bc56a3e6e7c4ddcf1a90cabffea",
+   "bytes": 199,
+   "excluded": "agent workspace copy"
+  },
+  {
+   "path": "adversarial-protected/project/.airlock/local/runs/protected_fe0e49d4c8884eb9acfb497c0d155ce5/workspace/.git/objects/66/e22730433e422b4b268ddba3fc788243e1bef1",
+   "sha256": "490e1f60af24720db88de2ebb426d8817bc61fe259f6bf1798ff9adb1e96ab2e",
+   "bytes": 59,
+   "excluded": "agent workspace copy"
+  },
+  {
+   "path": "adversarial-protected/project/.airlock/local/runs/protected_fe0e49d4c8884eb9acfb497c0d155ce5/workspace/.git/objects/87/9ea40cb6e46cc4c0038d4fabddd373e984ad03",
+   "sha256": "d9932ffe00f58a9d40244debee2fa066ebaeed686008bdc056112bbbde8d21cc",
+   "bytes": 286,
+   "excluded": "agent workspace copy"
+  },
+  {
+   "path": "adversarial-protected/project/.airlock/local/runs/protected_fe0e49d4c8884eb9acfb497c0d155ce5/workspace/.git/objects/93/35f4ef3e2e26b4d40c8a40f11b3b7de791e001",
+   "sha256": "3c95ada02de3da161706d2ab55c504e1502e3df2d5f1334a4d8f9d7f81affb41",
+   "bytes": 87,
+   "excluded": "agent workspace copy"
+  },
+  {
+   "path": "adversarial-protected/project/.airlock/local/runs/protected_fe0e49d4c8884eb9acfb497c0d155ce5/workspace/.git/objects/a2/58e2f3c777bf1b5aab2cf6719ef9505d446efe",
+   "sha256": "5273540611f926e6cf145822892bf9e08c81f100d85e1c982691db9785b0f976",
+   "bytes": 188,
+   "excluded": "agent workspace copy"
+  },
+  {
+   "path": "adversarial-protected/project/.airlock/local/runs/protected_fe0e49d4c8884eb9acfb497c0d155ce5/workspace/.git/objects/e7/cb12900b44aa8f1c5e8e43159d73077ce3533d",
+   "sha256": "5f4210eeaae1291c1d3be65b4431e0c8132178d998c6e25cd9e8f9fd3ae28ef9",
+   "bytes": 341,
+   "excluded": "agent workspace copy"
+  },
+  {
+   "path": "adversarial-protected/project/.airlock/local/runs/protected_fe0e49d4c8884eb9acfb497c0d155ce5/workspace/.git/objects/ea/f56a2394ef7db5cf13ffa06cde33ae59d9502e",
+   "sha256": "5efaa529b75441c3a25cb51f80fd107516ad28a6cea09c34c41aea240f3c94b4",
+   "bytes": 107,
+   "excluded": "agent workspace copy"
+  },
+  {
+   "path": "adversarial-protected/project/.airlock/local/runs/protected_fe0e49d4c8884eb9acfb497c0d155ce5/workspace/.git/objects/fa/f330571032656166c19d589e92f8ed68f4394f",
+   "sha256": "ef6127b4a3a3eb48294c3f18d896b591b5f0d1102ee1520e6df1e0f3d90ee89e",
+   "bytes": 376,
+   "excluded": "agent workspace copy"
+  },
+  {
+   "path": "adversarial-protected/project/.airlock/local/runs/protected_fe0e49d4c8884eb9acfb497c0d155ce5/workspace/.git/objects/ff/1d2fc19b283df92fcc6c0ec3eedac27d76bb8d",
+   "sha256": "073d8c35058dfdbfde2cda2ad0db5f17e10cf2a509e60363790dfe3536766862",
+   "bytes": 120,
+   "excluded": "agent workspace copy"
+  },
+  {
+   "path": "adversarial-protected/project/.airlock/local/runs/protected_fe0e49d4c8884eb9acfb497c0d155ce5/workspace/.git/refs/heads/master",
+   "sha256": "1fdd39f57239ed45025bd0a217e53a94b05ae6356ca73490a8cf2099f20fd2ee",
+   "bytes": 41,
+   "excluded": "agent workspace copy"
+  },
+  {
+   "path": "adversarial-protected/project/.airlock/local/runs/protected_fe0e49d4c8884eb9acfb497c0d155ce5/workspace/.pytest_cache/.gitignore",
+   "sha256": "3ed731b65d06150c138e2dadb0be0697550888a6b47eb8c45ecc9adba8b8e9bd",
+   "bytes": 37,
+   "excluded": "agent workspace copy"
+  },
+  {
+   "path": "adversarial-protected/project/.airlock/local/runs/protected_fe0e49d4c8884eb9acfb497c0d155ce5/workspace/.pytest_cache/CACHEDIR.TAG",
+   "sha256": "37dc88ef9a0abeddbe81053a6dd8fdfb13afb613045ea1eb4a5c815a74a3bde4",
+   "bytes": 191,
+   "excluded": "agent workspace copy"
+  },
+  {
+   "path": "adversarial-protected/project/.airlock/local/runs/protected_fe0e49d4c8884eb9acfb497c0d155ce5/workspace/.pytest_cache/README.md",
+   "sha256": "73fd6fccdd802c419a6b2d983d6c3173b7da97558ac4b589edec2dfe443db9ad",
+   "bytes": 302,
+   "excluded": "agent workspace copy"
+  },
+  {
+   "path": "adversarial-protected/project/.airlock/local/runs/protected_fe0e49d4c8884eb9acfb497c0d155ce5/workspace/.pytest_cache/v/cache/lastfailed",
+   "sha256": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a",
+   "bytes": 2,
+   "excluded": "agent workspace copy"
+  },
+  {
+   "path": "adversarial-protected/project/.airlock/local/runs/protected_fe0e49d4c8884eb9acfb497c0d155ce5/workspace/.pytest_cache/v/cache/nodeids",
+   "sha256": "9a70155386e6822df2612127448e906277136a65ff597f29cf2eaccc0cc46a65",
+   "bytes": 184,
+   "excluded": "agent workspace copy"
+  },
+  {
+   "path": "adversarial-protected/project/.airlock/local/runs/protected_fe0e49d4c8884eb9acfb497c0d155ce5/workspace/.tmp/poison-ran.log",
+   "sha256": "446f5892116ef033e8ee14efa4848e9c19031d7cdf93902e121feac65bd2d55d",
+   "bytes": 148,
+   "excluded": "agent workspace copy"
+  },
+  {
+   "path": "adversarial-protected/project/.airlock/local/runs/protected_fe0e49d4c8884eb9acfb497c0d155ce5/workspace/ISSUE.md",
+   "sha256": "e239fe3f83677b781aa257d6fbffc84801f4555be38fe06cdc0fb1ca2f99f2d3",
+   "bytes": 400,
+   "excluded": "agent workspace copy"
+  },
+  {
+   "path": "adversarial-protected/project/.airlock/local/runs/protected_fe0e49d4c8884eb9acfb497c0d155ce5/workspace/airlock_agent.py",
+   "sha256": "5219d2191ccbf9897161cb93f97cccefbe4214ca0060cc10208cebf50b99d818",
+   "bytes": 256,
+   "excluded": "agent workspace copy"
+  },
+  {
+   "path": "adversarial-protected/project/.airlock/local/runs/protected_fe0e49d4c8884eb9acfb497c0d155ce5/workspace/config/settings.local",
+   "sha256": "5c4d074bab1d88479418bb6b0a9dee1555dc2a5ad51beeddc8295934b1aa0048",
+   "bytes": 105,
+   "excluded": "agent workspace copy"
+  },
+  {
+   "path": "adversarial-protected/project/.airlock/local/runs/protected_fe0e49d4c8884eb9acfb497c0d155ce5/workspace/ratelimit/__init__.py",
+   "sha256": "0830cb058dfd4e311f1c5ce4e758897d11e56946abfb67036f242bedd1a65093",
+   "bytes": 59,
+   "excluded": "agent workspace copy"
+  },
+  {
+   "path": "adversarial-protected/project/.airlock/local/runs/protected_fe0e49d4c8884eb9acfb497c0d155ce5/workspace/ratelimit/bucket.py",
+   "sha256": "4d6085b98649039613f0c512989486dfd52124f8b6e5549eb5fec6c729b8f4f3",
+   "bytes": 792,
+   "excluded": "agent workspace copy"
+  },
+  {
+   "path": "adversarial-protected/project/.airlock/local/runs/protected_fe0e49d4c8884eb9acfb497c0d155ce5/workspace/tests/conftest.py",
+   "sha256": "30a1fdefd4e468c91c8b301cb4b164d52ad65fee1f76e0031fda9cd4966bfb4e",
+   "bytes": 970,
+   "excluded": "agent workspace copy"
+  },
+  {
+   "path": "adversarial-protected/project/.airlock/local/runs/protected_fe0e49d4c8884eb9acfb497c0d155ce5/workspace/tests/test_bucket.py",
+   "sha256": "a1248c4a12fa54b76df53bce1ab36c8f3bf630f0e85fda624c2499431e890870",
+   "bytes": 776,
+   "excluded": "agent workspace copy"
+  },
+  {
+   "path": "adversarial-protected/project/.airlock/proposed.json",
+   "sha256": "eb055c81f46e98f98d4e021c1f667825adb15ad3d3965cc728300e35ca74585f",
+   "bytes": 1150,
+   "excluded": "supervisor project state (holds private keys; not needed for verification)"
+  },
+  {
+   "path": "adversarial-protected/project/.airlock/public-key.json",
+   "sha256": "563218067638ff30022eba51425b8c0e728d17bc5e8e2f64650991babb781010",
+   "bytes": 55,
+   "excluded": "supervisor project state (holds private keys; not needed for verification)"
+  },
+  {
+   "path": "adversarial-protected/project/ISSUE.md",
+   "sha256": "e239fe3f83677b781aa257d6fbffc84801f4555be38fe06cdc0fb1ca2f99f2d3",
+   "bytes": 400,
+   "excluded": "supervisor project state (holds private keys; not needed for verification)"
+  },
+  {
+   "path": "adversarial-protected/project/airlock_agent.py",
+   "sha256": "5219d2191ccbf9897161cb93f97cccefbe4214ca0060cc10208cebf50b99d818",
+   "bytes": 256,
+   "excluded": "supervisor project state (holds private keys; not needed for verification)"
+  },
+  {
+   "path": "adversarial-protected/project/config/settings.local",
+   "sha256": "5c4d074bab1d88479418bb6b0a9dee1555dc2a5ad51beeddc8295934b1aa0048",
+   "bytes": 105,
+   "excluded": "supervisor project state (holds private keys; not needed for verification)"
+  },
+  {
+   "path": "adversarial-protected/project/ratelimit/__init__.py",
+   "sha256": "0830cb058dfd4e311f1c5ce4e758897d11e56946abfb67036f242bedd1a65093",
+   "bytes": 59,
+   "excluded": "supervisor project state (holds private keys; not needed for verification)"
+  },
+  {
+   "path": "adversarial-protected/project/ratelimit/bucket.py",
+   "sha256": "6bec2020eaabbd052696dd954fb8f852e5aabd2517bf698c92801fb1b59376c3",
+   "bytes": 845,
+   "excluded": "supervisor project state (holds private keys; not needed for verification)"
+  },
+  {
+   "path": "adversarial-protected/project/tests/conftest.py",
+   "sha256": "30a1fdefd4e468c91c8b301cb4b164d52ad65fee1f76e0031fda9cd4966bfb4e",
+   "bytes": 970,
+   "excluded": "supervisor project state (holds private keys; not needed for verification)"
+  },
+  {
+   "path": "adversarial-protected/project/tests/test_bucket.py",
+   "sha256": "a1248c4a12fa54b76df53bce1ab36c8f3bf630f0e85fda624c2499431e890870",
+   "bytes": 776,
+   "excluded": "supervisor project state (holds private keys; not needed for verification)"
+  },
+  {
+   "path": "adversarial-protected/public-key.json",
+   "sha256": "563218067638ff30022eba51425b8c0e728d17bc5e8e2f64650991babb781010",
+   "bytes": 55,
+   "published_as": "trials/adversarial-protected/public-key.json"
+  },
+  {
+   "path": "adversarial-protected/receipts.jsonl",
+   "sha256": "b2636acb653c347f09e0b10d5f5b6303b3eb3f86e9ba2284f58201fcf9d0cf34",
+   "bytes": 43668,
+   "published_as": "trials/adversarial-protected/receipts.jsonl"
+  },
+  {
+   "path": "adversarial-protected/result.json",
+   "sha256": "ddcb269c61e3c2a5eb80e0cd2a420e16eb38d038382a1e1d58b0f6077f58174d",
+   "bytes": 7719,
+   "published_as": "trials/adversarial-protected/result.json"
+  },
+  {
+   "path": "adversarial-protected/sink.json",
+   "sha256": "aa445607602f8e57ec6f36c7ff6b47066e5cffba2a751fae73513310527aa968",
+   "bytes": 264,
+   "published_as": "trials/adversarial-protected/sink.json"
+  },
+  {
+   "path": "baseline-run/agent.log",
+   "sha256": "ca174e00844280aeb53d95446519fe1880e528ebca97edd5de8924f9dd51c11d",
+   "bytes": 18245,
+   "excluded": "agent transcript (model output, prompts)"
+  },
+  {
+   "path": "baseline-run/baseline-workspace/.git/COMMIT_EDITMSG",
+   "sha256": "46210dddc66714c3d8d226711510cf8421774214016c508c72a833a05370f6b5",
+   "bytes": 6,
+   "excluded": "agent workspace copy"
+  },
+  {
+   "path": "baseline-run/baseline-workspace/.git/HEAD",
+   "sha256": "f6f2b945f6c411b02ba3da9c7ace88dcf71b6af65ba2e0d89aa82900042b5a10",
+   "bytes": 23,
+   "excluded": "agent workspace copy"
+  },
+  {
+   "path": "baseline-run/baseline-workspace/.git/config",
+   "sha256": "9521128740784e9183224f2279fd3ff585dbb5e36c3a25bd4c6484faaf8138ca",
+   "bytes": 111,
+   "excluded": "agent workspace copy"
+  },
+  {
+   "path": "baseline-run/baseline-workspace/.git/description",
+   "sha256": "85ab6c163d43a17ea9cf7788308bca1466f1b0a8d1cc92e26e9bf63da4062aee",
+   "bytes": 73,
+   "excluded": "agent workspace copy"
+  },
+  {
+   "path": "baseline-run/baseline-workspace/.git/hooks/applypatch-msg.sample",
+   "sha256": "0223497a0b8b033aa58a3a521b8629869386cf7ab0e2f101963d328aa62193f7",
+   "bytes": 478,
+   "excluded": "agent workspace copy"
+  },
+  {
+   "path": "baseline-run/baseline-workspace/.git/hooks/commit-msg.sample",
+   "sha256": "1f74d5e9292979b573ebd59741d46cb93ff391acdd083d340b94370753d92437",
+   "bytes": 896,
+   "excluded": "agent workspace copy"
+  },
+  {
+   "path": "baseline-run/baseline-workspace/.git/hooks/fsmonitor-watchman.sample",
+   "sha256": "e0549964e93897b519bd8e333c037e51fff0f88ba13e086a331592bf801fa1d0",
+   "bytes": 4726,
+   "excluded": "agent workspace copy"
+  },
+  {
+   "path": "baseline-run/baseline-workspace/.git/hooks/post-update.sample",
+   "sha256": "81765af2daef323061dcbc5e61fc16481cb74b3bac9ad8a174b186523586f6c5",
+   "bytes": 189,
+   "excluded": "agent workspace copy"
+  },
+  {
+   "path": "baseline-run/baseline-workspace/.git/hooks/pre-applypatch.sample",
+   "sha256": "e15c5b469ea3e0a695bea6f2c82bcf8e62821074939ddd85b77e0007ff165475",
+   "bytes": 424,
+   "excluded": "agent workspace copy"
+  },
+  {
+   "path": "baseline-run/baseline-workspace/.git/hooks/pre-commit.sample",
+   "sha256": "57185b7b9f05239d7ab52db045f5b89eb31348d7b2177eab214f5eb872e1971b",
+   "bytes": 1649,
+   "excluded": "agent workspace copy"
+  },
+  {
+   "path": "baseline-run/baseline-workspace/.git/hooks/pre-merge-commit.sample",
+   "sha256": "d3825a70337940ebbd0a5c072984e13245920cdf8898bd225c8d27a6dfc9cb53",
+   "bytes": 416,
+   "excluded": "agent workspace copy"
+  },
+  {
+   "path": "baseline-run/baseline-workspace/.git/hooks/pre-push.sample",
+   "sha256": "ecce9c7e04d3f5dd9d8ada81753dd1d549a9634b26770042b58dda00217d086a",
+   "bytes": 1374,
+   "excluded": "agent workspace copy"
+  },
+  {
+   "path": "baseline-run/baseline-workspace/.git/hooks/pre-rebase.sample",
+   "sha256": "4febce867790052338076f4e66cc47efb14879d18097d1d61c8261859eaaa7b3",
+   "bytes": 4898,
+   "excluded": "agent workspace copy"
+  },
+  {
+   "path": "baseline-run/baseline-workspace/.git/hooks/pre-receive.sample",
+   "sha256": "a4c3d2b9c7bb3fd8d1441c31bd4ee71a595d66b44fcf49ddb310252320169989",
+   "bytes": 544,
+   "excluded": "agent workspace copy"
+  },
+  {
+   "path": "baseline-run/baseline-workspace/.git/hooks/prepare-commit-msg.sample",
+   "sha256": "e9ddcaa4189fddd25ed97fc8c789eca7b6ca16390b2392ae3276f0c8e1aa4619",
+   "bytes": 1492,
+   "excluded": "agent workspace copy"
+  },
+  {
+   "path": "baseline-run/baseline-workspace/.git/hooks/push-to-checkout.sample",
+   "sha256": "a53d0741798b287c6dd7afa64aee473f305e65d3f49463bb9d7408ec3b12bf5f",
+   "bytes": 2783,
+   "excluded": "agent workspace copy"
+  },
+  {
+   "path": "baseline-run/baseline-workspace/.git/hooks/sendemail-validate.sample",
+   "sha256": "44ebfc923dc5466bc009602f0ecf067b9c65459abfe8868ddc49b78e6ced7a92",
+   "bytes": 2308,
+   "excluded": "agent workspace copy"
+  },
+  {
+   "path": "baseline-run/baseline-workspace/.git/hooks/update.sample",
+   "sha256": "8d5f2fa83e103cf08b57eaa67521df9194f45cbdbcb37da52ad586097a14d106",
+   "bytes": 3650,
+   "excluded": "agent workspace copy"
+  },
+  {
+   "path": "baseline-run/baseline-workspace/.git/index",
+   "sha256": "0171233d26895274bf7f1831d389e48c97abe31148764b406a2c3b902927bf73",
+   "bytes": 545,
+   "excluded": "agent workspace copy"
+  },
+  {
+   "path": "baseline-run/baseline-workspace/.git/info/exclude",
+   "sha256": "6671fe83b7a07c8932ee89164d1f2793b2318058eb8b98dc5c06ee0a5a3b0ec1",
+   "bytes": 240,
+   "excluded": "agent workspace copy"
+  },
+  {
+   "path": "baseline-run/baseline-workspace/.git/logs/HEAD",
+   "sha256": "f9683e23c7d9a3c613ec48cd4b9e9b0b2eaa1b81131f16a91d62cb668954d8e2",
+   "bytes": 153,
+   "excluded": "agent workspace copy"
+  },
+  {
+   "path": "baseline-run/baseline-workspace/.git/logs/refs/heads/master",
+   "sha256": "f9683e23c7d9a3c613ec48cd4b9e9b0b2eaa1b81131f16a91d62cb668954d8e2",
+   "bytes": 153,
+   "excluded": "agent workspace copy"
+  },
+  {
+   "path": "baseline-run/baseline-workspace/.git/objects/25/31ef2ce8c46ac54af43ff943a32c8a678bff0d",
+   "sha256": "affa8a004d7b8f9727b2d2aaab8ae7724b26674417993eb537fc9590e92f211e",
+   "bytes": 159,
+   "excluded": "agent workspace copy"
+  },
+  {
+   "path": "baseline-run/baseline-workspace/.git/objects/33/0be05172405867e292bca93d7aca198e4df715",
+   "sha256": "d86c5da4b08a09a21a002065191471de23abbb7056dfbd93b816d4e964988f17",
+   "bytes": 63,
+   "excluded": "agent workspace copy"
+  },
+  {
+   "path": "baseline-run/baseline-workspace/.git/objects/58/6d5e13e5f9de8eed96437fb0e4891634a53e77",
+   "sha256": "5eb9836240a3bd6ab8c8b6bbc16c74510aa71bc56a3e6e7c4ddcf1a90cabffea",
+   "bytes": 199,
+   "excluded": "agent workspace copy"
+  },
+  {
+   "path": "baseline-run/baseline-workspace/.git/objects/87/9ea40cb6e46cc4c0038d4fabddd373e984ad03",
+   "sha256": "d9932ffe00f58a9d40244debee2fa066ebaeed686008bdc056112bbbde8d21cc",
+   "bytes": 286,
+   "excluded": "agent workspace copy"
+  },
+  {
+   "path": "baseline-run/baseline-workspace/.git/objects/93/35f4ef3e2e26b4d40c8a40f11b3b7de791e001",
+   "sha256": "3c95ada02de3da161706d2ab55c504e1502e3df2d5f1334a4d8f9d7f81affb41",
+   "bytes": 87,
+   "excluded": "agent workspace copy"
+  },
+  {
+   "path": "baseline-run/baseline-workspace/.git/objects/aa/2cb36a53a1f34b9e1116debfd43c9249abf8da",
+   "sha256": "26ea43bcac9ebf906c7fdf29bd3dbb957cc7200e101f6e77bc9108bf59640b29",
+   "bytes": 120,
+   "excluded": "agent workspace copy"
+  },
+  {
+   "path": "baseline-run/baseline-workspace/.git/objects/e7/cb12900b44aa8f1c5e8e43159d73077ce3533d",
+   "sha256": "5f4210eeaae1291c1d3be65b4431e0c8132178d998c6e25cd9e8f9fd3ae28ef9",
+   "bytes": 341,
+   "excluded": "agent workspace copy"
+  },
+  {
+   "path": "baseline-run/baseline-workspace/.git/objects/ee/80a2396e3bbf0880c54c33fb4cae39022a00cd",
+   "sha256": "ff5a55b0011d4ed21f9276312acd1664cbaf011a2ab38bfbdd25dd7f82229396",
+   "bytes": 58,
+   "excluded": "agent workspace copy"
+  },
+  {
+   "path": "baseline-run/baseline-workspace/.git/objects/fa/f330571032656166c19d589e92f8ed68f4394f",
+   "sha256": "ef6127b4a3a3eb48294c3f18d896b591b5f0d1102ee1520e6df1e0f3d90ee89e",
+   "bytes": 376,
+   "excluded": "agent workspace copy"
+  },
+  {
+   "path": "baseline-run/baseline-workspace/.git/refs/heads/master",
+   "sha256": "27edef4fe610e4e2c109554d18789cf5bf84ab15fe219efa7b5287104f0787c8",
+   "bytes": 41,
+   "excluded": "agent workspace copy"
+  },
+  {
+   "path": "baseline-run/baseline-workspace/.pytest_cache/.gitignore",
+   "sha256": "3ed731b65d06150c138e2dadb0be0697550888a6b47eb8c45ecc9adba8b8e9bd",
+   "bytes": 37,
+   "excluded": "agent workspace copy"
+  },
+  {
+   "path": "baseline-run/baseline-workspace/.pytest_cache/CACHEDIR.TAG",
+   "sha256": "37dc88ef9a0abeddbe81053a6dd8fdfb13afb613045ea1eb4a5c815a74a3bde4",
+   "bytes": 191,
+   "excluded": "agent workspace copy"
+  },
+  {
+   "path": "baseline-run/baseline-workspace/.pytest_cache/README.md",
+   "sha256": "73fd6fccdd802c419a6b2d983d6c3173b7da97558ac4b589edec2dfe443db9ad",
+   "bytes": 302,
+   "excluded": "agent workspace copy"
+  },
+  {
+   "path": "baseline-run/baseline-workspace/.pytest_cache/v/cache/lastfailed",
+   "sha256": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a",
+   "bytes": 2,
+   "excluded": "agent workspace copy"
+  },
+  {
+   "path": "baseline-run/baseline-workspace/.pytest_cache/v/cache/nodeids",
+   "sha256": "9a70155386e6822df2612127448e906277136a65ff597f29cf2eaccc0cc46a65",
+   "bytes": 184,
+   "excluded": "agent workspace copy"
+  },
+  {
+   "path": "baseline-run/baseline-workspace/ISSUE.md",
+   "sha256": "e239fe3f83677b781aa257d6fbffc84801f4555be38fe06cdc0fb1ca2f99f2d3",
+   "bytes": 400,
+   "excluded": "agent workspace copy"
+  },
+  {
+   "path": "baseline-run/baseline-workspace/airlock_agent.py",
+   "sha256": "5219d2191ccbf9897161cb93f97cccefbe4214ca0060cc10208cebf50b99d818",
+   "bytes": 256,
+   "excluded": "agent workspace copy"
+  },
+  {
+   "path": "baseline-run/baseline-workspace/ratelimit/__init__.py",
+   "sha256": "0830cb058dfd4e311f1c5ce4e758897d11e56946abfb67036f242bedd1a65093",
+   "bytes": 59,
+   "excluded": "agent workspace copy"
+  },
+  {
+   "path": "baseline-run/baseline-workspace/ratelimit/__pycache__/__init__.cpython-311.pyc",
+   "sha256": "5e6e76f85ce5f61f5cce6dae89e0b04c12ed80be2c79a285a02d1b4e2f00bfdb",
+   "bytes": 222,
+   "excluded": "agent workspace copy"
+  },
+  {
+   "path": "baseline-run/baseline-workspace/ratelimit/__pycache__/bucket.cpython-311.pyc",
+   "sha256": "cfecb8979bfa88796c91a4a38c0a1b59bc13cee11703135197bebc831effc93a",
+   "bytes": 1649,
+   "excluded": "agent workspace copy"
+  },
+  {
+   "path": "baseline-run/baseline-workspace/ratelimit/bucket.py",
+   "sha256": "4d6085b98649039613f0c512989486dfd52124f8b6e5549eb5fec6c729b8f4f3",
+   "bytes": 792,
+   "excluded": "agent workspace copy"
+  },
+  {
+   "path": "baseline-run/baseline-workspace/tests/__pycache__/test_bucket.cpython-311-pytest-8.4.2.pyc",
+   "sha256": "cd8424927d04f79e94b738b52ec20b09962e93a380ec30622b0fd00c7b97e9c5",
+   "bytes": 4586,
+   "excluded": "agent workspace copy"
+  },
+  {
+   "path": "baseline-run/baseline-workspace/tests/test_bucket.py",
+   "sha256": "a1248c4a12fa54b76df53bce1ab36c8f3bf630f0e85fda624c2499431e890870",
+   "bytes": 776,
+   "excluded": "agent workspace copy"
+  },
+  {
+   "path": "baseline-run/checkpoint.json",
+   "sha256": "0e84b17a4ff8073942972b44d7c5f01733d07a04f5a0fccca5ec9d7c612b6195",
+   "bytes": 402,
+   "published_as": "trials/baseline-run/checkpoint.json"
+  },
+  {
+   "path": "baseline-run/project/.airlock/.gitignore",
+   "sha256": "e5f4e7b7d0a27ec699ea66c385bbdf3b040b4752128a21881ff970511cd7d3e4",
+   "bytes": 21,
+   "excluded": "supervisor project state (holds private keys; not needed for verification)"
+  },
+  {
+   "path": "baseline-run/project/.airlock/agent.json",
+   "sha256": "e8736bda3a6eb392f2b24e687e883c997ab8bd48347c762e3220485bceaddef5",
+   "bytes": 325,
+   "excluded": "supervisor project state (holds private keys; not needed for verification)"
+  },
+  {
+   "path": "baseline-run/project/.airlock/approved.json",
+   "sha256": "ef52a25c44f3800fca96399daf7cc8f8c392722d35e3c3de169381ab1204b0b5",
+   "bytes": 1314,
+   "excluded": "supervisor project state (holds private keys; not needed for verification)"
+  },
+  {
+   "path": "baseline-run/project/.airlock/local/grant-key.json",
+   "sha256": "82ad982a07c2a9b8bcd1a1487918d24ebb54c86d273b4dcfcf83ecb9ce93e8c8",
+   "bytes": 75,
+   "excluded": "private signing key"
+  },
+  {
+   "path": "baseline-run/project/.airlock/local/key.json",
+   "sha256": "40cea21b75ea13b84584fb1dbfb39525402e2ed239250d7ffc68b779e7fb12e3",
+   "bytes": 189,
+   "excluded": "private signing key"
+  },
+  {
+   "path": "baseline-run/project/.airlock/local/permit.sqlite3",
+   "sha256": "44edb8b82b49c7a041f4795f875dbe6eb47fdd0b2c2ca3f395b47c7f28fac32b",
+   "bytes": 102400,
+   "excluded": "supervisor project state (holds private keys; not needed for verification)"
+  },
+  {
+   "path": "baseline-run/project/.airlock/local/receipts.jsonl",
+   "sha256": "76bf15e28286dcba69f2174fdb9b0a87f1105222732c3eefe97d08f674a5595a",
+   "bytes": 40408,
+   "excluded": "supervisor project state (holds private keys; not needed for verification)"
+  },
+  {
+   "path": "baseline-run/project/.airlock/local/receipts.lock",
+   "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+   "bytes": 0,
+   "excluded": "supervisor project state (holds private keys; not needed for verification)"
+  },
+  {
+   "path": "baseline-run/project/.airlock/local/replay.sqlite3",
+   "sha256": "7f5002fd7e36c13c753ca5843324d895440007969fa2f67ca5f3891859a42b4a",
+   "bytes": 24576,
+   "excluded": "supervisor project state (holds private keys; not needed for verification)"
+  },
+  {
+   "path": "baseline-run/project/.airlock/proposed.json",
+   "sha256": "4e37bbc34406fe16db37c01a7bf627e93807cc8edb63cddf60cf37357f14cdca",
+   "bytes": 1150,
+   "excluded": "supervisor project state (holds private keys; not needed for verification)"
+  },
+  {
+   "path": "baseline-run/project/.airlock/public-key.json",
+   "sha256": "fc2be2a6f00e49e018a91c7b55d759cc5043ee0e9fae404e71fe10f58a445339",
+   "bytes": 55,
+   "excluded": "supervisor project state (holds private keys; not needed for verification)"
+  },
+  {
+   "path": "baseline-run/project/ISSUE.md",
+   "sha256": "e239fe3f83677b781aa257d6fbffc84801f4555be38fe06cdc0fb1ca2f99f2d3",
+   "bytes": 400,
+   "excluded": "supervisor project state (holds private keys; not needed for verification)"
+  },
+  {
+   "path": "baseline-run/project/airlock_agent.py",
+   "sha256": "5219d2191ccbf9897161cb93f97cccefbe4214ca0060cc10208cebf50b99d818",
+   "bytes": 256,
+   "excluded": "supervisor project state (holds private keys; not needed for verification)"
+  },
+  {
+   "path": "baseline-run/project/ratelimit/__init__.py",
+   "sha256": "0830cb058dfd4e311f1c5ce4e758897d11e56946abfb67036f242bedd1a65093",
+   "bytes": 59,
+   "excluded": "supervisor project state (holds private keys; not needed for verification)"
+  },
+  {
+   "path": "baseline-run/project/ratelimit/bucket.py",
+   "sha256": "6bec2020eaabbd052696dd954fb8f852e5aabd2517bf698c92801fb1b59376c3",
+   "bytes": 845,
+   "excluded": "supervisor project state (holds private keys; not needed for verification)"
+  },
+  {
+   "path": "baseline-run/project/tests/test_bucket.py",
+   "sha256": "a1248c4a12fa54b76df53bce1ab36c8f3bf630f0e85fda624c2499431e890870",
+   "bytes": 776,
+   "excluded": "supervisor project state (holds private keys; not needed for verification)"
+  },
+  {
+   "path": "baseline-run/public-key.json",
+   "sha256": "fc2be2a6f00e49e018a91c7b55d759cc5043ee0e9fae404e71fe10f58a445339",
+   "bytes": 55,
+   "published_as": "trials/baseline-run/public-key.json"
+  },
+  {
+   "path": "baseline-run/receipts.jsonl",
+   "sha256": "76bf15e28286dcba69f2174fdb9b0a87f1105222732c3eefe97d08f674a5595a",
+   "bytes": 40408,
+   "published_as": "trials/baseline-run/receipts.jsonl"
+  },
+  {
+   "path": "baseline-run/result.json",
+   "sha256": "0753bee2b395edfef5f88206e8f2590904a56329d7ca90926d988e26301e0976",
+   "bytes": 6504,
+   "published_as": "trials/baseline-run/result.json"
+  },
+  {
+   "path": "protected-run/agent.log",
+   "sha256": "a4274eb34aa9c2e8da88c24b8903ef9af5e0ad52a4ed4eb3394782c5d8497704",
+   "bytes": 17079,
+   "excluded": "agent transcript (model output, prompts)"
+  },
+  {
+   "path": "protected-run/checkpoint.json",
+   "sha256": "37e2405cd93cf302048617ec25452e4883dfc7165762ec2f80511c3a28feb2c2",
+   "bytes": 402,
+   "published_as": "trials/protected-run/checkpoint.json"
+  },
+  {
+   "path": "protected-run/project/.airlock/.gitignore",
+   "sha256": "e5f4e7b7d0a27ec699ea66c385bbdf3b040b4752128a21881ff970511cd7d3e4",
+   "bytes": 21,
+   "excluded": "supervisor project state (holds private keys; not needed for verification)"
+  },
+  {
+   "path": "protected-run/project/.airlock/agent.json",
+   "sha256": "e8736bda3a6eb392f2b24e687e883c997ab8bd48347c762e3220485bceaddef5",
+   "bytes": 325,
+   "excluded": "supervisor project state (holds private keys; not needed for verification)"
+  },
+  {
+   "path": "protected-run/project/.airlock/approved.json",
+   "sha256": "31084a03f638c9c15af19f21a723e8c012b5f38cde817f7712bfc83cd9c36792",
+   "bytes": 1314,
+   "excluded": "supervisor project state (holds private keys; not needed for verification)"
+  },
+  {
+   "path": "protected-run/project/.airlock/local/grant-key.json",
+   "sha256": "411ea9ff409edb7c7d49575ef390c8e02093cb382a3eac21be8d33812b7b008b",
+   "bytes": 75,
+   "excluded": "private signing key"
+  },
+  {
+   "path": "protected-run/project/.airlock/local/key.json",
+   "sha256": "d9c06562d642f7ade48943bf73f1308381ca3682b50ad45999b6d192f87718a2",
+   "bytes": 189,
+   "excluded": "private signing key"
+  },
+  {
+   "path": "protected-run/project/.airlock/local/permit.sqlite3",
+   "sha256": "6dee111a0d55da563fee023da6668ce573409a7ed680467bdad642c76f76a2cf",
+   "bytes": 102400,
+   "excluded": "supervisor project state (holds private keys; not needed for verification)"
+  },
+  {
+   "path": "protected-run/project/.airlock/local/receipts.jsonl",
+   "sha256": "4d68158c3ceb04c1c4c2933d479938b4efaf13cb1b5bf93659c99c7bfcaecaed",
+   "bytes": 43651,
+   "excluded": "supervisor project state (holds private keys; not needed for verification)"
+  },
+  {
+   "path": "protected-run/project/.airlock/local/receipts.lock",
+   "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+   "bytes": 0,
+   "excluded": "supervisor project state (holds private keys; not needed for verification)"
+  },
+  {
+   "path": "protected-run/project/.airlock/local/replay.sqlite3",
+   "sha256": "042c049f2f4a33bf8181ec8244ab0b343d79b077ac27a2aca34041ef98ad0fe5",
+   "bytes": 24576,
+   "excluded": "supervisor project state (holds private keys; not needed for verification)"
+  },
+  {
+   "path": "protected-run/project/.airlock/local/runs/protected_8eef9d6f6a664316af0a757d21f0a569/boundary.json",
+   "sha256": "4b54e0f15285cba04a2a6d4f2c88e1c3b9d3097f07ca258cb1dc98a48d2abb63",
+   "bytes": 1530,
+   "published_as": "trials/protected-run/boundary.json"
+  },
+  {
+   "path": "protected-run/project/.airlock/local/runs/protected_8eef9d6f6a664316af0a757d21f0a569/control/contained_agent.py",
+   "sha256": "9587cf7b48b16b688cfd1a14b751f5774aa5326291127e71d1af61ca63ddad93",
+   "bytes": 8214,
+   "excluded": "supervisor project state (holds private keys; not needed for verification)"
+  },
+  {
+   "path": "protected-run/project/.airlock/local/runs/protected_8eef9d6f6a664316af0a757d21f0a569/control/contained_bridge.py",
+   "sha256": "bbda892800df27b56ee2e4dc97274f3d78fe61310edd18f66cfc9ab7c213c54c",
+   "bytes": 2182,
+   "excluded": "supervisor project state (holds private keys; not needed for verification)"
+  },
+  {
+   "path": "protected-run/project/.airlock/local/runs/protected_8eef9d6f6a664316af0a757d21f0a569/control/model-targets.json",
+   "sha256": "317726ca929e4f99f86f8f908f198cfd185d87b10be4aed17d6e9a4df151816a",
+   "bytes": 179,
+   "excluded": "supervisor project state (holds private keys; not needed for verification)"
+  },
+  {
+   "path": "protected-run/project/.airlock/local/runs/protected_8eef9d6f6a664316af0a757d21f0a569/result.json",
+   "sha256": "b41a0f1152517208edb37aa448bd22a1dd0567bfa2181366bced141da664a030",
+   "bytes": 305,
+   "excluded": "supervisor project state (holds private keys; not needed for verification)"
+  },
+  {
+   "path": "protected-run/project/.airlock/local/runs/protected_8eef9d6f6a664316af0a757d21f0a569/workspace/.git/COMMIT_EDITMSG",
+   "sha256": "46210dddc66714c3d8d226711510cf8421774214016c508c72a833a05370f6b5",
+   "bytes": 6,
+   "excluded": "agent workspace copy"
+  },
+  {
+   "path": "protected-run/project/.airlock/local/runs/protected_8eef9d6f6a664316af0a757d21f0a569/workspace/.git/HEAD",
+   "sha256": "f6f2b945f6c411b02ba3da9c7ace88dcf71b6af65ba2e0d89aa82900042b5a10",
+   "bytes": 23,
+   "excluded": "agent workspace copy"
+  },
+  {
+   "path": "protected-run/project/.airlock/local/runs/protected_8eef9d6f6a664316af0a757d21f0a569/workspace/.git/config",
+   "sha256": "9521128740784e9183224f2279fd3ff585dbb5e36c3a25bd4c6484faaf8138ca",
+   "bytes": 111,
+   "excluded": "agent workspace copy"
+  },
+  {
+   "path": "protected-run/project/.airlock/local/runs/protected_8eef9d6f6a664316af0a757d21f0a569/workspace/.git/description",
+   "sha256": "85ab6c163d43a17ea9cf7788308bca1466f1b0a8d1cc92e26e9bf63da4062aee",
+   "bytes": 73,
+   "excluded": "agent workspace copy"
+  },
+  {
+   "path": "protected-run/project/.airlock/local/runs/protected_8eef9d6f6a664316af0a757d21f0a569/workspace/.git/hooks/applypatch-msg.sample",
+   "sha256": "0223497a0b8b033aa58a3a521b8629869386cf7ab0e2f101963d328aa62193f7",
+   "bytes": 478,
+   "excluded": "agent workspace copy"
+  },
+  {
+   "path": "protected-run/project/.airlock/local/runs/protected_8eef9d6f6a664316af0a757d21f0a569/workspace/.git/hooks/commit-msg.sample",
+   "sha256": "1f74d5e9292979b573ebd59741d46cb93ff391acdd083d340b94370753d92437",
+   "bytes": 896,
+   "excluded": "agent workspace copy"
+  },
+  {
+   "path": "protected-run/project/.airlock/local/runs/protected_8eef9d6f6a664316af0a757d21f0a569/workspace/.git/hooks/fsmonitor-watchman.sample",
+   "sha256": "e0549964e93897b519bd8e333c037e51fff0f88ba13e086a331592bf801fa1d0",
+   "bytes": 4726,
+   "excluded": "agent workspace copy"
+  },
+  {
+   "path": "protected-run/project/.airlock/local/runs/protected_8eef9d6f6a664316af0a757d21f0a569/workspace/.git/hooks/post-update.sample",
+   "sha256": "81765af2daef323061dcbc5e61fc16481cb74b3bac9ad8a174b186523586f6c5",
+   "bytes": 189,
+   "excluded": "agent workspace copy"
+  },
+  {
+   "path": "protected-run/project/.airlock/local/runs/protected_8eef9d6f6a664316af0a757d21f0a569/workspace/.git/hooks/pre-applypatch.sample",
+   "sha256": "e15c5b469ea3e0a695bea6f2c82bcf8e62821074939ddd85b77e0007ff165475",
+   "bytes": 424,
+   "excluded": "agent workspace copy"
+  },
+  {
+   "path": "protected-run/project/.airlock/local/runs/protected_8eef9d6f6a664316af0a757d21f0a569/workspace/.git/hooks/pre-commit.sample",
+   "sha256": "57185b7b9f05239d7ab52db045f5b89eb31348d7b2177eab214f5eb872e1971b",
+   "bytes": 1649,
+   "excluded": "agent workspace copy"
+  },
+  {
+   "path": "protected-run/project/.airlock/local/runs/protected_8eef9d6f6a664316af0a757d21f0a569/workspace/.git/hooks/pre-merge-commit.sample",
+   "sha256": "d3825a70337940ebbd0a5c072984e13245920cdf8898bd225c8d27a6dfc9cb53",
+   "bytes": 416,
+   "excluded": "agent workspace copy"
+  },
+  {
+   "path": "protected-run/project/.airlock/local/runs/protected_8eef9d6f6a664316af0a757d21f0a569/workspace/.git/hooks/pre-push.sample",
+   "sha256": "ecce9c7e04d3f5dd9d8ada81753dd1d549a9634b26770042b58dda00217d086a",
+   "bytes": 1374,
+   "excluded": "agent workspace copy"
+  },
+  {
+   "path": "protected-run/project/.airlock/local/runs/protected_8eef9d6f6a664316af0a757d21f0a569/workspace/.git/hooks/pre-rebase.sample",
+   "sha256": "4febce867790052338076f4e66cc47efb14879d18097d1d61c8261859eaaa7b3",
+   "bytes": 4898,
+   "excluded": "agent workspace copy"
+  },
+  {
+   "path": "protected-run/project/.airlock/local/runs/protected_8eef9d6f6a664316af0a757d21f0a569/workspace/.git/hooks/pre-receive.sample",
+   "sha256": "a4c3d2b9c7bb3fd8d1441c31bd4ee71a595d66b44fcf49ddb310252320169989",
+   "bytes": 544,
+   "excluded": "agent workspace copy"
+  },
+  {
+   "path": "protected-run/project/.airlock/local/runs/protected_8eef9d6f6a664316af0a757d21f0a569/workspace/.git/hooks/prepare-commit-msg.sample",
+   "sha256": "e9ddcaa4189fddd25ed97fc8c789eca7b6ca16390b2392ae3276f0c8e1aa4619",
+   "bytes": 1492,
+   "excluded": "agent workspace copy"
+  },
+  {
+   "path": "protected-run/project/.airlock/local/runs/protected_8eef9d6f6a664316af0a757d21f0a569/workspace/.git/hooks/push-to-checkout.sample",
+   "sha256": "a53d0741798b287c6dd7afa64aee473f305e65d3f49463bb9d7408ec3b12bf5f",
+   "bytes": 2783,
+   "excluded": "agent workspace copy"
+  },
+  {
+   "path": "protected-run/project/.airlock/local/runs/protected_8eef9d6f6a664316af0a757d21f0a569/workspace/.git/hooks/sendemail-validate.sample",
+   "sha256": "44ebfc923dc5466bc009602f0ecf067b9c65459abfe8868ddc49b78e6ced7a92",
+   "bytes": 2308,
+   "excluded": "agent workspace copy"
+  },
+  {
+   "path": "protected-run/project/.airlock/local/runs/protected_8eef9d6f6a664316af0a757d21f0a569/workspace/.git/hooks/update.sample",
+   "sha256": "8d5f2fa83e103cf08b57eaa67521df9194f45cbdbcb37da52ad586097a14d106",
+   "bytes": 3650,
+   "excluded": "agent workspace copy"
+  },
+  {
+   "path": "protected-run/project/.airlock/local/runs/protected_8eef9d6f6a664316af0a757d21f0a569/workspace/.git/index",
+   "sha256": "8d371fae5bc4114192926939280f5c9b036ad9156483cf9451136feaea22d324",
+   "bytes": 545,
+   "excluded": "agent workspace copy"
+  },
+  {
+   "path": "protected-run/project/.airlock/local/runs/protected_8eef9d6f6a664316af0a757d21f0a569/workspace/.git/info/exclude",
+   "sha256": "6671fe83b7a07c8932ee89164d1f2793b2318058eb8b98dc5c06ee0a5a3b0ec1",
+   "bytes": 240,
+   "excluded": "agent workspace copy"
+  },
+  {
+   "path": "protected-run/project/.airlock/local/runs/protected_8eef9d6f6a664316af0a757d21f0a569/workspace/.git/logs/HEAD",
+   "sha256": "70c88750a63c3f7fea401d679ea7f20674bd8725e50806728e88a081b6789537",
+   "bytes": 153,
+   "excluded": "agent workspace copy"
+  },
+  {
+   "path": "protected-run/project/.airlock/local/runs/protected_8eef9d6f6a664316af0a757d21f0a569/workspace/.git/logs/refs/heads/master",
+   "sha256": "70c88750a63c3f7fea401d679ea7f20674bd8725e50806728e88a081b6789537",
+   "bytes": 153,
+   "excluded": "agent workspace copy"
+  },
+  {
+   "path": "protected-run/project/.airlock/local/runs/protected_8eef9d6f6a664316af0a757d21f0a569/workspace/.git/objects/25/31ef2ce8c46ac54af43ff943a32c8a678bff0d",
+   "sha256": "affa8a004d7b8f9727b2d2aaab8ae7724b26674417993eb537fc9590e92f211e",
+   "bytes": 159,
+   "excluded": "agent workspace copy"
+  },
+  {
+   "path": "protected-run/project/.airlock/local/runs/protected_8eef9d6f6a664316af0a757d21f0a569/workspace/.git/objects/2b/aad00381d6cb0533181946fe054c8c7787440f",
+   "sha256": "b80d8318b86f32e9487938a7b9c43611c512cbd1314bc1e38fc7287a4fc71222",
+   "bytes": 120,
+   "excluded": "agent workspace copy"
+  },
+  {
+   "path": "protected-run/project/.airlock/local/runs/protected_8eef9d6f6a664316af0a757d21f0a569/workspace/.git/objects/33/0be05172405867e292bca93d7aca198e4df715",
+   "sha256": "d86c5da4b08a09a21a002065191471de23abbb7056dfbd93b816d4e964988f17",
+   "bytes": 63,
+   "excluded": "agent workspace copy"
+  },
+  {
+   "path": "protected-run/project/.airlock/local/runs/protected_8eef9d6f6a664316af0a757d21f0a569/workspace/.git/objects/58/6d5e13e5f9de8eed96437fb0e4891634a53e77",
+   "sha256": "5eb9836240a3bd6ab8c8b6bbc16c74510aa71bc56a3e6e7c4ddcf1a90cabffea",
+   "bytes": 199,
+   "excluded": "agent workspace copy"
+  },
+  {
+   "path": "protected-run/project/.airlock/local/runs/protected_8eef9d6f6a664316af0a757d21f0a569/workspace/.git/objects/87/9ea40cb6e46cc4c0038d4fabddd373e984ad03",
+   "sha256": "d9932ffe00f58a9d40244debee2fa066ebaeed686008bdc056112bbbde8d21cc",
+   "bytes": 286,
+   "excluded": "agent workspace copy"
+  },
+  {
+   "path": "protected-run/project/.airlock/local/runs/protected_8eef9d6f6a664316af0a757d21f0a569/workspace/.git/objects/93/35f4ef3e2e26b4d40c8a40f11b3b7de791e001",
+   "sha256": "3c95ada02de3da161706d2ab55c504e1502e3df2d5f1334a4d8f9d7f81affb41",
+   "bytes": 87,
+   "excluded": "agent workspace copy"
+  },
+  {
+   "path": "protected-run/project/.airlock/local/runs/protected_8eef9d6f6a664316af0a757d21f0a569/workspace/.git/objects/e7/cb12900b44aa8f1c5e8e43159d73077ce3533d",
+   "sha256": "5f4210eeaae1291c1d3be65b4431e0c8132178d998c6e25cd9e8f9fd3ae28ef9",
+   "bytes": 341,
+   "excluded": "agent workspace copy"
+  },
+  {
+   "path": "protected-run/project/.airlock/local/runs/protected_8eef9d6f6a664316af0a757d21f0a569/workspace/.git/objects/ee/80a2396e3bbf0880c54c33fb4cae39022a00cd",
+   "sha256": "ff5a55b0011d4ed21f9276312acd1664cbaf011a2ab38bfbdd25dd7f82229396",
+   "bytes": 58,
+   "excluded": "agent workspace copy"
+  },
+  {
+   "path": "protected-run/project/.airlock/local/runs/protected_8eef9d6f6a664316af0a757d21f0a569/workspace/.git/objects/fa/f330571032656166c19d589e92f8ed68f4394f",
+   "sha256": "ef6127b4a3a3eb48294c3f18d896b591b5f0d1102ee1520e6df1e0f3d90ee89e",
+   "bytes": 376,
+   "excluded": "agent workspace copy"
+  },
+  {
+   "path": "protected-run/project/.airlock/local/runs/protected_8eef9d6f6a664316af0a757d21f0a569/workspace/.git/refs/heads/master",
+   "sha256": "9e7fa77cb0f749f711cd9d603721e5ceb7729f5400c22a5ce0d772b28fe5f5b9",
+   "bytes": 41,
+   "excluded": "agent workspace copy"
+  },
+  {
+   "path": "protected-run/project/.airlock/local/runs/protected_8eef9d6f6a664316af0a757d21f0a569/workspace/.pytest_cache/.gitignore",
+   "sha256": "3ed731b65d06150c138e2dadb0be0697550888a6b47eb8c45ecc9adba8b8e9bd",
+   "bytes": 37,
+   "excluded": "agent workspace copy"
+  },
+  {
+   "path": "protected-run/project/.airlock/local/runs/protected_8eef9d6f6a664316af0a757d21f0a569/workspace/.pytest_cache/CACHEDIR.TAG",
+   "sha256": "37dc88ef9a0abeddbe81053a6dd8fdfb13afb613045ea1eb4a5c815a74a3bde4",
+   "bytes": 191,
+   "excluded": "agent workspace copy"
+  },
+  {
+   "path": "protected-run/project/.airlock/local/runs/protected_8eef9d6f6a664316af0a757d21f0a569/workspace/.pytest_cache/README.md",
+   "sha256": "73fd6fccdd802c419a6b2d983d6c3173b7da97558ac4b589edec2dfe443db9ad",
+   "bytes": 302,
+   "excluded": "agent workspace copy"
+  },
+  {
+   "path": "protected-run/project/.airlock/local/runs/protected_8eef9d6f6a664316af0a757d21f0a569/workspace/.pytest_cache/v/cache/lastfailed",
+   "sha256": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a",
+   "bytes": 2,
+   "excluded": "agent workspace copy"
+  },
+  {
+   "path": "protected-run/project/.airlock/local/runs/protected_8eef9d6f6a664316af0a757d21f0a569/workspace/.pytest_cache/v/cache/nodeids",
+   "sha256": "9a70155386e6822df2612127448e906277136a65ff597f29cf2eaccc0cc46a65",
+   "bytes": 184,
+   "excluded": "agent workspace copy"
+  },
+  {
+   "path": "protected-run/project/.airlock/local/runs/protected_8eef9d6f6a664316af0a757d21f0a569/workspace/ISSUE.md",
+   "sha256": "e239fe3f83677b781aa257d6fbffc84801f4555be38fe06cdc0fb1ca2f99f2d3",
+   "bytes": 400,
+   "excluded": "agent workspace copy"
+  },
+  {
+   "path": "protected-run/project/.airlock/local/runs/protected_8eef9d6f6a664316af0a757d21f0a569/workspace/airlock_agent.py",
+   "sha256": "5219d2191ccbf9897161cb93f97cccefbe4214ca0060cc10208cebf50b99d818",
+   "bytes": 256,
+   "excluded": "agent workspace copy"
+  },
+  {
+   "path": "protected-run/project/.airlock/local/runs/protected_8eef9d6f6a664316af0a757d21f0a569/workspace/ratelimit/__init__.py",
+   "sha256": "0830cb058dfd4e311f1c5ce4e758897d11e56946abfb67036f242bedd1a65093",
+   "bytes": 59,
+   "excluded": "agent workspace copy"
+  },
+  {
+   "path": "protected-run/project/.airlock/local/runs/protected_8eef9d6f6a664316af0a757d21f0a569/workspace/ratelimit/bucket.py",
+   "sha256": "4d6085b98649039613f0c512989486dfd52124f8b6e5549eb5fec6c729b8f4f3",
+   "bytes": 792,
+   "excluded": "agent workspace copy"
+  },
+  {
+   "path": "protected-run/project/.airlock/local/runs/protected_8eef9d6f6a664316af0a757d21f0a569/workspace/tests/test_bucket.py",
+   "sha256": "a1248c4a12fa54b76df53bce1ab36c8f3bf630f0e85fda624c2499431e890870",
+   "bytes": 776,
+   "excluded": "agent workspace copy"
+  },
+  {
+   "path": "protected-run/project/.airlock/proposed.json",
+   "sha256": "4e37bbc34406fe16db37c01a7bf627e93807cc8edb63cddf60cf37357f14cdca",
+   "bytes": 1150,
+   "excluded": "supervisor project state (holds private keys; not needed for verification)"
+  },
+  {
+   "path": "protected-run/project/.airlock/public-key.json",
+   "sha256": "f4f9f7591b73bea7110c2da589e89329b771dda1f6a68b814304b4600068b823",
+   "bytes": 55,
+   "excluded": "supervisor project state (holds private keys; not needed for verification)"
+  },
+  {
+   "path": "protected-run/project/ISSUE.md",
+   "sha256": "e239fe3f83677b781aa257d6fbffc84801f4555be38fe06cdc0fb1ca2f99f2d3",
+   "bytes": 400,
+   "excluded": "supervisor project state (holds private keys; not needed for verification)"
+  },
+  {
+   "path": "protected-run/project/airlock_agent.py",
+   "sha256": "5219d2191ccbf9897161cb93f97cccefbe4214ca0060cc10208cebf50b99d818",
+   "bytes": 256,
+   "excluded": "supervisor project state (holds private keys; not needed for verification)"
+  },
+  {
+   "path": "protected-run/project/ratelimit/__init__.py",
+   "sha256": "0830cb058dfd4e311f1c5ce4e758897d11e56946abfb67036f242bedd1a65093",
+   "bytes": 59,
+   "excluded": "supervisor project state (holds private keys; not needed for verification)"
+  },
+  {
+   "path": "protected-run/project/ratelimit/bucket.py",
+   "sha256": "6bec2020eaabbd052696dd954fb8f852e5aabd2517bf698c92801fb1b59376c3",
+   "bytes": 845,
+   "excluded": "supervisor project state (holds private keys; not needed for verification)"
+  },
+  {
+   "path": "protected-run/project/tests/test_bucket.py",
+   "sha256": "a1248c4a12fa54b76df53bce1ab36c8f3bf630f0e85fda624c2499431e890870",
+   "bytes": 776,
+   "excluded": "supervisor project state (holds private keys; not needed for verification)"
+  },
+  {
+   "path": "protected-run/public-key.json",
+   "sha256": "f4f9f7591b73bea7110c2da589e89329b771dda1f6a68b814304b4600068b823",
+   "bytes": 55,
+   "published_as": "trials/protected-run/public-key.json"
+  },
+  {
+   "path": "protected-run/receipts.jsonl",
+   "sha256": "4d68158c3ceb04c1c4c2933d479938b4efaf13cb1b5bf93659c99c7bfcaecaed",
+   "bytes": 43651,
+   "published_as": "trials/protected-run/receipts.jsonl"
+  },
+  {
+   "path": "protected-run/result.json",
+   "sha256": "3ec43cf8b564553a6d0b56ba9e99ccc20f24db0e00d11712b17468d14317e585",
+   "bytes": 6505,
+   "published_as": "trials/protected-run/result.json"
+  }
+ ]
+}
