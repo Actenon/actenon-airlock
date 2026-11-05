@@ -26,7 +26,7 @@ from pathlib import Path
 
 HERE = Path(__file__).resolve().parent
 sys.path.insert(0, str(HERE))
-import programme  # noqa: E402
+import gate7_programme as programme  # noqa: E402
 
 DEFAULT_CACHE = Path.home() / ".cache/actenon-airlock/gate7-upstream"
 
@@ -83,7 +83,7 @@ def cmd_prestate(args) -> int:
 
 def _live_inputs(args, item: dict, frozen: dict) -> dict:
     """Every local check a live run needs before anything leaves the machine."""
-    import agent
+    import gate7_agent as agent
 
     from actenon_airlock.credential_preflight import (
         CredentialRefused,
@@ -131,7 +131,7 @@ def _live_inputs(args, item: dict, frozen: dict) -> dict:
 def cmd_run(args, *, live: bool) -> int:
     import os
 
-    import agent
+    import gate7_agent as agent
 
     os.environ.pop("ANTHROPIC_API_KEY", None)
     os.environ.pop("GITHUB_TOKEN", None)
@@ -202,12 +202,12 @@ def main(argv=None) -> int:
     if args.command == "prestate":
         return cmd_prestate(args)
     if args.command == "report":
-        import report
+        import gate7_report as report
 
         print(report.render(args.evidence))
         return 0
     if args.command == "freeze":
-        import agent
+        import gate7_agent as agent
 
         frozen = agent.identity()
         if not frozen["working_tree_clean"]:

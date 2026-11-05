@@ -38,7 +38,7 @@ sys.path[:0] = [
     str(ROOT / "tests"),
     str(ROOT / "scripts"),
 ]
-import programme  # noqa: E402
+import gate7_programme as programme  # noqa: E402
 from anthropic_fixture import ScriptedProvider, stream_reply, text, tool  # noqa: E402
 from source_identity import identity as source_identity  # noqa: E402
 
@@ -88,8 +88,8 @@ def run_usd(item: dict) -> str:
 PROGRAMME_FILES = (
     "acceptance/gate7/cases.json",
     "acceptance/gate7/registry.json",
-    "acceptance/gate7/programme.py",
-    "acceptance/gate7/agent.py",
+    "acceptance/gate7/gate7_programme.py",
+    "acceptance/gate7/gate7_agent.py",
     "acceptance/gate7/run.py",
     "acceptance/gate7/images/Dockerfile.go",
     "acceptance/gate7/images/Dockerfile.node",

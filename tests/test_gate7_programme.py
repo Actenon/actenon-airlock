@@ -18,8 +18,8 @@ import pytest
 ROOT = Path(__file__).resolve().parents[1]
 GATE7 = ROOT / "acceptance/gate7"
 sys.path.insert(0, str(GATE7))
-import agent  # noqa: E402
-import programme  # noqa: E402
+import gate7_agent as agent  # noqa: E402
+import gate7_programme as programme  # noqa: E402
 
 _spec = importlib.util.spec_from_file_location("gate7_run", GATE7 / "run.py")
 gate7_run = importlib.util.module_from_spec(_spec)
