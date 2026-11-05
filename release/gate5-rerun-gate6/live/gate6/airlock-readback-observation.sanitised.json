@@ -1,0 +1,124 @@
+{
+  "SANITISED_DERIVATIVE": "Not byte-identical to the original. GitHub response bodies are replaced by selected fields and their SHA-256; author/committer identity (which includes the owner's email) and account metadata are omitted. The original is kept unchanged by the owner.",
+  "original": {
+    "file": "github-observation-01e7020016de4f33b25fbbed634909ef.json",
+    "sha256": "3bbd4bec1e18baa7dfd5435cd362790deb258dcadfd2feb969b5f8ea043dd332",
+    "bytes": 22833,
+    "observation_hash": "5a07191e87a18afe3bc0fc83905c6459a549dfbdfe64a31964cf809f17432291",
+    "request_hash": "f6feda524e4ac0993f455f1f892658f93c30314bc35e3f6830b977ea55feb768"
+  },
+  "schema": "actenon-airlock/github-observation/v1",
+  "observation_kind": "anchored_provider_state",
+  "outcome": "COMMITTED",
+  "reason": "exact_provider_state_observed_under_exclusive_writer_assumption",
+  "causal_attribution": "not_proven",
+  "commit_sha": "bafc2c434001089d41c2bf95012fd41578560b20",
+  "acknowledged_commit": "bafc2c434001089d41c2bf95012fd41578560b20",
+  "authorized_receipt_id": "receipt_e37bfe78713f41be8f4bde5894c43c8d",
+  "github_profile": {
+    "credential_name": "GITHUB_TOKEN",
+    "exclusive_writer": true,
+    "review": {
+      "branch": "main",
+      "content_sha256": "63543214156640b90f9cad06eeff68fed41f44763045561d90c5809f619cc798",
+      "expected_parent_sha": "ab5b511bf18f56f01e2944ddf55ec172e5fd4d4d",
+      "message": "Airlock Gate 6: reviewed token-bucket patch from Claude Code",
+      "owner": "rossbuckley1990-hash",
+      "path": "airlock-gate6/token-bucket-fix.patch",
+      "repo": "airlock-gate6-disposable",
+      "repo_id": 1447043154,
+      "repo_node_id": "R_kgDOVkAgUg"
+    },
+    "schema": "actenon-airlock/github-create/v1"
+  },
+  "request": {
+    "action": "github.contents.write",
+    "action_hash": "296660e7404b948e5437de3f81ddb4dc8a061cf0500172838fc11330684ec61d",
+    "approval_digest": "abe5fa99190d1922da7198bd21c6d68f39c43e7a3fa785905c5ece078475e149",
+    "descriptor_hash": "cdb47be2fee1e5cdc0f2f1cfe397e3259da1bc54e94098131c0b37d0401394de",
+    "expected_event_sequence": 12,
+    "grant_id": "grant_8e8daa9f2c8243e5",
+    "manifest_digest": "97fb4cebbe90db62e6905da0b8cde5142013e7cd21f6537f314b26d51b6ab17a",
+    "principal": "airlock-protected:dd8d332a33d943600d0bc0c57a7fadfe3c91a68080564a71071ff16a95fb16d0:2f5aa2889270543622d767f1314cdb69004b328ceec9be74fb1e7fef234a64c2",
+    "prior_state": "AMBIGUOUS",
+    "project_key_hash": "9451a6862169027791308002e0d4d55d2c25eae68a0a7836b3311fe99594f1a2",
+    "proof_id": "pccb_8ca47c39ddc54e07b71c198ae692ce50",
+    "reference": {
+      "effect_id": "effect_cc0cd1500ce2ea9205ec36574ad7ec47d5cb5dbbcd33e5c94d5d1cd87c0bdba3",
+      "owner_attempt_id": "exec_29ec3a40e125977f035f52b6ae953188",
+      "profile": "ACTENON-EFFECT-1",
+      "reservation_id": "reservation_e32a8c359e9140c68e10172ad28565f3"
+    },
+    "schema": "actenon-airlock/reconciliation/v1",
+    "source_digest": "dd8d332a33d943600d0bc0c57a7fadfe3c91a68080564a71071ff16a95fb16d0",
+    "target": "https://api.github.com/repos/rossbuckley1990-hash/airlock-gate6-disposable/contents/airlock-gate6/token-bucket-fix.patch"
+  },
+  "creation": {
+    "body_length": 775,
+    "body_sha256": "250007272760c955d05e4739b39fdb5ca24f97f2174f7f94d38c485d87621dfe",
+    "body_sha256_matches_original_bytes": true,
+    "branch": "main",
+    "message": "Airlock Gate 6: reviewed token-bucket patch from Claude Code",
+    "content_sha256": "63543214156640b90f9cad06eeff68fed41f44763045561d90c5809f619cc798",
+    "fields": [
+      "branch",
+      "content",
+      "message"
+    ]
+  },
+  "observations": [
+    {
+      "url": "https://api.github.com/repos/rossbuckley1990-hash/airlock-gate6-disposable",
+      "status": 200,
+      "redirected": false,
+      "body_length": 6753,
+      "body_sha256": "8026e2e1aac4db1ab2079ad7b3659d245e1a8c4fffb5c3d4da055eb8a135bd96",
+      "body_sha256_matches_original_bytes": true,
+      "selected_fields": {
+        "id": 1447043154,
+        "node_id": "R_kgDOVkAgUg",
+        "full_name": "rossbuckley1990-hash/airlock-gate6-disposable",
+        "private": true,
+        "default_branch": "main"
+      }
+    },
+    {
+      "url": "https://api.github.com/repos/rossbuckley1990-hash/airlock-gate6-disposable/commits/main",
+      "status": 200,
+      "redirected": false,
+      "body_length": 5036,
+      "body_sha256": "0314a3542f57630b25f83f21beec794ac36ca677175357b1edf0242ff40934b0",
+      "body_sha256_matches_original_bytes": true,
+      "selected_fields": {
+        "sha": "bafc2c434001089d41c2bf95012fd41578560b20",
+        "parents": [
+          "ab5b511bf18f56f01e2944ddf55ec172e5fd4d4d"
+        ],
+        "message": "Airlock Gate 6: reviewed token-bucket patch from Claude Code",
+        "files": [
+          {
+            "filename": "airlock-gate6/token-bucket-fix.patch",
+            "status": "added",
+            "additions": 13,
+            "deletions": 0,
+            "sha": "29b5736802972c8f828c7a680db13f6c33e0a379"
+          }
+        ]
+      }
+    },
+    {
+      "url": "https://api.github.com/repos/rossbuckley1990-hash/airlock-gate6-disposable/contents/airlock-gate6/token-bucket-fix.patch?ref=bafc2c434001089d41c2bf95012fd41578560b20",
+      "status": 200,
+      "redirected": false,
+      "body_length": 2045,
+      "body_sha256": "f07658ca002c84fef93b3deb75fd9af661276f82fc26648b1bda455aed747cea",
+      "body_sha256_matches_original_bytes": true,
+      "selected_fields": {
+        "path": "airlock-gate6/token-bucket-fix.patch",
+        "sha": "29b5736802972c8f828c7a680db13f6c33e0a379",
+        "size": 504,
+        "content_sha256": "63543214156640b90f9cad06eeff68fed41f44763045561d90c5809f619cc798"
+      }
+    }
+  ]
+}

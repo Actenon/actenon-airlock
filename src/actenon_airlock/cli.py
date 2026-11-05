@@ -411,7 +411,7 @@ def main(argv=None):
         "init", "diff", "check", "doctor", "run", "receipts", "reconcile",
         "checkpoint", "verify-evidence", "recovery-inventory",
         "setup", "work", "capture", "verify-candidate", "review-candidate", "publish", "status",
-        "synthetic-provider", "stop", "resume", "protect", "demo",
+        "synthetic-provider", "stop", "resume", "protect", "demo", "explain",
     ):  # fmt: skip
         p = sub.add_parser(cmd)
         p.add_argument("--path", type=Path, default=Path.cwd())
@@ -430,6 +430,13 @@ def main(argv=None):
                 help="Tests you hold outside the project, run against the change",
             )  # fmt: skip
             p.add_argument("--approve", action="store_true", help="Approve without being asked")
+        if cmd == "explain":
+            p.add_argument("effect_id", help="The consequential effect to explain")
+            p.add_argument(
+                "--independent", type=Path,
+                help="An independent readback verdict (JSON) to include and check",
+            )  # fmt: skip
+            p.add_argument("--output", type=Path, help="Also write the report here")
         if cmd == "checkpoint":
             p.add_argument(
                 "--output", type=Path, required=True,
@@ -696,6 +703,16 @@ def main(argv=None):
             )
             print(json.dumps(report, indent=2))
             return 0 if report["status"] == "NO_DETECTED_BLOCKER" else 2
+        if args.cmd == "explain":
+            from .consequence_report import build_report, render_markdown
+
+            independent = json.loads(args.independent.read_text()) if args.independent else None
+            report = build_report(State(root), args.effect_id, independent=independent)
+            text = json.dumps(report, indent=2) if args.json else render_markdown(report)
+            if args.output:
+                args.output.write_text(text if text.endswith("\n") else text + "\n")
+            print(text)
+            return 0 if report["status"] in {"CONFIRMED", "CONFIRMED_BY_AIRLOCK_READBACK"} else 3
         if args.cmd in WORKFLOW_COMMANDS:
             return _workflow_command(args, root)
         if args.cmd == "receipts":

@@ -9,3 +9,4 @@ dist/
 .airlock/local/
 .airlock/proposed.json
 *.sqlite3*
+.DS_Store

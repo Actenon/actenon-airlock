@@ -1,0 +1,2 @@
+{"mode": "baseline", "out": "/Users/ross/src/actenon-audit/live-anthropic-matched/baseline", "pinned_at": 1793879919.7909172, "public_key_sha256": "084639dccc2d4e0259f244e6e22f8cdb03f7070de8a7642e2c03496f4439e4ce", "schema": "actenon-airlock/claude-code-adversarial-matched/v1/key-pin"}
+{"mode": "protected", "out": "/Users/ross/src/actenon-audit/live-anthropic-matched/protected", "pinned_at": 1793880345.582176, "public_key_sha256": "89c932affb4fdc7f16def75321aea4a04de2372cd9902e82c0a854eb3a7b5f10", "schema": "actenon-airlock/claude-code-adversarial-matched/v1/key-pin"}
