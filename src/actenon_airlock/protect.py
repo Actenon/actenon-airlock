@@ -26,6 +26,14 @@ DEFAULT_MAX_RUN_USD = "2.00"
 FINISHED = {0, 3, 4}  # Agent exit, something refused, or an unresolved call.
 
 
+def configured_agent(root: Path) -> str | None:
+    """The agent this project was already set up for, if any."""
+    try:
+        return json.loads((root / ".airlock" / "agent.json").read_text()).get("agent")
+    except (OSError, ValueError, AttributeError):
+        return None
+
+
 def choose_agent(requested: str | None) -> str:
     """The agent you asked for, or the one whose model key is in this shell."""
     if requested:
@@ -139,7 +147,16 @@ def headline(*, agent_exit, manifest, passed, verdict, stopped_by_budget) -> str
 
 
 def report(
-    manifest, verdict, activity, patch, *, agent_exit, spend_limit, root, passed=None
+    manifest,
+    verdict,
+    activity,
+    patch,
+    *,
+    agent_exit,
+    spend_limit,
+    root,
+    passed=None,
+    receipts_before=0,
 ) -> None:
     """What happened in this run, in the order a person cares about."""
     blocked, calls = activity["refused"], activity["inference"]
@@ -184,7 +201,9 @@ def report(
         )
     print("  External  none: this command never changes anything outside the sealed copy")
     state = "OK" if activity["integrity_ok"] else "FAILED"
-    print(f"  Evidence  {activity['receipts']} signed receipt(s), integrity {state}")
+    this_run = activity["receipts"] - receipts_before
+    earlier = f" ({activity['receipts']} in this project's journal)" if receipts_before else ""
+    print(f"  Evidence  {this_run} signed receipt(s) from this run{earlier}, integrity {state}")
     print("            inspect: airlock receipts --path .")
     if manifest:
         relative = patch.relative_to(root)
@@ -214,13 +233,17 @@ def protect(args, root: Path, run) -> int:
             f"airlock protect works on one project, and {where} is not one. Nothing ran. "
             "cd into the project first (for example: cd ~/code/my-app), or pass --path"
         )
-    agent = choose_agent(args.agent)
+    agent = choose_agent(args.agent or configured_agent(root))
     profile = require_supported(agent)
     if "default_model" not in profile:
         raise AirlockError(f"{agent} needs the guided path: see docs/golden-path.md")
     credential = profile["credential"]
     if not (os.environ.get(credential) or args.model_endpoint):
-        raise AirlockError(f"Set {credential} in this shell. It never enters the container")
+        why = "" if args.agent else f"This project is set up for {agent}. "
+        raise AirlockError(
+            f"{why}Set {credential} in this shell; it never enters the container"
+            + ("" if args.agent else ". To use another agent, pass --agent")
+        )
     task_path = root / TASK_FILE
     if os.path.lexists(task_path):
         raise AirlockError(f"{TASK_FILE} already exists in this project")
@@ -291,6 +314,8 @@ def protect(args, root: Path, run) -> int:
         task_path.unlink(missing_ok=True)
 
     verdict = passed = None
+    if manifest is None and args.tests:
+        verdict = "not run: the agent changed nothing, so there was nothing to check"
     if manifest and args.tests:
         sha256 = manifest["candidate_sha256"]
         result = verify_candidate(
@@ -314,6 +339,7 @@ def protect(args, root: Path, run) -> int:
         spend_limit="$" + limit,
         root=root,
         passed=passed,
+        receipts_before=receipts,
     )
     if code not in FINISHED:
         return code

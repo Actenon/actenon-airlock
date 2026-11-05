@@ -494,3 +494,50 @@ def test_a_run_shows_short_progress_and_keeps_the_full_transcript(project, monke
     assert all(line in raw for line in STREAM) and "AIRLOCK ALLOW" in raw
     # The receipt that follows is Airlock's, printed normally.
     assert "RESULT" in shown and "Changed   1 file(s)" in shown
+
+
+def test_nothing_changed_says_why_the_checks_did_not_run(project, monkeypatch, capsys, tmp_path):
+    launch, _ = fake_launch(edit=False)
+    monkeypatch.setattr("actenon_airlock.protected.launch_protected", launch)
+    assert protect(project, "--approve", "--tests", str(tmp_path)) == 0
+    shown = capsys.readouterr().out
+    assert "The agent finished but changed nothing." in shown
+    assert "Checks    not run: the agent changed nothing, so there was nothing to check" in shown
+    assert "Pass --tests DIR" not in shown
+
+
+def test_the_evidence_line_counts_this_run_apart_from_earlier_ones(project, monkeypatch, capsys):
+    launch, _ = fake_launch()
+    monkeypatch.setattr("actenon_airlock.protected.launch_protected", launch)
+    assert protect(project, "--approve") == 0
+    first = capsys.readouterr().out
+    assert "signed receipt(s) from this run, integrity OK" in first
+    shutil.rmtree(State(project).local / "runs")  # the stand-in reuses one run folder
+    monkeypatch.setattr("sys.stdin", io.StringIO(""))
+    assert protect(project) == 0
+    second = capsys.readouterr().out
+    line = next(line for line in second.splitlines() if line.startswith("  Evidence"))
+    this_run, total = (int(word) for word in line.replace("(", " ").split() if word.isdigit())
+    assert 0 < this_run < total and "in this project's journal" in line
+
+
+def test_a_missing_key_names_the_agent_this_project_is_set_up_for(project, monkeypatch, capsys):
+    launch, _ = fake_launch()
+    monkeypatch.setattr("actenon_airlock.protected.launch_protected", launch)
+    assert protect(project, "--approve") == 0
+    capsys.readouterr()
+    monkeypatch.delenv("ANTHROPIC_API_KEY")
+    monkeypatch.delenv("OPENAI_API_KEY", raising=False)
+    assert main(["protect", "--path", str(project), "Fix add"]) != 0
+    err = capsys.readouterr().err
+    assert "This project is set up for claude-code. Set ANTHROPIC_API_KEY" in err
+    assert "OPENAI_API_KEY" not in err and "--agent" in err
+
+
+def test_a_new_project_without_a_key_still_offers_both_agents(tmp_path, monkeypatch, capsys):
+    root = tmp_path / "fresh"
+    root.mkdir()
+    monkeypatch.delenv("ANTHROPIC_API_KEY", raising=False)
+    monkeypatch.delenv("OPENAI_API_KEY", raising=False)
+    assert main(["protect", "--path", str(root), "Fix add"]) != 0
+    assert "OPENAI_API_KEY or ANTHROPIC_API_KEY" in capsys.readouterr().err
