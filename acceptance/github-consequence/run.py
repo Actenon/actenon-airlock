@@ -215,6 +215,34 @@ def _attempt_publish(label, state, candidate, client, scope):
     return {"control": label, **result}
 
 
+def owner_review(profile_path: Path, patch: bytes, ask=input, show=print) -> dict:
+    """Show the owner the exact proposed write and require the content hash to approve it.
+
+    The bytes only exist once the agent has run, so a pre-run authorisation of the
+    repository/branch/path cannot cover them. Approval needs the first 12 hex
+    characters of the content SHA-256: a stray Return or a pasted command cannot
+    approve, and nothing is approved or sent unless it matches.
+    """
+    review = json.loads(profile_path.read_text())["review"]
+    show("\n=== Proposed GitHub write: review before approving ===")
+    for name in (
+        "owner",
+        "repo",
+        "branch",
+        "expected_parent_sha",
+        "path",
+        "message",
+        "content_sha256",
+    ):
+        show(f"  {name}: {review[name]}")
+    show("  bytes to be written (the agent's patch, exactly):")
+    show(patch.decode("utf-8", "replace"))
+    show("Type the first 12 characters of content_sha256 to approve exactly this write.")
+    answer = ask("Approve? ").strip().lower()
+    approved = answer == review["content_sha256"][:12]
+    return {"approved": approved, "content_sha256": review["content_sha256"]}
+
+
 def altered_candidate(state: State, run: Path, trusted: Path, image: str) -> tuple[str, dict]:
     """A real, passing variant of the agent's output: same fix plus one comment line."""
     variant = run.parent / (run.name + "-altered")
@@ -316,6 +344,10 @@ def main() -> int:
     parser.add_argument(
         "--authorize-github-write", help="Exactly OWNER/REPO@BRANCH:PATH, as reviewed by the owner"
     )
+    parser.add_argument(
+        "--interactive-approval", action="store_true",
+        help="Rehearsal: also require the owner's typed approval (always on in live mode)",
+    )  # fmt: skip
     args = parser.parse_args()
     live = args.mode == "live"
     os.environ.pop("ANTHROPIC_API_KEY", None)
@@ -414,6 +446,16 @@ def main() -> int:
                    "--owner", facts["owner"], "--repo", facts["repo"], "--branch", facts["branch"],
                    "--parent", facts["expected_parent_sha"]]  # fmt: skip
     assert airlock(review) == 0
+    patch_bytes = (state.local / "candidates" / candidate / "candidate.patch").read_bytes()
+    approval = {"approved": True, "mode": "rehearsal: synthetic provider, no owner prompt"}
+    if live or args.interactive_approval:
+        approval = {**owner_review(profile, patch_bytes), "mode": "owner typed content hash prefix"}
+        if not approval["approved"]:
+            (out / "result.json").write_text(json.dumps(
+                {"schema": SCHEMA, "status": "STOPPED_BY_OWNER", "candidate_sha256": candidate,
+                 "controls": controls, "approval": approval}, indent=2) + "\n")  # fmt: skip
+            print("Not approved: nothing was approved and nothing was written to GitHub.")
+            return 2
     assert airlock(
         ["init", "--path", str(project), "--approve", "--github-create", str(profile),
          "--reconciler-key", str(key), "--credential", "GITHUB_TOKEN=" + API]
@@ -425,7 +467,6 @@ def main() -> int:
     controls[-1].update(variant_sha256=altered, variant_verdict=altered_verification["verdict"],
                         provider_puts_after=_puts(provider))  # fmt: skip
     # 5. A write to a path the owner never reviewed is denied by Permit/Kernel.
-    patch_bytes = (state.local / "candidates" / candidate / "candidate.patch").read_bytes()
     controls.append(unauthorised_write(state, facts, patch_bytes, client, scope))
     controls[-1]["provider_puts_after"] = _puts(provider)
 
@@ -487,6 +528,7 @@ def main() -> int:
         "verification": {
             k: verification.get(k) for k in ("verdict", "detail", "tests_sha256", "image_id")
         },
+        "approval": approval,
         "repository_facts": facts,
         "controls": controls,
         "effect_id": effect_id,
