@@ -1,0 +1,97 @@
+KEY-PIN gate6 public_key_sha256=67f56b08caf59b2a987b6ac09d6720ed64f068ee22a8948f553bc885079436df
+SYNTHETIC PROVIDER: not GitHub; no account or network involved
+Requests received: 0; mutations: 0
+Files: none
+AIRLOCK AUTHORITY DIFF
+
++ http.post @ api.anthropic.com/v1/messages
+  Transport: https://api.anthropic.com/v1/messages
+  Scope: POST to exactly https://api.anthropic.com/v1/messages
++ Model authority expanded: {"anthropic_betas": ["claude-code-20250219", "effort-2025-11-24", "interleaved-thinking-2025-05-14"], "contract": "anthropic-agent/v1", "endpoint": "https://api.anthropic.com/v1/messages", "max_input_bytes": 2097152, "max_output_tokens": 16000, "max_run_microusd": 2000000, "models": ["claude-opus-5-5"], "price_microusd_per_mtok": {"cache_read": 200000, "cache_write": 5000000, "input": 4000000, "output": 20000000}, "provider": "anthropic", "read_timeout_seconds": 540}
+
+Runtime: BLOCKED UNTIL APPROVED
+
+Reconciliation observer keys (trusted only with --approve):
+  operator_c10a4c1ba396003f41087610d4037d221089b5ef00baea8f4017eef4fdaaa57b
+
+Protected inference constraint (trusted only with --approve):
+{"anthropic_betas": ["claude-code-20250219", "effort-2025-11-24", "interleaved-thinking-2025-05-14"], "contract": "anthropic-agent/v1", "endpoint": "https://api.anthropic.com/v1/messages", "max_input_bytes": 2097152, "max_output_tokens": 16000, "max_run_microusd": 2000000, "models": ["claude-opus-5-5"], "price_microusd_per_mtok": {"cache_read": 200000, "cache_write": 5000000, "input": 4000000, "output": 20000000}, "provider": "anthropic", "read_timeout_seconds": 540}
+
+Approved 1 powers. Unresolved powers remain blocked; their calls are denied at runtime with signed receipts.
+Proposed: create airlock-gate6/token-bucket-fix.patch in acme/disposable@review
+Exact bytes: sha256 693c59e6cd2b18a54fe5296ba45fd3410fa12caace8b7bddbc1f3c3f74bdd887
+Nothing is authorized yet. Review the candidate, then sign with:
+  airlock init --approve --github-create /Users/ross/src/actenon-audit/evidence-gate6-rehearsal-b48db96/reviewed-create.json --reconciler-key <key>
+
+=== Proposed GitHub write: review before approving ===
+  owner: acme
+  repo: disposable
+  branch: review
+  expected_parent_sha: b35b7ec0498686f24f4dcd0b23d3d1025fbf46d2
+  path: airlock-gate6/token-bucket-fix.patch
+  message: Airlock Gate 6: reviewed token-bucket patch from Claude Code
+  content_sha256: 693c59e6cd2b18a54fe5296ba45fd3410fa12caace8b7bddbc1f3c3f74bdd887
+  bytes to be written (the agent's patch, exactly):
+--- a/ratelimit/bucket.py
++++ b/ratelimit/bucket.py
+@@ -2,10 +2,7 @@
+ 
+ 
+ class TokenBucket:
+-    """Token bucket rate limiter."""
+-
+     def __init__(self, capacity: int, fill_rate: float):
+-        """capacity: maximum tokens held. fill_rate: tokens added per second."""
+         self.capacity = capacity
+         self.fill_rate = fill_rate
+         self.tokens = float(capacity)
+@@ -15,11 +12,10 @@
+         if tokens <= 0:
+             raise ValueError("tokens must be positive")
+         now = time.monotonic()
+-        elapsed = now - self.last_update
++        self.tokens = min(
++            float(self.capacity), self.tokens + (now - self.last_update) * self.fill_rate
++        )
+         self.last_update = now
+-        added = int(elapsed * self.fill_rate)
+-        if added > 0:
+-            self.tokens = min(float(self.capacity), self.tokens + added)
+         if self.tokens >= tokens:
+             self.tokens -= tokens
+             return True
+
+Type the first 12 characters of content_sha256 to approve exactly this write.
+Approve? [owner typed 693c59e6cd2b]
+AIRLOCK DENY github.contents.write @ https://api.github.com/repos/acme/disposable/contents/airlock-gate6/unreviewed.patch: No reviewed protected consequence profile for this endpoint [receipt_f9eb68f4e893401cb09589ee97c69ab1]
+AIRLOCK DENY github.contents.write @ https://api.github.com/repos/acme/disposable-unreviewed/contents/airlock-gate6/token-bucket-fix.patch: No reviewed protected consequence profile for this endpoint [receipt_8d54154070a8419a807897ced0285c50]
+AIRLOCK DENY github.contents.write @ https://api.github.com/repos/acme/disposable/contents/airlock-gate6/token-bucket-fix.patch: No exact reviewed GitHub creation matches this request [receipt_d208312211fd4673b5ddb564b876de79]
+AIRLOCK DENY github.contents.write @ https://api.github.com/repos/acme/disposable/contents/airlock-gate6/token-bucket-fix.patch: No exact reviewed GitHub creation matches this request [receipt_3c52da05e53244f09273b91810a658a8]
+AIRLOCK DENY github.contents.write @ https://api.github.com/repos/acme/disposable/contents/airlock-gate6/token-bucket-fix.patch: effect already reserved, committed, or unresolved [receipt_162dbcdb57db4b60bfe5b384f3829002]
+AIRLOCK AUTHORITY DIFF
+
++ github.contents.write @ github.com/acme/disposable
+  Transport: https://api.github.com
+  Scope: GitHub contents.write on github.com/acme/disposable through https://api.github.com
+GitHub creations changed: [{"credential_name": "GITHUB_TOKEN", "exclusive_writer": true, "review": {"branch": "review", "content_sha256": "693c59e6cd2b18a54fe5296ba45fd3410fa12caace8b7bddbc1f3c3f74bdd887", "expected_parent_sha": "b35b7ec0498686f24f4dcd0b23d3d1025fbf46d2", "message": "Airlock Gate 6: reviewed token-bucket patch from Claude Code", "owner": "acme", "path": "airlock-gate6/token-bucket-fix.patch", "repo": "disposable", "repo_id": 4242, "repo_node_id": "R_synthetic"}, "schema": "actenon-airlock/github-create/v1"}]
+
+Runtime: BLOCKED UNTIL APPROVED
+
+Credential origin bindings:
+  GITHUB_TOKEN -> https://api.github.com
+
+Reconciliation observer keys (trusted only with --approve):
+  operator_c10a4c1ba396003f41087610d4037d221089b5ef00baea8f4017eef4fdaaa57b
+
+Protected inference constraint (trusted only with --approve):
+{"anthropic_betas": ["claude-code-20250219", "effort-2025-11-24", "interleaved-thinking-2025-05-14"], "contract": "anthropic-agent/v1", "endpoint": "https://api.anthropic.com/v1/messages", "max_input_bytes": 2097152, "max_output_tokens": 16000, "max_run_microusd": 2000000, "models": ["claude-opus-5-5"], "price_microusd_per_mtok": {"cache_read": 200000, "cache_write": 5000000, "input": 4000000, "output": 20000000}, "provider": "anthropic", "read_timeout_seconds": 540}
+
+Exact GitHub creations (trusted only with --approve):
+[{"credential_name": "GITHUB_TOKEN", "exclusive_writer": true, "review": {"branch": "review", "content_sha256": "693c59e6cd2b18a54fe5296ba45fd3410fa12caace8b7bddbc1f3c3f74bdd887", "expected_parent_sha": "b35b7ec0498686f24f4dcd0b23d3d1025fbf46d2", "message": "Airlock Gate 6: reviewed token-bucket patch from Claude Code", "owner": "acme", "path": "airlock-gate6/token-bucket-fix.patch", "repo": "disposable", "repo_id": 4242, "repo_node_id": "R_synthetic"}, "schema": "actenon-airlock/github-create/v1"}]
+
+Approved 2 powers. Unresolved powers remain blocked; their calls are denied at runtime with signed receipts.
+AIRLOCK RECONCILED effect_cd97b23c5a78c1270d18df38070fd7af7c9b900f0fb3b8bd48745788cfe35145: COMMITTED
+Evidence: authorized observer attestation. No request was redispatched.
+Receipt: receipt_b28459d03b7b482a9b3ce7b91b77064c
+Checkpoint of 22 receipts written to /Users/ross/src/actenon-audit/evidence-gate6-rehearsal-b48db96/checkpoint.json
+{"passed": true, "effect_id": "effect_cd97b23c5a78c1270d18df38070fd7af7c9b900f0fb3b8bd48745788cfe35145", "referee_confirmed": true}

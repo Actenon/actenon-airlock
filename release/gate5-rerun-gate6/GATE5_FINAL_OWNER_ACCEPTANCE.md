@@ -99,3 +99,18 @@ There were no hits. These matches were accepted as non-secret:
 - the per-run synthetic canary strings
 
 Not published: `agent.log`, workspaces, and `project/.airlock/local/`, which includes the signing keys and Permit databases. These stay with the owner.
+
+## 7. Independent re-verification and the proposed owner record
+
+On 2026-11-05 the published files were re-verified from the PR checkout at `9bff86c`:
+
+- every manifest hash, both referee hash sets and both key pins match
+- every frozen programme hash equals its blob at `f04f60f`
+- the source digest recomputed from Git objects at `f04f60f` is `60684fcd…`. It is unchanged at every later commit on this branch, because those commits touch only `acceptance/`, `tests/`, `release/` and `.gitignore`.
+- the two trials have the same identity, hook and patch
+- each key pin was recorded before that trial's first receipt: 11:58:39.79 against 11:58:40.44, and 12:05:45.58 against 12:05:46.63 UTC
+- 6 of 6 and 7 of 7 receipts verify with the standalone verifier
+
+A Gate 5 owner record and its evidence file are prepared **outside the repository and not committed**. `release/bar-records/item-5.json` does not exist.
+
+**How the bar binds records.** The admission gate evaluates one `candidate_sha` and requires every owner record to name that same SHA. A Gate 5 record bound to `f04f60f` and a Gate 6 record bound to the Gate 6 run's commit can therefore not both pass for one candidate. The evidence file records the source digest, so that when the owner fixes the candidate to evaluate, the record can be issued for that SHA with a stated basis: an identical `src/actenon_airlock` digest and an unchanged Claude Code programme. That basis is the owner's to accept.

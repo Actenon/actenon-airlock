@@ -1,0 +1,81 @@
+{
+  "schema": "actenon-airlock/synthetic-github/v1",
+  "notice": "SYNTHETIC PROVIDER: not GitHub; no account or network involved",
+  "repository": {
+    "id": 4242,
+    "node_id": "R_synthetic",
+    "owner": "acme",
+    "name": "disposable"
+  },
+  "branch": "review",
+  "head": "72cf720a828b9567b42ceef2f08ffe9ec893cc46",
+  "commits": {
+    "b35b7ec0498686f24f4dcd0b23d3d1025fbf46d2": {
+      "parent": null,
+      "message": "initial",
+      "files": []
+    },
+    "72cf720a828b9567b42ceef2f08ffe9ec893cc46": {
+      "parent": "b35b7ec0498686f24f4dcd0b23d3d1025fbf46d2",
+      "message": "Airlock Gate 6: reviewed token-bucket patch from Claude Code",
+      "files": [
+        {
+          "filename": "airlock-gate6/token-bucket-fix.patch",
+          "status": "added",
+          "sha": "f1195aa6ca1ab4b38e893807310211b72d119a8e"
+        }
+      ]
+    }
+  },
+  "files": {
+    "airlock-gate6/token-bucket-fix.patch": {
+      "content": "LS0tIGEvcmF0ZWxpbWl0L2J1Y2tldC5weQorKysgYi9yYXRlbGltaXQvYnVja2V0LnB5CkBAIC0yLDEwICsyLDcgQEAKIAogCiBjbGFzcyBUb2tlbkJ1Y2tldDoKLSAgICAiIiJUb2tlbiBidWNrZXQgcmF0ZSBsaW1pdGVyLiIiIgotCiAgICAgZGVmIF9faW5pdF9fKHNlbGYsIGNhcGFjaXR5OiBpbnQsIGZpbGxfcmF0ZTogZmxvYXQpOgotICAgICAgICAiIiJjYXBhY2l0eTogbWF4aW11bSB0b2tlbnMgaGVsZC4gZmlsbF9yYXRlOiB0b2tlbnMgYWRkZWQgcGVyIHNlY29uZC4iIiIKICAgICAgICAgc2VsZi5jYXBhY2l0eSA9IGNhcGFjaXR5CiAgICAgICAgIHNlbGYuZmlsbF9yYXRlID0gZmlsbF9yYXRlCiAgICAgICAgIHNlbGYudG9rZW5zID0gZmxvYXQoY2FwYWNpdHkpCkBAIC0xNSwxMSArMTIsMTAgQEAKICAgICAgICAgaWYgdG9rZW5zIDw9IDA6CiAgICAgICAgICAgICByYWlzZSBWYWx1ZUVycm9yKCJ0b2tlbnMgbXVzdCBiZSBwb3NpdGl2ZSIpCiAgICAgICAgIG5vdyA9IHRpbWUubW9ub3RvbmljKCkKLSAgICAgICAgZWxhcHNlZCA9IG5vdyAtIHNlbGYubGFzdF91cGRhdGUKKyAgICAgICAgc2VsZi50b2tlbnMgPSBtaW4oCisgICAgICAgICAgICBmbG9hdChzZWxmLmNhcGFjaXR5KSwgc2VsZi50b2tlbnMgKyAobm93IC0gc2VsZi5sYXN0X3VwZGF0ZSkgKiBzZWxmLmZpbGxfcmF0ZQorICAgICAgICApCiAgICAgICAgIHNlbGYubGFzdF91cGRhdGUgPSBub3cKLSAgICAgICAgYWRkZWQgPSBpbnQoZWxhcHNlZCAqIHNlbGYuZmlsbF9yYXRlKQotICAgICAgICBpZiBhZGRlZCA+IDA6Ci0gICAgICAgICAgICBzZWxmLnRva2VucyA9IG1pbihmbG9hdChzZWxmLmNhcGFjaXR5KSwgc2VsZi50b2tlbnMgKyBhZGRlZCkKICAgICAgICAgaWYgc2VsZi50b2tlbnMgPj0gdG9rZW5zOgogICAgICAgICAgICAgc2VsZi50b2tlbnMgLT0gdG9rZW5zCiAgICAgICAgICAgICByZXR1cm4gVHJ1ZQo=",
+      "commit": "72cf720a828b9567b42ceef2f08ffe9ec893cc46"
+    }
+  },
+  "lose_next_acknowledgement": false,
+  "requests": [
+    {
+      "method": "GET",
+      "url": "https://api.github.com/repos/acme/disposable",
+      "authorized": true,
+      "body_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "method": "GET",
+      "url": "https://api.github.com/repos/acme/disposable/git/ref/heads/review",
+      "authorized": true,
+      "body_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "method": "GET",
+      "url": "https://api.github.com/repos/acme/disposable/contents/airlock-gate6/token-bucket-fix.patch?ref=b35b7ec0498686f24f4dcd0b23d3d1025fbf46d2",
+      "authorized": true,
+      "body_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "method": "PUT",
+      "url": "https://api.github.com/repos/acme/disposable/contents/airlock-gate6/token-bucket-fix.patch",
+      "authorized": true,
+      "body_sha256": "a4a36ab8aed766c8e2643eb52941f378861f6f000bf32c4ac8a8bfd22de0921f"
+    },
+    {
+      "method": "GET",
+      "url": "https://api.github.com/repos/acme/disposable",
+      "authorized": true,
+      "body_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "method": "GET",
+      "url": "https://api.github.com/repos/acme/disposable/commits/review",
+      "authorized": true,
+      "body_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "method": "GET",
+      "url": "https://api.github.com/repos/acme/disposable/contents/airlock-gate6/token-bucket-fix.patch?ref=72cf720a828b9567b42ceef2f08ffe9ec893cc46",
+      "authorized": true,
+      "body_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    }
+  ]
+}

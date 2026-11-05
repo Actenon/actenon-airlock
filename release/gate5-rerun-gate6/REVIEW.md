@@ -90,7 +90,11 @@ Rehearsal (`rehearsal/gate6/`, regenerated at clean head `2e12874` with the type
 
 ## E. Remaining blockers
 
-- **Gate 5:** owner decision A4; if rerun, two authorised live trials; billing reconciliation; owner record.
+The two matched Gate 5 trials have since run live and verified. See `GATE5_FINAL_OWNER_ACCEPTANCE.md`.
+
+The Gate 6 programme gained four broker-level refusal controls, a fail-closed stop and a credential-isolation check at `b48db96`. It was rehearsed again from that commit in `rehearsal/gate6-b48db96/`; the `rehearsal/gate6/` run from `2e12874` is kept as it was.
+
+- **Gate 5:** billing reconciliation, revoking the exposed credential, and the owner record.
 - **Gate 6:** an owner-created disposable repository and two tokens; owner authorisation of one live run (one Anthropic run at $2 maximum plus one GitHub write); the live run itself; owner record. The exclusive-writer assumption is the owner's to uphold during the run.
 - **Gates 7–9** (three repositories and ten agent cases, public-registry install, two independent operators) are not addressed.
 - Single-trial cells; one task; one machine.

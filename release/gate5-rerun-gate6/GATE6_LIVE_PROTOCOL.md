@@ -1,6 +1,6 @@
 # Gate 6 live protocol: one real GitHub write, independently read back
 
-**Prepared, not authorised.** Running it makes one billable Claude Code run (estimated maximum $2) and **one real write** to a GitHub repository. It needs the owner's separate, explicit approval of the exact frozen SHA, repository, branch and path.
+**Prepared, not authorised.** The owner's inputs and the exact authorisation statement are in `GATE6_OWNER_AUTHORISATION.md`. A synthetic rehearsal of this exact programme, from commit `b48db96`, is in `rehearsal/gate6-b48db96/` and explained for non-specialists in `GATE6_DEMO.md`. Running it makes one billable Claude Code run (estimated maximum $2) and **one real write** to a GitHub repository. It needs the owner's separate, explicit approval of the exact frozen SHA, repository, branch and path.
 
 ## 1. Owner prerequisites
 
@@ -35,7 +35,14 @@ Before anything is created, the runner checks locally that every credential file
 ## 3. What success requires
 
 - Agent exit 0; the operator's tests pass on the captured patch.
-- Publish before approval, a passing altered variant and an unreviewed path are all refused before any request reaches GitHub; the unreviewed path releases no credential.
+- Six refusals, each before any request reaches GitHub:
+  - publish before approval
+  - a passing altered variant
+  - four direct broker writes the owner never reviewed: another path, another repository, the reviewed path with modified bytes, and an update instead of a create
+
+  The four broker writes are each denied with **no credential released**. If any control is not refused, the runner stops (`STOPPED_CONTROL_FAILED`) and the approved write is never attempted.
+- A changed branch parent or a recreated repository is refused at the approved write's own pre-flight, before the create is sent. The integration test `test_failed_authenticated_preflight_reports_credential_release_but_no_creation[repo|parent]` covers both. They are not induced live, because that would need a second mutation of the real repository.
+- Neither the write token, the read token nor the Anthropic key appears in the agent's run directory or output (`credentials_absent_from_agent_surfaces`).
 - The approved write is sent once. Its outcome is **not** taken from the HTTP reply: it stays unresolved until `reconcile --github-readback` settles it.
 - The identical replay is refused.
 - The referee, with the read-only token, confirms that the file bytes' SHA-256 equals the approved candidate, the commit's only parent is `expected_parent_sha`, and the commit changes only `airlock-gate6/token-bucket-fix.patch`.
