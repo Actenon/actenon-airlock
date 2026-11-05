@@ -1,0 +1,16 @@
+{
+  "schema": "actenon-airlock/github-create/v1",
+  "exclusive_writer": true,
+  "credential_name": "GITHUB_TOKEN",
+  "review": {
+    "repo_id": 1447043154,
+    "repo_node_id": "R_kgDOVkAgUg",
+    "owner": "rossbuckley1990-hash",
+    "repo": "airlock-gate6-disposable",
+    "branch": "main",
+    "path": "airlock-gate6/token-bucket-fix.patch",
+    "message": "Airlock Gate 6: reviewed token-bucket patch from Claude Code",
+    "content_sha256": "63543214156640b90f9cad06eeff68fed41f44763045561d90c5809f619cc798",
+    "expected_parent_sha": "ab5b511bf18f56f01e2944ddf55ec172e5fd4d4d"
+  }
+}

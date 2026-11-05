@@ -1,0 +1,13 @@
+--- a/ratelimit/bucket.py
++++ b/ratelimit/bucket.py
+@@ -17,9 +17,7 @@
+         now = time.monotonic()
+         elapsed = now - self.last_update
+         self.last_update = now
+-        added = int(elapsed * self.fill_rate)
+-        if added > 0:
+-            self.tokens = min(float(self.capacity), self.tokens + added)
++        self.tokens = min(float(self.capacity), self.tokens + elapsed * self.fill_rate)
+         if self.tokens >= tokens:
+             self.tokens -= tokens
+             return True

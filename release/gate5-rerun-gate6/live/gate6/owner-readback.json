@@ -1,0 +1,41 @@
+{
+  "schema": "actenon-airlock/gate6-owner-readback/v1",
+  "note": "Third readback, separate from Airlock and the referee: the owner's own gh CLI login, read-only GETs, performed on the owner's machine after the run. Selected fields only; no personal data.",
+  "observed_at": "2026-11-05T14:48:58+00:00",
+  "repository": {
+    "id": 1447043154,
+    "node_id": "R_kgDOVkAgUg",
+    "full_name": "rossbuckley1990-hash/airlock-gate6-disposable",
+    "private": true,
+    "default_branch": "main"
+  },
+  "branch_head": "bafc2c434001089d41c2bf95012fd41578560b20",
+  "commits_on_main": [
+    "bafc2c434001089d41c2bf95012fd41578560b20",
+    "ab5b511bf18f56f01e2944ddf55ec172e5fd4d4d"
+  ],
+  "commit": {
+    "sha": "bafc2c434001089d41c2bf95012fd41578560b20",
+    "parents": [
+      "ab5b511bf18f56f01e2944ddf55ec172e5fd4d4d"
+    ],
+    "message": "Airlock Gate 6: reviewed token-bucket patch from Claude Code",
+    "files": [
+      {
+        "filename": "airlock-gate6/token-bucket-fix.patch",
+        "status": "added",
+        "additions": 13,
+        "deletions": 0,
+        "blob_sha": "29b5736802972c8f828c7a680db13f6c33e0a379"
+      }
+    ]
+  },
+  "file": {
+    "path": "airlock-gate6/token-bucket-fix.patch",
+    "blob_sha": "29b5736802972c8f828c7a680db13f6c33e0a379",
+    "size": 504,
+    "content_sha256": "63543214156640b90f9cad06eeff68fed41f44763045561d90c5809f619cc798"
+  },
+  "actions_enabled": false,
+  "webhooks": 0
+}
