@@ -446,6 +446,7 @@ def test_the_demo_says_what_the_real_thing_needs():
     from actenon_airlock.demo import NEXT_STEP
 
     assert "path/to" not in NEXT_STEP  # every line can be pasted as it is
+    assert "skip to" not in NEXT_STEP  # own projects are not pointed at the practice tests
     assert "mkdir -p ~/airlock-practice && cd ~/airlock-practice" in NEXT_STEP
     assert 'airlock protect --tests ~/airlock-practice-tests "Fix the failing test"' in NEXT_STEP
     assert "ANTHROPIC_API_KEY" in NEXT_STEP and "never enters the container" in NEXT_STEP

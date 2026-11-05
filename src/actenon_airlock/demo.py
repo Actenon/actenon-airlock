@@ -85,7 +85,7 @@ if relay:
 
 # Honest about what the real thing needs: a project, a key, and money you approve.
 NEXT_STEP = r"""That is Airlock. To try it with a real agent, make a practice project with one bug
-(or cd into a project of your own and skip to the last two lines):
+(or cd into a project of your own, set your key and run airlock protect with your task):
 
   mkdir -p ~/airlock-practice && cd ~/airlock-practice
   printf 'def add(a, b):\n    return a - b\n' > calculator.py
