@@ -76,6 +76,11 @@ PATH_IN_REPO = "airlock-gate6/token-bucket-fix.patch"
 MESSAGE = "Airlock Gate 6: reviewed token-bucket patch from Claude Code"
 API = "https://api.github.com"
 FACT_FIELDS = ("repo_id", "repo_node_id", "owner", "repo", "branch", "expected_parent_sha")
+REHEARSAL_NOTICE = (
+    "> **Rehearsal with a synthetic GitHub. Nothing was written to any real repository.** "
+    '"GitHub" below is a local stand-in that records every request; the agent, Airlock, '
+    "the approval and the refusals are real."
+)
 
 
 def _sha(data: bytes) -> str:
@@ -573,7 +578,12 @@ def main() -> int:
     )  # fmt: skip
 
     report = build_report(state, effect_id, independent=referee, candidate=candidate)
-    (out / "CONSEQUENCE.md").write_text(render_markdown(report))
+    markdown = render_markdown(report)
+    if provider is not None:
+        # The journal names api.github.com either way; say plainly this one never reached it.
+        title, rest = markdown.split("\n", 1)
+        markdown = f"{title}\n\n{REHEARSAL_NOTICE}\n{rest}"
+    (out / "CONSEQUENCE.md").write_text(markdown)
     result = {
         "schema": SCHEMA,
         "evidence_class": "frozen-live-github-write" if live else "rehearsal-synthetic-github",

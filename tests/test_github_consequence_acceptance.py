@@ -130,7 +130,7 @@ def test_full_rehearsal_with_controls(tmp_path):
     assert result["airlock"]["unresolved_effects"] == []
     assert result["airlock"]["inference"]["unconfirmed"] == 0
     report = (out / "CONSEQUENCE.md").read_text()
-    assert report.startswith("# Consequence report: CONFIRMED\n")
+    assert report.startswith("# Consequence report: CONFIRMED\n\n" + gate6.REHEARSAL_NOTICE)
     assert "acknowledgement of the write never arrived" in report
 
 
