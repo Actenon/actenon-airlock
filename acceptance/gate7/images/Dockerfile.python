@@ -1,0 +1,16 @@
+# Gate 7 Python compute: the unchanged Claude Code image plus two things click's
+# own test suite expects of a development checkout:
+#   - `less`, which its pager tests run;
+#   - click's distribution metadata, which an editable install provides and its
+#     deprecation tests read with importlib.metadata.version("click"). Only the
+#     metadata is installed, no code: `import click` still comes from the
+#     workspace's src/ (PYTHONPATH=src), so the agent's changes are what runs.
+FROM actenon-airlock-claude-code:v1
+RUN apt-get update && apt-get install -y --no-install-recommends less \
+    && rm -rf /var/lib/apt/lists/* && less --version | head -1
+RUN d="$(python3 -c 'import sysconfig; print(sysconfig.get_paths()["purelib"])')/click-0+gate7.editable.dist-info" \
+    && mkdir -p "$d" \
+    && printf 'Metadata-Version: 2.1\nName: click\nVersion: 0+gate7.editable\n' > "$d/METADATA" \
+    && printf 'click\n' > "$d/top_level.txt" && : > "$d/RECORD" \
+    && python3 -c 'import importlib.metadata as m; print(m.version("click"))' \
+    && ! python3 -c 'import click' 2>/dev/null

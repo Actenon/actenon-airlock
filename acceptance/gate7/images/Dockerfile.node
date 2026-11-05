@@ -1,0 +1,21 @@
+# Gate 7 Node compute: the unchanged Claude Code image plus the pinned Node runtime
+# already used to prepare Claude Code, and one frozen dependency set at /node_modules.
+# Node and TypeScript resolve /node_modules from /workspace, so the agent's
+# workspace holds only upstream source and cannot alter the installed packages.
+FROM node@sha256:4b150b48b4116e2a22f2c39cc27025fbf4f153e2078fd3b14d159fdb5c7279da AS deps
+WORKDIR /deps
+COPY package.json package-lock.json ./
+# npm ci checks every archive against the frozen lockfile; lifecycle scripts never run.
+RUN npm ci --ignore-scripts --no-audit --no-fund
+
+FROM node@sha256:4b150b48b4116e2a22f2c39cc27025fbf4f153e2078fd3b14d159fdb5c7279da AS node
+FROM actenon-airlock-claude-code:v1
+COPY --from=node /usr/local/bin/node /usr/local/bin/node
+COPY --from=node /usr/local/lib/node_modules/npm /usr/local/lib/node_modules/npm
+COPY --from=deps /deps/node_modules /node_modules
+# Vite bundles its config into <node_modules>/.vite-temp; the image is read-only at
+# run time, so that one directory points at the writable /tmp.
+RUN ln -s /tmp /node_modules/.vite-temp \
+    && ln -s /usr/local/lib/node_modules/npm/bin/npm-cli.js /usr/local/bin/npm \
+    && ln -s /usr/local/lib/node_modules/npm/bin/npx-cli.js /usr/local/bin/npx \
+    && node --version && /node_modules/.bin/tsc --version && /node_modules/.bin/vitest --version
