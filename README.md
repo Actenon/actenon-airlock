@@ -13,20 +13,24 @@ a release gate. No Airlock package, tag, or release has been published.
 
 ## Install
 
-Python 3.11+ on Linux or macOS, with Git installed:
+Airlock is **not published to PyPI or any other package registry**, and there is no release.
+You install the development candidate directly from GitHub, at an exact commit, so every
+install gets the same code.
+
+Python 3.11+ on Linux or macOS, with Git installed. Install into your agent's own Python
+environment (create one first if you need to):
 
 ~~~sh
 python3 -m venv .venv
 . .venv/bin/activate
-python -m pip install "git+https://github.com/Actenon/actenon-airlock.git@feat/protected-acceptance"
+python -m pip install "git+https://github.com/Actenon/actenon-airlock.git@c38093e8a521fac4f5dbeaef32eb454b989260d0"
 airlock doctor
 ~~~
 
 One Airlock installation includes Scan, Permit, Kernel, and Protocol at the exact commits in
 [dependency-pins.json](evidence/dependency-pins.json). Install your agent's own requirements
-in the same environment. This command follows the development branch in
-[candidate PR #13](https://github.com/Actenon/actenon-airlock/pull/13). For repeatable testing,
-replace the branch with the exact reviewed Airlock commit. It is not a production release.
+in the same environment. To try the latest development state instead, replace the commit with
+`@main`. That changes with every merge and is not a fixed release. Neither is a production release.
 
 ## Quickstart
 
@@ -70,9 +74,19 @@ Existing approved powers can continue. New powers are denied by Permit. Removed 
 automatically removed from the runtime grant. Re-run init --approve after reviewing the change
 to activate the new resolved powers. Templates and unknown targets stay blocked after approval.
 
-For a demonstration without any external account, run examples/server.py directly in one terminal.
-In another terminal, change into examples/agent and run init --approve followed by run.
-Then change the POST to DELETE in main.py: diff shows the new power and run denies it.
+For a demonstration without any external account, get the examples first; they are not part of
+the pip install:
+
+~~~sh
+git clone https://github.com/Actenon/actenon-airlock.git
+cd actenon-airlock
+git checkout c38093e8a521fac4f5dbeaef32eb454b989260d0
+~~~
+
+Run examples/server.py directly in one terminal. In another terminal, change into examples/agent
+and run init --approve followed by run. Then change the POST to DELETE in main.py: diff shows the
+new power and run denies it. Running the unchanged agent a second time is also denied. The first
+POST's outcome is uncertain to Airlock, and it refuses blind retries of an uncertain effect.
 
 ## Credentials and receipts
 
