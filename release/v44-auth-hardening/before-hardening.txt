@@ -1,0 +1,1947 @@
+FFFFFFFFFFFFFFF...............FF.FFFFFFFFFFFFFFFFFFFFFFFFFFF             [100%]
+=================================== FAILURES ===================================
+_________ test_failed_reply_is_sanitized_signed_and_held[401-full-key] _________
+
+broker = (<actenon_airlock.state.State object at 0x10a2efb30>, <actenon_airlock.protected.ProtectedBroker object at 0x10a168320>, <responses_fixture.ScriptedProvider object at 0x109d39670>)
+case = '401-full-key'
+
+    @pytest.mark.parametrize("case", CASES)
+    def test_failed_reply_is_sanitized_signed_and_held(broker, case):
+        state, subject, provider = broker
+        code, body = CASES[case]
+        provider.steps.insert(0, response(code, body))
+        result = subject.handle(message())
+        assert result["ok"] and result["outcome"] == "AMBIGUOUS"
+    
+        # The agent sees the real status and a fixed local error, nothing provider-supplied.
+        relayed = result["response"]
+        assert relayed["status"] == code
+>       assert relayed["headers"] == {"content-type": "application/json"}
+E       AssertionError: assert {'content-typ...-tenant', ...} == {'content-typ...ication/json'}
+E         
+E         Omitting 1 identical items, use -vv to show
+E         Left contains 6 more items:
+E         {'content-length': '159',
+E          'openai-organization': 'org-secret-tenant',
+E          'retry-after': '1',
+E          'set-cookie': 'session=sk-proj-SYNTHETICfakeKEYvalue0123456789abcdefSECRETtail, '...
+E         
+E         ...Full output truncated (4 lines hidden), use '-vv' to show
+
+tests/test_inference_provider_errors.py:128: AssertionError
+---------------------------- Captured stdout setup -----------------------------
+AIRLOCK AUTHORITY DIFF
+
++ http.post @ api.openai.com/v1/responses
+  Transport: https://api.openai.com/v1/responses
+  Scope: POST to exactly https://api.openai.com/v1/responses
++ Model authority expanded: {"anthropic_betas": [], "contract": "openai-responses-agent/v1", "endpoint": "https://api.openai.com/v1/responses", "max_input_bytes": 200000, "max_output_tokens": 16000, "max_run_microusd": 5000000, "models": ["gpt-5.5"], "price_microusd_per_mtok": {"cache_read": 500000, "cache_write": 0, "input": 5000000, "output": 30000000}, "provider": "openai-responses", "read_timeout_seconds": 540}
+
+Runtime: BLOCKED UNTIL APPROVED
+
+Protected inference constraint (trusted only with --approve):
+{"anthropic_betas": [], "contract": "openai-responses-agent/v1", "endpoint": "https://api.openai.com/v1/responses", "max_input_bytes": 200000, "max_output_tokens": 16000, "max_run_microusd": 5000000, "models": ["gpt-5.5"], "price_microusd_per_mtok": {"cache_read": 500000, "cache_write": 0, "input": 5000000, "output": 30000000}, "provider": "openai-responses", "read_timeout_seconds": 540}
+
+Approved 1 powers. Unresolved powers remain blocked; their calls are denied at runtime with signed receipts.
+----------------------------- Captured stderr call -----------------------------
+AIRLOCK ALLOW http.post @ https://api.openai.com/v1/responses: effect AMBIGUOUS; duplicate dispatch blocked [receipt_8ab726b1bb5e480c9c7dacf8aac0d691]
+________ test_failed_reply_is_sanitized_signed_and_held[401-masked-key] ________
+
+broker = (<actenon_airlock.state.State object at 0x10a2efdd0>, <actenon_airlock.protected.ProtectedBroker object at 0x10a2effe0>, <responses_fixture.ScriptedProvider object at 0x10a2effb0>)
+case = '401-masked-key'
+
+    @pytest.mark.parametrize("case", CASES)
+    def test_failed_reply_is_sanitized_signed_and_held(broker, case):
+        state, subject, provider = broker
+        code, body = CASES[case]
+        provider.steps.insert(0, response(code, body))
+        result = subject.handle(message())
+        assert result["ok"] and result["outcome"] == "AMBIGUOUS"
+    
+        # The agent sees the real status and a fixed local error, nothing provider-supplied.
+        relayed = result["response"]
+        assert relayed["status"] == code
+>       assert relayed["headers"] == {"content-type": "application/json"}
+E       AssertionError: assert {'content-typ...-tenant', ...} == {'content-typ...ication/json'}
+E         
+E         Omitting 1 identical items, use -vv to show
+E         Left contains 6 more items:
+E         {'content-length': '153',
+E          'openai-organization': 'org-secret-tenant',
+E          'retry-after': '1',
+E          'set-cookie': 'session=sk-proj-SYNTHETICfakeKEYvalue0123456789abcdefSECRETtail, '...
+E         
+E         ...Full output truncated (4 lines hidden), use '-vv' to show
+
+tests/test_inference_provider_errors.py:128: AssertionError
+---------------------------- Captured stdout setup -----------------------------
+AIRLOCK AUTHORITY DIFF
+
++ http.post @ api.openai.com/v1/responses
+  Transport: https://api.openai.com/v1/responses
+  Scope: POST to exactly https://api.openai.com/v1/responses
++ Model authority expanded: {"anthropic_betas": [], "contract": "openai-responses-agent/v1", "endpoint": "https://api.openai.com/v1/responses", "max_input_bytes": 200000, "max_output_tokens": 16000, "max_run_microusd": 5000000, "models": ["gpt-5.5"], "price_microusd_per_mtok": {"cache_read": 500000, "cache_write": 0, "input": 5000000, "output": 30000000}, "provider": "openai-responses", "read_timeout_seconds": 540}
+
+Runtime: BLOCKED UNTIL APPROVED
+
+Protected inference constraint (trusted only with --approve):
+{"anthropic_betas": [], "contract": "openai-responses-agent/v1", "endpoint": "https://api.openai.com/v1/responses", "max_input_bytes": 200000, "max_output_tokens": 16000, "max_run_microusd": 5000000, "models": ["gpt-5.5"], "price_microusd_per_mtok": {"cache_read": 500000, "cache_write": 0, "input": 5000000, "output": 30000000}, "provider": "openai-responses", "read_timeout_seconds": 540}
+
+Approved 1 powers. Unresolved powers remain blocked; their calls are denied at runtime with signed receipts.
+----------------------------- Captured stderr call -----------------------------
+AIRLOCK ALLOW http.post @ https://api.openai.com/v1/responses: effect AMBIGUOUS; duplicate dispatch blocked [receipt_dcaffa078b9242f88a0863f29b5ccd02]
+________ test_failed_reply_is_sanitized_signed_and_held[401-other-key] _________
+
+broker = (<actenon_airlock.state.State object at 0x10a478cb0>, <actenon_airlock.protected.ProtectedBroker object at 0x10a47bd70>, <responses_fixture.ScriptedProvider object at 0x10a479fd0>)
+case = '401-other-key'
+
+    @pytest.mark.parametrize("case", CASES)
+    def test_failed_reply_is_sanitized_signed_and_held(broker, case):
+        state, subject, provider = broker
+        code, body = CASES[case]
+        provider.steps.insert(0, response(code, body))
+        result = subject.handle(message())
+        assert result["ok"] and result["outcome"] == "AMBIGUOUS"
+    
+        # The agent sees the real status and a fixed local error, nothing provider-supplied.
+        relayed = result["response"]
+        assert relayed["status"] == code
+>       assert relayed["headers"] == {"content-type": "application/json"}
+E       AssertionError: assert {'content-typ...-tenant', ...} == {'content-typ...ication/json'}
+E         
+E         Omitting 1 identical items, use -vv to show
+E         Left contains 6 more items:
+E         {'content-length': '175',
+E          'openai-organization': 'org-secret-tenant',
+E          'retry-after': '1',
+E          'set-cookie': 'session=sk-proj-SYNTHETICfakeKEYvalue0123456789abcdefSECRETtail, '...
+E         
+E         ...Full output truncated (4 lines hidden), use '-vv' to show
+
+tests/test_inference_provider_errors.py:128: AssertionError
+---------------------------- Captured stdout setup -----------------------------
+AIRLOCK AUTHORITY DIFF
+
++ http.post @ api.openai.com/v1/responses
+  Transport: https://api.openai.com/v1/responses
+  Scope: POST to exactly https://api.openai.com/v1/responses
++ Model authority expanded: {"anthropic_betas": [], "contract": "openai-responses-agent/v1", "endpoint": "https://api.openai.com/v1/responses", "max_input_bytes": 200000, "max_output_tokens": 16000, "max_run_microusd": 5000000, "models": ["gpt-5.5"], "price_microusd_per_mtok": {"cache_read": 500000, "cache_write": 0, "input": 5000000, "output": 30000000}, "provider": "openai-responses", "read_timeout_seconds": 540}
+
+Runtime: BLOCKED UNTIL APPROVED
+
+Protected inference constraint (trusted only with --approve):
+{"anthropic_betas": [], "contract": "openai-responses-agent/v1", "endpoint": "https://api.openai.com/v1/responses", "max_input_bytes": 200000, "max_output_tokens": 16000, "max_run_microusd": 5000000, "models": ["gpt-5.5"], "price_microusd_per_mtok": {"cache_read": 500000, "cache_write": 0, "input": 5000000, "output": 30000000}, "provider": "openai-responses", "read_timeout_seconds": 540}
+
+Approved 1 powers. Unresolved powers remain blocked; their calls are denied at runtime with signed receipts.
+----------------------------- Captured stderr call -----------------------------
+AIRLOCK ALLOW http.post @ https://api.openai.com/v1/responses: effect AMBIGUOUS; duplicate dispatch blocked [receipt_ec803a366bb649b18122066f766ac308]
+__ test_failed_reply_is_sanitized_signed_and_held[401-misleading-quota-code] ___
+
+broker = (<actenon_airlock.state.State object at 0x10a345c40>, <actenon_airlock.protected.ProtectedBroker object at 0x10a551e50>, <responses_fixture.ScriptedProvider object at 0x10a345d60>)
+case = '401-misleading-quota-code'
+
+    @pytest.mark.parametrize("case", CASES)
+    def test_failed_reply_is_sanitized_signed_and_held(broker, case):
+        state, subject, provider = broker
+        code, body = CASES[case]
+        provider.steps.insert(0, response(code, body))
+        result = subject.handle(message())
+        assert result["ok"] and result["outcome"] == "AMBIGUOUS"
+    
+        # The agent sees the real status and a fixed local error, nothing provider-supplied.
+        relayed = result["response"]
+        assert relayed["status"] == code
+>       assert relayed["headers"] == {"content-type": "application/json"}
+E       AssertionError: assert {'content-typ...-tenant', ...} == {'content-typ...ication/json'}
+E         
+E         Omitting 1 identical items, use -vv to show
+E         Left contains 6 more items:
+E         {'content-length': '111',
+E          'openai-organization': 'org-secret-tenant',
+E          'retry-after': '1',
+E          'set-cookie': 'session=sk-proj-SYNTHETICfakeKEYvalue0123456789abcdefSECRETtail, '...
+E         
+E         ...Full output truncated (4 lines hidden), use '-vv' to show
+
+tests/test_inference_provider_errors.py:128: AssertionError
+---------------------------- Captured stdout setup -----------------------------
+AIRLOCK AUTHORITY DIFF
+
++ http.post @ api.openai.com/v1/responses
+  Transport: https://api.openai.com/v1/responses
+  Scope: POST to exactly https://api.openai.com/v1/responses
++ Model authority expanded: {"anthropic_betas": [], "contract": "openai-responses-agent/v1", "endpoint": "https://api.openai.com/v1/responses", "max_input_bytes": 200000, "max_output_tokens": 16000, "max_run_microusd": 5000000, "models": ["gpt-5.5"], "price_microusd_per_mtok": {"cache_read": 500000, "cache_write": 0, "input": 5000000, "output": 30000000}, "provider": "openai-responses", "read_timeout_seconds": 540}
+
+Runtime: BLOCKED UNTIL APPROVED
+
+Protected inference constraint (trusted only with --approve):
+{"anthropic_betas": [], "contract": "openai-responses-agent/v1", "endpoint": "https://api.openai.com/v1/responses", "max_input_bytes": 200000, "max_output_tokens": 16000, "max_run_microusd": 5000000, "models": ["gpt-5.5"], "price_microusd_per_mtok": {"cache_read": 500000, "cache_write": 0, "input": 5000000, "output": 30000000}, "provider": "openai-responses", "read_timeout_seconds": 540}
+
+Approved 1 powers. Unresolved powers remain blocked; their calls are denied at runtime with signed receipts.
+----------------------------- Captured stderr call -----------------------------
+AIRLOCK ALLOW http.post @ https://api.openai.com/v1/responses: effect AMBIGUOUS; duplicate dispatch blocked [receipt_0ca8617090e9415db188ecdf08fb05d4]
+__________ test_failed_reply_is_sanitized_signed_and_held[403-region] __________
+
+broker = (<actenon_airlock.state.State object at 0x10a3c7d40>, <actenon_airlock.protected.ProtectedBroker object at 0x10a345400>, <responses_fixture.ScriptedProvider object at 0x10a3c59d0>)
+case = '403-region'
+
+    @pytest.mark.parametrize("case", CASES)
+    def test_failed_reply_is_sanitized_signed_and_held(broker, case):
+        state, subject, provider = broker
+        code, body = CASES[case]
+        provider.steps.insert(0, response(code, body))
+        result = subject.handle(message())
+        assert result["ok"] and result["outcome"] == "AMBIGUOUS"
+    
+        # The agent sees the real status and a fixed local error, nothing provider-supplied.
+        relayed = result["response"]
+        assert relayed["status"] == code
+>       assert relayed["headers"] == {"content-type": "application/json"}
+E       AssertionError: assert {'content-typ...-tenant', ...} == {'content-typ...ication/json'}
+E         
+E         Omitting 1 identical items, use -vv to show
+E         Left contains 6 more items:
+E         {'content-length': '135',
+E          'openai-organization': 'org-secret-tenant',
+E          'retry-after': '1',
+E          'set-cookie': 'session=sk-proj-SYNTHETICfakeKEYvalue0123456789abcdefSECRETtail, '...
+E         
+E         ...Full output truncated (4 lines hidden), use '-vv' to show
+
+tests/test_inference_provider_errors.py:128: AssertionError
+---------------------------- Captured stdout setup -----------------------------
+AIRLOCK AUTHORITY DIFF
+
++ http.post @ api.openai.com/v1/responses
+  Transport: https://api.openai.com/v1/responses
+  Scope: POST to exactly https://api.openai.com/v1/responses
++ Model authority expanded: {"anthropic_betas": [], "contract": "openai-responses-agent/v1", "endpoint": "https://api.openai.com/v1/responses", "max_input_bytes": 200000, "max_output_tokens": 16000, "max_run_microusd": 5000000, "models": ["gpt-5.5"], "price_microusd_per_mtok": {"cache_read": 500000, "cache_write": 0, "input": 5000000, "output": 30000000}, "provider": "openai-responses", "read_timeout_seconds": 540}
+
+Runtime: BLOCKED UNTIL APPROVED
+
+Protected inference constraint (trusted only with --approve):
+{"anthropic_betas": [], "contract": "openai-responses-agent/v1", "endpoint": "https://api.openai.com/v1/responses", "max_input_bytes": 200000, "max_output_tokens": 16000, "max_run_microusd": 5000000, "models": ["gpt-5.5"], "price_microusd_per_mtok": {"cache_read": 500000, "cache_write": 0, "input": 5000000, "output": 30000000}, "provider": "openai-responses", "read_timeout_seconds": 540}
+
+Approved 1 powers. Unresolved powers remain blocked; their calls are denied at runtime with signed receipts.
+----------------------------- Captured stderr call -----------------------------
+AIRLOCK ALLOW http.post @ https://api.openai.com/v1/responses: effect AMBIGUOUS; duplicate dispatch blocked [receipt_fdceb9aa1c1e42f982941bbc29c02c92]
+___ test_failed_reply_is_sanitized_signed_and_held[429-misleading-auth-code] ___
+
+broker = (<actenon_airlock.state.State object at 0x10a5dfa40>, <actenon_airlock.protected.ProtectedBroker object at 0x10a475220>, <responses_fixture.ScriptedProvider object at 0x10a475cd0>)
+case = '429-misleading-auth-code'
+
+    @pytest.mark.parametrize("case", CASES)
+    def test_failed_reply_is_sanitized_signed_and_held(broker, case):
+        state, subject, provider = broker
+        code, body = CASES[case]
+        provider.steps.insert(0, response(code, body))
+        result = subject.handle(message())
+        assert result["ok"] and result["outcome"] == "AMBIGUOUS"
+    
+        # The agent sees the real status and a fixed local error, nothing provider-supplied.
+        relayed = result["response"]
+        assert relayed["status"] == code
+>       assert relayed["headers"] == {"content-type": "application/json"}
+E       AssertionError: assert {'content-typ...-tenant', ...} == {'content-typ...ication/json'}
+E         
+E         Omitting 1 identical items, use -vv to show
+E         Left contains 6 more items:
+E         {'content-length': '156',
+E          'openai-organization': 'org-secret-tenant',
+E          'retry-after': '1',
+E          'set-cookie': 'session=sk-proj-SYNTHETICfakeKEYvalue0123456789abcdefSECRETtail, '...
+E         
+E         ...Full output truncated (4 lines hidden), use '-vv' to show
+
+tests/test_inference_provider_errors.py:128: AssertionError
+---------------------------- Captured stdout setup -----------------------------
+AIRLOCK AUTHORITY DIFF
+
++ http.post @ api.openai.com/v1/responses
+  Transport: https://api.openai.com/v1/responses
+  Scope: POST to exactly https://api.openai.com/v1/responses
++ Model authority expanded: {"anthropic_betas": [], "contract": "openai-responses-agent/v1", "endpoint": "https://api.openai.com/v1/responses", "max_input_bytes": 200000, "max_output_tokens": 16000, "max_run_microusd": 5000000, "models": ["gpt-5.5"], "price_microusd_per_mtok": {"cache_read": 500000, "cache_write": 0, "input": 5000000, "output": 30000000}, "provider": "openai-responses", "read_timeout_seconds": 540}
+
+Runtime: BLOCKED UNTIL APPROVED
+
+Protected inference constraint (trusted only with --approve):
+{"anthropic_betas": [], "contract": "openai-responses-agent/v1", "endpoint": "https://api.openai.com/v1/responses", "max_input_bytes": 200000, "max_output_tokens": 16000, "max_run_microusd": 5000000, "models": ["gpt-5.5"], "price_microusd_per_mtok": {"cache_read": 500000, "cache_write": 0, "input": 5000000, "output": 30000000}, "provider": "openai-responses", "read_timeout_seconds": 540}
+
+Approved 1 powers. Unresolved powers remain blocked; their calls are denied at runtime with signed receipts.
+----------------------------- Captured stderr call -----------------------------
+AIRLOCK ALLOW http.post @ https://api.openai.com/v1/responses: effect AMBIGUOUS; duplicate dispatch blocked [receipt_5846ba4fc35e44548637bbfeff949247]
+__________ test_failed_reply_is_sanitized_signed_and_held[500-server] __________
+
+broker = (<actenon_airlock.state.State object at 0x10a536810>, <actenon_airlock.protected.ProtectedBroker object at 0x109d74620>, <responses_fixture.ScriptedProvider object at 0x10a537c20>)
+case = '500-server'
+
+    @pytest.mark.parametrize("case", CASES)
+    def test_failed_reply_is_sanitized_signed_and_held(broker, case):
+        state, subject, provider = broker
+        code, body = CASES[case]
+        provider.steps.insert(0, response(code, body))
+        result = subject.handle(message())
+        assert result["ok"] and result["outcome"] == "AMBIGUOUS"
+    
+        # The agent sees the real status and a fixed local error, nothing provider-supplied.
+        relayed = result["response"]
+        assert relayed["status"] == code
+>       assert relayed["headers"] == {"content-type": "application/json"}
+E       AssertionError: assert {'content-typ...-tenant', ...} == {'content-typ...ication/json'}
+E         
+E         Omitting 1 identical items, use -vv to show
+E         Left contains 6 more items:
+E         {'content-length': '150',
+E          'openai-organization': 'org-secret-tenant',
+E          'retry-after': '1',
+E          'set-cookie': 'session=sk-proj-SYNTHETICfakeKEYvalue0123456789abcdefSECRETtail, '...
+E         
+E         ...Full output truncated (4 lines hidden), use '-vv' to show
+
+tests/test_inference_provider_errors.py:128: AssertionError
+---------------------------- Captured stdout setup -----------------------------
+AIRLOCK AUTHORITY DIFF
+
++ http.post @ api.openai.com/v1/responses
+  Transport: https://api.openai.com/v1/responses
+  Scope: POST to exactly https://api.openai.com/v1/responses
++ Model authority expanded: {"anthropic_betas": [], "contract": "openai-responses-agent/v1", "endpoint": "https://api.openai.com/v1/responses", "max_input_bytes": 200000, "max_output_tokens": 16000, "max_run_microusd": 5000000, "models": ["gpt-5.5"], "price_microusd_per_mtok": {"cache_read": 500000, "cache_write": 0, "input": 5000000, "output": 30000000}, "provider": "openai-responses", "read_timeout_seconds": 540}
+
+Runtime: BLOCKED UNTIL APPROVED
+
+Protected inference constraint (trusted only with --approve):
+{"anthropic_betas": [], "contract": "openai-responses-agent/v1", "endpoint": "https://api.openai.com/v1/responses", "max_input_bytes": 200000, "max_output_tokens": 16000, "max_run_microusd": 5000000, "models": ["gpt-5.5"], "price_microusd_per_mtok": {"cache_read": 500000, "cache_write": 0, "input": 5000000, "output": 30000000}, "provider": "openai-responses", "read_timeout_seconds": 540}
+
+Approved 1 powers. Unresolved powers remain blocked; their calls are denied at runtime with signed receipts.
+----------------------------- Captured stderr call -----------------------------
+AIRLOCK ALLOW http.post @ https://api.openai.com/v1/responses: effect AMBIGUOUS; duplicate dispatch blocked [receipt_03b40149fd3d4c70a1413913ba9ed0e1]
+___________ test_failed_reply_is_sanitized_signed_and_held[503-text] ___________
+
+broker = (<actenon_airlock.state.State object at 0x10a47a780>, <actenon_airlock.protected.ProtectedBroker object at 0x10a4ab620>, <responses_fixture.ScriptedProvider object at 0x10a47b5c0>)
+case = '503-text'
+
+    @pytest.mark.parametrize("case", CASES)
+    def test_failed_reply_is_sanitized_signed_and_held(broker, case):
+        state, subject, provider = broker
+        code, body = CASES[case]
+        provider.steps.insert(0, response(code, body))
+        result = subject.handle(message())
+        assert result["ok"] and result["outcome"] == "AMBIGUOUS"
+    
+        # The agent sees the real status and a fixed local error, nothing provider-supplied.
+        relayed = result["response"]
+        assert relayed["status"] == code
+>       assert relayed["headers"] == {"content-type": "application/json"}
+E       AssertionError: assert {'content-typ...-tenant', ...} == {'content-typ...ication/json'}
+E         
+E         Omitting 1 identical items, use -vv to show
+E         Left contains 6 more items:
+E         {'content-length': '75',
+E          'openai-organization': 'org-secret-tenant',
+E          'retry-after': '1',
+E          'set-cookie': 'session=sk-proj-SYNTHETICfakeKEYvalue0123456789abcdefSECRETtail, '...
+E         
+E         ...Full output truncated (4 lines hidden), use '-vv' to show
+
+tests/test_inference_provider_errors.py:128: AssertionError
+---------------------------- Captured stdout setup -----------------------------
+AIRLOCK AUTHORITY DIFF
+
++ http.post @ api.openai.com/v1/responses
+  Transport: https://api.openai.com/v1/responses
+  Scope: POST to exactly https://api.openai.com/v1/responses
++ Model authority expanded: {"anthropic_betas": [], "contract": "openai-responses-agent/v1", "endpoint": "https://api.openai.com/v1/responses", "max_input_bytes": 200000, "max_output_tokens": 16000, "max_run_microusd": 5000000, "models": ["gpt-5.5"], "price_microusd_per_mtok": {"cache_read": 500000, "cache_write": 0, "input": 5000000, "output": 30000000}, "provider": "openai-responses", "read_timeout_seconds": 540}
+
+Runtime: BLOCKED UNTIL APPROVED
+
+Protected inference constraint (trusted only with --approve):
+{"anthropic_betas": [], "contract": "openai-responses-agent/v1", "endpoint": "https://api.openai.com/v1/responses", "max_input_bytes": 200000, "max_output_tokens": 16000, "max_run_microusd": 5000000, "models": ["gpt-5.5"], "price_microusd_per_mtok": {"cache_read": 500000, "cache_write": 0, "input": 5000000, "output": 30000000}, "provider": "openai-responses", "read_timeout_seconds": 540}
+
+Approved 1 powers. Unresolved powers remain blocked; their calls are denied at runtime with signed receipts.
+----------------------------- Captured stderr call -----------------------------
+AIRLOCK ALLOW http.post @ https://api.openai.com/v1/responses: effect AMBIGUOUS; duplicate dispatch blocked [receipt_85f02de2047644a780c72722dd9ab088]
+__________ test_failed_reply_is_sanitized_signed_and_held[502-empty] ___________
+
+broker = (<actenon_airlock.state.State object at 0x10a5deb40>, <actenon_airlock.protected.ProtectedBroker object at 0x10a5376e0>, <responses_fixture.ScriptedProvider object at 0x10a5dff80>)
+case = '502-empty'
+
+    @pytest.mark.parametrize("case", CASES)
+    def test_failed_reply_is_sanitized_signed_and_held(broker, case):
+        state, subject, provider = broker
+        code, body = CASES[case]
+        provider.steps.insert(0, response(code, body))
+        result = subject.handle(message())
+        assert result["ok"] and result["outcome"] == "AMBIGUOUS"
+    
+        # The agent sees the real status and a fixed local error, nothing provider-supplied.
+        relayed = result["response"]
+        assert relayed["status"] == code
+>       assert relayed["headers"] == {"content-type": "application/json"}
+E       AssertionError: assert {'content-typ...-tenant', ...} == {'content-typ...ication/json'}
+E         
+E         Omitting 1 identical items, use -vv to show
+E         Left contains 5 more items:
+E         {'openai-organization': 'org-secret-tenant',
+E          'retry-after': '1',
+E          'set-cookie': 'session=sk-proj-SYNTHETICfakeKEYvalue0123456789abcdefSECRETtail, '
+E                        'other=airlock_credential_58049f65e9554aab9bef4a1519e53ffc',...
+E         
+E         ...Full output truncated (3 lines hidden), use '-vv' to show
+
+tests/test_inference_provider_errors.py:128: AssertionError
+---------------------------- Captured stdout setup -----------------------------
+AIRLOCK AUTHORITY DIFF
+
++ http.post @ api.openai.com/v1/responses
+  Transport: https://api.openai.com/v1/responses
+  Scope: POST to exactly https://api.openai.com/v1/responses
++ Model authority expanded: {"anthropic_betas": [], "contract": "openai-responses-agent/v1", "endpoint": "https://api.openai.com/v1/responses", "max_input_bytes": 200000, "max_output_tokens": 16000, "max_run_microusd": 5000000, "models": ["gpt-5.5"], "price_microusd_per_mtok": {"cache_read": 500000, "cache_write": 0, "input": 5000000, "output": 30000000}, "provider": "openai-responses", "read_timeout_seconds": 540}
+
+Runtime: BLOCKED UNTIL APPROVED
+
+Protected inference constraint (trusted only with --approve):
+{"anthropic_betas": [], "contract": "openai-responses-agent/v1", "endpoint": "https://api.openai.com/v1/responses", "max_input_bytes": 200000, "max_output_tokens": 16000, "max_run_microusd": 5000000, "models": ["gpt-5.5"], "price_microusd_per_mtok": {"cache_read": 500000, "cache_write": 0, "input": 5000000, "output": 30000000}, "provider": "openai-responses", "read_timeout_seconds": 540}
+
+Approved 1 powers. Unresolved powers remain blocked; their calls are denied at runtime with signed receipts.
+----------------------------- Captured stderr call -----------------------------
+AIRLOCK ALLOW http.post @ https://api.openai.com/v1/responses: effect AMBIGUOUS; duplicate dispatch blocked [receipt_d2f044a17312442aa700bcec6b15fbd7]
+________ test_failed_reply_is_sanitized_signed_and_held[400-malformed] _________
+
+broker = (<actenon_airlock.state.State object at 0x10a2a4260>, <actenon_airlock.protected.ProtectedBroker object at 0x10a2a4140>, <responses_fixture.ScriptedProvider object at 0x10a2a4aa0>)
+case = '400-malformed'
+
+    @pytest.mark.parametrize("case", CASES)
+    def test_failed_reply_is_sanitized_signed_and_held(broker, case):
+        state, subject, provider = broker
+        code, body = CASES[case]
+        provider.steps.insert(0, response(code, body))
+        result = subject.handle(message())
+        assert result["ok"] and result["outcome"] == "AMBIGUOUS"
+    
+        # The agent sees the real status and a fixed local error, nothing provider-supplied.
+        relayed = result["response"]
+        assert relayed["status"] == code
+>       assert relayed["headers"] == {"content-type": "application/json"}
+E       AssertionError: assert {'content-typ...-tenant', ...} == {'content-typ...ication/json'}
+E         
+E         Omitting 1 identical items, use -vv to show
+E         Left contains 6 more items:
+E         {'content-length': '78',
+E          'openai-organization': 'org-secret-tenant',
+E          'retry-after': '1',
+E          'set-cookie': 'session=sk-proj-SYNTHETICfakeKEYvalue0123456789abcdefSECRETtail, '...
+E         
+E         ...Full output truncated (4 lines hidden), use '-vv' to show
+
+tests/test_inference_provider_errors.py:128: AssertionError
+---------------------------- Captured stdout setup -----------------------------
+AIRLOCK AUTHORITY DIFF
+
++ http.post @ api.openai.com/v1/responses
+  Transport: https://api.openai.com/v1/responses
+  Scope: POST to exactly https://api.openai.com/v1/responses
++ Model authority expanded: {"anthropic_betas": [], "contract": "openai-responses-agent/v1", "endpoint": "https://api.openai.com/v1/responses", "max_input_bytes": 200000, "max_output_tokens": 16000, "max_run_microusd": 5000000, "models": ["gpt-5.5"], "price_microusd_per_mtok": {"cache_read": 500000, "cache_write": 0, "input": 5000000, "output": 30000000}, "provider": "openai-responses", "read_timeout_seconds": 540}
+
+Runtime: BLOCKED UNTIL APPROVED
+
+Protected inference constraint (trusted only with --approve):
+{"anthropic_betas": [], "contract": "openai-responses-agent/v1", "endpoint": "https://api.openai.com/v1/responses", "max_input_bytes": 200000, "max_output_tokens": 16000, "max_run_microusd": 5000000, "models": ["gpt-5.5"], "price_microusd_per_mtok": {"cache_read": 500000, "cache_write": 0, "input": 5000000, "output": 30000000}, "provider": "openai-responses", "read_timeout_seconds": 540}
+
+Approved 1 powers. Unresolved powers remain blocked; their calls are denied at runtime with signed receipts.
+----------------------------- Captured stderr call -----------------------------
+AIRLOCK ALLOW http.post @ https://api.openai.com/v1/responses: effect AMBIGUOUS; duplicate dispatch blocked [receipt_556d8ba923874f7da29901e073994844]
+______ test_failed_reply_is_sanitized_signed_and_held[400-duplicate-keys] ______
+
+broker = (<actenon_airlock.state.State object at 0x10a2a6f90>, <actenon_airlock.protected.ProtectedBroker object at 0x10a474d70>, <responses_fixture.ScriptedProvider object at 0x10a2a7aa0>)
+case = '400-duplicate-keys'
+
+    @pytest.mark.parametrize("case", CASES)
+    def test_failed_reply_is_sanitized_signed_and_held(broker, case):
+        state, subject, provider = broker
+        code, body = CASES[case]
+        provider.steps.insert(0, response(code, body))
+        result = subject.handle(message())
+        assert result["ok"] and result["outcome"] == "AMBIGUOUS"
+    
+        # The agent sees the real status and a fixed local error, nothing provider-supplied.
+        relayed = result["response"]
+        assert relayed["status"] == code
+>       assert relayed["headers"] == {"content-type": "application/json"}
+E       AssertionError: assert {'content-typ...-tenant', ...} == {'content-typ...ication/json'}
+E         
+E         Omitting 1 identical items, use -vv to show
+E         Left contains 6 more items:
+E         {'content-length': '111',
+E          'openai-organization': 'org-secret-tenant',
+E          'retry-after': '1',
+E          'set-cookie': 'session=sk-proj-SYNTHETICfakeKEYvalue0123456789abcdefSECRETtail, '...
+E         
+E         ...Full output truncated (4 lines hidden), use '-vv' to show
+
+tests/test_inference_provider_errors.py:128: AssertionError
+---------------------------- Captured stdout setup -----------------------------
+AIRLOCK AUTHORITY DIFF
+
++ http.post @ api.openai.com/v1/responses
+  Transport: https://api.openai.com/v1/responses
+  Scope: POST to exactly https://api.openai.com/v1/responses
++ Model authority expanded: {"anthropic_betas": [], "contract": "openai-responses-agent/v1", "endpoint": "https://api.openai.com/v1/responses", "max_input_bytes": 200000, "max_output_tokens": 16000, "max_run_microusd": 5000000, "models": ["gpt-5.5"], "price_microusd_per_mtok": {"cache_read": 500000, "cache_write": 0, "input": 5000000, "output": 30000000}, "provider": "openai-responses", "read_timeout_seconds": 540}
+
+Runtime: BLOCKED UNTIL APPROVED
+
+Protected inference constraint (trusted only with --approve):
+{"anthropic_betas": [], "contract": "openai-responses-agent/v1", "endpoint": "https://api.openai.com/v1/responses", "max_input_bytes": 200000, "max_output_tokens": 16000, "max_run_microusd": 5000000, "models": ["gpt-5.5"], "price_microusd_per_mtok": {"cache_read": 500000, "cache_write": 0, "input": 5000000, "output": 30000000}, "provider": "openai-responses", "read_timeout_seconds": 540}
+
+Approved 1 powers. Unresolved powers remain blocked; their calls are denied at runtime with signed receipts.
+----------------------------- Captured stderr call -----------------------------
+AIRLOCK ALLOW http.post @ https://api.openai.com/v1/responses: effect AMBIGUOUS; duplicate dispatch blocked [receipt_a70907a1ab77487b985b495211905ccc]
+________ test_failed_reply_is_sanitized_signed_and_held[400-non-object] ________
+
+broker = (<actenon_airlock.state.State object at 0x10a520d70>, <actenon_airlock.protected.ProtectedBroker object at 0x10a38d730>, <responses_fixture.ScriptedProvider object at 0x10a208ec0>)
+case = '400-non-object'
+
+    @pytest.mark.parametrize("case", CASES)
+    def test_failed_reply_is_sanitized_signed_and_held(broker, case):
+        state, subject, provider = broker
+        code, body = CASES[case]
+        provider.steps.insert(0, response(code, body))
+        result = subject.handle(message())
+        assert result["ok"] and result["outcome"] == "AMBIGUOUS"
+    
+        # The agent sees the real status and a fixed local error, nothing provider-supplied.
+        relayed = result["response"]
+        assert relayed["status"] == code
+>       assert relayed["headers"] == {"content-type": "application/json"}
+E       AssertionError: assert {'content-typ...-tenant', ...} == {'content-typ...ication/json'}
+E         
+E         Omitting 1 identical items, use -vv to show
+E         Left contains 6 more items:
+E         {'content-length': '59',
+E          'openai-organization': 'org-secret-tenant',
+E          'retry-after': '1',
+E          'set-cookie': 'session=sk-proj-SYNTHETICfakeKEYvalue0123456789abcdefSECRETtail, '...
+E         
+E         ...Full output truncated (4 lines hidden), use '-vv' to show
+
+tests/test_inference_provider_errors.py:128: AssertionError
+---------------------------- Captured stdout setup -----------------------------
+AIRLOCK AUTHORITY DIFF
+
++ http.post @ api.openai.com/v1/responses
+  Transport: https://api.openai.com/v1/responses
+  Scope: POST to exactly https://api.openai.com/v1/responses
++ Model authority expanded: {"anthropic_betas": [], "contract": "openai-responses-agent/v1", "endpoint": "https://api.openai.com/v1/responses", "max_input_bytes": 200000, "max_output_tokens": 16000, "max_run_microusd": 5000000, "models": ["gpt-5.5"], "price_microusd_per_mtok": {"cache_read": 500000, "cache_write": 0, "input": 5000000, "output": 30000000}, "provider": "openai-responses", "read_timeout_seconds": 540}
+
+Runtime: BLOCKED UNTIL APPROVED
+
+Protected inference constraint (trusted only with --approve):
+{"anthropic_betas": [], "contract": "openai-responses-agent/v1", "endpoint": "https://api.openai.com/v1/responses", "max_input_bytes": 200000, "max_output_tokens": 16000, "max_run_microusd": 5000000, "models": ["gpt-5.5"], "price_microusd_per_mtok": {"cache_read": 500000, "cache_write": 0, "input": 5000000, "output": 30000000}, "provider": "openai-responses", "read_timeout_seconds": 540}
+
+Approved 1 powers. Unresolved powers remain blocked; their calls are denied at runtime with signed receipts.
+----------------------------- Captured stderr call -----------------------------
+AIRLOCK ALLOW http.post @ https://api.openai.com/v1/responses: effect AMBIGUOUS; duplicate dispatch blocked [receipt_e99e9ee9941341768706a79e219ff568]
+_______ test_failed_reply_is_sanitized_signed_and_held[401-secret-code] ________
+
+broker = (<actenon_airlock.state.State object at 0x109f24cb0>, <actenon_airlock.protected.ProtectedBroker object at 0x10a2b4500>, <responses_fixture.ScriptedProvider object at 0x10a5df6e0>)
+case = '401-secret-code'
+
+    @pytest.mark.parametrize("case", CASES)
+    def test_failed_reply_is_sanitized_signed_and_held(broker, case):
+        state, subject, provider = broker
+        code, body = CASES[case]
+        provider.steps.insert(0, response(code, body))
+        result = subject.handle(message())
+        assert result["ok"] and result["outcome"] == "AMBIGUOUS"
+    
+        # The agent sees the real status and a fixed local error, nothing provider-supplied.
+        relayed = result["response"]
+        assert relayed["status"] == code
+>       assert relayed["headers"] == {"content-type": "application/json"}
+E       AssertionError: assert {'content-typ...-tenant', ...} == {'content-typ...ication/json'}
+E         
+E         Omitting 1 identical items, use -vv to show
+E         Left contains 6 more items:
+E         {'content-length': '148',
+E          'openai-organization': 'org-secret-tenant',
+E          'retry-after': '1',
+E          'set-cookie': 'session=sk-proj-SYNTHETICfakeKEYvalue0123456789abcdefSECRETtail, '...
+E         
+E         ...Full output truncated (4 lines hidden), use '-vv' to show
+
+tests/test_inference_provider_errors.py:128: AssertionError
+---------------------------- Captured stdout setup -----------------------------
+AIRLOCK AUTHORITY DIFF
+
++ http.post @ api.openai.com/v1/responses
+  Transport: https://api.openai.com/v1/responses
+  Scope: POST to exactly https://api.openai.com/v1/responses
++ Model authority expanded: {"anthropic_betas": [], "contract": "openai-responses-agent/v1", "endpoint": "https://api.openai.com/v1/responses", "max_input_bytes": 200000, "max_output_tokens": 16000, "max_run_microusd": 5000000, "models": ["gpt-5.5"], "price_microusd_per_mtok": {"cache_read": 500000, "cache_write": 0, "input": 5000000, "output": 30000000}, "provider": "openai-responses", "read_timeout_seconds": 540}
+
+Runtime: BLOCKED UNTIL APPROVED
+
+Protected inference constraint (trusted only with --approve):
+{"anthropic_betas": [], "contract": "openai-responses-agent/v1", "endpoint": "https://api.openai.com/v1/responses", "max_input_bytes": 200000, "max_output_tokens": 16000, "max_run_microusd": 5000000, "models": ["gpt-5.5"], "price_microusd_per_mtok": {"cache_read": 500000, "cache_write": 0, "input": 5000000, "output": 30000000}, "provider": "openai-responses", "read_timeout_seconds": 540}
+
+Approved 1 powers. Unresolved powers remain blocked; their calls are denied at runtime with signed receipts.
+----------------------------- Captured stderr call -----------------------------
+AIRLOCK ALLOW http.post @ https://api.openai.com/v1/responses: effect AMBIGUOUS; duplicate dispatch blocked [receipt_289c9b4b044d41c782f4b3eaf08f7c51]
+_____ test_failed_reply_is_sanitized_signed_and_held[401-code-not-string] ______
+
+broker = (<actenon_airlock.state.State object at 0x10a47a090>, <actenon_airlock.protected.ProtectedBroker object at 0x10a3aaf00>, <responses_fixture.ScriptedProvider object at 0x10a5e6f90>)
+case = '401-code-not-string'
+
+    @pytest.mark.parametrize("case", CASES)
+    def test_failed_reply_is_sanitized_signed_and_held(broker, case):
+        state, subject, provider = broker
+        code, body = CASES[case]
+        provider.steps.insert(0, response(code, body))
+        result = subject.handle(message())
+        assert result["ok"] and result["outcome"] == "AMBIGUOUS"
+    
+        # The agent sees the real status and a fixed local error, nothing provider-supplied.
+        relayed = result["response"]
+        assert relayed["status"] == code
+>       assert relayed["headers"] == {"content-type": "application/json"}
+E       AssertionError: assert {'content-typ...-tenant', ...} == {'content-typ...ication/json'}
+E         
+E         Omitting 1 identical items, use -vv to show
+E         Left contains 6 more items:
+E         {'content-length': '160',
+E          'openai-organization': 'org-secret-tenant',
+E          'retry-after': '1',
+E          'set-cookie': 'session=sk-proj-SYNTHETICfakeKEYvalue0123456789abcdefSECRETtail, '...
+E         
+E         ...Full output truncated (4 lines hidden), use '-vv' to show
+
+tests/test_inference_provider_errors.py:128: AssertionError
+---------------------------- Captured stdout setup -----------------------------
+AIRLOCK AUTHORITY DIFF
+
++ http.post @ api.openai.com/v1/responses
+  Transport: https://api.openai.com/v1/responses
+  Scope: POST to exactly https://api.openai.com/v1/responses
++ Model authority expanded: {"anthropic_betas": [], "contract": "openai-responses-agent/v1", "endpoint": "https://api.openai.com/v1/responses", "max_input_bytes": 200000, "max_output_tokens": 16000, "max_run_microusd": 5000000, "models": ["gpt-5.5"], "price_microusd_per_mtok": {"cache_read": 500000, "cache_write": 0, "input": 5000000, "output": 30000000}, "provider": "openai-responses", "read_timeout_seconds": 540}
+
+Runtime: BLOCKED UNTIL APPROVED
+
+Protected inference constraint (trusted only with --approve):
+{"anthropic_betas": [], "contract": "openai-responses-agent/v1", "endpoint": "https://api.openai.com/v1/responses", "max_input_bytes": 200000, "max_output_tokens": 16000, "max_run_microusd": 5000000, "models": ["gpt-5.5"], "price_microusd_per_mtok": {"cache_read": 500000, "cache_write": 0, "input": 5000000, "output": 30000000}, "provider": "openai-responses", "read_timeout_seconds": 540}
+
+Approved 1 powers. Unresolved powers remain blocked; their calls are denied at runtime with signed receipts.
+----------------------------- Captured stderr call -----------------------------
+AIRLOCK ALLOW http.post @ https://api.openai.com/v1/responses: effect AMBIGUOUS; duplicate dispatch blocked [receipt_74b12d5c19c446a9a5a43e985298278d]
+________ test_failed_reply_is_sanitized_signed_and_held[401-oversized] _________
+
+broker = (<actenon_airlock.state.State object at 0x10a3b37d0>, <actenon_airlock.protected.ProtectedBroker object at 0x10a3b38f0>, <responses_fixture.ScriptedProvider object at 0x10a3b2c60>)
+case = '401-oversized'
+
+    @pytest.mark.parametrize("case", CASES)
+    def test_failed_reply_is_sanitized_signed_and_held(broker, case):
+        state, subject, provider = broker
+        code, body = CASES[case]
+        provider.steps.insert(0, response(code, body))
+        result = subject.handle(message())
+        assert result["ok"] and result["outcome"] == "AMBIGUOUS"
+    
+        # The agent sees the real status and a fixed local error, nothing provider-supplied.
+        relayed = result["response"]
+        assert relayed["status"] == code
+>       assert relayed["headers"] == {"content-type": "application/json"}
+E       AssertionError: assert {'content-typ...-tenant', ...} == {'content-typ...ication/json'}
+E         
+E         Omitting 1 identical items, use -vv to show
+E         Left contains 6 more items:
+E         {'content-length': '200156',
+E          'openai-organization': 'org-secret-tenant',
+E          'retry-after': '1',
+E          'set-cookie': 'session=sk-proj-SYNTHETICfakeKEYvalue0123456789abcdefSECRETtail, '...
+E         
+E         ...Full output truncated (4 lines hidden), use '-vv' to show
+
+tests/test_inference_provider_errors.py:128: AssertionError
+---------------------------- Captured stdout setup -----------------------------
+AIRLOCK AUTHORITY DIFF
+
++ http.post @ api.openai.com/v1/responses
+  Transport: https://api.openai.com/v1/responses
+  Scope: POST to exactly https://api.openai.com/v1/responses
++ Model authority expanded: {"anthropic_betas": [], "contract": "openai-responses-agent/v1", "endpoint": "https://api.openai.com/v1/responses", "max_input_bytes": 200000, "max_output_tokens": 16000, "max_run_microusd": 5000000, "models": ["gpt-5.5"], "price_microusd_per_mtok": {"cache_read": 500000, "cache_write": 0, "input": 5000000, "output": 30000000}, "provider": "openai-responses", "read_timeout_seconds": 540}
+
+Runtime: BLOCKED UNTIL APPROVED
+
+Protected inference constraint (trusted only with --approve):
+{"anthropic_betas": [], "contract": "openai-responses-agent/v1", "endpoint": "https://api.openai.com/v1/responses", "max_input_bytes": 200000, "max_output_tokens": 16000, "max_run_microusd": 5000000, "models": ["gpt-5.5"], "price_microusd_per_mtok": {"cache_read": 500000, "cache_write": 0, "input": 5000000, "output": 30000000}, "provider": "openai-responses", "read_timeout_seconds": 540}
+
+Approved 1 powers. Unresolved powers remain blocked; their calls are denied at runtime with signed receipts.
+----------------------------- Captured stderr call -----------------------------
+AIRLOCK ALLOW http.post @ https://api.openai.com/v1/responses: effect AMBIGUOUS; duplicate dispatch blocked [receipt_578bc1134ef94fc38bf8bc1094088ea5]
+_ test_documented_429_declines_keep_their_existing_accounting_and_are_sanitized[rate_limit_exceeded] _
+
+broker = (<actenon_airlock.state.State object at 0x10b2d5a60>, <actenon_airlock.protected.ProtectedBroker object at 0x10a4aa5d0>, <responses_fixture.ScriptedProvider object at 0x10a2b6480>)
+code = 'rate_limit_exceeded'
+
+    @pytest.mark.parametrize("code", ["rate_limit_exceeded", "insufficient_quota"])
+    def test_documented_429_declines_keep_their_existing_accounting_and_are_sanitized(broker, code):
+        state, subject, provider = broker
+        provider.steps.insert(0, response(429, openai_error(code, f"limit {FAKE}")))
+        first = subject.handle(message())
+        assert first["outcome"] == "AMBIGUOUS" and subject.inference_spent == 0
+        assert first["response"]["status"] == 429
+>       assert_clean(json.dumps(first["response"]).encode())
+
+tests/test_inference_provider_errors.py:176: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+blob = b'{"status": 429, "headers": {"content-type": "application/json", "set-cookie": "session=sk-proj-SYNTHETICfakeKEYvalue...9yIiwgInBhcmFtIjogbnVsbCwgImNvZGUiOiAicmF0ZV9saW1pdF9leGNlZWRlZCJ9fQ==", "url": "https://api.openai.com/v1/responses"}'
+
+    def assert_clean(blob: bytes):
+        lowered = blob.lower()
+        for fragment in FRAGMENTS:
+>           assert fragment.lower().encode() not in lowered, fragment
+E           AssertionError: syntheti
+E           assert b'syntheti' not in b'{"status": 429, "headers": {"content-type": "application/json", "set-cookie": "session=sk-proj-syntheticfakekeyvalue...9yiiwginbhcmftijogbnvsbcwgimnvzguioiaicmf0zv9saw1pdf9legnlzwrlzcj9fq==", "url": "https://api.openai.com/v1/responses"}'
+E            +  where b'syntheti' = <built-in method encode of str object at 0x10a411230>()
+E            +    where <built-in method encode of str object at 0x10a411230> = 'syntheti'.encode
+E            +      where 'syntheti' = <built-in method lower of str object at 0x108f202b0>()
+E            +        where <built-in method lower of str object at 0x108f202b0> = 'syntheti'.lower
+
+tests/test_inference_provider_errors.py:114: AssertionError
+---------------------------- Captured stdout setup -----------------------------
+AIRLOCK AUTHORITY DIFF
+
++ http.post @ api.openai.com/v1/responses
+  Transport: https://api.openai.com/v1/responses
+  Scope: POST to exactly https://api.openai.com/v1/responses
++ Model authority expanded: {"anthropic_betas": [], "contract": "openai-responses-agent/v1", "endpoint": "https://api.openai.com/v1/responses", "max_input_bytes": 200000, "max_output_tokens": 16000, "max_run_microusd": 5000000, "models": ["gpt-5.5"], "price_microusd_per_mtok": {"cache_read": 500000, "cache_write": 0, "input": 5000000, "output": 30000000}, "provider": "openai-responses", "read_timeout_seconds": 540}
+
+Runtime: BLOCKED UNTIL APPROVED
+
+Protected inference constraint (trusted only with --approve):
+{"anthropic_betas": [], "contract": "openai-responses-agent/v1", "endpoint": "https://api.openai.com/v1/responses", "max_input_bytes": 200000, "max_output_tokens": 16000, "max_run_microusd": 5000000, "models": ["gpt-5.5"], "price_microusd_per_mtok": {"cache_read": 500000, "cache_write": 0, "input": 5000000, "output": 30000000}, "provider": "openai-responses", "read_timeout_seconds": 540}
+
+Approved 1 powers. Unresolved powers remain blocked; their calls are denied at runtime with signed receipts.
+----------------------------- Captured stderr call -----------------------------
+AIRLOCK ALLOW http.post @ https://api.openai.com/v1/responses: effect AMBIGUOUS; duplicate dispatch blocked [receipt_7fa06e9d8f3f4f8fb213244afaea924d]
+_ test_documented_429_declines_keep_their_existing_accounting_and_are_sanitized[insufficient_quota] _
+
+broker = (<actenon_airlock.state.State object at 0x10b2ad3a0>, <actenon_airlock.protected.ProtectedBroker object at 0x10b2afc20>, <responses_fixture.ScriptedProvider object at 0x10b2ada00>)
+code = 'insufficient_quota'
+
+    @pytest.mark.parametrize("code", ["rate_limit_exceeded", "insufficient_quota"])
+    def test_documented_429_declines_keep_their_existing_accounting_and_are_sanitized(broker, code):
+        state, subject, provider = broker
+        provider.steps.insert(0, response(429, openai_error(code, f"limit {FAKE}")))
+        first = subject.handle(message())
+        assert first["outcome"] == "AMBIGUOUS" and subject.inference_spent == 0
+        assert first["response"]["status"] == 429
+>       assert_clean(json.dumps(first["response"]).encode())
+
+tests/test_inference_provider_errors.py:176: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+blob = b'{"status": 429, "headers": {"content-type": "application/json", "set-cookie": "session=sk-proj-SYNTHETICfakeKEYvalue...Vycm9yIiwgInBhcmFtIjogbnVsbCwgImNvZGUiOiAiaW5zdWZmaWNpZW50X3F1b3RhIn19", "url": "https://api.openai.com/v1/responses"}'
+
+    def assert_clean(blob: bytes):
+        lowered = blob.lower()
+        for fragment in FRAGMENTS:
+>           assert fragment.lower().encode() not in lowered, fragment
+E           AssertionError: syntheti
+E           assert b'syntheti' not in b'{"status": 429, "headers": {"content-type": "application/json", "set-cookie": "session=sk-proj-syntheticfakekeyvalue...vycm9yiiwginbhcmftijogbnvsbcwgimnvzguioiaiaw5zdwzmawnpzw50x3f1b3rhin19", "url": "https://api.openai.com/v1/responses"}'
+E            +  where b'syntheti' = <built-in method encode of str object at 0x10a47def0>()
+E            +    where <built-in method encode of str object at 0x10a47def0> = 'syntheti'.encode
+E            +      where 'syntheti' = <built-in method lower of str object at 0x108f202b0>()
+E            +        where <built-in method lower of str object at 0x108f202b0> = 'syntheti'.lower
+
+tests/test_inference_provider_errors.py:114: AssertionError
+---------------------------- Captured stdout setup -----------------------------
+AIRLOCK AUTHORITY DIFF
+
++ http.post @ api.openai.com/v1/responses
+  Transport: https://api.openai.com/v1/responses
+  Scope: POST to exactly https://api.openai.com/v1/responses
++ Model authority expanded: {"anthropic_betas": [], "contract": "openai-responses-agent/v1", "endpoint": "https://api.openai.com/v1/responses", "max_input_bytes": 200000, "max_output_tokens": 16000, "max_run_microusd": 5000000, "models": ["gpt-5.5"], "price_microusd_per_mtok": {"cache_read": 500000, "cache_write": 0, "input": 5000000, "output": 30000000}, "provider": "openai-responses", "read_timeout_seconds": 540}
+
+Runtime: BLOCKED UNTIL APPROVED
+
+Protected inference constraint (trusted only with --approve):
+{"anthropic_betas": [], "contract": "openai-responses-agent/v1", "endpoint": "https://api.openai.com/v1/responses", "max_input_bytes": 200000, "max_output_tokens": 16000, "max_run_microusd": 5000000, "models": ["gpt-5.5"], "price_microusd_per_mtok": {"cache_read": 500000, "cache_write": 0, "input": 5000000, "output": 30000000}, "provider": "openai-responses", "read_timeout_seconds": 540}
+
+Approved 1 powers. Unresolved powers remain blocked; their calls are denied at runtime with signed receipts.
+----------------------------- Captured stderr call -----------------------------
+AIRLOCK ALLOW http.post @ https://api.openai.com/v1/responses: effect AMBIGUOUS; duplicate dispatch blocked [receipt_1250bdf83e7743689f14cef76207442e]
+___________ test_anthropic_contract_failure_is_sanitized_and_signed ____________
+
+tmp_path = PosixPath('/private/var/folders/tz/y04t4d0900xdbmz96jp608180000gn/T/pytest-of-ross/pytest-15/test_anthropic_contract_failur0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x10a38c3b0>
+
+    def test_anthropic_contract_failure_is_sanitized_and_signed(tmp_path, monkeypatch):
+        state = anthropic.configure(tmp_path)
+        leak = {
+            "type": "error",
+            "error": {"type": "authentication_error", "message": f"invalid x-api-key {FAKE}"},
+        }
+        calls = []
+        subject = anthropic.broker_for(
+            state, lambda r: calls.append(r) or response(401, leak), monkeypatch
+        )
+        try:
+            result = subject.handle(anthropic.message())
+            assert result["outcome"] == "AMBIGUOUS" and result["response"]["status"] == 401
+>           assert result["response"]["headers"] == {"content-type": "application/json"}
+E           AssertionError: assert {'content-typ...-tenant', ...} == {'content-typ...ication/json'}
+E             
+E             Omitting 1 identical items, use -vv to show
+E             Left contains 6 more items:
+E             {'content-length': '148',
+E              'openai-organization': 'org-secret-tenant',
+E              'retry-after': '1',
+E              'set-cookie': 'session=sk-proj-SYNTHETICfakeKEYvalue0123456789abcdefSECRETtail, '...
+E             
+E             ...Full output truncated (4 lines hidden), use '-vv' to show
+
+tests/test_inference_provider_errors.py:202: AssertionError
+----------------------------- Captured stdout call -----------------------------
+AIRLOCK AUTHORITY DIFF
+
++ http.post @ api.anthropic.com/v1/messages
+  Transport: https://api.anthropic.com/v1/messages
+  Scope: POST to exactly https://api.anthropic.com/v1/messages
++ Model authority expanded: {"anthropic_betas": ["claude-code-20250219", "effort-2025-11-24", "interleaved-thinking-2025-05-14"], "contract": "anthropic-agent/v1", "endpoint": "https://api.anthropic.com/v1/messages", "max_input_bytes": 2097152, "max_output_tokens": 16000, "max_run_microusd": 1000000, "models": ["claude-test-model"], "price_microusd_per_mtok": {"cache_read": 200000, "cache_write": 2500000, "input": 2000000, "output": 10000000}, "provider": "anthropic", "read_timeout_seconds": 540}
+
+Runtime: BLOCKED UNTIL APPROVED
+
+Protected inference constraint (trusted only with --approve):
+{"anthropic_betas": ["claude-code-20250219", "effort-2025-11-24", "interleaved-thinking-2025-05-14"], "contract": "anthropic-agent/v1", "endpoint": "https://api.anthropic.com/v1/messages", "max_input_bytes": 2097152, "max_output_tokens": 16000, "max_run_microusd": 1000000, "models": ["claude-test-model"], "price_microusd_per_mtok": {"cache_read": 200000, "cache_write": 2500000, "input": 2000000, "output": 10000000}, "provider": "anthropic", "read_timeout_seconds": 540}
+
+Approved 1 powers. Unresolved powers remain blocked; their calls are denied at runtime with signed receipts.
+----------------------------- Captured stderr call -----------------------------
+AIRLOCK ALLOW http.post @ https://api.anthropic.com/v1/messages: effect AMBIGUOUS; duplicate dispatch blocked [receipt_be3653fd05b04f9ea84fdfeebc46c9d2]
+____________ test_status_diagnostic_is_bounded_and_fixed_vocabulary ____________
+
+    def test_status_diagnostic_is_bounded_and_fixed_vocabulary():
+        deep = b'{"error":' * 5000 + b"0" + b"}" * 5000
+>       assert errors().status_diagnostic(401, deep)["provider_error_body"] == "malformed"
+               ^^^^^^^^
+
+tests/test_inference_provider_errors.py:219: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+    def errors():
+>       from actenon_airlock import provider_errors
+E       ImportError: cannot import name 'provider_errors' from 'actenon_airlock' (/Users/ross/src/actenon-audit/airlock-pr23/src/actenon_airlock/__init__.py)
+
+tests/test_inference_provider_errors.py:24: ImportError
+_________ test_malformed_credentials_are_refused_locally[None-missing] _________
+
+value = None, reason = 'missing'
+
+    @pytest.mark.parametrize(
+        "value,reason",
+        [
+            (None, "missing"),
+            ("", "empty"),
+            (SWALLOWED, "whitespace"),
+            (" " + GOOD, "whitespace"),
+            (GOOD + "\n", "whitespace"),
+            (GOOD[:20] + "\x00" + GOOD[20:], "control-characters"),
+            (GOOD + "é", "non-ascii"),
+            ("sk-short", "too-short"),
+            ("sk-" + "a" * 600, "too-long"),
+            ("pk-" + "a" * 60, "unexpected-prefix"),
+            ("sk-" + "a" * 30 + "/bin/python", "unexpected-characters"),
+            ("scripted-codex-no-real-credential", "unexpected-prefix"),
+        ],
+    )
+    def test_malformed_credentials_are_refused_locally(value, reason):
+>       assert reason in preflight.format_problems(value)
+                         ^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/test_credential_preflight.py:56: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <test_credential_preflight._Lazy object at 0x10a2eb5f0>
+name = 'format_problems'
+
+    def __getattr__(self, name):
+>       from actenon_airlock import credential_preflight
+E       ImportError: cannot import name 'credential_preflight' from 'actenon_airlock' (/Users/ross/src/actenon-audit/airlock-pr23/src/actenon_airlock/__init__.py)
+
+tests/test_credential_preflight.py:21: ImportError
+____________ test_malformed_credentials_are_refused_locally[-empty] ____________
+
+value = '', reason = 'empty'
+
+    @pytest.mark.parametrize(
+        "value,reason",
+        [
+            (None, "missing"),
+            ("", "empty"),
+            (SWALLOWED, "whitespace"),
+            (" " + GOOD, "whitespace"),
+            (GOOD + "\n", "whitespace"),
+            (GOOD[:20] + "\x00" + GOOD[20:], "control-characters"),
+            (GOOD + "é", "non-ascii"),
+            ("sk-short", "too-short"),
+            ("sk-" + "a" * 600, "too-long"),
+            ("pk-" + "a" * 60, "unexpected-prefix"),
+            ("sk-" + "a" * 30 + "/bin/python", "unexpected-characters"),
+            ("scripted-codex-no-real-credential", "unexpected-prefix"),
+        ],
+    )
+    def test_malformed_credentials_are_refused_locally(value, reason):
+>       assert reason in preflight.format_problems(value)
+                         ^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/test_credential_preflight.py:56: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <test_credential_preflight._Lazy object at 0x10a2eb5f0>
+name = 'format_problems'
+
+    def __getattr__(self, name):
+>       from actenon_airlock import credential_preflight
+E       ImportError: cannot import name 'credential_preflight' from 'actenon_airlock' (/Users/ross/src/actenon-audit/airlock-pr23/src/actenon_airlock/__init__.py)
+
+tests/test_credential_preflight.py:21: ImportError
+_ test_malformed_credentials_are_refused_locally[.venv/bin/python acceptance/codex-cli/run.py baseline --task token-bucket --image sha256:c449dec52754bad2a55dea7bb7b1edfbf7a864475464c53edc8ad9489d9d2269 --config ~/src/actenon-audit/live-codex/v44-frozen-candidate.json --out ~/src/actenon-audit/live-codex/1-baseline-v4-4 --live --authorized-usd 2-whitespace] _
+
+value = '.venv/bin/python acceptance/codex-cli/run.py baseline --task token-bucket --image sha256:c449dec52754bad2a55dea7bb7b1...it/live-codex/v44-frozen-candidate.json --out ~/src/actenon-audit/live-codex/1-baseline-v4-4 --live --authorized-usd 2'
+reason = 'whitespace'
+
+    @pytest.mark.parametrize(
+        "value,reason",
+        [
+            (None, "missing"),
+            ("", "empty"),
+            (SWALLOWED, "whitespace"),
+            (" " + GOOD, "whitespace"),
+            (GOOD + "\n", "whitespace"),
+            (GOOD[:20] + "\x00" + GOOD[20:], "control-characters"),
+            (GOOD + "é", "non-ascii"),
+            ("sk-short", "too-short"),
+            ("sk-" + "a" * 600, "too-long"),
+            ("pk-" + "a" * 60, "unexpected-prefix"),
+            ("sk-" + "a" * 30 + "/bin/python", "unexpected-characters"),
+            ("scripted-codex-no-real-credential", "unexpected-prefix"),
+        ],
+    )
+    def test_malformed_credentials_are_refused_locally(value, reason):
+>       assert reason in preflight.format_problems(value)
+                         ^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/test_credential_preflight.py:56: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <test_credential_preflight._Lazy object at 0x10a2eb5f0>
+name = 'format_problems'
+
+    def __getattr__(self, name):
+>       from actenon_airlock import credential_preflight
+E       ImportError: cannot import name 'credential_preflight' from 'actenon_airlock' (/Users/ross/src/actenon-audit/airlock-pr23/src/actenon_airlock/__init__.py)
+
+tests/test_credential_preflight.py:21: ImportError
+_ test_malformed_credentials_are_refused_locally[ sk-proj-A1b2C3d4E5f6G7h8A1b2C3d4E5f6G7h8A1b2C3d4E5f6G7h8A1b2C3d4E5f6G7h8A1b2C3d4E5f6G7h8A1b2C3d4E5f6G7h8-whitespace] _
+
+value = ' sk-proj-A1b2C3d4E5f6G7h8A1b2C3d4E5f6G7h8A1b2C3d4E5f6G7h8A1b2C3d4E5f6G7h8A1b2C3d4E5f6G7h8A1b2C3d4E5f6G7h8'
+reason = 'whitespace'
+
+    @pytest.mark.parametrize(
+        "value,reason",
+        [
+            (None, "missing"),
+            ("", "empty"),
+            (SWALLOWED, "whitespace"),
+            (" " + GOOD, "whitespace"),
+            (GOOD + "\n", "whitespace"),
+            (GOOD[:20] + "\x00" + GOOD[20:], "control-characters"),
+            (GOOD + "é", "non-ascii"),
+            ("sk-short", "too-short"),
+            ("sk-" + "a" * 600, "too-long"),
+            ("pk-" + "a" * 60, "unexpected-prefix"),
+            ("sk-" + "a" * 30 + "/bin/python", "unexpected-characters"),
+            ("scripted-codex-no-real-credential", "unexpected-prefix"),
+        ],
+    )
+    def test_malformed_credentials_are_refused_locally(value, reason):
+>       assert reason in preflight.format_problems(value)
+                         ^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/test_credential_preflight.py:56: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <test_credential_preflight._Lazy object at 0x10a2eb5f0>
+name = 'format_problems'
+
+    def __getattr__(self, name):
+>       from actenon_airlock import credential_preflight
+E       ImportError: cannot import name 'credential_preflight' from 'actenon_airlock' (/Users/ross/src/actenon-audit/airlock-pr23/src/actenon_airlock/__init__.py)
+
+tests/test_credential_preflight.py:21: ImportError
+_ test_malformed_credentials_are_refused_locally[sk-proj-A1b2C3d4E5f6G7h8A1b2C3d4E5f6G7h8A1b2C3d4E5f6G7h8A1b2C3d4E5f6G7h8A1b2C3d4E5f6G7h8A1b2C3d4E5f6G7h8\n-whitespace] _
+
+value = 'sk-proj-A1b2C3d4E5f6G7h8A1b2C3d4E5f6G7h8A1b2C3d4E5f6G7h8A1b2C3d4E5f6G7h8A1b2C3d4E5f6G7h8A1b2C3d4E5f6G7h8\n'
+reason = 'whitespace'
+
+    @pytest.mark.parametrize(
+        "value,reason",
+        [
+            (None, "missing"),
+            ("", "empty"),
+            (SWALLOWED, "whitespace"),
+            (" " + GOOD, "whitespace"),
+            (GOOD + "\n", "whitespace"),
+            (GOOD[:20] + "\x00" + GOOD[20:], "control-characters"),
+            (GOOD + "é", "non-ascii"),
+            ("sk-short", "too-short"),
+            ("sk-" + "a" * 600, "too-long"),
+            ("pk-" + "a" * 60, "unexpected-prefix"),
+            ("sk-" + "a" * 30 + "/bin/python", "unexpected-characters"),
+            ("scripted-codex-no-real-credential", "unexpected-prefix"),
+        ],
+    )
+    def test_malformed_credentials_are_refused_locally(value, reason):
+>       assert reason in preflight.format_problems(value)
+                         ^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/test_credential_preflight.py:56: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <test_credential_preflight._Lazy object at 0x10a2eb5f0>
+name = 'format_problems'
+
+    def __getattr__(self, name):
+>       from actenon_airlock import credential_preflight
+E       ImportError: cannot import name 'credential_preflight' from 'actenon_airlock' (/Users/ross/src/actenon-audit/airlock-pr23/src/actenon_airlock/__init__.py)
+
+tests/test_credential_preflight.py:21: ImportError
+_ test_malformed_credentials_are_refused_locally[sk-proj-A1b2C3d4E5f6\x00G7h8A1b2C3d4E5f6G7h8A1b2C3d4E5f6G7h8A1b2C3d4E5f6G7h8A1b2C3d4E5f6G7h8A1b2C3d4E5f6G7h8-control-characters] _
+
+value = 'sk-proj-A1b2C3d4E5f6\x00G7h8A1b2C3d4E5f6G7h8A1b2C3d4E5f6G7h8A1b2C3d4E5f6G7h8A1b2C3d4E5f6G7h8A1b2C3d4E5f6G7h8'
+reason = 'control-characters'
+
+    @pytest.mark.parametrize(
+        "value,reason",
+        [
+            (None, "missing"),
+            ("", "empty"),
+            (SWALLOWED, "whitespace"),
+            (" " + GOOD, "whitespace"),
+            (GOOD + "\n", "whitespace"),
+            (GOOD[:20] + "\x00" + GOOD[20:], "control-characters"),
+            (GOOD + "é", "non-ascii"),
+            ("sk-short", "too-short"),
+            ("sk-" + "a" * 600, "too-long"),
+            ("pk-" + "a" * 60, "unexpected-prefix"),
+            ("sk-" + "a" * 30 + "/bin/python", "unexpected-characters"),
+            ("scripted-codex-no-real-credential", "unexpected-prefix"),
+        ],
+    )
+    def test_malformed_credentials_are_refused_locally(value, reason):
+>       assert reason in preflight.format_problems(value)
+                         ^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/test_credential_preflight.py:56: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <test_credential_preflight._Lazy object at 0x10a2eb5f0>
+name = 'format_problems'
+
+    def __getattr__(self, name):
+>       from actenon_airlock import credential_preflight
+E       ImportError: cannot import name 'credential_preflight' from 'actenon_airlock' (/Users/ross/src/actenon-audit/airlock-pr23/src/actenon_airlock/__init__.py)
+
+tests/test_credential_preflight.py:21: ImportError
+_ test_malformed_credentials_are_refused_locally[sk-proj-A1b2C3d4E5f6G7h8A1b2C3d4E5f6G7h8A1b2C3d4E5f6G7h8A1b2C3d4E5f6G7h8A1b2C3d4E5f6G7h8A1b2C3d4E5f6G7h8\xe9-non-ascii] _
+
+value = 'sk-proj-A1b2C3d4E5f6G7h8A1b2C3d4E5f6G7h8A1b2C3d4E5f6G7h8A1b2C3d4E5f6G7h8A1b2C3d4E5f6G7h8A1b2C3d4E5f6G7h8é'
+reason = 'non-ascii'
+
+    @pytest.mark.parametrize(
+        "value,reason",
+        [
+            (None, "missing"),
+            ("", "empty"),
+            (SWALLOWED, "whitespace"),
+            (" " + GOOD, "whitespace"),
+            (GOOD + "\n", "whitespace"),
+            (GOOD[:20] + "\x00" + GOOD[20:], "control-characters"),
+            (GOOD + "é", "non-ascii"),
+            ("sk-short", "too-short"),
+            ("sk-" + "a" * 600, "too-long"),
+            ("pk-" + "a" * 60, "unexpected-prefix"),
+            ("sk-" + "a" * 30 + "/bin/python", "unexpected-characters"),
+            ("scripted-codex-no-real-credential", "unexpected-prefix"),
+        ],
+    )
+    def test_malformed_credentials_are_refused_locally(value, reason):
+>       assert reason in preflight.format_problems(value)
+                         ^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/test_credential_preflight.py:56: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <test_credential_preflight._Lazy object at 0x10a2eb5f0>
+name = 'format_problems'
+
+    def __getattr__(self, name):
+>       from actenon_airlock import credential_preflight
+E       ImportError: cannot import name 'credential_preflight' from 'actenon_airlock' (/Users/ross/src/actenon-audit/airlock-pr23/src/actenon_airlock/__init__.py)
+
+tests/test_credential_preflight.py:21: ImportError
+______ test_malformed_credentials_are_refused_locally[sk-short-too-short] ______
+
+value = 'sk-short', reason = 'too-short'
+
+    @pytest.mark.parametrize(
+        "value,reason",
+        [
+            (None, "missing"),
+            ("", "empty"),
+            (SWALLOWED, "whitespace"),
+            (" " + GOOD, "whitespace"),
+            (GOOD + "\n", "whitespace"),
+            (GOOD[:20] + "\x00" + GOOD[20:], "control-characters"),
+            (GOOD + "é", "non-ascii"),
+            ("sk-short", "too-short"),
+            ("sk-" + "a" * 600, "too-long"),
+            ("pk-" + "a" * 60, "unexpected-prefix"),
+            ("sk-" + "a" * 30 + "/bin/python", "unexpected-characters"),
+            ("scripted-codex-no-real-credential", "unexpected-prefix"),
+        ],
+    )
+    def test_malformed_credentials_are_refused_locally(value, reason):
+>       assert reason in preflight.format_problems(value)
+                         ^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/test_credential_preflight.py:56: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <test_credential_preflight._Lazy object at 0x10a2eb5f0>
+name = 'format_problems'
+
+    def __getattr__(self, name):
+>       from actenon_airlock import credential_preflight
+E       ImportError: cannot import name 'credential_preflight' from 'actenon_airlock' (/Users/ross/src/actenon-audit/airlock-pr23/src/actenon_airlock/__init__.py)
+
+tests/test_credential_preflight.py:21: ImportError
+_ test_malformed_credentials_are_refused_locally[sk-aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa-too-long] _
+
+value = 'sk-aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa...aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa'
+reason = 'too-long'
+
+    @pytest.mark.parametrize(
+        "value,reason",
+        [
+            (None, "missing"),
+            ("", "empty"),
+            (SWALLOWED, "whitespace"),
+            (" " + GOOD, "whitespace"),
+            (GOOD + "\n", "whitespace"),
+            (GOOD[:20] + "\x00" + GOOD[20:], "control-characters"),
+            (GOOD + "é", "non-ascii"),
+            ("sk-short", "too-short"),
+            ("sk-" + "a" * 600, "too-long"),
+            ("pk-" + "a" * 60, "unexpected-prefix"),
+            ("sk-" + "a" * 30 + "/bin/python", "unexpected-characters"),
+            ("scripted-codex-no-real-credential", "unexpected-prefix"),
+        ],
+    )
+    def test_malformed_credentials_are_refused_locally(value, reason):
+>       assert reason in preflight.format_problems(value)
+                         ^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/test_credential_preflight.py:56: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <test_credential_preflight._Lazy object at 0x10a2eb5f0>
+name = 'format_problems'
+
+    def __getattr__(self, name):
+>       from actenon_airlock import credential_preflight
+E       ImportError: cannot import name 'credential_preflight' from 'actenon_airlock' (/Users/ross/src/actenon-audit/airlock-pr23/src/actenon_airlock/__init__.py)
+
+tests/test_credential_preflight.py:21: ImportError
+_ test_malformed_credentials_are_refused_locally[pk-aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa-unexpected-prefix] _
+
+value = 'pk-aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa'
+reason = 'unexpected-prefix'
+
+    @pytest.mark.parametrize(
+        "value,reason",
+        [
+            (None, "missing"),
+            ("", "empty"),
+            (SWALLOWED, "whitespace"),
+            (" " + GOOD, "whitespace"),
+            (GOOD + "\n", "whitespace"),
+            (GOOD[:20] + "\x00" + GOOD[20:], "control-characters"),
+            (GOOD + "é", "non-ascii"),
+            ("sk-short", "too-short"),
+            ("sk-" + "a" * 600, "too-long"),
+            ("pk-" + "a" * 60, "unexpected-prefix"),
+            ("sk-" + "a" * 30 + "/bin/python", "unexpected-characters"),
+            ("scripted-codex-no-real-credential", "unexpected-prefix"),
+        ],
+    )
+    def test_malformed_credentials_are_refused_locally(value, reason):
+>       assert reason in preflight.format_problems(value)
+                         ^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/test_credential_preflight.py:56: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <test_credential_preflight._Lazy object at 0x10a2eb5f0>
+name = 'format_problems'
+
+    def __getattr__(self, name):
+>       from actenon_airlock import credential_preflight
+E       ImportError: cannot import name 'credential_preflight' from 'actenon_airlock' (/Users/ross/src/actenon-audit/airlock-pr23/src/actenon_airlock/__init__.py)
+
+tests/test_credential_preflight.py:21: ImportError
+_ test_malformed_credentials_are_refused_locally[sk-aaaaaaaaaaaaaaaaaaaaaaaaaaaaaa/bin/python-unexpected-characters] _
+
+value = 'sk-aaaaaaaaaaaaaaaaaaaaaaaaaaaaaa/bin/python'
+reason = 'unexpected-characters'
+
+    @pytest.mark.parametrize(
+        "value,reason",
+        [
+            (None, "missing"),
+            ("", "empty"),
+            (SWALLOWED, "whitespace"),
+            (" " + GOOD, "whitespace"),
+            (GOOD + "\n", "whitespace"),
+            (GOOD[:20] + "\x00" + GOOD[20:], "control-characters"),
+            (GOOD + "é", "non-ascii"),
+            ("sk-short", "too-short"),
+            ("sk-" + "a" * 600, "too-long"),
+            ("pk-" + "a" * 60, "unexpected-prefix"),
+            ("sk-" + "a" * 30 + "/bin/python", "unexpected-characters"),
+            ("scripted-codex-no-real-credential", "unexpected-prefix"),
+        ],
+    )
+    def test_malformed_credentials_are_refused_locally(value, reason):
+>       assert reason in preflight.format_problems(value)
+                         ^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/test_credential_preflight.py:56: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <test_credential_preflight._Lazy object at 0x10a2eb5f0>
+name = 'format_problems'
+
+    def __getattr__(self, name):
+>       from actenon_airlock import credential_preflight
+E       ImportError: cannot import name 'credential_preflight' from 'actenon_airlock' (/Users/ross/src/actenon-audit/airlock-pr23/src/actenon_airlock/__init__.py)
+
+tests/test_credential_preflight.py:21: ImportError
+_ test_malformed_credentials_are_refused_locally[scripted-codex-no-real-credential-unexpected-prefix] _
+
+value = 'scripted-codex-no-real-credential', reason = 'unexpected-prefix'
+
+    @pytest.mark.parametrize(
+        "value,reason",
+        [
+            (None, "missing"),
+            ("", "empty"),
+            (SWALLOWED, "whitespace"),
+            (" " + GOOD, "whitespace"),
+            (GOOD + "\n", "whitespace"),
+            (GOOD[:20] + "\x00" + GOOD[20:], "control-characters"),
+            (GOOD + "é", "non-ascii"),
+            ("sk-short", "too-short"),
+            ("sk-" + "a" * 600, "too-long"),
+            ("pk-" + "a" * 60, "unexpected-prefix"),
+            ("sk-" + "a" * 30 + "/bin/python", "unexpected-characters"),
+            ("scripted-codex-no-real-credential", "unexpected-prefix"),
+        ],
+    )
+    def test_malformed_credentials_are_refused_locally(value, reason):
+>       assert reason in preflight.format_problems(value)
+                         ^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/test_credential_preflight.py:56: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <test_credential_preflight._Lazy object at 0x10a2eb5f0>
+name = 'format_problems'
+
+    def __getattr__(self, name):
+>       from actenon_airlock import credential_preflight
+E       ImportError: cannot import name 'credential_preflight' from 'actenon_airlock' (/Users/ross/src/actenon-audit/airlock-pr23/src/actenon_airlock/__init__.py)
+
+tests/test_credential_preflight.py:21: ImportError
+_________________ test_a_plausible_key_passes_the_local_check __________________
+
+    def test_a_plausible_key_passes_the_local_check():
+>       assert preflight.format_problems(GOOD) == []
+               ^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/test_credential_preflight.py:60: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <test_credential_preflight._Lazy object at 0x10a2eb5f0>
+name = 'format_problems'
+
+    def __getattr__(self, name):
+>       from actenon_airlock import credential_preflight
+E       ImportError: cannot import name 'credential_preflight' from 'actenon_airlock' (/Users/ross/src/actenon-audit/airlock-pr23/src/actenon_airlock/__init__.py)
+
+tests/test_credential_preflight.py:21: ImportError
+___________ test_authentication_check_is_one_promptless_model_lookup ___________
+
+    def test_authentication_check_is_one_promptless_model_lookup():
+        seen = []
+>       result = preflight.authenticate(GOOD, MODEL, client=provider(200, seen=seen))
+                 ^^^^^^^^^^^^^^^^^^^^^^
+
+tests/test_credential_preflight.py:74: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <test_credential_preflight._Lazy object at 0x10a2eb5f0>
+name = 'authenticate'
+
+    def __getattr__(self, name):
+>       from actenon_airlock import credential_preflight
+E       ImportError: cannot import name 'credential_preflight' from 'actenon_airlock' (/Users/ross/src/actenon-audit/airlock-pr23/src/actenon_airlock/__init__.py)
+
+tests/test_credential_preflight.py:21: ImportError
+_ test_failed_authentication_reports_fixed_vocabulary_only[401-body0-rejected-invalid_api_key] _
+
+status = 401
+body = {'error': {'code': 'invalid_api_key', 'message': 'sk-proj-A1b2C3d4E5f6G7h8A1b2C3d4E5f6G7h8A1b2C3d4E5f6G7h8A1b2C3d4E5f6G7h8A1b2C3d4E5f6G7h8A1b2C3d4E5f6G7h8'}}
+outcome = 'rejected', code = 'invalid_api_key'
+
+    @pytest.mark.parametrize(
+        "status,body,outcome,code",
+        [
+            (
+                401,
+                {"error": {"code": "invalid_api_key", "message": GOOD}},
+                "rejected",
+                "invalid_api_key",
+            ),
+            (403, {"error": {"code": "unsupported_country_region_territory"}}, "rejected", None),
+            (404, {"error": {"code": "model_not_found", "message": GOOD}}, "model-unavailable", None),
+            (429, {"error": {"code": "insufficient_quota"}}, "unavailable", None),
+            (500, b"proxy " + GOOD.encode(), "unavailable", None),
+        ],
+    )
+    def test_failed_authentication_reports_fixed_vocabulary_only(status, body, outcome, code):
+        content = json.dumps(body).encode() if isinstance(body, dict) else body
+>       result = preflight.authenticate(GOOD, MODEL, client=provider(status, content))
+                 ^^^^^^^^^^^^^^^^^^^^^^
+
+tests/test_credential_preflight.py:104: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <test_credential_preflight._Lazy object at 0x10a2eb5f0>
+name = 'authenticate'
+
+    def __getattr__(self, name):
+>       from actenon_airlock import credential_preflight
+E       ImportError: cannot import name 'credential_preflight' from 'actenon_airlock' (/Users/ross/src/actenon-audit/airlock-pr23/src/actenon_airlock/__init__.py)
+
+tests/test_credential_preflight.py:21: ImportError
+_ test_failed_authentication_reports_fixed_vocabulary_only[403-body1-rejected-None] _
+
+status = 403, body = {'error': {'code': 'unsupported_country_region_territory'}}
+outcome = 'rejected', code = None
+
+    @pytest.mark.parametrize(
+        "status,body,outcome,code",
+        [
+            (
+                401,
+                {"error": {"code": "invalid_api_key", "message": GOOD}},
+                "rejected",
+                "invalid_api_key",
+            ),
+            (403, {"error": {"code": "unsupported_country_region_territory"}}, "rejected", None),
+            (404, {"error": {"code": "model_not_found", "message": GOOD}}, "model-unavailable", None),
+            (429, {"error": {"code": "insufficient_quota"}}, "unavailable", None),
+            (500, b"proxy " + GOOD.encode(), "unavailable", None),
+        ],
+    )
+    def test_failed_authentication_reports_fixed_vocabulary_only(status, body, outcome, code):
+        content = json.dumps(body).encode() if isinstance(body, dict) else body
+>       result = preflight.authenticate(GOOD, MODEL, client=provider(status, content))
+                 ^^^^^^^^^^^^^^^^^^^^^^
+
+tests/test_credential_preflight.py:104: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <test_credential_preflight._Lazy object at 0x10a2eb5f0>
+name = 'authenticate'
+
+    def __getattr__(self, name):
+>       from actenon_airlock import credential_preflight
+E       ImportError: cannot import name 'credential_preflight' from 'actenon_airlock' (/Users/ross/src/actenon-audit/airlock-pr23/src/actenon_airlock/__init__.py)
+
+tests/test_credential_preflight.py:21: ImportError
+_ test_failed_authentication_reports_fixed_vocabulary_only[404-body2-model-unavailable-None] _
+
+status = 404
+body = {'error': {'code': 'model_not_found', 'message': 'sk-proj-A1b2C3d4E5f6G7h8A1b2C3d4E5f6G7h8A1b2C3d4E5f6G7h8A1b2C3d4E5f6G7h8A1b2C3d4E5f6G7h8A1b2C3d4E5f6G7h8'}}
+outcome = 'model-unavailable', code = None
+
+    @pytest.mark.parametrize(
+        "status,body,outcome,code",
+        [
+            (
+                401,
+                {"error": {"code": "invalid_api_key", "message": GOOD}},
+                "rejected",
+                "invalid_api_key",
+            ),
+            (403, {"error": {"code": "unsupported_country_region_territory"}}, "rejected", None),
+            (404, {"error": {"code": "model_not_found", "message": GOOD}}, "model-unavailable", None),
+            (429, {"error": {"code": "insufficient_quota"}}, "unavailable", None),
+            (500, b"proxy " + GOOD.encode(), "unavailable", None),
+        ],
+    )
+    def test_failed_authentication_reports_fixed_vocabulary_only(status, body, outcome, code):
+        content = json.dumps(body).encode() if isinstance(body, dict) else body
+>       result = preflight.authenticate(GOOD, MODEL, client=provider(status, content))
+                 ^^^^^^^^^^^^^^^^^^^^^^
+
+tests/test_credential_preflight.py:104: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <test_credential_preflight._Lazy object at 0x10a2eb5f0>
+name = 'authenticate'
+
+    def __getattr__(self, name):
+>       from actenon_airlock import credential_preflight
+E       ImportError: cannot import name 'credential_preflight' from 'actenon_airlock' (/Users/ross/src/actenon-audit/airlock-pr23/src/actenon_airlock/__init__.py)
+
+tests/test_credential_preflight.py:21: ImportError
+_ test_failed_authentication_reports_fixed_vocabulary_only[429-body3-unavailable-None] _
+
+status = 429, body = {'error': {'code': 'insufficient_quota'}}
+outcome = 'unavailable', code = None
+
+    @pytest.mark.parametrize(
+        "status,body,outcome,code",
+        [
+            (
+                401,
+                {"error": {"code": "invalid_api_key", "message": GOOD}},
+                "rejected",
+                "invalid_api_key",
+            ),
+            (403, {"error": {"code": "unsupported_country_region_territory"}}, "rejected", None),
+            (404, {"error": {"code": "model_not_found", "message": GOOD}}, "model-unavailable", None),
+            (429, {"error": {"code": "insufficient_quota"}}, "unavailable", None),
+            (500, b"proxy " + GOOD.encode(), "unavailable", None),
+        ],
+    )
+    def test_failed_authentication_reports_fixed_vocabulary_only(status, body, outcome, code):
+        content = json.dumps(body).encode() if isinstance(body, dict) else body
+>       result = preflight.authenticate(GOOD, MODEL, client=provider(status, content))
+                 ^^^^^^^^^^^^^^^^^^^^^^
+
+tests/test_credential_preflight.py:104: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <test_credential_preflight._Lazy object at 0x10a2eb5f0>
+name = 'authenticate'
+
+    def __getattr__(self, name):
+>       from actenon_airlock import credential_preflight
+E       ImportError: cannot import name 'credential_preflight' from 'actenon_airlock' (/Users/ross/src/actenon-audit/airlock-pr23/src/actenon_airlock/__init__.py)
+
+tests/test_credential_preflight.py:21: ImportError
+_ test_failed_authentication_reports_fixed_vocabulary_only[500-proxy sk-proj-A1b2C3d4E5f6G7h8A1b2C3d4E5f6G7h8A1b2C3d4E5f6G7h8A1b2C3d4E5f6G7h8A1b2C3d4E5f6G7h8A1b2C3d4E5f6G7h8-unavailable-None] _
+
+status = 500
+body = b'proxy sk-proj-A1b2C3d4E5f6G7h8A1b2C3d4E5f6G7h8A1b2C3d4E5f6G7h8A1b2C3d4E5f6G7h8A1b2C3d4E5f6G7h8A1b2C3d4E5f6G7h8'
+outcome = 'unavailable', code = None
+
+    @pytest.mark.parametrize(
+        "status,body,outcome,code",
+        [
+            (
+                401,
+                {"error": {"code": "invalid_api_key", "message": GOOD}},
+                "rejected",
+                "invalid_api_key",
+            ),
+            (403, {"error": {"code": "unsupported_country_region_territory"}}, "rejected", None),
+            (404, {"error": {"code": "model_not_found", "message": GOOD}}, "model-unavailable", None),
+            (429, {"error": {"code": "insufficient_quota"}}, "unavailable", None),
+            (500, b"proxy " + GOOD.encode(), "unavailable", None),
+        ],
+    )
+    def test_failed_authentication_reports_fixed_vocabulary_only(status, body, outcome, code):
+        content = json.dumps(body).encode() if isinstance(body, dict) else body
+>       result = preflight.authenticate(GOOD, MODEL, client=provider(status, content))
+                 ^^^^^^^^^^^^^^^^^^^^^^
+
+tests/test_credential_preflight.py:104: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <test_credential_preflight._Lazy object at 0x10a2eb5f0>
+name = 'authenticate'
+
+    def __getattr__(self, name):
+>       from actenon_airlock import credential_preflight
+E       ImportError: cannot import name 'credential_preflight' from 'actenon_airlock' (/Users/ross/src/actenon-audit/airlock-pr23/src/actenon_airlock/__init__.py)
+
+tests/test_credential_preflight.py:21: ImportError
+____________ test_unreachable_provider_never_reports_exception_text ____________
+
+    def test_unreachable_provider_never_reports_exception_text():
+        def broken(request):
+            raise httpx.ConnectError(f"cannot reach with {GOOD}")
+    
+        client = httpx.Client(transport=httpx.MockTransport(broken))
+>       result = preflight.authenticate(GOOD, MODEL, client=client)
+                 ^^^^^^^^^^^^^^^^^^^^^^
+
+tests/test_credential_preflight.py:116: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <test_credential_preflight._Lazy object at 0x10a2eb5f0>
+name = 'authenticate'
+
+    def __getattr__(self, name):
+>       from actenon_airlock import credential_preflight
+E       ImportError: cannot import name 'credential_preflight' from 'actenon_airlock' (/Users/ross/src/actenon-audit/airlock-pr23/src/actenon_airlock/__init__.py)
+
+tests/test_credential_preflight.py:21: ImportError
+_________ test_credential_file_must_be_private_regular_and_single_line _________
+
+tmp_path = PosixPath('/private/var/folders/tz/y04t4d0900xdbmz96jp608180000gn/T/pytest-of-ross/pytest-15/test_credential_file_must_be_p0')
+
+    def test_credential_file_must_be_private_regular_and_single_line(tmp_path):
+        key = tmp_path / "key"
+        key.write_text(GOOD + "\n")
+        key.chmod(0o600)
+>       assert preflight.read_credential_file(key) == GOOD
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/test_credential_preflight.py:124: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <test_credential_preflight._Lazy object at 0x10a2eb5f0>
+name = 'read_credential_file'
+
+    def __getattr__(self, name):
+>       from actenon_airlock import credential_preflight
+E       ImportError: cannot import name 'credential_preflight' from 'actenon_airlock' (/Users/ross/src/actenon-audit/airlock-pr23/src/actenon_airlock/__init__.py)
+
+tests/test_credential_preflight.py:21: ImportError
+_ test_live_runner_refuses_bad_credentials_before_any_work[.venv/bin/python acceptance/codex-cli/run.py baseline --task token-bucket --image sha256:c449dec52754bad2a55dea7bb7b1edfbf7a864475464c53edc8ad9489d9d2269 --config ~/src/actenon-audit/live-codex/v44-frozen-candidate.json --out ~/src/actenon-audit/live-codex/1-baseline-v4-4 --live --authorized-usd 2] _
+
+tmp_path = PosixPath('/private/var/folders/tz/y04t4d0900xdbmz96jp608180000gn/T/pytest-of-ross/pytest-15/test_live_runner_refuses_bad_c0')
+value = '.venv/bin/python acceptance/codex-cli/run.py baseline --task token-bucket --image sha256:c449dec52754bad2a55dea7bb7b1...it/live-codex/v44-frozen-candidate.json --out ~/src/actenon-audit/live-codex/1-baseline-v4-4 --live --authorized-usd 2'
+
+    @pytest.mark.parametrize("value", [SWALLOWED, "", None, "sk-short"])
+    def test_live_runner_refuses_bad_credentials_before_any_work(tmp_path, value):
+        result, out = run_live(value, tmp_path)
+        assert result.returncode != 0
+>       assert "credential" in result.stderr.lower()
+E       assert 'credential' in 'traceback (most recent call last):\n  file "/users/ross/src/actenon-audit/airlock-pr23/acceptance/codex-cli/run.py", ...r operation failed: " + args[0])\nactenon_airlock.common.airlockerror: protected mode docker operation failed: image\n'
+E        +  where 'traceback (most recent call last):\n  file "/users/ross/src/actenon-audit/airlock-pr23/acceptance/codex-cli/run.py", ...r operation failed: " + args[0])\nactenon_airlock.common.airlockerror: protected mode docker operation failed: image\n' = <built-in method lower of str object at 0x75471a0f00>()
+E        +    where <built-in method lower of str object at 0x75471a0f00> = 'Traceback (most recent call last):\n  File "/Users/ross/src/actenon-audit/airlock-pr23/acceptance/codex-cli/run.py", ...r operation failed: " + args[0])\nactenon_airlock.common.AirlockError: Protected Mode Docker operation failed: image\n'.lower
+E        +      where 'Traceback (most recent call last):\n  File "/Users/ross/src/actenon-audit/airlock-pr23/acceptance/codex-cli/run.py", ...r operation failed: " + args[0])\nactenon_airlock.common.AirlockError: Protected Mode Docker operation failed: image\n' = CompletedProcess(args=['/Users/ross/src/actenon-audit/airlock-pr23/.venv/bin/python', '/Users/ross/src/actenon-audit/a... operation failed: " + args[0])\nactenon_airlock.common.AirlockError: Protected Mode Docker operation failed: image\n').stderr
+
+tests/test_credential_preflight.py:167: AssertionError
+__________ test_live_runner_refuses_bad_credentials_before_any_work[] __________
+
+tmp_path = PosixPath('/private/var/folders/tz/y04t4d0900xdbmz96jp608180000gn/T/pytest-of-ross/pytest-15/test_live_runner_refuses_bad_c1')
+value = ''
+
+    @pytest.mark.parametrize("value", [SWALLOWED, "", None, "sk-short"])
+    def test_live_runner_refuses_bad_credentials_before_any_work(tmp_path, value):
+        result, out = run_live(value, tmp_path)
+        assert result.returncode != 0
+>       assert "credential" in result.stderr.lower()
+E       assert 'credential' in 'traceback (most recent call last):\n  file "/users/ross/src/actenon-audit/airlock-pr23/acceptance/codex-cli/run.py", ...r operation failed: " + args[0])\nactenon_airlock.common.airlockerror: protected mode docker operation failed: image\n'
+E        +  where 'traceback (most recent call last):\n  file "/users/ross/src/actenon-audit/airlock-pr23/acceptance/codex-cli/run.py", ...r operation failed: " + args[0])\nactenon_airlock.common.airlockerror: protected mode docker operation failed: image\n' = <built-in method lower of str object at 0x75471a2d00>()
+E        +    where <built-in method lower of str object at 0x75471a2d00> = 'Traceback (most recent call last):\n  File "/Users/ross/src/actenon-audit/airlock-pr23/acceptance/codex-cli/run.py", ...r operation failed: " + args[0])\nactenon_airlock.common.AirlockError: Protected Mode Docker operation failed: image\n'.lower
+E        +      where 'Traceback (most recent call last):\n  File "/Users/ross/src/actenon-audit/airlock-pr23/acceptance/codex-cli/run.py", ...r operation failed: " + args[0])\nactenon_airlock.common.AirlockError: Protected Mode Docker operation failed: image\n' = CompletedProcess(args=['/Users/ross/src/actenon-audit/airlock-pr23/.venv/bin/python', '/Users/ross/src/actenon-audit/a... operation failed: " + args[0])\nactenon_airlock.common.AirlockError: Protected Mode Docker operation failed: image\n').stderr
+
+tests/test_credential_preflight.py:167: AssertionError
+________ test_live_runner_refuses_bad_credentials_before_any_work[None] ________
+
+tmp_path = PosixPath('/private/var/folders/tz/y04t4d0900xdbmz96jp608180000gn/T/pytest-of-ross/pytest-15/test_live_runner_refuses_bad_c2')
+value = None
+
+    @pytest.mark.parametrize("value", [SWALLOWED, "", None, "sk-short"])
+    def test_live_runner_refuses_bad_credentials_before_any_work(tmp_path, value):
+        result, out = run_live(value, tmp_path)
+        assert result.returncode != 0
+>       assert "credential" in result.stderr.lower()
+E       assert 'credential' in 'traceback (most recent call last):\n  file "/users/ross/src/actenon-audit/airlock-pr23/acceptance/codex-cli/run.py", ...r operation failed: " + args[0])\nactenon_airlock.common.airlockerror: protected mode docker operation failed: image\n'
+E        +  where 'traceback (most recent call last):\n  file "/users/ross/src/actenon-audit/airlock-pr23/acceptance/codex-cli/run.py", ...r operation failed: " + args[0])\nactenon_airlock.common.airlockerror: protected mode docker operation failed: image\n' = <built-in method lower of str object at 0x75471a3200>()
+E        +    where <built-in method lower of str object at 0x75471a3200> = 'Traceback (most recent call last):\n  File "/Users/ross/src/actenon-audit/airlock-pr23/acceptance/codex-cli/run.py", ...r operation failed: " + args[0])\nactenon_airlock.common.AirlockError: Protected Mode Docker operation failed: image\n'.lower
+E        +      where 'Traceback (most recent call last):\n  File "/Users/ross/src/actenon-audit/airlock-pr23/acceptance/codex-cli/run.py", ...r operation failed: " + args[0])\nactenon_airlock.common.AirlockError: Protected Mode Docker operation failed: image\n' = CompletedProcess(args=['/Users/ross/src/actenon-audit/airlock-pr23/.venv/bin/python', '/Users/ross/src/actenon-audit/a... operation failed: " + args[0])\nactenon_airlock.common.AirlockError: Protected Mode Docker operation failed: image\n').stderr
+
+tests/test_credential_preflight.py:167: AssertionError
+______ test_live_runner_refuses_bad_credentials_before_any_work[sk-short] ______
+
+tmp_path = PosixPath('/private/var/folders/tz/y04t4d0900xdbmz96jp608180000gn/T/pytest-of-ross/pytest-15/test_live_runner_refuses_bad_c3')
+value = 'sk-short'
+
+    @pytest.mark.parametrize("value", [SWALLOWED, "", None, "sk-short"])
+    def test_live_runner_refuses_bad_credentials_before_any_work(tmp_path, value):
+        result, out = run_live(value, tmp_path)
+        assert result.returncode != 0
+>       assert "credential" in result.stderr.lower()
+E       assert 'credential' in 'traceback (most recent call last):\n  file "/users/ross/src/actenon-audit/airlock-pr23/acceptance/codex-cli/run.py", ...r operation failed: " + args[0])\nactenon_airlock.common.airlockerror: protected mode docker operation failed: image\n'
+E        +  where 'traceback (most recent call last):\n  file "/users/ross/src/actenon-audit/airlock-pr23/acceptance/codex-cli/run.py", ...r operation failed: " + args[0])\nactenon_airlock.common.airlockerror: protected mode docker operation failed: image\n' = <built-in method lower of str object at 0x75471a2d00>()
+E        +    where <built-in method lower of str object at 0x75471a2d00> = 'Traceback (most recent call last):\n  File "/Users/ross/src/actenon-audit/airlock-pr23/acceptance/codex-cli/run.py", ...r operation failed: " + args[0])\nactenon_airlock.common.AirlockError: Protected Mode Docker operation failed: image\n'.lower
+E        +      where 'Traceback (most recent call last):\n  File "/Users/ross/src/actenon-audit/airlock-pr23/acceptance/codex-cli/run.py", ...r operation failed: " + args[0])\nactenon_airlock.common.AirlockError: Protected Mode Docker operation failed: image\n' = CompletedProcess(args=['/Users/ross/src/actenon-audit/airlock-pr23/.venv/bin/python', '/Users/ross/src/actenon-audit/a... operation failed: " + args[0])\nactenon_airlock.common.AirlockError: Protected Mode Docker operation failed: image\n').stderr
+
+tests/test_credential_preflight.py:167: AssertionError
+==================================== PASSES ====================================
+_ test_failed_reply_keeps_its_reservation_and_refuses_the_retry[401-full-key] __
+---------------------------- Captured stdout setup -----------------------------
+AIRLOCK AUTHORITY DIFF
+
++ http.post @ api.openai.com/v1/responses
+  Transport: https://api.openai.com/v1/responses
+  Scope: POST to exactly https://api.openai.com/v1/responses
++ Model authority expanded: {"anthropic_betas": [], "contract": "openai-responses-agent/v1", "endpoint": "https://api.openai.com/v1/responses", "max_input_bytes": 200000, "max_output_tokens": 16000, "max_run_microusd": 5000000, "models": ["gpt-5.5"], "price_microusd_per_mtok": {"cache_read": 500000, "cache_write": 0, "input": 5000000, "output": 30000000}, "provider": "openai-responses", "read_timeout_seconds": 540}
+
+Runtime: BLOCKED UNTIL APPROVED
+
+Protected inference constraint (trusted only with --approve):
+{"anthropic_betas": [], "contract": "openai-responses-agent/v1", "endpoint": "https://api.openai.com/v1/responses", "max_input_bytes": 200000, "max_output_tokens": 16000, "max_run_microusd": 5000000, "models": ["gpt-5.5"], "price_microusd_per_mtok": {"cache_read": 500000, "cache_write": 0, "input": 5000000, "output": 30000000}, "provider": "openai-responses", "read_timeout_seconds": 540}
+
+Approved 1 powers. Unresolved powers remain blocked; their calls are denied at runtime with signed receipts.
+----------------------------- Captured stderr call -----------------------------
+AIRLOCK ALLOW http.post @ https://api.openai.com/v1/responses: effect AMBIGUOUS; duplicate dispatch blocked [receipt_18b3329bba7e488f8e21db7463dd8be8]
+AIRLOCK DENY http.post @ https://api.openai.com/v1/responses: effect already reserved, committed, or unresolved [receipt_8f59cb3fe6ff4b82bcd040483462896d]
+_ test_failed_reply_keeps_its_reservation_and_refuses_the_retry[401-masked-key] _
+---------------------------- Captured stdout setup -----------------------------
+AIRLOCK AUTHORITY DIFF
+
++ http.post @ api.openai.com/v1/responses
+  Transport: https://api.openai.com/v1/responses
+  Scope: POST to exactly https://api.openai.com/v1/responses
++ Model authority expanded: {"anthropic_betas": [], "contract": "openai-responses-agent/v1", "endpoint": "https://api.openai.com/v1/responses", "max_input_bytes": 200000, "max_output_tokens": 16000, "max_run_microusd": 5000000, "models": ["gpt-5.5"], "price_microusd_per_mtok": {"cache_read": 500000, "cache_write": 0, "input": 5000000, "output": 30000000}, "provider": "openai-responses", "read_timeout_seconds": 540}
+
+Runtime: BLOCKED UNTIL APPROVED
+
+Protected inference constraint (trusted only with --approve):
+{"anthropic_betas": [], "contract": "openai-responses-agent/v1", "endpoint": "https://api.openai.com/v1/responses", "max_input_bytes": 200000, "max_output_tokens": 16000, "max_run_microusd": 5000000, "models": ["gpt-5.5"], "price_microusd_per_mtok": {"cache_read": 500000, "cache_write": 0, "input": 5000000, "output": 30000000}, "provider": "openai-responses", "read_timeout_seconds": 540}
+
+Approved 1 powers. Unresolved powers remain blocked; their calls are denied at runtime with signed receipts.
+----------------------------- Captured stderr call -----------------------------
+AIRLOCK ALLOW http.post @ https://api.openai.com/v1/responses: effect AMBIGUOUS; duplicate dispatch blocked [receipt_e244658aac2047cfb274d5d001a9f01d]
+AIRLOCK DENY http.post @ https://api.openai.com/v1/responses: effect already reserved, committed, or unresolved [receipt_e2850ba42e734c44aa5b99d69efe2f97]
+_ test_failed_reply_keeps_its_reservation_and_refuses_the_retry[401-other-key] _
+---------------------------- Captured stdout setup -----------------------------
+AIRLOCK AUTHORITY DIFF
+
++ http.post @ api.openai.com/v1/responses
+  Transport: https://api.openai.com/v1/responses
+  Scope: POST to exactly https://api.openai.com/v1/responses
++ Model authority expanded: {"anthropic_betas": [], "contract": "openai-responses-agent/v1", "endpoint": "https://api.openai.com/v1/responses", "max_input_bytes": 200000, "max_output_tokens": 16000, "max_run_microusd": 5000000, "models": ["gpt-5.5"], "price_microusd_per_mtok": {"cache_read": 500000, "cache_write": 0, "input": 5000000, "output": 30000000}, "provider": "openai-responses", "read_timeout_seconds": 540}
+
+Runtime: BLOCKED UNTIL APPROVED
+
+Protected inference constraint (trusted only with --approve):
+{"anthropic_betas": [], "contract": "openai-responses-agent/v1", "endpoint": "https://api.openai.com/v1/responses", "max_input_bytes": 200000, "max_output_tokens": 16000, "max_run_microusd": 5000000, "models": ["gpt-5.5"], "price_microusd_per_mtok": {"cache_read": 500000, "cache_write": 0, "input": 5000000, "output": 30000000}, "provider": "openai-responses", "read_timeout_seconds": 540}
+
+Approved 1 powers. Unresolved powers remain blocked; their calls are denied at runtime with signed receipts.
+----------------------------- Captured stderr call -----------------------------
+AIRLOCK ALLOW http.post @ https://api.openai.com/v1/responses: effect AMBIGUOUS; duplicate dispatch blocked [receipt_0e5bad0129e24c498c35dc7f50c12c2b]
+AIRLOCK DENY http.post @ https://api.openai.com/v1/responses: effect already reserved, committed, or unresolved [receipt_7c8292ac083a4dee8c2e844d3e3bb05f]
+_ test_failed_reply_keeps_its_reservation_and_refuses_the_retry[401-misleading-quota-code] _
+---------------------------- Captured stdout setup -----------------------------
+AIRLOCK AUTHORITY DIFF
+
++ http.post @ api.openai.com/v1/responses
+  Transport: https://api.openai.com/v1/responses
+  Scope: POST to exactly https://api.openai.com/v1/responses
++ Model authority expanded: {"anthropic_betas": [], "contract": "openai-responses-agent/v1", "endpoint": "https://api.openai.com/v1/responses", "max_input_bytes": 200000, "max_output_tokens": 16000, "max_run_microusd": 5000000, "models": ["gpt-5.5"], "price_microusd_per_mtok": {"cache_read": 500000, "cache_write": 0, "input": 5000000, "output": 30000000}, "provider": "openai-responses", "read_timeout_seconds": 540}
+
+Runtime: BLOCKED UNTIL APPROVED
+
+Protected inference constraint (trusted only with --approve):
+{"anthropic_betas": [], "contract": "openai-responses-agent/v1", "endpoint": "https://api.openai.com/v1/responses", "max_input_bytes": 200000, "max_output_tokens": 16000, "max_run_microusd": 5000000, "models": ["gpt-5.5"], "price_microusd_per_mtok": {"cache_read": 500000, "cache_write": 0, "input": 5000000, "output": 30000000}, "provider": "openai-responses", "read_timeout_seconds": 540}
+
+Approved 1 powers. Unresolved powers remain blocked; their calls are denied at runtime with signed receipts.
+----------------------------- Captured stderr call -----------------------------
+AIRLOCK ALLOW http.post @ https://api.openai.com/v1/responses: effect AMBIGUOUS; duplicate dispatch blocked [receipt_ce8554d532ac4e53b5cd53ac422fe6e8]
+AIRLOCK DENY http.post @ https://api.openai.com/v1/responses: effect already reserved, committed, or unresolved [receipt_38e820ec40ea497bb96a5aa3538d0d1f]
+__ test_failed_reply_keeps_its_reservation_and_refuses_the_retry[403-region] ___
+---------------------------- Captured stdout setup -----------------------------
+AIRLOCK AUTHORITY DIFF
+
++ http.post @ api.openai.com/v1/responses
+  Transport: https://api.openai.com/v1/responses
+  Scope: POST to exactly https://api.openai.com/v1/responses
++ Model authority expanded: {"anthropic_betas": [], "contract": "openai-responses-agent/v1", "endpoint": "https://api.openai.com/v1/responses", "max_input_bytes": 200000, "max_output_tokens": 16000, "max_run_microusd": 5000000, "models": ["gpt-5.5"], "price_microusd_per_mtok": {"cache_read": 500000, "cache_write": 0, "input": 5000000, "output": 30000000}, "provider": "openai-responses", "read_timeout_seconds": 540}
+
+Runtime: BLOCKED UNTIL APPROVED
+
+Protected inference constraint (trusted only with --approve):
+{"anthropic_betas": [], "contract": "openai-responses-agent/v1", "endpoint": "https://api.openai.com/v1/responses", "max_input_bytes": 200000, "max_output_tokens": 16000, "max_run_microusd": 5000000, "models": ["gpt-5.5"], "price_microusd_per_mtok": {"cache_read": 500000, "cache_write": 0, "input": 5000000, "output": 30000000}, "provider": "openai-responses", "read_timeout_seconds": 540}
+
+Approved 1 powers. Unresolved powers remain blocked; their calls are denied at runtime with signed receipts.
+----------------------------- Captured stderr call -----------------------------
+AIRLOCK ALLOW http.post @ https://api.openai.com/v1/responses: effect AMBIGUOUS; duplicate dispatch blocked [receipt_7ccf1e96ad9949eca00b5d01442fea23]
+AIRLOCK DENY http.post @ https://api.openai.com/v1/responses: effect already reserved, committed, or unresolved [receipt_2e4ba9d64a3f4e9aaa4df4214d698190]
+__ test_failed_reply_keeps_its_reservation_and_refuses_the_retry[500-server] ___
+---------------------------- Captured stdout setup -----------------------------
+AIRLOCK AUTHORITY DIFF
+
++ http.post @ api.openai.com/v1/responses
+  Transport: https://api.openai.com/v1/responses
+  Scope: POST to exactly https://api.openai.com/v1/responses
++ Model authority expanded: {"anthropic_betas": [], "contract": "openai-responses-agent/v1", "endpoint": "https://api.openai.com/v1/responses", "max_input_bytes": 200000, "max_output_tokens": 16000, "max_run_microusd": 5000000, "models": ["gpt-5.5"], "price_microusd_per_mtok": {"cache_read": 500000, "cache_write": 0, "input": 5000000, "output": 30000000}, "provider": "openai-responses", "read_timeout_seconds": 540}
+
+Runtime: BLOCKED UNTIL APPROVED
+
+Protected inference constraint (trusted only with --approve):
+{"anthropic_betas": [], "contract": "openai-responses-agent/v1", "endpoint": "https://api.openai.com/v1/responses", "max_input_bytes": 200000, "max_output_tokens": 16000, "max_run_microusd": 5000000, "models": ["gpt-5.5"], "price_microusd_per_mtok": {"cache_read": 500000, "cache_write": 0, "input": 5000000, "output": 30000000}, "provider": "openai-responses", "read_timeout_seconds": 540}
+
+Approved 1 powers. Unresolved powers remain blocked; their calls are denied at runtime with signed receipts.
+----------------------------- Captured stderr call -----------------------------
+AIRLOCK ALLOW http.post @ https://api.openai.com/v1/responses: effect AMBIGUOUS; duplicate dispatch blocked [receipt_78f0ca60466a4e19b955109f3ddc5188]
+AIRLOCK DENY http.post @ https://api.openai.com/v1/responses: effect already reserved, committed, or unresolved [receipt_36014b2c6b3343f3ae97baa0c1605ef5]
+___ test_failed_reply_keeps_its_reservation_and_refuses_the_retry[503-text] ____
+---------------------------- Captured stdout setup -----------------------------
+AIRLOCK AUTHORITY DIFF
+
++ http.post @ api.openai.com/v1/responses
+  Transport: https://api.openai.com/v1/responses
+  Scope: POST to exactly https://api.openai.com/v1/responses
++ Model authority expanded: {"anthropic_betas": [], "contract": "openai-responses-agent/v1", "endpoint": "https://api.openai.com/v1/responses", "max_input_bytes": 200000, "max_output_tokens": 16000, "max_run_microusd": 5000000, "models": ["gpt-5.5"], "price_microusd_per_mtok": {"cache_read": 500000, "cache_write": 0, "input": 5000000, "output": 30000000}, "provider": "openai-responses", "read_timeout_seconds": 540}
+
+Runtime: BLOCKED UNTIL APPROVED
+
+Protected inference constraint (trusted only with --approve):
+{"anthropic_betas": [], "contract": "openai-responses-agent/v1", "endpoint": "https://api.openai.com/v1/responses", "max_input_bytes": 200000, "max_output_tokens": 16000, "max_run_microusd": 5000000, "models": ["gpt-5.5"], "price_microusd_per_mtok": {"cache_read": 500000, "cache_write": 0, "input": 5000000, "output": 30000000}, "provider": "openai-responses", "read_timeout_seconds": 540}
+
+Approved 1 powers. Unresolved powers remain blocked; their calls are denied at runtime with signed receipts.
+----------------------------- Captured stderr call -----------------------------
+AIRLOCK ALLOW http.post @ https://api.openai.com/v1/responses: effect AMBIGUOUS; duplicate dispatch blocked [receipt_9bafe1a2a831415a82d730e6753a8358]
+AIRLOCK DENY http.post @ https://api.openai.com/v1/responses: effect already reserved, committed, or unresolved [receipt_57de9c94dd1545eb982715a24c770c2b]
+___ test_failed_reply_keeps_its_reservation_and_refuses_the_retry[502-empty] ___
+---------------------------- Captured stdout setup -----------------------------
+AIRLOCK AUTHORITY DIFF
+
++ http.post @ api.openai.com/v1/responses
+  Transport: https://api.openai.com/v1/responses
+  Scope: POST to exactly https://api.openai.com/v1/responses
++ Model authority expanded: {"anthropic_betas": [], "contract": "openai-responses-agent/v1", "endpoint": "https://api.openai.com/v1/responses", "max_input_bytes": 200000, "max_output_tokens": 16000, "max_run_microusd": 5000000, "models": ["gpt-5.5"], "price_microusd_per_mtok": {"cache_read": 500000, "cache_write": 0, "input": 5000000, "output": 30000000}, "provider": "openai-responses", "read_timeout_seconds": 540}
+
+Runtime: BLOCKED UNTIL APPROVED
+
+Protected inference constraint (trusted only with --approve):
+{"anthropic_betas": [], "contract": "openai-responses-agent/v1", "endpoint": "https://api.openai.com/v1/responses", "max_input_bytes": 200000, "max_output_tokens": 16000, "max_run_microusd": 5000000, "models": ["gpt-5.5"], "price_microusd_per_mtok": {"cache_read": 500000, "cache_write": 0, "input": 5000000, "output": 30000000}, "provider": "openai-responses", "read_timeout_seconds": 540}
+
+Approved 1 powers. Unresolved powers remain blocked; their calls are denied at runtime with signed receipts.
+----------------------------- Captured stderr call -----------------------------
+AIRLOCK ALLOW http.post @ https://api.openai.com/v1/responses: effect AMBIGUOUS; duplicate dispatch blocked [receipt_07217fcdbd8349bdab95acad2cb03692]
+AIRLOCK DENY http.post @ https://api.openai.com/v1/responses: effect already reserved, committed, or unresolved [receipt_0aec132934b04db783d3ee7be9cdd3aa]
+_ test_failed_reply_keeps_its_reservation_and_refuses_the_retry[400-malformed] _
+---------------------------- Captured stdout setup -----------------------------
+AIRLOCK AUTHORITY DIFF
+
++ http.post @ api.openai.com/v1/responses
+  Transport: https://api.openai.com/v1/responses
+  Scope: POST to exactly https://api.openai.com/v1/responses
++ Model authority expanded: {"anthropic_betas": [], "contract": "openai-responses-agent/v1", "endpoint": "https://api.openai.com/v1/responses", "max_input_bytes": 200000, "max_output_tokens": 16000, "max_run_microusd": 5000000, "models": ["gpt-5.5"], "price_microusd_per_mtok": {"cache_read": 500000, "cache_write": 0, "input": 5000000, "output": 30000000}, "provider": "openai-responses", "read_timeout_seconds": 540}
+
+Runtime: BLOCKED UNTIL APPROVED
+
+Protected inference constraint (trusted only with --approve):
+{"anthropic_betas": [], "contract": "openai-responses-agent/v1", "endpoint": "https://api.openai.com/v1/responses", "max_input_bytes": 200000, "max_output_tokens": 16000, "max_run_microusd": 5000000, "models": ["gpt-5.5"], "price_microusd_per_mtok": {"cache_read": 500000, "cache_write": 0, "input": 5000000, "output": 30000000}, "provider": "openai-responses", "read_timeout_seconds": 540}
+
+Approved 1 powers. Unresolved powers remain blocked; their calls are denied at runtime with signed receipts.
+----------------------------- Captured stderr call -----------------------------
+AIRLOCK ALLOW http.post @ https://api.openai.com/v1/responses: effect AMBIGUOUS; duplicate dispatch blocked [receipt_58bb8f4d7e8d4743a67ed9e818b7a7d4]
+AIRLOCK DENY http.post @ https://api.openai.com/v1/responses: effect already reserved, committed, or unresolved [receipt_b3585fa5cc80474d9ff33152c8947802]
+_ test_failed_reply_keeps_its_reservation_and_refuses_the_retry[400-duplicate-keys] _
+---------------------------- Captured stdout setup -----------------------------
+AIRLOCK AUTHORITY DIFF
+
++ http.post @ api.openai.com/v1/responses
+  Transport: https://api.openai.com/v1/responses
+  Scope: POST to exactly https://api.openai.com/v1/responses
++ Model authority expanded: {"anthropic_betas": [], "contract": "openai-responses-agent/v1", "endpoint": "https://api.openai.com/v1/responses", "max_input_bytes": 200000, "max_output_tokens": 16000, "max_run_microusd": 5000000, "models": ["gpt-5.5"], "price_microusd_per_mtok": {"cache_read": 500000, "cache_write": 0, "input": 5000000, "output": 30000000}, "provider": "openai-responses", "read_timeout_seconds": 540}
+
+Runtime: BLOCKED UNTIL APPROVED
+
+Protected inference constraint (trusted only with --approve):
+{"anthropic_betas": [], "contract": "openai-responses-agent/v1", "endpoint": "https://api.openai.com/v1/responses", "max_input_bytes": 200000, "max_output_tokens": 16000, "max_run_microusd": 5000000, "models": ["gpt-5.5"], "price_microusd_per_mtok": {"cache_read": 500000, "cache_write": 0, "input": 5000000, "output": 30000000}, "provider": "openai-responses", "read_timeout_seconds": 540}
+
+Approved 1 powers. Unresolved powers remain blocked; their calls are denied at runtime with signed receipts.
+----------------------------- Captured stderr call -----------------------------
+AIRLOCK ALLOW http.post @ https://api.openai.com/v1/responses: effect AMBIGUOUS; duplicate dispatch blocked [receipt_e97ee689b7fc452aa5cf68ad22832fed]
+AIRLOCK DENY http.post @ https://api.openai.com/v1/responses: effect already reserved, committed, or unresolved [receipt_cbe1ba12f6384c85a2094cc786e7dc76]
+_ test_failed_reply_keeps_its_reservation_and_refuses_the_retry[400-non-object] _
+---------------------------- Captured stdout setup -----------------------------
+AIRLOCK AUTHORITY DIFF
+
++ http.post @ api.openai.com/v1/responses
+  Transport: https://api.openai.com/v1/responses
+  Scope: POST to exactly https://api.openai.com/v1/responses
++ Model authority expanded: {"anthropic_betas": [], "contract": "openai-responses-agent/v1", "endpoint": "https://api.openai.com/v1/responses", "max_input_bytes": 200000, "max_output_tokens": 16000, "max_run_microusd": 5000000, "models": ["gpt-5.5"], "price_microusd_per_mtok": {"cache_read": 500000, "cache_write": 0, "input": 5000000, "output": 30000000}, "provider": "openai-responses", "read_timeout_seconds": 540}
+
+Runtime: BLOCKED UNTIL APPROVED
+
+Protected inference constraint (trusted only with --approve):
+{"anthropic_betas": [], "contract": "openai-responses-agent/v1", "endpoint": "https://api.openai.com/v1/responses", "max_input_bytes": 200000, "max_output_tokens": 16000, "max_run_microusd": 5000000, "models": ["gpt-5.5"], "price_microusd_per_mtok": {"cache_read": 500000, "cache_write": 0, "input": 5000000, "output": 30000000}, "provider": "openai-responses", "read_timeout_seconds": 540}
+
+Approved 1 powers. Unresolved powers remain blocked; their calls are denied at runtime with signed receipts.
+----------------------------- Captured stderr call -----------------------------
+AIRLOCK ALLOW http.post @ https://api.openai.com/v1/responses: effect AMBIGUOUS; duplicate dispatch blocked [receipt_adbe0c059630444698b952af1e5f0569]
+AIRLOCK DENY http.post @ https://api.openai.com/v1/responses: effect already reserved, committed, or unresolved [receipt_cde1434bd0b9450087771fb653e2df68]
+_ test_failed_reply_keeps_its_reservation_and_refuses_the_retry[401-secret-code] _
+---------------------------- Captured stdout setup -----------------------------
+AIRLOCK AUTHORITY DIFF
+
++ http.post @ api.openai.com/v1/responses
+  Transport: https://api.openai.com/v1/responses
+  Scope: POST to exactly https://api.openai.com/v1/responses
++ Model authority expanded: {"anthropic_betas": [], "contract": "openai-responses-agent/v1", "endpoint": "https://api.openai.com/v1/responses", "max_input_bytes": 200000, "max_output_tokens": 16000, "max_run_microusd": 5000000, "models": ["gpt-5.5"], "price_microusd_per_mtok": {"cache_read": 500000, "cache_write": 0, "input": 5000000, "output": 30000000}, "provider": "openai-responses", "read_timeout_seconds": 540}
+
+Runtime: BLOCKED UNTIL APPROVED
+
+Protected inference constraint (trusted only with --approve):
+{"anthropic_betas": [], "contract": "openai-responses-agent/v1", "endpoint": "https://api.openai.com/v1/responses", "max_input_bytes": 200000, "max_output_tokens": 16000, "max_run_microusd": 5000000, "models": ["gpt-5.5"], "price_microusd_per_mtok": {"cache_read": 500000, "cache_write": 0, "input": 5000000, "output": 30000000}, "provider": "openai-responses", "read_timeout_seconds": 540}
+
+Approved 1 powers. Unresolved powers remain blocked; their calls are denied at runtime with signed receipts.
+----------------------------- Captured stderr call -----------------------------
+AIRLOCK ALLOW http.post @ https://api.openai.com/v1/responses: effect AMBIGUOUS; duplicate dispatch blocked [receipt_e335728975fe4a85ab37ec6958c17c6a]
+AIRLOCK DENY http.post @ https://api.openai.com/v1/responses: effect already reserved, committed, or unresolved [receipt_1aa3796b8f394a76be3e759deb7d591e]
+_ test_failed_reply_keeps_its_reservation_and_refuses_the_retry[401-code-not-string] _
+---------------------------- Captured stdout setup -----------------------------
+AIRLOCK AUTHORITY DIFF
+
++ http.post @ api.openai.com/v1/responses
+  Transport: https://api.openai.com/v1/responses
+  Scope: POST to exactly https://api.openai.com/v1/responses
++ Model authority expanded: {"anthropic_betas": [], "contract": "openai-responses-agent/v1", "endpoint": "https://api.openai.com/v1/responses", "max_input_bytes": 200000, "max_output_tokens": 16000, "max_run_microusd": 5000000, "models": ["gpt-5.5"], "price_microusd_per_mtok": {"cache_read": 500000, "cache_write": 0, "input": 5000000, "output": 30000000}, "provider": "openai-responses", "read_timeout_seconds": 540}
+
+Runtime: BLOCKED UNTIL APPROVED
+
+Protected inference constraint (trusted only with --approve):
+{"anthropic_betas": [], "contract": "openai-responses-agent/v1", "endpoint": "https://api.openai.com/v1/responses", "max_input_bytes": 200000, "max_output_tokens": 16000, "max_run_microusd": 5000000, "models": ["gpt-5.5"], "price_microusd_per_mtok": {"cache_read": 500000, "cache_write": 0, "input": 5000000, "output": 30000000}, "provider": "openai-responses", "read_timeout_seconds": 540}
+
+Approved 1 powers. Unresolved powers remain blocked; their calls are denied at runtime with signed receipts.
+----------------------------- Captured stderr call -----------------------------
+AIRLOCK ALLOW http.post @ https://api.openai.com/v1/responses: effect AMBIGUOUS; duplicate dispatch blocked [receipt_993199fd7a36411486136b96aa161dcb]
+AIRLOCK DENY http.post @ https://api.openai.com/v1/responses: effect already reserved, committed, or unresolved [receipt_2b3aaa74368d4c78adb248164c1b53ff]
+_ test_failed_reply_keeps_its_reservation_and_refuses_the_retry[401-oversized] _
+---------------------------- Captured stdout setup -----------------------------
+AIRLOCK AUTHORITY DIFF
+
++ http.post @ api.openai.com/v1/responses
+  Transport: https://api.openai.com/v1/responses
+  Scope: POST to exactly https://api.openai.com/v1/responses
++ Model authority expanded: {"anthropic_betas": [], "contract": "openai-responses-agent/v1", "endpoint": "https://api.openai.com/v1/responses", "max_input_bytes": 200000, "max_output_tokens": 16000, "max_run_microusd": 5000000, "models": ["gpt-5.5"], "price_microusd_per_mtok": {"cache_read": 500000, "cache_write": 0, "input": 5000000, "output": 30000000}, "provider": "openai-responses", "read_timeout_seconds": 540}
+
+Runtime: BLOCKED UNTIL APPROVED
+
+Protected inference constraint (trusted only with --approve):
+{"anthropic_betas": [], "contract": "openai-responses-agent/v1", "endpoint": "https://api.openai.com/v1/responses", "max_input_bytes": 200000, "max_output_tokens": 16000, "max_run_microusd": 5000000, "models": ["gpt-5.5"], "price_microusd_per_mtok": {"cache_read": 500000, "cache_write": 0, "input": 5000000, "output": 30000000}, "provider": "openai-responses", "read_timeout_seconds": 540}
+
+Approved 1 powers. Unresolved powers remain blocked; their calls are denied at runtime with signed receipts.
+----------------------------- Captured stderr call -----------------------------
+AIRLOCK ALLOW http.post @ https://api.openai.com/v1/responses: effect AMBIGUOUS; duplicate dispatch blocked [receipt_560b2fd092cb4e5a869f96d353b7cd79]
+AIRLOCK DENY http.post @ https://api.openai.com/v1/responses: effect already reserved, committed, or unresolved [receipt_b7ca59ddd8fc48088d24a52c30c71e23]
+__________ test_401_is_never_treated_as_a_declined_or_zero_cost_reply __________
+---------------------------- Captured stdout setup -----------------------------
+AIRLOCK AUTHORITY DIFF
+
++ http.post @ api.openai.com/v1/responses
+  Transport: https://api.openai.com/v1/responses
+  Scope: POST to exactly https://api.openai.com/v1/responses
++ Model authority expanded: {"anthropic_betas": [], "contract": "openai-responses-agent/v1", "endpoint": "https://api.openai.com/v1/responses", "max_input_bytes": 200000, "max_output_tokens": 16000, "max_run_microusd": 5000000, "models": ["gpt-5.5"], "price_microusd_per_mtok": {"cache_read": 500000, "cache_write": 0, "input": 5000000, "output": 30000000}, "provider": "openai-responses", "read_timeout_seconds": 540}
+
+Runtime: BLOCKED UNTIL APPROVED
+
+Protected inference constraint (trusted only with --approve):
+{"anthropic_betas": [], "contract": "openai-responses-agent/v1", "endpoint": "https://api.openai.com/v1/responses", "max_input_bytes": 200000, "max_output_tokens": 16000, "max_run_microusd": 5000000, "models": ["gpt-5.5"], "price_microusd_per_mtok": {"cache_read": 500000, "cache_write": 0, "input": 5000000, "output": 30000000}, "provider": "openai-responses", "read_timeout_seconds": 540}
+
+Approved 1 powers. Unresolved powers remain blocked; their calls are denied at runtime with signed receipts.
+----------------------------- Captured stderr call -----------------------------
+AIRLOCK ALLOW http.post @ https://api.openai.com/v1/responses: effect AMBIGUOUS; duplicate dispatch blocked [receipt_0eed026344064b3cbffa1c8d750c21b9]
+__________________ test_successful_replies_are_not_rewritten ___________________
+---------------------------- Captured stdout setup -----------------------------
+AIRLOCK AUTHORITY DIFF
+
++ http.post @ api.openai.com/v1/responses
+  Transport: https://api.openai.com/v1/responses
+  Scope: POST to exactly https://api.openai.com/v1/responses
++ Model authority expanded: {"anthropic_betas": [], "contract": "openai-responses-agent/v1", "endpoint": "https://api.openai.com/v1/responses", "max_input_bytes": 200000, "max_output_tokens": 16000, "max_run_microusd": 5000000, "models": ["gpt-5.5"], "price_microusd_per_mtok": {"cache_read": 500000, "cache_write": 0, "input": 5000000, "output": 30000000}, "provider": "openai-responses", "read_timeout_seconds": 540}
+
+Runtime: BLOCKED UNTIL APPROVED
+
+Protected inference constraint (trusted only with --approve):
+{"anthropic_betas": [], "contract": "openai-responses-agent/v1", "endpoint": "https://api.openai.com/v1/responses", "max_input_bytes": 200000, "max_output_tokens": 16000, "max_run_microusd": 5000000, "models": ["gpt-5.5"], "price_microusd_per_mtok": {"cache_read": 500000, "cache_write": 0, "input": 5000000, "output": 30000000}, "provider": "openai-responses", "read_timeout_seconds": 540}
+
+Approved 1 powers. Unresolved powers remain blocked; their calls are denied at runtime with signed receipts.
+----------------------------- Captured stderr call -----------------------------
+AIRLOCK ALLOW http.post @ https://api.openai.com/v1/responses: effect COMMITTED [receipt_c949ddf2e8e041d0a7a4da010bb35ac3]
+=========================== short test summary info ============================
+PASSED tests/test_inference_provider_errors.py::test_failed_reply_keeps_its_reservation_and_refuses_the_retry[401-full-key]
+PASSED tests/test_inference_provider_errors.py::test_failed_reply_keeps_its_reservation_and_refuses_the_retry[401-masked-key]
+PASSED tests/test_inference_provider_errors.py::test_failed_reply_keeps_its_reservation_and_refuses_the_retry[401-other-key]
+PASSED tests/test_inference_provider_errors.py::test_failed_reply_keeps_its_reservation_and_refuses_the_retry[401-misleading-quota-code]
+PASSED tests/test_inference_provider_errors.py::test_failed_reply_keeps_its_reservation_and_refuses_the_retry[403-region]
+PASSED tests/test_inference_provider_errors.py::test_failed_reply_keeps_its_reservation_and_refuses_the_retry[500-server]
+PASSED tests/test_inference_provider_errors.py::test_failed_reply_keeps_its_reservation_and_refuses_the_retry[503-text]
+PASSED tests/test_inference_provider_errors.py::test_failed_reply_keeps_its_reservation_and_refuses_the_retry[502-empty]
+PASSED tests/test_inference_provider_errors.py::test_failed_reply_keeps_its_reservation_and_refuses_the_retry[400-malformed]
+PASSED tests/test_inference_provider_errors.py::test_failed_reply_keeps_its_reservation_and_refuses_the_retry[400-duplicate-keys]
+PASSED tests/test_inference_provider_errors.py::test_failed_reply_keeps_its_reservation_and_refuses_the_retry[400-non-object]
+PASSED tests/test_inference_provider_errors.py::test_failed_reply_keeps_its_reservation_and_refuses_the_retry[401-secret-code]
+PASSED tests/test_inference_provider_errors.py::test_failed_reply_keeps_its_reservation_and_refuses_the_retry[401-code-not-string]
+PASSED tests/test_inference_provider_errors.py::test_failed_reply_keeps_its_reservation_and_refuses_the_retry[401-oversized]
+PASSED tests/test_inference_provider_errors.py::test_401_is_never_treated_as_a_declined_or_zero_cost_reply
+PASSED tests/test_inference_provider_errors.py::test_successful_replies_are_not_rewritten
+FAILED tests/test_inference_provider_errors.py::test_failed_reply_is_sanitized_signed_and_held[401-full-key]
+FAILED tests/test_inference_provider_errors.py::test_failed_reply_is_sanitized_signed_and_held[401-masked-key]
+FAILED tests/test_inference_provider_errors.py::test_failed_reply_is_sanitized_signed_and_held[401-other-key]
+FAILED tests/test_inference_provider_errors.py::test_failed_reply_is_sanitized_signed_and_held[401-misleading-quota-code]
+FAILED tests/test_inference_provider_errors.py::test_failed_reply_is_sanitized_signed_and_held[403-region]
+FAILED tests/test_inference_provider_errors.py::test_failed_reply_is_sanitized_signed_and_held[429-misleading-auth-code]
+FAILED tests/test_inference_provider_errors.py::test_failed_reply_is_sanitized_signed_and_held[500-server]
+FAILED tests/test_inference_provider_errors.py::test_failed_reply_is_sanitized_signed_and_held[503-text]
+FAILED tests/test_inference_provider_errors.py::test_failed_reply_is_sanitized_signed_and_held[502-empty]
+FAILED tests/test_inference_provider_errors.py::test_failed_reply_is_sanitized_signed_and_held[400-malformed]
+FAILED tests/test_inference_provider_errors.py::test_failed_reply_is_sanitized_signed_and_held[400-duplicate-keys]
+FAILED tests/test_inference_provider_errors.py::test_failed_reply_is_sanitized_signed_and_held[400-non-object]
+FAILED tests/test_inference_provider_errors.py::test_failed_reply_is_sanitized_signed_and_held[401-secret-code]
+FAILED tests/test_inference_provider_errors.py::test_failed_reply_is_sanitized_signed_and_held[401-code-not-string]
+FAILED tests/test_inference_provider_errors.py::test_failed_reply_is_sanitized_signed_and_held[401-oversized]
+FAILED tests/test_inference_provider_errors.py::test_documented_429_declines_keep_their_existing_accounting_and_are_sanitized[rate_limit_exceeded]
+FAILED tests/test_inference_provider_errors.py::test_documented_429_declines_keep_their_existing_accounting_and_are_sanitized[insufficient_quota]
+FAILED tests/test_inference_provider_errors.py::test_anthropic_contract_failure_is_sanitized_and_signed
+FAILED tests/test_inference_provider_errors.py::test_status_diagnostic_is_bounded_and_fixed_vocabulary
+FAILED tests/test_credential_preflight.py::test_malformed_credentials_are_refused_locally[None-missing]
+FAILED tests/test_credential_preflight.py::test_malformed_credentials_are_refused_locally[-empty]
+FAILED tests/test_credential_preflight.py::test_malformed_credentials_are_refused_locally[.venv/bin/python acceptance/codex-cli/run.py baseline --task token-bucket --image sha256:c449dec52754bad2a55dea7bb7b1edfbf7a864475464c53edc8ad9489d9d2269 --config ~/src/actenon-audit/live-codex/v44-frozen-candidate.json --out ~/src/actenon-audit/live-codex/1-baseline-v4-4 --live --authorized-usd 2-whitespace]
+FAILED tests/test_credential_preflight.py::test_malformed_credentials_are_refused_locally[ sk-proj-A1b2C3d4E5f6G7h8A1b2C3d4E5f6G7h8A1b2C3d4E5f6G7h8A1b2C3d4E5f6G7h8A1b2C3d4E5f6G7h8A1b2C3d4E5f6G7h8-whitespace]
+FAILED tests/test_credential_preflight.py::test_malformed_credentials_are_refused_locally[sk-proj-A1b2C3d4E5f6G7h8A1b2C3d4E5f6G7h8A1b2C3d4E5f6G7h8A1b2C3d4E5f6G7h8A1b2C3d4E5f6G7h8A1b2C3d4E5f6G7h8\n-whitespace]
+FAILED tests/test_credential_preflight.py::test_malformed_credentials_are_refused_locally[sk-proj-A1b2C3d4E5f6\x00G7h8A1b2C3d4E5f6G7h8A1b2C3d4E5f6G7h8A1b2C3d4E5f6G7h8A1b2C3d4E5f6G7h8A1b2C3d4E5f6G7h8-control-characters]
+FAILED tests/test_credential_preflight.py::test_malformed_credentials_are_refused_locally[sk-proj-A1b2C3d4E5f6G7h8A1b2C3d4E5f6G7h8A1b2C3d4E5f6G7h8A1b2C3d4E5f6G7h8A1b2C3d4E5f6G7h8A1b2C3d4E5f6G7h8\xe9-non-ascii]
+FAILED tests/test_credential_preflight.py::test_malformed_credentials_are_refused_locally[sk-short-too-short]
+FAILED tests/test_credential_preflight.py::test_malformed_credentials_are_refused_locally[sk-aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa-too-long]
+FAILED tests/test_credential_preflight.py::test_malformed_credentials_are_refused_locally[pk-aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa-unexpected-prefix]
+FAILED tests/test_credential_preflight.py::test_malformed_credentials_are_refused_locally[sk-aaaaaaaaaaaaaaaaaaaaaaaaaaaaaa/bin/python-unexpected-characters]
+FAILED tests/test_credential_preflight.py::test_malformed_credentials_are_refused_locally[scripted-codex-no-real-credential-unexpected-prefix]
+FAILED tests/test_credential_preflight.py::test_a_plausible_key_passes_the_local_check
+FAILED tests/test_credential_preflight.py::test_authentication_check_is_one_promptless_model_lookup
+FAILED tests/test_credential_preflight.py::test_failed_authentication_reports_fixed_vocabulary_only[401-body0-rejected-invalid_api_key]
+FAILED tests/test_credential_preflight.py::test_failed_authentication_reports_fixed_vocabulary_only[403-body1-rejected-None]
+FAILED tests/test_credential_preflight.py::test_failed_authentication_reports_fixed_vocabulary_only[404-body2-model-unavailable-None]
+FAILED tests/test_credential_preflight.py::test_failed_authentication_reports_fixed_vocabulary_only[429-body3-unavailable-None]
+FAILED tests/test_credential_preflight.py::test_failed_authentication_reports_fixed_vocabulary_only[500-proxy sk-proj-A1b2C3d4E5f6G7h8A1b2C3d4E5f6G7h8A1b2C3d4E5f6G7h8A1b2C3d4E5f6G7h8A1b2C3d4E5f6G7h8A1b2C3d4E5f6G7h8-unavailable-None]
+FAILED tests/test_credential_preflight.py::test_unreachable_provider_never_reports_exception_text
+FAILED tests/test_credential_preflight.py::test_credential_file_must_be_private_regular_and_single_line
+FAILED tests/test_credential_preflight.py::test_live_runner_refuses_bad_credentials_before_any_work[.venv/bin/python acceptance/codex-cli/run.py baseline --task token-bucket --image sha256:c449dec52754bad2a55dea7bb7b1edfbf7a864475464c53edc8ad9489d9d2269 --config ~/src/actenon-audit/live-codex/v44-frozen-candidate.json --out ~/src/actenon-audit/live-codex/1-baseline-v4-4 --live --authorized-usd 2]
+FAILED tests/test_credential_preflight.py::test_live_runner_refuses_bad_credentials_before_any_work[]
+FAILED tests/test_credential_preflight.py::test_live_runner_refuses_bad_credentials_before_any_work[None]
+FAILED tests/test_credential_preflight.py::test_live_runner_refuses_bad_credentials_before_any_work[sk-short]
+44 failed, 16 passed in 1.90s

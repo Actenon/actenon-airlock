@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="0" failures="5" skipped="0" tests="8" time="16.998" timestamp="2026-11-04T23:06:27.119501+00:00" hostname="Rosss-MacBook-Air.local"><testcase classname="tests.test_supervisor_credential_isolation" name="test_runner_identity_git_and_docker_do_not_inherit_supervisor_secrets" time="0.610"><failure message="AssertionError: ['rev-parse', 'HEAD']&#10;assert ['signing', 'supervisor'] == []&#10;  &#10;  Left contains 2 more items, first extra item: 'signing'&#10;  Use -v to get more diff">probes = &lt;function probes.&lt;locals&gt;.records at 0x10c34f9c0&gt;
+
+    def test_runner_identity_git_and_docker_do_not_inherit_supervisor_secrets(probes):
+        runner = load_runner()
+        frozen = runner.identity("synthetic-image")
+        assert frozen["source_commit"] == "0" * 40  # the probe answered git
+&gt;       assert_isolated(probes(), expect={"git", "docker"})
+
+tests/test_supervisor_credential_isolation.py:122: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+records = [{'tool': 'git', 'sub': ['rev-parse', 'HEAD'], 'env_hits': ['signing', 'supervisor'], 'arg_hits': [], ...}, {'tool': 'docker', 'sub': ['image', 'inspect'], 'env_hits': [], 'arg_hits': [], ...}]
+expect = {'docker', 'git'}
+
+    def assert_isolated(records, *, expect):
+        assert records, "the probe never ran"
+        assert {r["tool"] for r in records} &gt;= expect
+        for record in records:
+&gt;           assert record["env_hits"] == [], record["sub"]
+E           AssertionError: ['rev-parse', 'HEAD']
+E           assert ['signing', 'supervisor'] == []
+E             
+E             Left contains 2 more items, first extra item: 'signing'
+E             Use -v to get more diff
+
+tests/test_supervisor_credential_isolation.py:113: AssertionError</failure></testcase><testcase classname="tests.test_supervisor_credential_isolation" name="test_baseline_docker_client_gets_only_the_dummy_credential" time="0.335"><failure message="AssertionError: ['run', '--rm']&#10;assert ['signing', 'supervisor'] == []&#10;  &#10;  Left contains 2 more items, first extra item: 'signing'&#10;  Use -v to get more diff">tmp_path = PosixPath('/private/var/folders/tz/y04t4d0900xdbmz96jp608180000gn/T/pytest-of-ross/pytest-33/test_baseline_docker_client_ge0')
+probes = &lt;function probes.&lt;locals&gt;.records at 0x10c3dc4a0&gt;
+
+    def test_baseline_docker_client_gets_only_the_dummy_credential(tmp_path, probes):
+        runner = load_runner()
+        project = tmp_path / "project"
+        shutil.copytree(ROOT / "acceptance/v2/tasks/token-bucket/repo", project)
+        with (tmp_path / "agent.log").open("w") as log:
+            code, _ = runner.baseline(project, "synthetic-image", log, _Gateway())
+        assert code == 0
+        records = probes()
+&gt;       assert_isolated(records, expect={"docker"})
+
+tests/test_supervisor_credential_isolation.py:137: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+records = [{'tool': 'docker', 'sub': ['run', '--rm'], 'env_hits': ['signing', 'supervisor'], 'arg_hits': [], ...}, {'tool': 'docker', 'sub': ['rm', '-f'], 'env_hits': ['signing', 'supervisor'], 'arg_hits': [], ...}]
+expect = {'docker'}
+
+    def assert_isolated(records, *, expect):
+        assert records, "the probe never ran"
+        assert {r["tool"] for r in records} &gt;= expect
+        for record in records:
+&gt;           assert record["env_hits"] == [], record["sub"]
+E           AssertionError: ['run', '--rm']
+E           assert ['signing', 'supervisor'] == []
+E             
+E             Left contains 2 more items, first extra item: 'signing'
+E             Use -v to get more diff
+
+tests/test_supervisor_credential_isolation.py:113: AssertionError</failure></testcase><testcase classname="tests.test_supervisor_credential_isolation" name="test_scoring_containers_do_not_inherit_supervisor_secrets" time="0.256"><failure message="AssertionError: ['run', '--rm']&#10;assert ['signing', 'supervisor'] == []&#10;  &#10;  Left contains 2 more items, first extra item: 'signing'&#10;  Use -v to get more diff">tmp_path = PosixPath('/private/var/folders/tz/y04t4d0900xdbmz96jp608180000gn/T/pytest-of-ross/pytest-33/test_scoring_containers_do_not0')
+probes = &lt;function probes.&lt;locals&gt;.records at 0x10c3dd120&gt;
+
+    def test_scoring_containers_do_not_inherit_supervisor_secrets(tmp_path, probes):
+        runner = load_runner()
+        work = tmp_path / "work"
+        shutil.copytree(ROOT / "acceptance/v2/tasks/token-bucket/repo", work)
+        runner.scoring.SCORING_IMAGE = "synthetic-image"
+        runner.scoring.score(ROOT / "acceptance/v2/tasks/token-bucket", work)
+&gt;       assert_isolated(probes(), expect={"docker"})
+
+tests/test_supervisor_credential_isolation.py:148: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+records = [{'tool': 'docker', 'sub': ['run', '--rm'], 'env_hits': ['signing', 'supervisor'], 'arg_hits': [], ...}, {'tool': 'docker', 'sub': ['run', '--rm'], 'env_hits': ['signing', 'supervisor'], 'arg_hits': [], ...}]
+expect = {'docker'}
+
+    def assert_isolated(records, *, expect):
+        assert records, "the probe never ran"
+        assert {r["tool"] for r in records} &gt;= expect
+        for record in records:
+&gt;           assert record["env_hits"] == [], record["sub"]
+E           AssertionError: ['run', '--rm']
+E           assert ['signing', 'supervisor'] == []
+E             
+E             Left contains 2 more items, first extra item: 'signing'
+E             Use -v to get more diff
+
+tests/test_supervisor_credential_isolation.py:113: AssertionError</failure></testcase><testcase classname="tests.test_supervisor_credential_isolation" name="test_protected_docker_client_environment_stays_allowlisted" time="0.208" /><testcase classname="tests.test_supervisor_credential_isolation" name="test_supervisor_scope_exposes_the_key_only_to_broker_construction" time="0.060"><failure message="AttributeError: module 'actenon_airlock.credential_preflight' has no attribute 'supervisor_scope'">tmp_path = PosixPath('/private/var/folders/tz/y04t4d0900xdbmz96jp608180000gn/T/pytest-of-ross/pytest-33/test_supervisor_scope_exposes_0')
+monkeypatch = &lt;_pytest.monkeypatch.MonkeyPatch object at 0x10c30ff20&gt;
+
+    def test_supervisor_scope_exposes_the_key_only_to_broker_construction(tmp_path, monkeypatch):
+        from test_responses_inference import configure, message
+    
+        from actenon_airlock import credential_preflight
+    
+        monkeypatch.delenv("OPENAI_API_KEY", raising=False)
+        state = configure(tmp_path)
+&gt;       with credential_preflight.supervisor_scope("OPENAI_API_KEY", SUPERVISOR):
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AttributeError: module 'actenon_airlock.credential_preflight' has no attribute 'supervisor_scope'
+
+tests/test_supervisor_credential_isolation.py:163: AttributeError</failure></testcase><testcase classname="tests.test_supervisor_credential_isolation" name="test_supervisor_scope_restores_a_previous_value" time="0.001"><failure message="AttributeError: module 'actenon_airlock.credential_preflight' has no attribute 'supervisor_scope'">monkeypatch = &lt;_pytest.monkeypatch.MonkeyPatch object at 0x10c4919a0&gt;
+
+    def test_supervisor_scope_restores_a_previous_value(monkeypatch):
+        from actenon_airlock import credential_preflight
+    
+        monkeypatch.setenv("OPENAI_API_KEY", "previous-dummy")
+&gt;       with credential_preflight.supervisor_scope("OPENAI_API_KEY", SUPERVISOR):
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AttributeError: module 'actenon_airlock.credential_preflight' has no attribute 'supervisor_scope'
+
+tests/test_supervisor_credential_isolation.py:191: AttributeError</failure></testcase><testcase classname="tests.test_supervisor_credential_isolation" name="test_protected_contained_agent_never_holds_the_supervisor_key" time="11.740" /><testcase classname="tests.test_supervisor_credential_isolation" name="test_baseline_contained_agent_gets_only_the_dummy_credential" time="3.425" /></testsuite></testsuites>

@@ -1,0 +1,23 @@
+{
+  "emergency_stop": null,
+  "integrity_ok": true,
+  "receipts": 9,
+  "completeness": "UNANCHORED",
+  "refused": 0,
+  "refusal_reasons": [],
+  "independently_observed": {},
+  "runtime_claims": {
+    "COMMITTED": 4
+  },
+  "unresolved_effects": [],
+  "inference": {
+    "dispatched": 4,
+    "confirmed": 4,
+    "unconfirmed": 0,
+    "retries_held": 0
+  },
+  "model_spend": {
+    "estimated_microusd": 4220,
+    "declined_calls": 0
+  }
+}

@@ -1,0 +1,28 @@
+FFFF.                                                                    [100%]
+=================================== FAILURES ===================================
+_ test_provider_strict_resolution_cannot_contradict_an_earlier_snapshot[False-False] _
+tests/test_responses_tool_echo.py:168: in test_provider_strict_resolution_cannot_contradict_an_earlier_snapshot
+    assert not result.confirmed and result.usage is None
+E   AssertionError: assert (not True)
+E    +  where True = ResponsesObservation(confirmed=True, declined=False, usage={'input_tokens': 90, 'cache_creation_input_tokens': 0, 'cac...ed_usage': {'input_tokens': 90, 'cache_creation_input_tokens': 0, 'cache_read_input_tokens': 10, 'output_tokens': 20}}).confirmed
+_ test_provider_strict_resolution_cannot_contradict_an_earlier_snapshot[False-True] _
+tests/test_responses_tool_echo.py:168: in test_provider_strict_resolution_cannot_contradict_an_earlier_snapshot
+    assert not result.confirmed and result.usage is None
+E   AssertionError: assert (not True)
+E    +  where True = ResponsesObservation(confirmed=True, declined=False, usage={'input_tokens': 90, 'cache_creation_input_tokens': 0, 'cac...ed_usage': {'input_tokens': 90, 'cache_creation_input_tokens': 0, 'cache_read_input_tokens': 10, 'output_tokens': 20}}).confirmed
+_ test_provider_strict_resolution_cannot_contradict_an_earlier_snapshot[True-False] _
+tests/test_responses_tool_echo.py:168: in test_provider_strict_resolution_cannot_contradict_an_earlier_snapshot
+    assert not result.confirmed and result.usage is None
+E   AssertionError: assert (not True)
+E    +  where True = ResponsesObservation(confirmed=True, declined=False, usage={'input_tokens': 90, 'cache_creation_input_tokens': 0, 'cac...ed_usage': {'input_tokens': 90, 'cache_creation_input_tokens': 0, 'cache_read_input_tokens': 10, 'output_tokens': 20}}).confirmed
+_ test_provider_strict_resolution_cannot_contradict_an_earlier_snapshot[True-True] _
+tests/test_responses_tool_echo.py:168: in test_provider_strict_resolution_cannot_contradict_an_earlier_snapshot
+    assert not result.confirmed and result.usage is None
+E   AssertionError: assert (not True)
+E    +  where True = ResponsesObservation(confirmed=True, declined=False, usage={'input_tokens': 90, 'cache_creation_input_tokens': 0, 'cac...ed_usage': {'input_tokens': 90, 'cache_creation_input_tokens': 0, 'cache_read_input_tokens': 10, 'output_tokens': 20}}).confirmed
+=========================== short test summary info ============================
+FAILED tests/test_responses_tool_echo.py::test_provider_strict_resolution_cannot_contradict_an_earlier_snapshot[False-False]
+FAILED tests/test_responses_tool_echo.py::test_provider_strict_resolution_cannot_contradict_an_earlier_snapshot[False-True]
+FAILED tests/test_responses_tool_echo.py::test_provider_strict_resolution_cannot_contradict_an_earlier_snapshot[True-False]
+FAILED tests/test_responses_tool_echo.py::test_provider_strict_resolution_cannot_contradict_an_earlier_snapshot[True-True]
+4 failed, 1 passed, 187 deselected in 0.09s

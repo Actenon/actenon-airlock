@@ -1,0 +1,1177 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="0" failures="44" skipped="0" tests="60" time="1.827" timestamp="2026-11-04T22:44:23.844011+00:00" hostname="Rosss-MacBook-Air.local"><testcase classname="tests.test_inference_provider_errors" name="test_failed_reply_is_sanitized_signed_and_held[401-full-key]" time="0.038"><failure message="AssertionError: assert {'content-typ...-tenant', ...} == {'content-typ...ication/json'}&#10;  &#10;  Omitting 1 identical items, use -vv to show&#10;  Left contains 6 more items:&#10;  {'content-length': '159',&#10;   'openai-organization': 'org-secret-tenant',&#10;   'retry-after': '1',&#10;   'set-cookie': 'session=sk-proj-SYNTHETICfakeKEYvalue0123456789abcdefSECRETtail, '...&#10;  &#10;  ...Full output truncated (4 lines hidden), use '-vv' to show">broker = (&lt;actenon_airlock.state.State object at 0x10a2efb30&gt;, &lt;actenon_airlock.protected.ProtectedBroker object at 0x10a168320&gt;, &lt;responses_fixture.ScriptedProvider object at 0x109d39670&gt;)
+case = '401-full-key'
+
+    @pytest.mark.parametrize("case", CASES)
+    def test_failed_reply_is_sanitized_signed_and_held(broker, case):
+        state, subject, provider = broker
+        code, body = CASES[case]
+        provider.steps.insert(0, response(code, body))
+        result = subject.handle(message())
+        assert result["ok"] and result["outcome"] == "AMBIGUOUS"
+    
+        # The agent sees the real status and a fixed local error, nothing provider-supplied.
+        relayed = result["response"]
+        assert relayed["status"] == code
+&gt;       assert relayed["headers"] == {"content-type": "application/json"}
+E       AssertionError: assert {'content-typ...-tenant', ...} == {'content-typ...ication/json'}
+E         
+E         Omitting 1 identical items, use -vv to show
+E         Left contains 6 more items:
+E         {'content-length': '159',
+E          'openai-organization': 'org-secret-tenant',
+E          'retry-after': '1',
+E          'set-cookie': 'session=sk-proj-SYNTHETICfakeKEYvalue0123456789abcdefSECRETtail, '...
+E         
+E         ...Full output truncated (4 lines hidden), use '-vv' to show
+
+tests/test_inference_provider_errors.py:128: AssertionError</failure></testcase><testcase classname="tests.test_inference_provider_errors" name="test_failed_reply_is_sanitized_signed_and_held[401-masked-key]" time="0.017"><failure message="AssertionError: assert {'content-typ...-tenant', ...} == {'content-typ...ication/json'}&#10;  &#10;  Omitting 1 identical items, use -vv to show&#10;  Left contains 6 more items:&#10;  {'content-length': '153',&#10;   'openai-organization': 'org-secret-tenant',&#10;   'retry-after': '1',&#10;   'set-cookie': 'session=sk-proj-SYNTHETICfakeKEYvalue0123456789abcdefSECRETtail, '...&#10;  &#10;  ...Full output truncated (4 lines hidden), use '-vv' to show">broker = (&lt;actenon_airlock.state.State object at 0x10a2efdd0&gt;, &lt;actenon_airlock.protected.ProtectedBroker object at 0x10a2effe0&gt;, &lt;responses_fixture.ScriptedProvider object at 0x10a2effb0&gt;)
+case = '401-masked-key'
+
+    @pytest.mark.parametrize("case", CASES)
+    def test_failed_reply_is_sanitized_signed_and_held(broker, case):
+        state, subject, provider = broker
+        code, body = CASES[case]
+        provider.steps.insert(0, response(code, body))
+        result = subject.handle(message())
+        assert result["ok"] and result["outcome"] == "AMBIGUOUS"
+    
+        # The agent sees the real status and a fixed local error, nothing provider-supplied.
+        relayed = result["response"]
+        assert relayed["status"] == code
+&gt;       assert relayed["headers"] == {"content-type": "application/json"}
+E       AssertionError: assert {'content-typ...-tenant', ...} == {'content-typ...ication/json'}
+E         
+E         Omitting 1 identical items, use -vv to show
+E         Left contains 6 more items:
+E         {'content-length': '153',
+E          'openai-organization': 'org-secret-tenant',
+E          'retry-after': '1',
+E          'set-cookie': 'session=sk-proj-SYNTHETICfakeKEYvalue0123456789abcdefSECRETtail, '...
+E         
+E         ...Full output truncated (4 lines hidden), use '-vv' to show
+
+tests/test_inference_provider_errors.py:128: AssertionError</failure></testcase><testcase classname="tests.test_inference_provider_errors" name="test_failed_reply_is_sanitized_signed_and_held[401-other-key]" time="0.015"><failure message="AssertionError: assert {'content-typ...-tenant', ...} == {'content-typ...ication/json'}&#10;  &#10;  Omitting 1 identical items, use -vv to show&#10;  Left contains 6 more items:&#10;  {'content-length': '175',&#10;   'openai-organization': 'org-secret-tenant',&#10;   'retry-after': '1',&#10;   'set-cookie': 'session=sk-proj-SYNTHETICfakeKEYvalue0123456789abcdefSECRETtail, '...&#10;  &#10;  ...Full output truncated (4 lines hidden), use '-vv' to show">broker = (&lt;actenon_airlock.state.State object at 0x10a478cb0&gt;, &lt;actenon_airlock.protected.ProtectedBroker object at 0x10a47bd70&gt;, &lt;responses_fixture.ScriptedProvider object at 0x10a479fd0&gt;)
+case = '401-other-key'
+
+    @pytest.mark.parametrize("case", CASES)
+    def test_failed_reply_is_sanitized_signed_and_held(broker, case):
+        state, subject, provider = broker
+        code, body = CASES[case]
+        provider.steps.insert(0, response(code, body))
+        result = subject.handle(message())
+        assert result["ok"] and result["outcome"] == "AMBIGUOUS"
+    
+        # The agent sees the real status and a fixed local error, nothing provider-supplied.
+        relayed = result["response"]
+        assert relayed["status"] == code
+&gt;       assert relayed["headers"] == {"content-type": "application/json"}
+E       AssertionError: assert {'content-typ...-tenant', ...} == {'content-typ...ication/json'}
+E         
+E         Omitting 1 identical items, use -vv to show
+E         Left contains 6 more items:
+E         {'content-length': '175',
+E          'openai-organization': 'org-secret-tenant',
+E          'retry-after': '1',
+E          'set-cookie': 'session=sk-proj-SYNTHETICfakeKEYvalue0123456789abcdefSECRETtail, '...
+E         
+E         ...Full output truncated (4 lines hidden), use '-vv' to show
+
+tests/test_inference_provider_errors.py:128: AssertionError</failure></testcase><testcase classname="tests.test_inference_provider_errors" name="test_failed_reply_is_sanitized_signed_and_held[401-misleading-quota-code]" time="0.015"><failure message="AssertionError: assert {'content-typ...-tenant', ...} == {'content-typ...ication/json'}&#10;  &#10;  Omitting 1 identical items, use -vv to show&#10;  Left contains 6 more items:&#10;  {'content-length': '111',&#10;   'openai-organization': 'org-secret-tenant',&#10;   'retry-after': '1',&#10;   'set-cookie': 'session=sk-proj-SYNTHETICfakeKEYvalue0123456789abcdefSECRETtail, '...&#10;  &#10;  ...Full output truncated (4 lines hidden), use '-vv' to show">broker = (&lt;actenon_airlock.state.State object at 0x10a345c40&gt;, &lt;actenon_airlock.protected.ProtectedBroker object at 0x10a551e50&gt;, &lt;responses_fixture.ScriptedProvider object at 0x10a345d60&gt;)
+case = '401-misleading-quota-code'
+
+    @pytest.mark.parametrize("case", CASES)
+    def test_failed_reply_is_sanitized_signed_and_held(broker, case):
+        state, subject, provider = broker
+        code, body = CASES[case]
+        provider.steps.insert(0, response(code, body))
+        result = subject.handle(message())
+        assert result["ok"] and result["outcome"] == "AMBIGUOUS"
+    
+        # The agent sees the real status and a fixed local error, nothing provider-supplied.
+        relayed = result["response"]
+        assert relayed["status"] == code
+&gt;       assert relayed["headers"] == {"content-type": "application/json"}
+E       AssertionError: assert {'content-typ...-tenant', ...} == {'content-typ...ication/json'}
+E         
+E         Omitting 1 identical items, use -vv to show
+E         Left contains 6 more items:
+E         {'content-length': '111',
+E          'openai-organization': 'org-secret-tenant',
+E          'retry-after': '1',
+E          'set-cookie': 'session=sk-proj-SYNTHETICfakeKEYvalue0123456789abcdefSECRETtail, '...
+E         
+E         ...Full output truncated (4 lines hidden), use '-vv' to show
+
+tests/test_inference_provider_errors.py:128: AssertionError</failure></testcase><testcase classname="tests.test_inference_provider_errors" name="test_failed_reply_is_sanitized_signed_and_held[403-region]" time="0.025"><failure message="AssertionError: assert {'content-typ...-tenant', ...} == {'content-typ...ication/json'}&#10;  &#10;  Omitting 1 identical items, use -vv to show&#10;  Left contains 6 more items:&#10;  {'content-length': '135',&#10;   'openai-organization': 'org-secret-tenant',&#10;   'retry-after': '1',&#10;   'set-cookie': 'session=sk-proj-SYNTHETICfakeKEYvalue0123456789abcdefSECRETtail, '...&#10;  &#10;  ...Full output truncated (4 lines hidden), use '-vv' to show">broker = (&lt;actenon_airlock.state.State object at 0x10a3c7d40&gt;, &lt;actenon_airlock.protected.ProtectedBroker object at 0x10a345400&gt;, &lt;responses_fixture.ScriptedProvider object at 0x10a3c59d0&gt;)
+case = '403-region'
+
+    @pytest.mark.parametrize("case", CASES)
+    def test_failed_reply_is_sanitized_signed_and_held(broker, case):
+        state, subject, provider = broker
+        code, body = CASES[case]
+        provider.steps.insert(0, response(code, body))
+        result = subject.handle(message())
+        assert result["ok"] and result["outcome"] == "AMBIGUOUS"
+    
+        # The agent sees the real status and a fixed local error, nothing provider-supplied.
+        relayed = result["response"]
+        assert relayed["status"] == code
+&gt;       assert relayed["headers"] == {"content-type": "application/json"}
+E       AssertionError: assert {'content-typ...-tenant', ...} == {'content-typ...ication/json'}
+E         
+E         Omitting 1 identical items, use -vv to show
+E         Left contains 6 more items:
+E         {'content-length': '135',
+E          'openai-organization': 'org-secret-tenant',
+E          'retry-after': '1',
+E          'set-cookie': 'session=sk-proj-SYNTHETICfakeKEYvalue0123456789abcdefSECRETtail, '...
+E         
+E         ...Full output truncated (4 lines hidden), use '-vv' to show
+
+tests/test_inference_provider_errors.py:128: AssertionError</failure></testcase><testcase classname="tests.test_inference_provider_errors" name="test_failed_reply_is_sanitized_signed_and_held[429-misleading-auth-code]" time="0.015"><failure message="AssertionError: assert {'content-typ...-tenant', ...} == {'content-typ...ication/json'}&#10;  &#10;  Omitting 1 identical items, use -vv to show&#10;  Left contains 6 more items:&#10;  {'content-length': '156',&#10;   'openai-organization': 'org-secret-tenant',&#10;   'retry-after': '1',&#10;   'set-cookie': 'session=sk-proj-SYNTHETICfakeKEYvalue0123456789abcdefSECRETtail, '...&#10;  &#10;  ...Full output truncated (4 lines hidden), use '-vv' to show">broker = (&lt;actenon_airlock.state.State object at 0x10a5dfa40&gt;, &lt;actenon_airlock.protected.ProtectedBroker object at 0x10a475220&gt;, &lt;responses_fixture.ScriptedProvider object at 0x10a475cd0&gt;)
+case = '429-misleading-auth-code'
+
+    @pytest.mark.parametrize("case", CASES)
+    def test_failed_reply_is_sanitized_signed_and_held(broker, case):
+        state, subject, provider = broker
+        code, body = CASES[case]
+        provider.steps.insert(0, response(code, body))
+        result = subject.handle(message())
+        assert result["ok"] and result["outcome"] == "AMBIGUOUS"
+    
+        # The agent sees the real status and a fixed local error, nothing provider-supplied.
+        relayed = result["response"]
+        assert relayed["status"] == code
+&gt;       assert relayed["headers"] == {"content-type": "application/json"}
+E       AssertionError: assert {'content-typ...-tenant', ...} == {'content-typ...ication/json'}
+E         
+E         Omitting 1 identical items, use -vv to show
+E         Left contains 6 more items:
+E         {'content-length': '156',
+E          'openai-organization': 'org-secret-tenant',
+E          'retry-after': '1',
+E          'set-cookie': 'session=sk-proj-SYNTHETICfakeKEYvalue0123456789abcdefSECRETtail, '...
+E         
+E         ...Full output truncated (4 lines hidden), use '-vv' to show
+
+tests/test_inference_provider_errors.py:128: AssertionError</failure></testcase><testcase classname="tests.test_inference_provider_errors" name="test_failed_reply_is_sanitized_signed_and_held[500-server]" time="0.016"><failure message="AssertionError: assert {'content-typ...-tenant', ...} == {'content-typ...ication/json'}&#10;  &#10;  Omitting 1 identical items, use -vv to show&#10;  Left contains 6 more items:&#10;  {'content-length': '150',&#10;   'openai-organization': 'org-secret-tenant',&#10;   'retry-after': '1',&#10;   'set-cookie': 'session=sk-proj-SYNTHETICfakeKEYvalue0123456789abcdefSECRETtail, '...&#10;  &#10;  ...Full output truncated (4 lines hidden), use '-vv' to show">broker = (&lt;actenon_airlock.state.State object at 0x10a536810&gt;, &lt;actenon_airlock.protected.ProtectedBroker object at 0x109d74620&gt;, &lt;responses_fixture.ScriptedProvider object at 0x10a537c20&gt;)
+case = '500-server'
+
+    @pytest.mark.parametrize("case", CASES)
+    def test_failed_reply_is_sanitized_signed_and_held(broker, case):
+        state, subject, provider = broker
+        code, body = CASES[case]
+        provider.steps.insert(0, response(code, body))
+        result = subject.handle(message())
+        assert result["ok"] and result["outcome"] == "AMBIGUOUS"
+    
+        # The agent sees the real status and a fixed local error, nothing provider-supplied.
+        relayed = result["response"]
+        assert relayed["status"] == code
+&gt;       assert relayed["headers"] == {"content-type": "application/json"}
+E       AssertionError: assert {'content-typ...-tenant', ...} == {'content-typ...ication/json'}
+E         
+E         Omitting 1 identical items, use -vv to show
+E         Left contains 6 more items:
+E         {'content-length': '150',
+E          'openai-organization': 'org-secret-tenant',
+E          'retry-after': '1',
+E          'set-cookie': 'session=sk-proj-SYNTHETICfakeKEYvalue0123456789abcdefSECRETtail, '...
+E         
+E         ...Full output truncated (4 lines hidden), use '-vv' to show
+
+tests/test_inference_provider_errors.py:128: AssertionError</failure></testcase><testcase classname="tests.test_inference_provider_errors" name="test_failed_reply_is_sanitized_signed_and_held[503-text]" time="0.029"><failure message="AssertionError: assert {'content-typ...-tenant', ...} == {'content-typ...ication/json'}&#10;  &#10;  Omitting 1 identical items, use -vv to show&#10;  Left contains 6 more items:&#10;  {'content-length': '75',&#10;   'openai-organization': 'org-secret-tenant',&#10;   'retry-after': '1',&#10;   'set-cookie': 'session=sk-proj-SYNTHETICfakeKEYvalue0123456789abcdefSECRETtail, '...&#10;  &#10;  ...Full output truncated (4 lines hidden), use '-vv' to show">broker = (&lt;actenon_airlock.state.State object at 0x10a47a780&gt;, &lt;actenon_airlock.protected.ProtectedBroker object at 0x10a4ab620&gt;, &lt;responses_fixture.ScriptedProvider object at 0x10a47b5c0&gt;)
+case = '503-text'
+
+    @pytest.mark.parametrize("case", CASES)
+    def test_failed_reply_is_sanitized_signed_and_held(broker, case):
+        state, subject, provider = broker
+        code, body = CASES[case]
+        provider.steps.insert(0, response(code, body))
+        result = subject.handle(message())
+        assert result["ok"] and result["outcome"] == "AMBIGUOUS"
+    
+        # The agent sees the real status and a fixed local error, nothing provider-supplied.
+        relayed = result["response"]
+        assert relayed["status"] == code
+&gt;       assert relayed["headers"] == {"content-type": "application/json"}
+E       AssertionError: assert {'content-typ...-tenant', ...} == {'content-typ...ication/json'}
+E         
+E         Omitting 1 identical items, use -vv to show
+E         Left contains 6 more items:
+E         {'content-length': '75',
+E          'openai-organization': 'org-secret-tenant',
+E          'retry-after': '1',
+E          'set-cookie': 'session=sk-proj-SYNTHETICfakeKEYvalue0123456789abcdefSECRETtail, '...
+E         
+E         ...Full output truncated (4 lines hidden), use '-vv' to show
+
+tests/test_inference_provider_errors.py:128: AssertionError</failure></testcase><testcase classname="tests.test_inference_provider_errors" name="test_failed_reply_is_sanitized_signed_and_held[502-empty]" time="0.017"><failure message="AssertionError: assert {'content-typ...-tenant', ...} == {'content-typ...ication/json'}&#10;  &#10;  Omitting 1 identical items, use -vv to show&#10;  Left contains 5 more items:&#10;  {'openai-organization': 'org-secret-tenant',&#10;   'retry-after': '1',&#10;   'set-cookie': 'session=sk-proj-SYNTHETICfakeKEYvalue0123456789abcdefSECRETtail, '&#10;                 'other=airlock_credential_58049f65e9554aab9bef4a1519e53ffc',...&#10;  &#10;  ...Full output truncated (3 lines hidden), use '-vv' to show">broker = (&lt;actenon_airlock.state.State object at 0x10a5deb40&gt;, &lt;actenon_airlock.protected.ProtectedBroker object at 0x10a5376e0&gt;, &lt;responses_fixture.ScriptedProvider object at 0x10a5dff80&gt;)
+case = '502-empty'
+
+    @pytest.mark.parametrize("case", CASES)
+    def test_failed_reply_is_sanitized_signed_and_held(broker, case):
+        state, subject, provider = broker
+        code, body = CASES[case]
+        provider.steps.insert(0, response(code, body))
+        result = subject.handle(message())
+        assert result["ok"] and result["outcome"] == "AMBIGUOUS"
+    
+        # The agent sees the real status and a fixed local error, nothing provider-supplied.
+        relayed = result["response"]
+        assert relayed["status"] == code
+&gt;       assert relayed["headers"] == {"content-type": "application/json"}
+E       AssertionError: assert {'content-typ...-tenant', ...} == {'content-typ...ication/json'}
+E         
+E         Omitting 1 identical items, use -vv to show
+E         Left contains 5 more items:
+E         {'openai-organization': 'org-secret-tenant',
+E          'retry-after': '1',
+E          'set-cookie': 'session=sk-proj-SYNTHETICfakeKEYvalue0123456789abcdefSECRETtail, '
+E                        'other=airlock_credential_58049f65e9554aab9bef4a1519e53ffc',...
+E         
+E         ...Full output truncated (3 lines hidden), use '-vv' to show
+
+tests/test_inference_provider_errors.py:128: AssertionError</failure></testcase><testcase classname="tests.test_inference_provider_errors" name="test_failed_reply_is_sanitized_signed_and_held[400-malformed]" time="0.017"><failure message="AssertionError: assert {'content-typ...-tenant', ...} == {'content-typ...ication/json'}&#10;  &#10;  Omitting 1 identical items, use -vv to show&#10;  Left contains 6 more items:&#10;  {'content-length': '78',&#10;   'openai-organization': 'org-secret-tenant',&#10;   'retry-after': '1',&#10;   'set-cookie': 'session=sk-proj-SYNTHETICfakeKEYvalue0123456789abcdefSECRETtail, '...&#10;  &#10;  ...Full output truncated (4 lines hidden), use '-vv' to show">broker = (&lt;actenon_airlock.state.State object at 0x10a2a4260&gt;, &lt;actenon_airlock.protected.ProtectedBroker object at 0x10a2a4140&gt;, &lt;responses_fixture.ScriptedProvider object at 0x10a2a4aa0&gt;)
+case = '400-malformed'
+
+    @pytest.mark.parametrize("case", CASES)
+    def test_failed_reply_is_sanitized_signed_and_held(broker, case):
+        state, subject, provider = broker
+        code, body = CASES[case]
+        provider.steps.insert(0, response(code, body))
+        result = subject.handle(message())
+        assert result["ok"] and result["outcome"] == "AMBIGUOUS"
+    
+        # The agent sees the real status and a fixed local error, nothing provider-supplied.
+        relayed = result["response"]
+        assert relayed["status"] == code
+&gt;       assert relayed["headers"] == {"content-type": "application/json"}
+E       AssertionError: assert {'content-typ...-tenant', ...} == {'content-typ...ication/json'}
+E         
+E         Omitting 1 identical items, use -vv to show
+E         Left contains 6 more items:
+E         {'content-length': '78',
+E          'openai-organization': 'org-secret-tenant',
+E          'retry-after': '1',
+E          'set-cookie': 'session=sk-proj-SYNTHETICfakeKEYvalue0123456789abcdefSECRETtail, '...
+E         
+E         ...Full output truncated (4 lines hidden), use '-vv' to show
+
+tests/test_inference_provider_errors.py:128: AssertionError</failure></testcase><testcase classname="tests.test_inference_provider_errors" name="test_failed_reply_is_sanitized_signed_and_held[400-duplicate-keys]" time="0.016"><failure message="AssertionError: assert {'content-typ...-tenant', ...} == {'content-typ...ication/json'}&#10;  &#10;  Omitting 1 identical items, use -vv to show&#10;  Left contains 6 more items:&#10;  {'content-length': '111',&#10;   'openai-organization': 'org-secret-tenant',&#10;   'retry-after': '1',&#10;   'set-cookie': 'session=sk-proj-SYNTHETICfakeKEYvalue0123456789abcdefSECRETtail, '...&#10;  &#10;  ...Full output truncated (4 lines hidden), use '-vv' to show">broker = (&lt;actenon_airlock.state.State object at 0x10a2a6f90&gt;, &lt;actenon_airlock.protected.ProtectedBroker object at 0x10a474d70&gt;, &lt;responses_fixture.ScriptedProvider object at 0x10a2a7aa0&gt;)
+case = '400-duplicate-keys'
+
+    @pytest.mark.parametrize("case", CASES)
+    def test_failed_reply_is_sanitized_signed_and_held(broker, case):
+        state, subject, provider = broker
+        code, body = CASES[case]
+        provider.steps.insert(0, response(code, body))
+        result = subject.handle(message())
+        assert result["ok"] and result["outcome"] == "AMBIGUOUS"
+    
+        # The agent sees the real status and a fixed local error, nothing provider-supplied.
+        relayed = result["response"]
+        assert relayed["status"] == code
+&gt;       assert relayed["headers"] == {"content-type": "application/json"}
+E       AssertionError: assert {'content-typ...-tenant', ...} == {'content-typ...ication/json'}
+E         
+E         Omitting 1 identical items, use -vv to show
+E         Left contains 6 more items:
+E         {'content-length': '111',
+E          'openai-organization': 'org-secret-tenant',
+E          'retry-after': '1',
+E          'set-cookie': 'session=sk-proj-SYNTHETICfakeKEYvalue0123456789abcdefSECRETtail, '...
+E         
+E         ...Full output truncated (4 lines hidden), use '-vv' to show
+
+tests/test_inference_provider_errors.py:128: AssertionError</failure></testcase><testcase classname="tests.test_inference_provider_errors" name="test_failed_reply_is_sanitized_signed_and_held[400-non-object]" time="0.016"><failure message="AssertionError: assert {'content-typ...-tenant', ...} == {'content-typ...ication/json'}&#10;  &#10;  Omitting 1 identical items, use -vv to show&#10;  Left contains 6 more items:&#10;  {'content-length': '59',&#10;   'openai-organization': 'org-secret-tenant',&#10;   'retry-after': '1',&#10;   'set-cookie': 'session=sk-proj-SYNTHETICfakeKEYvalue0123456789abcdefSECRETtail, '...&#10;  &#10;  ...Full output truncated (4 lines hidden), use '-vv' to show">broker = (&lt;actenon_airlock.state.State object at 0x10a520d70&gt;, &lt;actenon_airlock.protected.ProtectedBroker object at 0x10a38d730&gt;, &lt;responses_fixture.ScriptedProvider object at 0x10a208ec0&gt;)
+case = '400-non-object'
+
+    @pytest.mark.parametrize("case", CASES)
+    def test_failed_reply_is_sanitized_signed_and_held(broker, case):
+        state, subject, provider = broker
+        code, body = CASES[case]
+        provider.steps.insert(0, response(code, body))
+        result = subject.handle(message())
+        assert result["ok"] and result["outcome"] == "AMBIGUOUS"
+    
+        # The agent sees the real status and a fixed local error, nothing provider-supplied.
+        relayed = result["response"]
+        assert relayed["status"] == code
+&gt;       assert relayed["headers"] == {"content-type": "application/json"}
+E       AssertionError: assert {'content-typ...-tenant', ...} == {'content-typ...ication/json'}
+E         
+E         Omitting 1 identical items, use -vv to show
+E         Left contains 6 more items:
+E         {'content-length': '59',
+E          'openai-organization': 'org-secret-tenant',
+E          'retry-after': '1',
+E          'set-cookie': 'session=sk-proj-SYNTHETICfakeKEYvalue0123456789abcdefSECRETtail, '...
+E         
+E         ...Full output truncated (4 lines hidden), use '-vv' to show
+
+tests/test_inference_provider_errors.py:128: AssertionError</failure></testcase><testcase classname="tests.test_inference_provider_errors" name="test_failed_reply_is_sanitized_signed_and_held[401-secret-code]" time="0.015"><failure message="AssertionError: assert {'content-typ...-tenant', ...} == {'content-typ...ication/json'}&#10;  &#10;  Omitting 1 identical items, use -vv to show&#10;  Left contains 6 more items:&#10;  {'content-length': '148',&#10;   'openai-organization': 'org-secret-tenant',&#10;   'retry-after': '1',&#10;   'set-cookie': 'session=sk-proj-SYNTHETICfakeKEYvalue0123456789abcdefSECRETtail, '...&#10;  &#10;  ...Full output truncated (4 lines hidden), use '-vv' to show">broker = (&lt;actenon_airlock.state.State object at 0x109f24cb0&gt;, &lt;actenon_airlock.protected.ProtectedBroker object at 0x10a2b4500&gt;, &lt;responses_fixture.ScriptedProvider object at 0x10a5df6e0&gt;)
+case = '401-secret-code'
+
+    @pytest.mark.parametrize("case", CASES)
+    def test_failed_reply_is_sanitized_signed_and_held(broker, case):
+        state, subject, provider = broker
+        code, body = CASES[case]
+        provider.steps.insert(0, response(code, body))
+        result = subject.handle(message())
+        assert result["ok"] and result["outcome"] == "AMBIGUOUS"
+    
+        # The agent sees the real status and a fixed local error, nothing provider-supplied.
+        relayed = result["response"]
+        assert relayed["status"] == code
+&gt;       assert relayed["headers"] == {"content-type": "application/json"}
+E       AssertionError: assert {'content-typ...-tenant', ...} == {'content-typ...ication/json'}
+E         
+E         Omitting 1 identical items, use -vv to show
+E         Left contains 6 more items:
+E         {'content-length': '148',
+E          'openai-organization': 'org-secret-tenant',
+E          'retry-after': '1',
+E          'set-cookie': 'session=sk-proj-SYNTHETICfakeKEYvalue0123456789abcdefSECRETtail, '...
+E         
+E         ...Full output truncated (4 lines hidden), use '-vv' to show
+
+tests/test_inference_provider_errors.py:128: AssertionError</failure></testcase><testcase classname="tests.test_inference_provider_errors" name="test_failed_reply_is_sanitized_signed_and_held[401-code-not-string]" time="0.015"><failure message="AssertionError: assert {'content-typ...-tenant', ...} == {'content-typ...ication/json'}&#10;  &#10;  Omitting 1 identical items, use -vv to show&#10;  Left contains 6 more items:&#10;  {'content-length': '160',&#10;   'openai-organization': 'org-secret-tenant',&#10;   'retry-after': '1',&#10;   'set-cookie': 'session=sk-proj-SYNTHETICfakeKEYvalue0123456789abcdefSECRETtail, '...&#10;  &#10;  ...Full output truncated (4 lines hidden), use '-vv' to show">broker = (&lt;actenon_airlock.state.State object at 0x10a47a090&gt;, &lt;actenon_airlock.protected.ProtectedBroker object at 0x10a3aaf00&gt;, &lt;responses_fixture.ScriptedProvider object at 0x10a5e6f90&gt;)
+case = '401-code-not-string'
+
+    @pytest.mark.parametrize("case", CASES)
+    def test_failed_reply_is_sanitized_signed_and_held(broker, case):
+        state, subject, provider = broker
+        code, body = CASES[case]
+        provider.steps.insert(0, response(code, body))
+        result = subject.handle(message())
+        assert result["ok"] and result["outcome"] == "AMBIGUOUS"
+    
+        # The agent sees the real status and a fixed local error, nothing provider-supplied.
+        relayed = result["response"]
+        assert relayed["status"] == code
+&gt;       assert relayed["headers"] == {"content-type": "application/json"}
+E       AssertionError: assert {'content-typ...-tenant', ...} == {'content-typ...ication/json'}
+E         
+E         Omitting 1 identical items, use -vv to show
+E         Left contains 6 more items:
+E         {'content-length': '160',
+E          'openai-organization': 'org-secret-tenant',
+E          'retry-after': '1',
+E          'set-cookie': 'session=sk-proj-SYNTHETICfakeKEYvalue0123456789abcdefSECRETtail, '...
+E         
+E         ...Full output truncated (4 lines hidden), use '-vv' to show
+
+tests/test_inference_provider_errors.py:128: AssertionError</failure></testcase><testcase classname="tests.test_inference_provider_errors" name="test_failed_reply_is_sanitized_signed_and_held[401-oversized]" time="0.016"><failure message="AssertionError: assert {'content-typ...-tenant', ...} == {'content-typ...ication/json'}&#10;  &#10;  Omitting 1 identical items, use -vv to show&#10;  Left contains 6 more items:&#10;  {'content-length': '200156',&#10;   'openai-organization': 'org-secret-tenant',&#10;   'retry-after': '1',&#10;   'set-cookie': 'session=sk-proj-SYNTHETICfakeKEYvalue0123456789abcdefSECRETtail, '...&#10;  &#10;  ...Full output truncated (4 lines hidden), use '-vv' to show">broker = (&lt;actenon_airlock.state.State object at 0x10a3b37d0&gt;, &lt;actenon_airlock.protected.ProtectedBroker object at 0x10a3b38f0&gt;, &lt;responses_fixture.ScriptedProvider object at 0x10a3b2c60&gt;)
+case = '401-oversized'
+
+    @pytest.mark.parametrize("case", CASES)
+    def test_failed_reply_is_sanitized_signed_and_held(broker, case):
+        state, subject, provider = broker
+        code, body = CASES[case]
+        provider.steps.insert(0, response(code, body))
+        result = subject.handle(message())
+        assert result["ok"] and result["outcome"] == "AMBIGUOUS"
+    
+        # The agent sees the real status and a fixed local error, nothing provider-supplied.
+        relayed = result["response"]
+        assert relayed["status"] == code
+&gt;       assert relayed["headers"] == {"content-type": "application/json"}
+E       AssertionError: assert {'content-typ...-tenant', ...} == {'content-typ...ication/json'}
+E         
+E         Omitting 1 identical items, use -vv to show
+E         Left contains 6 more items:
+E         {'content-length': '200156',
+E          'openai-organization': 'org-secret-tenant',
+E          'retry-after': '1',
+E          'set-cookie': 'session=sk-proj-SYNTHETICfakeKEYvalue0123456789abcdefSECRETtail, '...
+E         
+E         ...Full output truncated (4 lines hidden), use '-vv' to show
+
+tests/test_inference_provider_errors.py:128: AssertionError</failure></testcase><testcase classname="tests.test_inference_provider_errors" name="test_failed_reply_keeps_its_reservation_and_refuses_the_retry[401-full-key]" time="0.017" /><testcase classname="tests.test_inference_provider_errors" name="test_failed_reply_keeps_its_reservation_and_refuses_the_retry[401-masked-key]" time="0.018" /><testcase classname="tests.test_inference_provider_errors" name="test_failed_reply_keeps_its_reservation_and_refuses_the_retry[401-other-key]" time="0.016" /><testcase classname="tests.test_inference_provider_errors" name="test_failed_reply_keeps_its_reservation_and_refuses_the_retry[401-misleading-quota-code]" time="0.016" /><testcase classname="tests.test_inference_provider_errors" name="test_failed_reply_keeps_its_reservation_and_refuses_the_retry[403-region]" time="0.019" /><testcase classname="tests.test_inference_provider_errors" name="test_failed_reply_keeps_its_reservation_and_refuses_the_retry[500-server]" time="0.016" /><testcase classname="tests.test_inference_provider_errors" name="test_failed_reply_keeps_its_reservation_and_refuses_the_retry[503-text]" time="0.016" /><testcase classname="tests.test_inference_provider_errors" name="test_failed_reply_keeps_its_reservation_and_refuses_the_retry[502-empty]" time="0.019" /><testcase classname="tests.test_inference_provider_errors" name="test_failed_reply_keeps_its_reservation_and_refuses_the_retry[400-malformed]" time="0.016" /><testcase classname="tests.test_inference_provider_errors" name="test_failed_reply_keeps_its_reservation_and_refuses_the_retry[400-duplicate-keys]" time="0.017" /><testcase classname="tests.test_inference_provider_errors" name="test_failed_reply_keeps_its_reservation_and_refuses_the_retry[400-non-object]" time="0.018" /><testcase classname="tests.test_inference_provider_errors" name="test_failed_reply_keeps_its_reservation_and_refuses_the_retry[401-secret-code]" time="0.018" /><testcase classname="tests.test_inference_provider_errors" name="test_failed_reply_keeps_its_reservation_and_refuses_the_retry[401-code-not-string]" time="0.017" /><testcase classname="tests.test_inference_provider_errors" name="test_failed_reply_keeps_its_reservation_and_refuses_the_retry[401-oversized]" time="0.019" /><testcase classname="tests.test_inference_provider_errors" name="test_401_is_never_treated_as_a_declined_or_zero_cost_reply" time="0.015" /><testcase classname="tests.test_inference_provider_errors" name="test_documented_429_declines_keep_their_existing_accounting_and_are_sanitized[rate_limit_exceeded]" time="0.015"><failure message="AssertionError: syntheti&#10;assert b'syntheti' not in b'{&quot;status&quot;: 429, &quot;headers&quot;: {&quot;content-type&quot;: &quot;application/json&quot;, &quot;set-cookie&quot;: &quot;session=sk-proj-syntheticfakekeyvalue...9yiiwginbhcmftijogbnvsbcwgimnvzguioiaicmf0zv9saw1pdf9legnlzwrlzcj9fq==&quot;, &quot;url&quot;: &quot;https://api.openai.com/v1/responses&quot;}'&#10; +  where b'syntheti' = &lt;built-in method encode of str object at 0x10a411230&gt;()&#10; +    where &lt;built-in method encode of str object at 0x10a411230&gt; = 'syntheti'.encode&#10; +      where 'syntheti' = &lt;built-in method lower of str object at 0x108f202b0&gt;()&#10; +        where &lt;built-in method lower of str object at 0x108f202b0&gt; = 'syntheti'.lower">broker = (&lt;actenon_airlock.state.State object at 0x10b2d5a60&gt;, &lt;actenon_airlock.protected.ProtectedBroker object at 0x10a4aa5d0&gt;, &lt;responses_fixture.ScriptedProvider object at 0x10a2b6480&gt;)
+code = 'rate_limit_exceeded'
+
+    @pytest.mark.parametrize("code", ["rate_limit_exceeded", "insufficient_quota"])
+    def test_documented_429_declines_keep_their_existing_accounting_and_are_sanitized(broker, code):
+        state, subject, provider = broker
+        provider.steps.insert(0, response(429, openai_error(code, f"limit {FAKE}")))
+        first = subject.handle(message())
+        assert first["outcome"] == "AMBIGUOUS" and subject.inference_spent == 0
+        assert first["response"]["status"] == 429
+&gt;       assert_clean(json.dumps(first["response"]).encode())
+
+tests/test_inference_provider_errors.py:176: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+blob = b'{"status": 429, "headers": {"content-type": "application/json", "set-cookie": "session=sk-proj-SYNTHETICfakeKEYvalue...9yIiwgInBhcmFtIjogbnVsbCwgImNvZGUiOiAicmF0ZV9saW1pdF9leGNlZWRlZCJ9fQ==", "url": "https://api.openai.com/v1/responses"}'
+
+    def assert_clean(blob: bytes):
+        lowered = blob.lower()
+        for fragment in FRAGMENTS:
+&gt;           assert fragment.lower().encode() not in lowered, fragment
+E           AssertionError: syntheti
+E           assert b'syntheti' not in b'{"status": 429, "headers": {"content-type": "application/json", "set-cookie": "session=sk-proj-syntheticfakekeyvalue...9yiiwginbhcmftijogbnvsbcwgimnvzguioiaicmf0zv9saw1pdf9legnlzwrlzcj9fq==", "url": "https://api.openai.com/v1/responses"}'
+E            +  where b'syntheti' = &lt;built-in method encode of str object at 0x10a411230&gt;()
+E            +    where &lt;built-in method encode of str object at 0x10a411230&gt; = 'syntheti'.encode
+E            +      where 'syntheti' = &lt;built-in method lower of str object at 0x108f202b0&gt;()
+E            +        where &lt;built-in method lower of str object at 0x108f202b0&gt; = 'syntheti'.lower
+
+tests/test_inference_provider_errors.py:114: AssertionError</failure></testcase><testcase classname="tests.test_inference_provider_errors" name="test_documented_429_declines_keep_their_existing_accounting_and_are_sanitized[insufficient_quota]" time="0.017"><failure message="AssertionError: syntheti&#10;assert b'syntheti' not in b'{&quot;status&quot;: 429, &quot;headers&quot;: {&quot;content-type&quot;: &quot;application/json&quot;, &quot;set-cookie&quot;: &quot;session=sk-proj-syntheticfakekeyvalue...vycm9yiiwginbhcmftijogbnvsbcwgimnvzguioiaiaw5zdwzmawnpzw50x3f1b3rhin19&quot;, &quot;url&quot;: &quot;https://api.openai.com/v1/responses&quot;}'&#10; +  where b'syntheti' = &lt;built-in method encode of str object at 0x10a47def0&gt;()&#10; +    where &lt;built-in method encode of str object at 0x10a47def0&gt; = 'syntheti'.encode&#10; +      where 'syntheti' = &lt;built-in method lower of str object at 0x108f202b0&gt;()&#10; +        where &lt;built-in method lower of str object at 0x108f202b0&gt; = 'syntheti'.lower">broker = (&lt;actenon_airlock.state.State object at 0x10b2ad3a0&gt;, &lt;actenon_airlock.protected.ProtectedBroker object at 0x10b2afc20&gt;, &lt;responses_fixture.ScriptedProvider object at 0x10b2ada00&gt;)
+code = 'insufficient_quota'
+
+    @pytest.mark.parametrize("code", ["rate_limit_exceeded", "insufficient_quota"])
+    def test_documented_429_declines_keep_their_existing_accounting_and_are_sanitized(broker, code):
+        state, subject, provider = broker
+        provider.steps.insert(0, response(429, openai_error(code, f"limit {FAKE}")))
+        first = subject.handle(message())
+        assert first["outcome"] == "AMBIGUOUS" and subject.inference_spent == 0
+        assert first["response"]["status"] == 429
+&gt;       assert_clean(json.dumps(first["response"]).encode())
+
+tests/test_inference_provider_errors.py:176: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+blob = b'{"status": 429, "headers": {"content-type": "application/json", "set-cookie": "session=sk-proj-SYNTHETICfakeKEYvalue...Vycm9yIiwgInBhcmFtIjogbnVsbCwgImNvZGUiOiAiaW5zdWZmaWNpZW50X3F1b3RhIn19", "url": "https://api.openai.com/v1/responses"}'
+
+    def assert_clean(blob: bytes):
+        lowered = blob.lower()
+        for fragment in FRAGMENTS:
+&gt;           assert fragment.lower().encode() not in lowered, fragment
+E           AssertionError: syntheti
+E           assert b'syntheti' not in b'{"status": 429, "headers": {"content-type": "application/json", "set-cookie": "session=sk-proj-syntheticfakekeyvalue...vycm9yiiwginbhcmftijogbnvsbcwgimnvzguioiaiaw5zdwzmawnpzw50x3f1b3rhin19", "url": "https://api.openai.com/v1/responses"}'
+E            +  where b'syntheti' = &lt;built-in method encode of str object at 0x10a47def0&gt;()
+E            +    where &lt;built-in method encode of str object at 0x10a47def0&gt; = 'syntheti'.encode
+E            +      where 'syntheti' = &lt;built-in method lower of str object at 0x108f202b0&gt;()
+E            +        where &lt;built-in method lower of str object at 0x108f202b0&gt; = 'syntheti'.lower
+
+tests/test_inference_provider_errors.py:114: AssertionError</failure></testcase><testcase classname="tests.test_inference_provider_errors" name="test_successful_replies_are_not_rewritten" time="0.016" /><testcase classname="tests.test_inference_provider_errors" name="test_anthropic_contract_failure_is_sanitized_and_signed" time="0.016"><failure message="AssertionError: assert {'content-typ...-tenant', ...} == {'content-typ...ication/json'}&#10;  &#10;  Omitting 1 identical items, use -vv to show&#10;  Left contains 6 more items:&#10;  {'content-length': '148',&#10;   'openai-organization': 'org-secret-tenant',&#10;   'retry-after': '1',&#10;   'set-cookie': 'session=sk-proj-SYNTHETICfakeKEYvalue0123456789abcdefSECRETtail, '...&#10;  &#10;  ...Full output truncated (4 lines hidden), use '-vv' to show">tmp_path = PosixPath('/private/var/folders/tz/y04t4d0900xdbmz96jp608180000gn/T/pytest-of-ross/pytest-15/test_anthropic_contract_failur0')
+monkeypatch = &lt;_pytest.monkeypatch.MonkeyPatch object at 0x10a38c3b0&gt;
+
+    def test_anthropic_contract_failure_is_sanitized_and_signed(tmp_path, monkeypatch):
+        state = anthropic.configure(tmp_path)
+        leak = {
+            "type": "error",
+            "error": {"type": "authentication_error", "message": f"invalid x-api-key {FAKE}"},
+        }
+        calls = []
+        subject = anthropic.broker_for(
+            state, lambda r: calls.append(r) or response(401, leak), monkeypatch
+        )
+        try:
+            result = subject.handle(anthropic.message())
+            assert result["outcome"] == "AMBIGUOUS" and result["response"]["status"] == 401
+&gt;           assert result["response"]["headers"] == {"content-type": "application/json"}
+E           AssertionError: assert {'content-typ...-tenant', ...} == {'content-typ...ication/json'}
+E             
+E             Omitting 1 identical items, use -vv to show
+E             Left contains 6 more items:
+E             {'content-length': '148',
+E              'openai-organization': 'org-secret-tenant',
+E              'retry-after': '1',
+E              'set-cookie': 'session=sk-proj-SYNTHETICfakeKEYvalue0123456789abcdefSECRETtail, '...
+E             
+E             ...Full output truncated (4 lines hidden), use '-vv' to show
+
+tests/test_inference_provider_errors.py:202: AssertionError</failure></testcase><testcase classname="tests.test_inference_provider_errors" name="test_status_diagnostic_is_bounded_and_fixed_vocabulary" time="0.000"><failure message="ImportError: cannot import name 'provider_errors' from 'actenon_airlock' (/Users/ross/src/actenon-audit/airlock-pr23/src/actenon_airlock/__init__.py)">def test_status_diagnostic_is_bounded_and_fixed_vocabulary():
+        deep = b'{"error":' * 5000 + b"0" + b"}" * 5000
+&gt;       assert errors().status_diagnostic(401, deep)["provider_error_body"] == "malformed"
+               ^^^^^^^^
+
+tests/test_inference_provider_errors.py:219: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+    def errors():
+&gt;       from actenon_airlock import provider_errors
+E       ImportError: cannot import name 'provider_errors' from 'actenon_airlock' (/Users/ross/src/actenon-audit/airlock-pr23/src/actenon_airlock/__init__.py)
+
+tests/test_inference_provider_errors.py:24: ImportError</failure></testcase><testcase classname="tests.test_credential_preflight" name="test_malformed_credentials_are_refused_locally[None-missing]" time="0.000"><failure message="ImportError: cannot import name 'credential_preflight' from 'actenon_airlock' (/Users/ross/src/actenon-audit/airlock-pr23/src/actenon_airlock/__init__.py)">value = None, reason = 'missing'
+
+    @pytest.mark.parametrize(
+        "value,reason",
+        [
+            (None, "missing"),
+            ("", "empty"),
+            (SWALLOWED, "whitespace"),
+            (" " + GOOD, "whitespace"),
+            (GOOD + "\n", "whitespace"),
+            (GOOD[:20] + "\x00" + GOOD[20:], "control-characters"),
+            (GOOD + "é", "non-ascii"),
+            ("sk-short", "too-short"),
+            ("sk-" + "a" * 600, "too-long"),
+            ("pk-" + "a" * 60, "unexpected-prefix"),
+            ("sk-" + "a" * 30 + "/bin/python", "unexpected-characters"),
+            ("scripted-codex-no-real-credential", "unexpected-prefix"),
+        ],
+    )
+    def test_malformed_credentials_are_refused_locally(value, reason):
+&gt;       assert reason in preflight.format_problems(value)
+                         ^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/test_credential_preflight.py:56: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = &lt;test_credential_preflight._Lazy object at 0x10a2eb5f0&gt;
+name = 'format_problems'
+
+    def __getattr__(self, name):
+&gt;       from actenon_airlock import credential_preflight
+E       ImportError: cannot import name 'credential_preflight' from 'actenon_airlock' (/Users/ross/src/actenon-audit/airlock-pr23/src/actenon_airlock/__init__.py)
+
+tests/test_credential_preflight.py:21: ImportError</failure></testcase><testcase classname="tests.test_credential_preflight" name="test_malformed_credentials_are_refused_locally[-empty]" time="0.000"><failure message="ImportError: cannot import name 'credential_preflight' from 'actenon_airlock' (/Users/ross/src/actenon-audit/airlock-pr23/src/actenon_airlock/__init__.py)">value = '', reason = 'empty'
+
+    @pytest.mark.parametrize(
+        "value,reason",
+        [
+            (None, "missing"),
+            ("", "empty"),
+            (SWALLOWED, "whitespace"),
+            (" " + GOOD, "whitespace"),
+            (GOOD + "\n", "whitespace"),
+            (GOOD[:20] + "\x00" + GOOD[20:], "control-characters"),
+            (GOOD + "é", "non-ascii"),
+            ("sk-short", "too-short"),
+            ("sk-" + "a" * 600, "too-long"),
+            ("pk-" + "a" * 60, "unexpected-prefix"),
+            ("sk-" + "a" * 30 + "/bin/python", "unexpected-characters"),
+            ("scripted-codex-no-real-credential", "unexpected-prefix"),
+        ],
+    )
+    def test_malformed_credentials_are_refused_locally(value, reason):
+&gt;       assert reason in preflight.format_problems(value)
+                         ^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/test_credential_preflight.py:56: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = &lt;test_credential_preflight._Lazy object at 0x10a2eb5f0&gt;
+name = 'format_problems'
+
+    def __getattr__(self, name):
+&gt;       from actenon_airlock import credential_preflight
+E       ImportError: cannot import name 'credential_preflight' from 'actenon_airlock' (/Users/ross/src/actenon-audit/airlock-pr23/src/actenon_airlock/__init__.py)
+
+tests/test_credential_preflight.py:21: ImportError</failure></testcase><testcase classname="tests.test_credential_preflight" name="test_malformed_credentials_are_refused_locally[.venv/bin/python acceptance/codex-cli/run.py baseline --task token-bucket --image sha256:c449dec52754bad2a55dea7bb7b1edfbf7a864475464c53edc8ad9489d9d2269 --config ~/src/actenon-audit/live-codex/v44-frozen-candidate.json --out ~/src/actenon-audit/live-codex/1-baseline-v4-4 --live --authorized-usd 2-whitespace]" time="0.000"><failure message="ImportError: cannot import name 'credential_preflight' from 'actenon_airlock' (/Users/ross/src/actenon-audit/airlock-pr23/src/actenon_airlock/__init__.py)">value = '.venv/bin/python acceptance/codex-cli/run.py baseline --task token-bucket --image sha256:c449dec52754bad2a55dea7bb7b1...it/live-codex/v44-frozen-candidate.json --out ~/src/actenon-audit/live-codex/1-baseline-v4-4 --live --authorized-usd 2'
+reason = 'whitespace'
+
+    @pytest.mark.parametrize(
+        "value,reason",
+        [
+            (None, "missing"),
+            ("", "empty"),
+            (SWALLOWED, "whitespace"),
+            (" " + GOOD, "whitespace"),
+            (GOOD + "\n", "whitespace"),
+            (GOOD[:20] + "\x00" + GOOD[20:], "control-characters"),
+            (GOOD + "é", "non-ascii"),
+            ("sk-short", "too-short"),
+            ("sk-" + "a" * 600, "too-long"),
+            ("pk-" + "a" * 60, "unexpected-prefix"),
+            ("sk-" + "a" * 30 + "/bin/python", "unexpected-characters"),
+            ("scripted-codex-no-real-credential", "unexpected-prefix"),
+        ],
+    )
+    def test_malformed_credentials_are_refused_locally(value, reason):
+&gt;       assert reason in preflight.format_problems(value)
+                         ^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/test_credential_preflight.py:56: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = &lt;test_credential_preflight._Lazy object at 0x10a2eb5f0&gt;
+name = 'format_problems'
+
+    def __getattr__(self, name):
+&gt;       from actenon_airlock import credential_preflight
+E       ImportError: cannot import name 'credential_preflight' from 'actenon_airlock' (/Users/ross/src/actenon-audit/airlock-pr23/src/actenon_airlock/__init__.py)
+
+tests/test_credential_preflight.py:21: ImportError</failure></testcase><testcase classname="tests.test_credential_preflight" name="test_malformed_credentials_are_refused_locally[ sk-proj-A1b2C3d4E5f6G7h8A1b2C3d4E5f6G7h8A1b2C3d4E5f6G7h8A1b2C3d4E5f6G7h8A1b2C3d4E5f6G7h8A1b2C3d4E5f6G7h8-whitespace]" time="0.000"><failure message="ImportError: cannot import name 'credential_preflight' from 'actenon_airlock' (/Users/ross/src/actenon-audit/airlock-pr23/src/actenon_airlock/__init__.py)">value = ' sk-proj-A1b2C3d4E5f6G7h8A1b2C3d4E5f6G7h8A1b2C3d4E5f6G7h8A1b2C3d4E5f6G7h8A1b2C3d4E5f6G7h8A1b2C3d4E5f6G7h8'
+reason = 'whitespace'
+
+    @pytest.mark.parametrize(
+        "value,reason",
+        [
+            (None, "missing"),
+            ("", "empty"),
+            (SWALLOWED, "whitespace"),
+            (" " + GOOD, "whitespace"),
+            (GOOD + "\n", "whitespace"),
+            (GOOD[:20] + "\x00" + GOOD[20:], "control-characters"),
+            (GOOD + "é", "non-ascii"),
+            ("sk-short", "too-short"),
+            ("sk-" + "a" * 600, "too-long"),
+            ("pk-" + "a" * 60, "unexpected-prefix"),
+            ("sk-" + "a" * 30 + "/bin/python", "unexpected-characters"),
+            ("scripted-codex-no-real-credential", "unexpected-prefix"),
+        ],
+    )
+    def test_malformed_credentials_are_refused_locally(value, reason):
+&gt;       assert reason in preflight.format_problems(value)
+                         ^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/test_credential_preflight.py:56: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = &lt;test_credential_preflight._Lazy object at 0x10a2eb5f0&gt;
+name = 'format_problems'
+
+    def __getattr__(self, name):
+&gt;       from actenon_airlock import credential_preflight
+E       ImportError: cannot import name 'credential_preflight' from 'actenon_airlock' (/Users/ross/src/actenon-audit/airlock-pr23/src/actenon_airlock/__init__.py)
+
+tests/test_credential_preflight.py:21: ImportError</failure></testcase><testcase classname="tests.test_credential_preflight" name="test_malformed_credentials_are_refused_locally[sk-proj-A1b2C3d4E5f6G7h8A1b2C3d4E5f6G7h8A1b2C3d4E5f6G7h8A1b2C3d4E5f6G7h8A1b2C3d4E5f6G7h8A1b2C3d4E5f6G7h8\n-whitespace]" time="0.000"><failure message="ImportError: cannot import name 'credential_preflight' from 'actenon_airlock' (/Users/ross/src/actenon-audit/airlock-pr23/src/actenon_airlock/__init__.py)">value = 'sk-proj-A1b2C3d4E5f6G7h8A1b2C3d4E5f6G7h8A1b2C3d4E5f6G7h8A1b2C3d4E5f6G7h8A1b2C3d4E5f6G7h8A1b2C3d4E5f6G7h8\n'
+reason = 'whitespace'
+
+    @pytest.mark.parametrize(
+        "value,reason",
+        [
+            (None, "missing"),
+            ("", "empty"),
+            (SWALLOWED, "whitespace"),
+            (" " + GOOD, "whitespace"),
+            (GOOD + "\n", "whitespace"),
+            (GOOD[:20] + "\x00" + GOOD[20:], "control-characters"),
+            (GOOD + "é", "non-ascii"),
+            ("sk-short", "too-short"),
+            ("sk-" + "a" * 600, "too-long"),
+            ("pk-" + "a" * 60, "unexpected-prefix"),
+            ("sk-" + "a" * 30 + "/bin/python", "unexpected-characters"),
+            ("scripted-codex-no-real-credential", "unexpected-prefix"),
+        ],
+    )
+    def test_malformed_credentials_are_refused_locally(value, reason):
+&gt;       assert reason in preflight.format_problems(value)
+                         ^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/test_credential_preflight.py:56: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = &lt;test_credential_preflight._Lazy object at 0x10a2eb5f0&gt;
+name = 'format_problems'
+
+    def __getattr__(self, name):
+&gt;       from actenon_airlock import credential_preflight
+E       ImportError: cannot import name 'credential_preflight' from 'actenon_airlock' (/Users/ross/src/actenon-audit/airlock-pr23/src/actenon_airlock/__init__.py)
+
+tests/test_credential_preflight.py:21: ImportError</failure></testcase><testcase classname="tests.test_credential_preflight" name="test_malformed_credentials_are_refused_locally[sk-proj-A1b2C3d4E5f6\x00G7h8A1b2C3d4E5f6G7h8A1b2C3d4E5f6G7h8A1b2C3d4E5f6G7h8A1b2C3d4E5f6G7h8A1b2C3d4E5f6G7h8-control-characters]" time="0.000"><failure message="ImportError: cannot import name 'credential_preflight' from 'actenon_airlock' (/Users/ross/src/actenon-audit/airlock-pr23/src/actenon_airlock/__init__.py)">value = 'sk-proj-A1b2C3d4E5f6\x00G7h8A1b2C3d4E5f6G7h8A1b2C3d4E5f6G7h8A1b2C3d4E5f6G7h8A1b2C3d4E5f6G7h8A1b2C3d4E5f6G7h8'
+reason = 'control-characters'
+
+    @pytest.mark.parametrize(
+        "value,reason",
+        [
+            (None, "missing"),
+            ("", "empty"),
+            (SWALLOWED, "whitespace"),
+            (" " + GOOD, "whitespace"),
+            (GOOD + "\n", "whitespace"),
+            (GOOD[:20] + "\x00" + GOOD[20:], "control-characters"),
+            (GOOD + "é", "non-ascii"),
+            ("sk-short", "too-short"),
+            ("sk-" + "a" * 600, "too-long"),
+            ("pk-" + "a" * 60, "unexpected-prefix"),
+            ("sk-" + "a" * 30 + "/bin/python", "unexpected-characters"),
+            ("scripted-codex-no-real-credential", "unexpected-prefix"),
+        ],
+    )
+    def test_malformed_credentials_are_refused_locally(value, reason):
+&gt;       assert reason in preflight.format_problems(value)
+                         ^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/test_credential_preflight.py:56: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = &lt;test_credential_preflight._Lazy object at 0x10a2eb5f0&gt;
+name = 'format_problems'
+
+    def __getattr__(self, name):
+&gt;       from actenon_airlock import credential_preflight
+E       ImportError: cannot import name 'credential_preflight' from 'actenon_airlock' (/Users/ross/src/actenon-audit/airlock-pr23/src/actenon_airlock/__init__.py)
+
+tests/test_credential_preflight.py:21: ImportError</failure></testcase><testcase classname="tests.test_credential_preflight" name="test_malformed_credentials_are_refused_locally[sk-proj-A1b2C3d4E5f6G7h8A1b2C3d4E5f6G7h8A1b2C3d4E5f6G7h8A1b2C3d4E5f6G7h8A1b2C3d4E5f6G7h8A1b2C3d4E5f6G7h8\xe9-non-ascii]" time="0.000"><failure message="ImportError: cannot import name 'credential_preflight' from 'actenon_airlock' (/Users/ross/src/actenon-audit/airlock-pr23/src/actenon_airlock/__init__.py)">value = 'sk-proj-A1b2C3d4E5f6G7h8A1b2C3d4E5f6G7h8A1b2C3d4E5f6G7h8A1b2C3d4E5f6G7h8A1b2C3d4E5f6G7h8A1b2C3d4E5f6G7h8é'
+reason = 'non-ascii'
+
+    @pytest.mark.parametrize(
+        "value,reason",
+        [
+            (None, "missing"),
+            ("", "empty"),
+            (SWALLOWED, "whitespace"),
+            (" " + GOOD, "whitespace"),
+            (GOOD + "\n", "whitespace"),
+            (GOOD[:20] + "\x00" + GOOD[20:], "control-characters"),
+            (GOOD + "é", "non-ascii"),
+            ("sk-short", "too-short"),
+            ("sk-" + "a" * 600, "too-long"),
+            ("pk-" + "a" * 60, "unexpected-prefix"),
+            ("sk-" + "a" * 30 + "/bin/python", "unexpected-characters"),
+            ("scripted-codex-no-real-credential", "unexpected-prefix"),
+        ],
+    )
+    def test_malformed_credentials_are_refused_locally(value, reason):
+&gt;       assert reason in preflight.format_problems(value)
+                         ^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/test_credential_preflight.py:56: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = &lt;test_credential_preflight._Lazy object at 0x10a2eb5f0&gt;
+name = 'format_problems'
+
+    def __getattr__(self, name):
+&gt;       from actenon_airlock import credential_preflight
+E       ImportError: cannot import name 'credential_preflight' from 'actenon_airlock' (/Users/ross/src/actenon-audit/airlock-pr23/src/actenon_airlock/__init__.py)
+
+tests/test_credential_preflight.py:21: ImportError</failure></testcase><testcase classname="tests.test_credential_preflight" name="test_malformed_credentials_are_refused_locally[sk-short-too-short]" time="0.000"><failure message="ImportError: cannot import name 'credential_preflight' from 'actenon_airlock' (/Users/ross/src/actenon-audit/airlock-pr23/src/actenon_airlock/__init__.py)">value = 'sk-short', reason = 'too-short'
+
+    @pytest.mark.parametrize(
+        "value,reason",
+        [
+            (None, "missing"),
+            ("", "empty"),
+            (SWALLOWED, "whitespace"),
+            (" " + GOOD, "whitespace"),
+            (GOOD + "\n", "whitespace"),
+            (GOOD[:20] + "\x00" + GOOD[20:], "control-characters"),
+            (GOOD + "é", "non-ascii"),
+            ("sk-short", "too-short"),
+            ("sk-" + "a" * 600, "too-long"),
+            ("pk-" + "a" * 60, "unexpected-prefix"),
+            ("sk-" + "a" * 30 + "/bin/python", "unexpected-characters"),
+            ("scripted-codex-no-real-credential", "unexpected-prefix"),
+        ],
+    )
+    def test_malformed_credentials_are_refused_locally(value, reason):
+&gt;       assert reason in preflight.format_problems(value)
+                         ^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/test_credential_preflight.py:56: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = &lt;test_credential_preflight._Lazy object at 0x10a2eb5f0&gt;
+name = 'format_problems'
+
+    def __getattr__(self, name):
+&gt;       from actenon_airlock import credential_preflight
+E       ImportError: cannot import name 'credential_preflight' from 'actenon_airlock' (/Users/ross/src/actenon-audit/airlock-pr23/src/actenon_airlock/__init__.py)
+
+tests/test_credential_preflight.py:21: ImportError</failure></testcase><testcase classname="tests.test_credential_preflight" name="test_malformed_credentials_are_refused_locally[sk-aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa-too-long]" time="0.000"><failure message="ImportError: cannot import name 'credential_preflight' from 'actenon_airlock' (/Users/ross/src/actenon-audit/airlock-pr23/src/actenon_airlock/__init__.py)">value = 'sk-aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa...aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa'
+reason = 'too-long'
+
+    @pytest.mark.parametrize(
+        "value,reason",
+        [
+            (None, "missing"),
+            ("", "empty"),
+            (SWALLOWED, "whitespace"),
+            (" " + GOOD, "whitespace"),
+            (GOOD + "\n", "whitespace"),
+            (GOOD[:20] + "\x00" + GOOD[20:], "control-characters"),
+            (GOOD + "é", "non-ascii"),
+            ("sk-short", "too-short"),
+            ("sk-" + "a" * 600, "too-long"),
+            ("pk-" + "a" * 60, "unexpected-prefix"),
+            ("sk-" + "a" * 30 + "/bin/python", "unexpected-characters"),
+            ("scripted-codex-no-real-credential", "unexpected-prefix"),
+        ],
+    )
+    def test_malformed_credentials_are_refused_locally(value, reason):
+&gt;       assert reason in preflight.format_problems(value)
+                         ^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/test_credential_preflight.py:56: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = &lt;test_credential_preflight._Lazy object at 0x10a2eb5f0&gt;
+name = 'format_problems'
+
+    def __getattr__(self, name):
+&gt;       from actenon_airlock import credential_preflight
+E       ImportError: cannot import name 'credential_preflight' from 'actenon_airlock' (/Users/ross/src/actenon-audit/airlock-pr23/src/actenon_airlock/__init__.py)
+
+tests/test_credential_preflight.py:21: ImportError</failure></testcase><testcase classname="tests.test_credential_preflight" name="test_malformed_credentials_are_refused_locally[pk-aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa-unexpected-prefix]" time="0.000"><failure message="ImportError: cannot import name 'credential_preflight' from 'actenon_airlock' (/Users/ross/src/actenon-audit/airlock-pr23/src/actenon_airlock/__init__.py)">value = 'pk-aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa'
+reason = 'unexpected-prefix'
+
+    @pytest.mark.parametrize(
+        "value,reason",
+        [
+            (None, "missing"),
+            ("", "empty"),
+            (SWALLOWED, "whitespace"),
+            (" " + GOOD, "whitespace"),
+            (GOOD + "\n", "whitespace"),
+            (GOOD[:20] + "\x00" + GOOD[20:], "control-characters"),
+            (GOOD + "é", "non-ascii"),
+            ("sk-short", "too-short"),
+            ("sk-" + "a" * 600, "too-long"),
+            ("pk-" + "a" * 60, "unexpected-prefix"),
+            ("sk-" + "a" * 30 + "/bin/python", "unexpected-characters"),
+            ("scripted-codex-no-real-credential", "unexpected-prefix"),
+        ],
+    )
+    def test_malformed_credentials_are_refused_locally(value, reason):
+&gt;       assert reason in preflight.format_problems(value)
+                         ^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/test_credential_preflight.py:56: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = &lt;test_credential_preflight._Lazy object at 0x10a2eb5f0&gt;
+name = 'format_problems'
+
+    def __getattr__(self, name):
+&gt;       from actenon_airlock import credential_preflight
+E       ImportError: cannot import name 'credential_preflight' from 'actenon_airlock' (/Users/ross/src/actenon-audit/airlock-pr23/src/actenon_airlock/__init__.py)
+
+tests/test_credential_preflight.py:21: ImportError</failure></testcase><testcase classname="tests.test_credential_preflight" name="test_malformed_credentials_are_refused_locally[sk-aaaaaaaaaaaaaaaaaaaaaaaaaaaaaa/bin/python-unexpected-characters]" time="0.000"><failure message="ImportError: cannot import name 'credential_preflight' from 'actenon_airlock' (/Users/ross/src/actenon-audit/airlock-pr23/src/actenon_airlock/__init__.py)">value = 'sk-aaaaaaaaaaaaaaaaaaaaaaaaaaaaaa/bin/python'
+reason = 'unexpected-characters'
+
+    @pytest.mark.parametrize(
+        "value,reason",
+        [
+            (None, "missing"),
+            ("", "empty"),
+            (SWALLOWED, "whitespace"),
+            (" " + GOOD, "whitespace"),
+            (GOOD + "\n", "whitespace"),
+            (GOOD[:20] + "\x00" + GOOD[20:], "control-characters"),
+            (GOOD + "é", "non-ascii"),
+            ("sk-short", "too-short"),
+            ("sk-" + "a" * 600, "too-long"),
+            ("pk-" + "a" * 60, "unexpected-prefix"),
+            ("sk-" + "a" * 30 + "/bin/python", "unexpected-characters"),
+            ("scripted-codex-no-real-credential", "unexpected-prefix"),
+        ],
+    )
+    def test_malformed_credentials_are_refused_locally(value, reason):
+&gt;       assert reason in preflight.format_problems(value)
+                         ^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/test_credential_preflight.py:56: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = &lt;test_credential_preflight._Lazy object at 0x10a2eb5f0&gt;
+name = 'format_problems'
+
+    def __getattr__(self, name):
+&gt;       from actenon_airlock import credential_preflight
+E       ImportError: cannot import name 'credential_preflight' from 'actenon_airlock' (/Users/ross/src/actenon-audit/airlock-pr23/src/actenon_airlock/__init__.py)
+
+tests/test_credential_preflight.py:21: ImportError</failure></testcase><testcase classname="tests.test_credential_preflight" name="test_malformed_credentials_are_refused_locally[scripted-codex-no-real-credential-unexpected-prefix]" time="0.000"><failure message="ImportError: cannot import name 'credential_preflight' from 'actenon_airlock' (/Users/ross/src/actenon-audit/airlock-pr23/src/actenon_airlock/__init__.py)">value = 'scripted-codex-no-real-credential', reason = 'unexpected-prefix'
+
+    @pytest.mark.parametrize(
+        "value,reason",
+        [
+            (None, "missing"),
+            ("", "empty"),
+            (SWALLOWED, "whitespace"),
+            (" " + GOOD, "whitespace"),
+            (GOOD + "\n", "whitespace"),
+            (GOOD[:20] + "\x00" + GOOD[20:], "control-characters"),
+            (GOOD + "é", "non-ascii"),
+            ("sk-short", "too-short"),
+            ("sk-" + "a" * 600, "too-long"),
+            ("pk-" + "a" * 60, "unexpected-prefix"),
+            ("sk-" + "a" * 30 + "/bin/python", "unexpected-characters"),
+            ("scripted-codex-no-real-credential", "unexpected-prefix"),
+        ],
+    )
+    def test_malformed_credentials_are_refused_locally(value, reason):
+&gt;       assert reason in preflight.format_problems(value)
+                         ^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/test_credential_preflight.py:56: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = &lt;test_credential_preflight._Lazy object at 0x10a2eb5f0&gt;
+name = 'format_problems'
+
+    def __getattr__(self, name):
+&gt;       from actenon_airlock import credential_preflight
+E       ImportError: cannot import name 'credential_preflight' from 'actenon_airlock' (/Users/ross/src/actenon-audit/airlock-pr23/src/actenon_airlock/__init__.py)
+
+tests/test_credential_preflight.py:21: ImportError</failure></testcase><testcase classname="tests.test_credential_preflight" name="test_a_plausible_key_passes_the_local_check" time="0.000"><failure message="ImportError: cannot import name 'credential_preflight' from 'actenon_airlock' (/Users/ross/src/actenon-audit/airlock-pr23/src/actenon_airlock/__init__.py)">def test_a_plausible_key_passes_the_local_check():
+&gt;       assert preflight.format_problems(GOOD) == []
+               ^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/test_credential_preflight.py:60: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = &lt;test_credential_preflight._Lazy object at 0x10a2eb5f0&gt;
+name = 'format_problems'
+
+    def __getattr__(self, name):
+&gt;       from actenon_airlock import credential_preflight
+E       ImportError: cannot import name 'credential_preflight' from 'actenon_airlock' (/Users/ross/src/actenon-audit/airlock-pr23/src/actenon_airlock/__init__.py)
+
+tests/test_credential_preflight.py:21: ImportError</failure></testcase><testcase classname="tests.test_credential_preflight" name="test_authentication_check_is_one_promptless_model_lookup" time="0.000"><failure message="ImportError: cannot import name 'credential_preflight' from 'actenon_airlock' (/Users/ross/src/actenon-audit/airlock-pr23/src/actenon_airlock/__init__.py)">def test_authentication_check_is_one_promptless_model_lookup():
+        seen = []
+&gt;       result = preflight.authenticate(GOOD, MODEL, client=provider(200, seen=seen))
+                 ^^^^^^^^^^^^^^^^^^^^^^
+
+tests/test_credential_preflight.py:74: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = &lt;test_credential_preflight._Lazy object at 0x10a2eb5f0&gt;
+name = 'authenticate'
+
+    def __getattr__(self, name):
+&gt;       from actenon_airlock import credential_preflight
+E       ImportError: cannot import name 'credential_preflight' from 'actenon_airlock' (/Users/ross/src/actenon-audit/airlock-pr23/src/actenon_airlock/__init__.py)
+
+tests/test_credential_preflight.py:21: ImportError</failure></testcase><testcase classname="tests.test_credential_preflight" name="test_failed_authentication_reports_fixed_vocabulary_only[401-body0-rejected-invalid_api_key]" time="0.000"><failure message="ImportError: cannot import name 'credential_preflight' from 'actenon_airlock' (/Users/ross/src/actenon-audit/airlock-pr23/src/actenon_airlock/__init__.py)">status = 401
+body = {'error': {'code': 'invalid_api_key', 'message': 'sk-proj-A1b2C3d4E5f6G7h8A1b2C3d4E5f6G7h8A1b2C3d4E5f6G7h8A1b2C3d4E5f6G7h8A1b2C3d4E5f6G7h8A1b2C3d4E5f6G7h8'}}
+outcome = 'rejected', code = 'invalid_api_key'
+
+    @pytest.mark.parametrize(
+        "status,body,outcome,code",
+        [
+            (
+                401,
+                {"error": {"code": "invalid_api_key", "message": GOOD}},
+                "rejected",
+                "invalid_api_key",
+            ),
+            (403, {"error": {"code": "unsupported_country_region_territory"}}, "rejected", None),
+            (404, {"error": {"code": "model_not_found", "message": GOOD}}, "model-unavailable", None),
+            (429, {"error": {"code": "insufficient_quota"}}, "unavailable", None),
+            (500, b"proxy " + GOOD.encode(), "unavailable", None),
+        ],
+    )
+    def test_failed_authentication_reports_fixed_vocabulary_only(status, body, outcome, code):
+        content = json.dumps(body).encode() if isinstance(body, dict) else body
+&gt;       result = preflight.authenticate(GOOD, MODEL, client=provider(status, content))
+                 ^^^^^^^^^^^^^^^^^^^^^^
+
+tests/test_credential_preflight.py:104: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = &lt;test_credential_preflight._Lazy object at 0x10a2eb5f0&gt;
+name = 'authenticate'
+
+    def __getattr__(self, name):
+&gt;       from actenon_airlock import credential_preflight
+E       ImportError: cannot import name 'credential_preflight' from 'actenon_airlock' (/Users/ross/src/actenon-audit/airlock-pr23/src/actenon_airlock/__init__.py)
+
+tests/test_credential_preflight.py:21: ImportError</failure></testcase><testcase classname="tests.test_credential_preflight" name="test_failed_authentication_reports_fixed_vocabulary_only[403-body1-rejected-None]" time="0.000"><failure message="ImportError: cannot import name 'credential_preflight' from 'actenon_airlock' (/Users/ross/src/actenon-audit/airlock-pr23/src/actenon_airlock/__init__.py)">status = 403, body = {'error': {'code': 'unsupported_country_region_territory'}}
+outcome = 'rejected', code = None
+
+    @pytest.mark.parametrize(
+        "status,body,outcome,code",
+        [
+            (
+                401,
+                {"error": {"code": "invalid_api_key", "message": GOOD}},
+                "rejected",
+                "invalid_api_key",
+            ),
+            (403, {"error": {"code": "unsupported_country_region_territory"}}, "rejected", None),
+            (404, {"error": {"code": "model_not_found", "message": GOOD}}, "model-unavailable", None),
+            (429, {"error": {"code": "insufficient_quota"}}, "unavailable", None),
+            (500, b"proxy " + GOOD.encode(), "unavailable", None),
+        ],
+    )
+    def test_failed_authentication_reports_fixed_vocabulary_only(status, body, outcome, code):
+        content = json.dumps(body).encode() if isinstance(body, dict) else body
+&gt;       result = preflight.authenticate(GOOD, MODEL, client=provider(status, content))
+                 ^^^^^^^^^^^^^^^^^^^^^^
+
+tests/test_credential_preflight.py:104: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = &lt;test_credential_preflight._Lazy object at 0x10a2eb5f0&gt;
+name = 'authenticate'
+
+    def __getattr__(self, name):
+&gt;       from actenon_airlock import credential_preflight
+E       ImportError: cannot import name 'credential_preflight' from 'actenon_airlock' (/Users/ross/src/actenon-audit/airlock-pr23/src/actenon_airlock/__init__.py)
+
+tests/test_credential_preflight.py:21: ImportError</failure></testcase><testcase classname="tests.test_credential_preflight" name="test_failed_authentication_reports_fixed_vocabulary_only[404-body2-model-unavailable-None]" time="0.000"><failure message="ImportError: cannot import name 'credential_preflight' from 'actenon_airlock' (/Users/ross/src/actenon-audit/airlock-pr23/src/actenon_airlock/__init__.py)">status = 404
+body = {'error': {'code': 'model_not_found', 'message': 'sk-proj-A1b2C3d4E5f6G7h8A1b2C3d4E5f6G7h8A1b2C3d4E5f6G7h8A1b2C3d4E5f6G7h8A1b2C3d4E5f6G7h8A1b2C3d4E5f6G7h8'}}
+outcome = 'model-unavailable', code = None
+
+    @pytest.mark.parametrize(
+        "status,body,outcome,code",
+        [
+            (
+                401,
+                {"error": {"code": "invalid_api_key", "message": GOOD}},
+                "rejected",
+                "invalid_api_key",
+            ),
+            (403, {"error": {"code": "unsupported_country_region_territory"}}, "rejected", None),
+            (404, {"error": {"code": "model_not_found", "message": GOOD}}, "model-unavailable", None),
+            (429, {"error": {"code": "insufficient_quota"}}, "unavailable", None),
+            (500, b"proxy " + GOOD.encode(), "unavailable", None),
+        ],
+    )
+    def test_failed_authentication_reports_fixed_vocabulary_only(status, body, outcome, code):
+        content = json.dumps(body).encode() if isinstance(body, dict) else body
+&gt;       result = preflight.authenticate(GOOD, MODEL, client=provider(status, content))
+                 ^^^^^^^^^^^^^^^^^^^^^^
+
+tests/test_credential_preflight.py:104: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = &lt;test_credential_preflight._Lazy object at 0x10a2eb5f0&gt;
+name = 'authenticate'
+
+    def __getattr__(self, name):
+&gt;       from actenon_airlock import credential_preflight
+E       ImportError: cannot import name 'credential_preflight' from 'actenon_airlock' (/Users/ross/src/actenon-audit/airlock-pr23/src/actenon_airlock/__init__.py)
+
+tests/test_credential_preflight.py:21: ImportError</failure></testcase><testcase classname="tests.test_credential_preflight" name="test_failed_authentication_reports_fixed_vocabulary_only[429-body3-unavailable-None]" time="0.000"><failure message="ImportError: cannot import name 'credential_preflight' from 'actenon_airlock' (/Users/ross/src/actenon-audit/airlock-pr23/src/actenon_airlock/__init__.py)">status = 429, body = {'error': {'code': 'insufficient_quota'}}
+outcome = 'unavailable', code = None
+
+    @pytest.mark.parametrize(
+        "status,body,outcome,code",
+        [
+            (
+                401,
+                {"error": {"code": "invalid_api_key", "message": GOOD}},
+                "rejected",
+                "invalid_api_key",
+            ),
+            (403, {"error": {"code": "unsupported_country_region_territory"}}, "rejected", None),
+            (404, {"error": {"code": "model_not_found", "message": GOOD}}, "model-unavailable", None),
+            (429, {"error": {"code": "insufficient_quota"}}, "unavailable", None),
+            (500, b"proxy " + GOOD.encode(), "unavailable", None),
+        ],
+    )
+    def test_failed_authentication_reports_fixed_vocabulary_only(status, body, outcome, code):
+        content = json.dumps(body).encode() if isinstance(body, dict) else body
+&gt;       result = preflight.authenticate(GOOD, MODEL, client=provider(status, content))
+                 ^^^^^^^^^^^^^^^^^^^^^^
+
+tests/test_credential_preflight.py:104: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = &lt;test_credential_preflight._Lazy object at 0x10a2eb5f0&gt;
+name = 'authenticate'
+
+    def __getattr__(self, name):
+&gt;       from actenon_airlock import credential_preflight
+E       ImportError: cannot import name 'credential_preflight' from 'actenon_airlock' (/Users/ross/src/actenon-audit/airlock-pr23/src/actenon_airlock/__init__.py)
+
+tests/test_credential_preflight.py:21: ImportError</failure></testcase><testcase classname="tests.test_credential_preflight" name="test_failed_authentication_reports_fixed_vocabulary_only[500-proxy sk-proj-A1b2C3d4E5f6G7h8A1b2C3d4E5f6G7h8A1b2C3d4E5f6G7h8A1b2C3d4E5f6G7h8A1b2C3d4E5f6G7h8A1b2C3d4E5f6G7h8-unavailable-None]" time="0.000"><failure message="ImportError: cannot import name 'credential_preflight' from 'actenon_airlock' (/Users/ross/src/actenon-audit/airlock-pr23/src/actenon_airlock/__init__.py)">status = 500
+body = b'proxy sk-proj-A1b2C3d4E5f6G7h8A1b2C3d4E5f6G7h8A1b2C3d4E5f6G7h8A1b2C3d4E5f6G7h8A1b2C3d4E5f6G7h8A1b2C3d4E5f6G7h8'
+outcome = 'unavailable', code = None
+
+    @pytest.mark.parametrize(
+        "status,body,outcome,code",
+        [
+            (
+                401,
+                {"error": {"code": "invalid_api_key", "message": GOOD}},
+                "rejected",
+                "invalid_api_key",
+            ),
+            (403, {"error": {"code": "unsupported_country_region_territory"}}, "rejected", None),
+            (404, {"error": {"code": "model_not_found", "message": GOOD}}, "model-unavailable", None),
+            (429, {"error": {"code": "insufficient_quota"}}, "unavailable", None),
+            (500, b"proxy " + GOOD.encode(), "unavailable", None),
+        ],
+    )
+    def test_failed_authentication_reports_fixed_vocabulary_only(status, body, outcome, code):
+        content = json.dumps(body).encode() if isinstance(body, dict) else body
+&gt;       result = preflight.authenticate(GOOD, MODEL, client=provider(status, content))
+                 ^^^^^^^^^^^^^^^^^^^^^^
+
+tests/test_credential_preflight.py:104: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = &lt;test_credential_preflight._Lazy object at 0x10a2eb5f0&gt;
+name = 'authenticate'
+
+    def __getattr__(self, name):
+&gt;       from actenon_airlock import credential_preflight
+E       ImportError: cannot import name 'credential_preflight' from 'actenon_airlock' (/Users/ross/src/actenon-audit/airlock-pr23/src/actenon_airlock/__init__.py)
+
+tests/test_credential_preflight.py:21: ImportError</failure></testcase><testcase classname="tests.test_credential_preflight" name="test_unreachable_provider_never_reports_exception_text" time="0.000"><failure message="ImportError: cannot import name 'credential_preflight' from 'actenon_airlock' (/Users/ross/src/actenon-audit/airlock-pr23/src/actenon_airlock/__init__.py)">def test_unreachable_provider_never_reports_exception_text():
+        def broken(request):
+            raise httpx.ConnectError(f"cannot reach with {GOOD}")
+    
+        client = httpx.Client(transport=httpx.MockTransport(broken))
+&gt;       result = preflight.authenticate(GOOD, MODEL, client=client)
+                 ^^^^^^^^^^^^^^^^^^^^^^
+
+tests/test_credential_preflight.py:116: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = &lt;test_credential_preflight._Lazy object at 0x10a2eb5f0&gt;
+name = 'authenticate'
+
+    def __getattr__(self, name):
+&gt;       from actenon_airlock import credential_preflight
+E       ImportError: cannot import name 'credential_preflight' from 'actenon_airlock' (/Users/ross/src/actenon-audit/airlock-pr23/src/actenon_airlock/__init__.py)
+
+tests/test_credential_preflight.py:21: ImportError</failure></testcase><testcase classname="tests.test_credential_preflight" name="test_credential_file_must_be_private_regular_and_single_line" time="0.000"><failure message="ImportError: cannot import name 'credential_preflight' from 'actenon_airlock' (/Users/ross/src/actenon-audit/airlock-pr23/src/actenon_airlock/__init__.py)">tmp_path = PosixPath('/private/var/folders/tz/y04t4d0900xdbmz96jp608180000gn/T/pytest-of-ross/pytest-15/test_credential_file_must_be_p0')
+
+    def test_credential_file_must_be_private_regular_and_single_line(tmp_path):
+        key = tmp_path / "key"
+        key.write_text(GOOD + "\n")
+        key.chmod(0o600)
+&gt;       assert preflight.read_credential_file(key) == GOOD
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/test_credential_preflight.py:124: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = &lt;test_credential_preflight._Lazy object at 0x10a2eb5f0&gt;
+name = 'read_credential_file'
+
+    def __getattr__(self, name):
+&gt;       from actenon_airlock import credential_preflight
+E       ImportError: cannot import name 'credential_preflight' from 'actenon_airlock' (/Users/ross/src/actenon-audit/airlock-pr23/src/actenon_airlock/__init__.py)
+
+tests/test_credential_preflight.py:21: ImportError</failure></testcase><testcase classname="tests.test_credential_preflight" name="test_live_runner_refuses_bad_credentials_before_any_work[.venv/bin/python acceptance/codex-cli/run.py baseline --task token-bucket --image sha256:c449dec52754bad2a55dea7bb7b1edfbf7a864475464c53edc8ad9489d9d2269 --config ~/src/actenon-audit/live-codex/v44-frozen-candidate.json --out ~/src/actenon-audit/live-codex/1-baseline-v4-4 --live --authorized-usd 2]" time="0.328"><failure message="assert 'credential' in 'traceback (most recent call last):\n  file &quot;/users/ross/src/actenon-audit/airlock-pr23/acceptance/codex-cli/run.py&quot;, ...r operation failed: &quot; + args[0])\nactenon_airlock.common.airlockerror: protected mode docker operation failed: image\n'&#10; +  where 'traceback (most recent call last):\n  file &quot;/users/ross/src/actenon-audit/airlock-pr23/acceptance/codex-cli/run.py&quot;, ...r operation failed: &quot; + args[0])\nactenon_airlock.common.airlockerror: protected mode docker operation failed: image\n' = &lt;built-in method lower of str object at 0x75471a0f00&gt;()&#10; +    where &lt;built-in method lower of str object at 0x75471a0f00&gt; = 'Traceback (most recent call last):\n  File &quot;/Users/ross/src/actenon-audit/airlock-pr23/acceptance/codex-cli/run.py&quot;, ...r operation failed: &quot; + args[0])\nactenon_airlock.common.AirlockError: Protected Mode Docker operation failed: image\n'.lower&#10; +      where 'Traceback (most recent call last):\n  File &quot;/Users/ross/src/actenon-audit/airlock-pr23/acceptance/codex-cli/run.py&quot;, ...r operation failed: &quot; + args[0])\nactenon_airlock.common.AirlockError: Protected Mode Docker operation failed: image\n' = CompletedProcess(args=['/Users/ross/src/actenon-audit/airlock-pr23/.venv/bin/python', '/Users/ross/src/actenon-audit/a... operation failed: &quot; + args[0])\nactenon_airlock.common.AirlockError: Protected Mode Docker operation failed: image\n').stderr">tmp_path = PosixPath('/private/var/folders/tz/y04t4d0900xdbmz96jp608180000gn/T/pytest-of-ross/pytest-15/test_live_runner_refuses_bad_c0')
+value = '.venv/bin/python acceptance/codex-cli/run.py baseline --task token-bucket --image sha256:c449dec52754bad2a55dea7bb7b1...it/live-codex/v44-frozen-candidate.json --out ~/src/actenon-audit/live-codex/1-baseline-v4-4 --live --authorized-usd 2'
+
+    @pytest.mark.parametrize("value", [SWALLOWED, "", None, "sk-short"])
+    def test_live_runner_refuses_bad_credentials_before_any_work(tmp_path, value):
+        result, out = run_live(value, tmp_path)
+        assert result.returncode != 0
+&gt;       assert "credential" in result.stderr.lower()
+E       assert 'credential' in 'traceback (most recent call last):\n  file "/users/ross/src/actenon-audit/airlock-pr23/acceptance/codex-cli/run.py", ...r operation failed: " + args[0])\nactenon_airlock.common.airlockerror: protected mode docker operation failed: image\n'
+E        +  where 'traceback (most recent call last):\n  file "/users/ross/src/actenon-audit/airlock-pr23/acceptance/codex-cli/run.py", ...r operation failed: " + args[0])\nactenon_airlock.common.airlockerror: protected mode docker operation failed: image\n' = &lt;built-in method lower of str object at 0x75471a0f00&gt;()
+E        +    where &lt;built-in method lower of str object at 0x75471a0f00&gt; = 'Traceback (most recent call last):\n  File "/Users/ross/src/actenon-audit/airlock-pr23/acceptance/codex-cli/run.py", ...r operation failed: " + args[0])\nactenon_airlock.common.AirlockError: Protected Mode Docker operation failed: image\n'.lower
+E        +      where 'Traceback (most recent call last):\n  File "/Users/ross/src/actenon-audit/airlock-pr23/acceptance/codex-cli/run.py", ...r operation failed: " + args[0])\nactenon_airlock.common.AirlockError: Protected Mode Docker operation failed: image\n' = CompletedProcess(args=['/Users/ross/src/actenon-audit/airlock-pr23/.venv/bin/python', '/Users/ross/src/actenon-audit/a... operation failed: " + args[0])\nactenon_airlock.common.AirlockError: Protected Mode Docker operation failed: image\n').stderr
+
+tests/test_credential_preflight.py:167: AssertionError</failure></testcase><testcase classname="tests.test_credential_preflight" name="test_live_runner_refuses_bad_credentials_before_any_work[]" time="0.232"><failure message="assert 'credential' in 'traceback (most recent call last):\n  file &quot;/users/ross/src/actenon-audit/airlock-pr23/acceptance/codex-cli/run.py&quot;, ...r operation failed: &quot; + args[0])\nactenon_airlock.common.airlockerror: protected mode docker operation failed: image\n'&#10; +  where 'traceback (most recent call last):\n  file &quot;/users/ross/src/actenon-audit/airlock-pr23/acceptance/codex-cli/run.py&quot;, ...r operation failed: &quot; + args[0])\nactenon_airlock.common.airlockerror: protected mode docker operation failed: image\n' = &lt;built-in method lower of str object at 0x75471a2d00&gt;()&#10; +    where &lt;built-in method lower of str object at 0x75471a2d00&gt; = 'Traceback (most recent call last):\n  File &quot;/Users/ross/src/actenon-audit/airlock-pr23/acceptance/codex-cli/run.py&quot;, ...r operation failed: &quot; + args[0])\nactenon_airlock.common.AirlockError: Protected Mode Docker operation failed: image\n'.lower&#10; +      where 'Traceback (most recent call last):\n  File &quot;/Users/ross/src/actenon-audit/airlock-pr23/acceptance/codex-cli/run.py&quot;, ...r operation failed: &quot; + args[0])\nactenon_airlock.common.AirlockError: Protected Mode Docker operation failed: image\n' = CompletedProcess(args=['/Users/ross/src/actenon-audit/airlock-pr23/.venv/bin/python', '/Users/ross/src/actenon-audit/a... operation failed: &quot; + args[0])\nactenon_airlock.common.AirlockError: Protected Mode Docker operation failed: image\n').stderr">tmp_path = PosixPath('/private/var/folders/tz/y04t4d0900xdbmz96jp608180000gn/T/pytest-of-ross/pytest-15/test_live_runner_refuses_bad_c1')
+value = ''
+
+    @pytest.mark.parametrize("value", [SWALLOWED, "", None, "sk-short"])
+    def test_live_runner_refuses_bad_credentials_before_any_work(tmp_path, value):
+        result, out = run_live(value, tmp_path)
+        assert result.returncode != 0
+&gt;       assert "credential" in result.stderr.lower()
+E       assert 'credential' in 'traceback (most recent call last):\n  file "/users/ross/src/actenon-audit/airlock-pr23/acceptance/codex-cli/run.py", ...r operation failed: " + args[0])\nactenon_airlock.common.airlockerror: protected mode docker operation failed: image\n'
+E        +  where 'traceback (most recent call last):\n  file "/users/ross/src/actenon-audit/airlock-pr23/acceptance/codex-cli/run.py", ...r operation failed: " + args[0])\nactenon_airlock.common.airlockerror: protected mode docker operation failed: image\n' = &lt;built-in method lower of str object at 0x75471a2d00&gt;()
+E        +    where &lt;built-in method lower of str object at 0x75471a2d00&gt; = 'Traceback (most recent call last):\n  File "/Users/ross/src/actenon-audit/airlock-pr23/acceptance/codex-cli/run.py", ...r operation failed: " + args[0])\nactenon_airlock.common.AirlockError: Protected Mode Docker operation failed: image\n'.lower
+E        +      where 'Traceback (most recent call last):\n  File "/Users/ross/src/actenon-audit/airlock-pr23/acceptance/codex-cli/run.py", ...r operation failed: " + args[0])\nactenon_airlock.common.AirlockError: Protected Mode Docker operation failed: image\n' = CompletedProcess(args=['/Users/ross/src/actenon-audit/airlock-pr23/.venv/bin/python', '/Users/ross/src/actenon-audit/a... operation failed: " + args[0])\nactenon_airlock.common.AirlockError: Protected Mode Docker operation failed: image\n').stderr
+
+tests/test_credential_preflight.py:167: AssertionError</failure></testcase><testcase classname="tests.test_credential_preflight" name="test_live_runner_refuses_bad_credentials_before_any_work[None]" time="0.228"><failure message="assert 'credential' in 'traceback (most recent call last):\n  file &quot;/users/ross/src/actenon-audit/airlock-pr23/acceptance/codex-cli/run.py&quot;, ...r operation failed: &quot; + args[0])\nactenon_airlock.common.airlockerror: protected mode docker operation failed: image\n'&#10; +  where 'traceback (most recent call last):\n  file &quot;/users/ross/src/actenon-audit/airlock-pr23/acceptance/codex-cli/run.py&quot;, ...r operation failed: &quot; + args[0])\nactenon_airlock.common.airlockerror: protected mode docker operation failed: image\n' = &lt;built-in method lower of str object at 0x75471a3200&gt;()&#10; +    where &lt;built-in method lower of str object at 0x75471a3200&gt; = 'Traceback (most recent call last):\n  File &quot;/Users/ross/src/actenon-audit/airlock-pr23/acceptance/codex-cli/run.py&quot;, ...r operation failed: &quot; + args[0])\nactenon_airlock.common.AirlockError: Protected Mode Docker operation failed: image\n'.lower&#10; +      where 'Traceback (most recent call last):\n  File &quot;/Users/ross/src/actenon-audit/airlock-pr23/acceptance/codex-cli/run.py&quot;, ...r operation failed: &quot; + args[0])\nactenon_airlock.common.AirlockError: Protected Mode Docker operation failed: image\n' = CompletedProcess(args=['/Users/ross/src/actenon-audit/airlock-pr23/.venv/bin/python', '/Users/ross/src/actenon-audit/a... operation failed: &quot; + args[0])\nactenon_airlock.common.AirlockError: Protected Mode Docker operation failed: image\n').stderr">tmp_path = PosixPath('/private/var/folders/tz/y04t4d0900xdbmz96jp608180000gn/T/pytest-of-ross/pytest-15/test_live_runner_refuses_bad_c2')
+value = None
+
+    @pytest.mark.parametrize("value", [SWALLOWED, "", None, "sk-short"])
+    def test_live_runner_refuses_bad_credentials_before_any_work(tmp_path, value):
+        result, out = run_live(value, tmp_path)
+        assert result.returncode != 0
+&gt;       assert "credential" in result.stderr.lower()
+E       assert 'credential' in 'traceback (most recent call last):\n  file "/users/ross/src/actenon-audit/airlock-pr23/acceptance/codex-cli/run.py", ...r operation failed: " + args[0])\nactenon_airlock.common.airlockerror: protected mode docker operation failed: image\n'
+E        +  where 'traceback (most recent call last):\n  file "/users/ross/src/actenon-audit/airlock-pr23/acceptance/codex-cli/run.py", ...r operation failed: " + args[0])\nactenon_airlock.common.airlockerror: protected mode docker operation failed: image\n' = &lt;built-in method lower of str object at 0x75471a3200&gt;()
+E        +    where &lt;built-in method lower of str object at 0x75471a3200&gt; = 'Traceback (most recent call last):\n  File "/Users/ross/src/actenon-audit/airlock-pr23/acceptance/codex-cli/run.py", ...r operation failed: " + args[0])\nactenon_airlock.common.AirlockError: Protected Mode Docker operation failed: image\n'.lower
+E        +      where 'Traceback (most recent call last):\n  File "/Users/ross/src/actenon-audit/airlock-pr23/acceptance/codex-cli/run.py", ...r operation failed: " + args[0])\nactenon_airlock.common.AirlockError: Protected Mode Docker operation failed: image\n' = CompletedProcess(args=['/Users/ross/src/actenon-audit/airlock-pr23/.venv/bin/python', '/Users/ross/src/actenon-audit/a... operation failed: " + args[0])\nactenon_airlock.common.AirlockError: Protected Mode Docker operation failed: image\n').stderr
+
+tests/test_credential_preflight.py:167: AssertionError</failure></testcase><testcase classname="tests.test_credential_preflight" name="test_live_runner_refuses_bad_credentials_before_any_work[sk-short]" time="0.227"><failure message="assert 'credential' in 'traceback (most recent call last):\n  file &quot;/users/ross/src/actenon-audit/airlock-pr23/acceptance/codex-cli/run.py&quot;, ...r operation failed: &quot; + args[0])\nactenon_airlock.common.airlockerror: protected mode docker operation failed: image\n'&#10; +  where 'traceback (most recent call last):\n  file &quot;/users/ross/src/actenon-audit/airlock-pr23/acceptance/codex-cli/run.py&quot;, ...r operation failed: &quot; + args[0])\nactenon_airlock.common.airlockerror: protected mode docker operation failed: image\n' = &lt;built-in method lower of str object at 0x75471a2d00&gt;()&#10; +    where &lt;built-in method lower of str object at 0x75471a2d00&gt; = 'Traceback (most recent call last):\n  File &quot;/Users/ross/src/actenon-audit/airlock-pr23/acceptance/codex-cli/run.py&quot;, ...r operation failed: &quot; + args[0])\nactenon_airlock.common.AirlockError: Protected Mode Docker operation failed: image\n'.lower&#10; +      where 'Traceback (most recent call last):\n  File &quot;/Users/ross/src/actenon-audit/airlock-pr23/acceptance/codex-cli/run.py&quot;, ...r operation failed: &quot; + args[0])\nactenon_airlock.common.AirlockError: Protected Mode Docker operation failed: image\n' = CompletedProcess(args=['/Users/ross/src/actenon-audit/airlock-pr23/.venv/bin/python', '/Users/ross/src/actenon-audit/a... operation failed: &quot; + args[0])\nactenon_airlock.common.AirlockError: Protected Mode Docker operation failed: image\n').stderr">tmp_path = PosixPath('/private/var/folders/tz/y04t4d0900xdbmz96jp608180000gn/T/pytest-of-ross/pytest-15/test_live_runner_refuses_bad_c3')
+value = 'sk-short'
+
+    @pytest.mark.parametrize("value", [SWALLOWED, "", None, "sk-short"])
+    def test_live_runner_refuses_bad_credentials_before_any_work(tmp_path, value):
+        result, out = run_live(value, tmp_path)
+        assert result.returncode != 0
+&gt;       assert "credential" in result.stderr.lower()
+E       assert 'credential' in 'traceback (most recent call last):\n  file "/users/ross/src/actenon-audit/airlock-pr23/acceptance/codex-cli/run.py", ...r operation failed: " + args[0])\nactenon_airlock.common.airlockerror: protected mode docker operation failed: image\n'
+E        +  where 'traceback (most recent call last):\n  file "/users/ross/src/actenon-audit/airlock-pr23/acceptance/codex-cli/run.py", ...r operation failed: " + args[0])\nactenon_airlock.common.airlockerror: protected mode docker operation failed: image\n' = &lt;built-in method lower of str object at 0x75471a2d00&gt;()
+E        +    where &lt;built-in method lower of str object at 0x75471a2d00&gt; = 'Traceback (most recent call last):\n  File "/Users/ross/src/actenon-audit/airlock-pr23/acceptance/codex-cli/run.py", ...r operation failed: " + args[0])\nactenon_airlock.common.AirlockError: Protected Mode Docker operation failed: image\n'.lower
+E        +      where 'Traceback (most recent call last):\n  File "/Users/ross/src/actenon-audit/airlock-pr23/acceptance/codex-cli/run.py", ...r operation failed: " + args[0])\nactenon_airlock.common.AirlockError: Protected Mode Docker operation failed: image\n' = CompletedProcess(args=['/Users/ross/src/actenon-audit/airlock-pr23/.venv/bin/python', '/Users/ross/src/actenon-audit/a... operation failed: " + args[0])\nactenon_airlock.common.AirlockError: Protected Mode Docker operation failed: image\n').stderr
+
+tests/test_credential_preflight.py:167: AssertionError</failure></testcase></testsuite></testsuites>

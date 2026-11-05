@@ -1,0 +1,28 @@
+Original production source: 1fef59770d64047e3ce601816e6746702a606717
+Python 3.12.13, exact uv.lock, no provider/network calls
+Command: .venv/bin/python -m pytest tests/test_responses_inference.py tests/test_responses_observation.py -q
+Specification-derived fixtures, not a reproduction of captured V3.2 SSE.
+
+=========================== short test summary info ============================
+FAILED tests/test_responses_observation.py::test_documented_direct_caller_confirms[caller0-function_call]
+FAILED tests/test_responses_observation.py::test_documented_direct_caller_confirms[caller0-custom_tool_call]
+FAILED tests/test_responses_observation.py::test_documented_direct_caller_confirms[None-function_call]
+FAILED tests/test_responses_observation.py::test_documented_direct_caller_confirms[None-custom_tool_call]
+FAILED tests/test_responses_observation.py::test_documented_caller_releases_reservation_for_continuation
+FAILED tests/test_responses_observation.py::test_invalid_or_uncertain_stream_holds[created-model]
+FAILED tests/test_responses_observation.py::test_invalid_or_uncertain_stream_holds[progress-id]
+FAILED tests/test_responses_observation.py::test_invalid_or_uncertain_stream_holds[index]
+FAILED tests/test_responses_observation.py::test_invalid_or_uncertain_stream_holds[delta-id]
+FAILED tests/test_responses_observation.py::test_invalid_or_uncertain_stream_holds[delta-value]
+FAILED tests/test_responses_observation.py::test_invalid_or_uncertain_stream_holds[delta-type]
+FAILED tests/test_responses_observation.py::test_invalid_or_uncertain_stream_holds[done-value]
+FAILED tests/test_responses_observation.py::test_invalid_or_uncertain_stream_holds[unknown-field]
+FAILED tests/test_responses_observation.py::test_invalid_or_uncertain_stream_holds[sequence]
+FAILED tests/test_responses_observation.py::test_invalid_or_uncertain_stream_holds[incomplete]
+FAILED tests/test_responses_observation.py::test_invalid_or_uncertain_stream_holds[total]
+FAILED tests/test_responses_observation.py::test_invalid_or_uncertain_stream_holds[malformed-arguments]
+FAILED tests/test_responses_observation.py::test_malformed_framing_is_unconfirmed[<lambda>0]
+FAILED tests/test_responses_observation.py::test_malformed_framing_is_unconfirmed[<lambda>2]
+FAILED tests/test_responses_observation.py::test_malformed_framing_is_unconfirmed[<lambda>3]
+FAILED tests/test_responses_observation.py::test_malformed_framing_is_unconfirmed[<lambda>4]
+21 failed, 45 passed in 0.97s

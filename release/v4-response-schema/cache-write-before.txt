@@ -1,0 +1,100 @@
+FFFFFFFFFFFFFFFF..........                                               [100%]
+=================================== FAILURES ===================================
+_ test_documented_zero_cache_writes_confirms_with_complete_sdk_shape[True-metadata0] _
+tests/test_response_schema_compatibility.py:257: in test_documented_zero_cache_writes_confirms_with_complete_sdk_shape
+    assert result.confirmed
+E   AssertionError: assert False
+E    +  where False = ResponsesObservation(confirmed=False, declined=False, usage=None, diagnostics={'schema': 'actenon-airlock/responses-ob...90e88f85ae39cc947751022fbaf1b58b8aa10bddce'}, 'checked_sequence_number': 7, 'rejection_reason': 'usage-input-details'}).confirmed
+_ test_documented_zero_cache_writes_confirms_with_complete_sdk_shape[True-metadata1] _
+tests/test_response_schema_compatibility.py:257: in test_documented_zero_cache_writes_confirms_with_complete_sdk_shape
+    assert result.confirmed
+E   AssertionError: assert False
+E    +  where False = ResponsesObservation(confirmed=False, declined=False, usage=None, diagnostics={'schema': 'actenon-airlock/responses-ob...90e88f85ae39cc947751022fbaf1b58b8aa10bddce'}, 'checked_sequence_number': 7, 'rejection_reason': 'usage-input-details'}).confirmed
+_ test_documented_zero_cache_writes_confirms_with_complete_sdk_shape[True-metadata2] _
+tests/test_response_schema_compatibility.py:257: in test_documented_zero_cache_writes_confirms_with_complete_sdk_shape
+    assert result.confirmed
+E   AssertionError: assert False
+E    +  where False = ResponsesObservation(confirmed=False, declined=False, usage=None, diagnostics={'schema': 'actenon-airlock/responses-ob...90e88f85ae39cc947751022fbaf1b58b8aa10bddce'}, 'checked_sequence_number': 7, 'rejection_reason': 'usage-input-details'}).confirmed
+_ test_documented_zero_cache_writes_confirms_with_complete_sdk_shape[True-metadata3] _
+tests/test_response_schema_compatibility.py:257: in test_documented_zero_cache_writes_confirms_with_complete_sdk_shape
+    assert result.confirmed
+E   AssertionError: assert False
+E    +  where False = ResponsesObservation(confirmed=False, declined=False, usage=None, diagnostics={'schema': 'actenon-airlock/responses-ob...90e88f85ae39cc947751022fbaf1b58b8aa10bddce'}, 'checked_sequence_number': 7, 'rejection_reason': 'usage-input-details'}).confirmed
+_ test_documented_zero_cache_writes_confirms_with_complete_sdk_shape[True-metadata4] _
+tests/test_response_schema_compatibility.py:257: in test_documented_zero_cache_writes_confirms_with_complete_sdk_shape
+    assert result.confirmed
+E   AssertionError: assert False
+E    +  where False = ResponsesObservation(confirmed=False, declined=False, usage=None, diagnostics={'schema': 'actenon-airlock/responses-ob...90e88f85ae39cc947751022fbaf1b58b8aa10bddce'}, 'checked_sequence_number': 7, 'rejection_reason': 'usage-input-details'}).confirmed
+_ test_documented_zero_cache_writes_confirms_with_complete_sdk_shape[True-metadata5] _
+tests/test_response_schema_compatibility.py:257: in test_documented_zero_cache_writes_confirms_with_complete_sdk_shape
+    assert result.confirmed
+E   AssertionError: assert False
+E    +  where False = ResponsesObservation(confirmed=False, declined=False, usage=None, diagnostics={'schema': 'actenon-airlock/responses-ob...90e88f85ae39cc947751022fbaf1b58b8aa10bddce'}, 'checked_sequence_number': 7, 'rejection_reason': 'usage-input-details'}).confirmed
+_ test_documented_zero_cache_writes_confirms_with_complete_sdk_shape[True-metadata6] _
+tests/test_response_schema_compatibility.py:257: in test_documented_zero_cache_writes_confirms_with_complete_sdk_shape
+    assert result.confirmed
+E   AssertionError: assert False
+E    +  where False = ResponsesObservation(confirmed=False, declined=False, usage=None, diagnostics={'schema': 'actenon-airlock/responses-ob...90e88f85ae39cc947751022fbaf1b58b8aa10bddce'}, 'checked_sequence_number': 7, 'rejection_reason': 'usage-input-details'}).confirmed
+_ test_documented_zero_cache_writes_confirms_with_complete_sdk_shape[True-metadata7] _
+tests/test_response_schema_compatibility.py:257: in test_documented_zero_cache_writes_confirms_with_complete_sdk_shape
+    assert result.confirmed
+E   AssertionError: assert False
+E    +  where False = ResponsesObservation(confirmed=False, declined=False, usage=None, diagnostics={'schema': 'actenon-airlock/responses-ob...90e88f85ae39cc947751022fbaf1b58b8aa10bddce'}, 'checked_sequence_number': 7, 'rejection_reason': 'usage-input-details'}).confirmed
+_ test_documented_zero_cache_writes_confirms_with_complete_sdk_shape[False-metadata0] _
+tests/test_response_schema_compatibility.py:257: in test_documented_zero_cache_writes_confirms_with_complete_sdk_shape
+    assert result.confirmed
+E   AssertionError: assert False
+E    +  where False = ResponsesObservation(confirmed=False, declined=False, usage=None, diagnostics={'schema': 'actenon-airlock/responses-ob...5b8198c68d09f04390ee7803bfc079a0d4001e209', 'events': [], 'event_count': 0, 'rejection_reason': 'usage-input-details'}).confirmed
+_ test_documented_zero_cache_writes_confirms_with_complete_sdk_shape[False-metadata1] _
+tests/test_response_schema_compatibility.py:257: in test_documented_zero_cache_writes_confirms_with_complete_sdk_shape
+    assert result.confirmed
+E   AssertionError: assert False
+E    +  where False = ResponsesObservation(confirmed=False, declined=False, usage=None, diagnostics={'schema': 'actenon-airlock/responses-ob...cefe2548564a53b953684e1ba89908b012f6a8e2c', 'events': [], 'event_count': 0, 'rejection_reason': 'usage-input-details'}).confirmed
+_ test_documented_zero_cache_writes_confirms_with_complete_sdk_shape[False-metadata2] _
+tests/test_response_schema_compatibility.py:257: in test_documented_zero_cache_writes_confirms_with_complete_sdk_shape
+    assert result.confirmed
+E   AssertionError: assert False
+E    +  where False = ResponsesObservation(confirmed=False, declined=False, usage=None, diagnostics={'schema': 'actenon-airlock/responses-ob...7dd0b18766922ec4ffb01757090cb54d3c779a56b', 'events': [], 'event_count': 0, 'rejection_reason': 'usage-input-details'}).confirmed
+_ test_documented_zero_cache_writes_confirms_with_complete_sdk_shape[False-metadata3] _
+tests/test_response_schema_compatibility.py:257: in test_documented_zero_cache_writes_confirms_with_complete_sdk_shape
+    assert result.confirmed
+E   AssertionError: assert False
+E    +  where False = ResponsesObservation(confirmed=False, declined=False, usage=None, diagnostics={'schema': 'actenon-airlock/responses-ob...967772aee1d45b878d1d86ea72eb406223bdc5e86', 'events': [], 'event_count': 0, 'rejection_reason': 'usage-input-details'}).confirmed
+_ test_documented_zero_cache_writes_confirms_with_complete_sdk_shape[False-metadata4] _
+tests/test_response_schema_compatibility.py:257: in test_documented_zero_cache_writes_confirms_with_complete_sdk_shape
+    assert result.confirmed
+E   AssertionError: assert False
+E    +  where False = ResponsesObservation(confirmed=False, declined=False, usage=None, diagnostics={'schema': 'actenon-airlock/responses-ob...9fa6e840366369df631f4a27ef6689d7e9656c35b', 'events': [], 'event_count': 0, 'rejection_reason': 'usage-input-details'}).confirmed
+_ test_documented_zero_cache_writes_confirms_with_complete_sdk_shape[False-metadata5] _
+tests/test_response_schema_compatibility.py:257: in test_documented_zero_cache_writes_confirms_with_complete_sdk_shape
+    assert result.confirmed
+E   AssertionError: assert False
+E    +  where False = ResponsesObservation(confirmed=False, declined=False, usage=None, diagnostics={'schema': 'actenon-airlock/responses-ob...dc1018ba365eee173811c1708199733cae8a3c593', 'events': [], 'event_count': 0, 'rejection_reason': 'usage-input-details'}).confirmed
+_ test_documented_zero_cache_writes_confirms_with_complete_sdk_shape[False-metadata6] _
+tests/test_response_schema_compatibility.py:257: in test_documented_zero_cache_writes_confirms_with_complete_sdk_shape
+    assert result.confirmed
+E   AssertionError: assert False
+E    +  where False = ResponsesObservation(confirmed=False, declined=False, usage=None, diagnostics={'schema': 'actenon-airlock/responses-ob...af7c439c55eb33f338a0a61678f2cda74a1820f1a', 'events': [], 'event_count': 0, 'rejection_reason': 'usage-input-details'}).confirmed
+_ test_documented_zero_cache_writes_confirms_with_complete_sdk_shape[False-metadata7] _
+tests/test_response_schema_compatibility.py:257: in test_documented_zero_cache_writes_confirms_with_complete_sdk_shape
+    assert result.confirmed
+E   AssertionError: assert False
+E    +  where False = ResponsesObservation(confirmed=False, declined=False, usage=None, diagnostics={'schema': 'actenon-airlock/responses-ob...fc80bb0a68bbcb5fa33ba4c05db79228663ba1761', 'events': [], 'event_count': 0, 'rejection_reason': 'usage-input-details'}).confirmed
+=========================== short test summary info ============================
+FAILED tests/test_response_schema_compatibility.py::test_documented_zero_cache_writes_confirms_with_complete_sdk_shape[True-metadata0]
+FAILED tests/test_response_schema_compatibility.py::test_documented_zero_cache_writes_confirms_with_complete_sdk_shape[True-metadata1]
+FAILED tests/test_response_schema_compatibility.py::test_documented_zero_cache_writes_confirms_with_complete_sdk_shape[True-metadata2]
+FAILED tests/test_response_schema_compatibility.py::test_documented_zero_cache_writes_confirms_with_complete_sdk_shape[True-metadata3]
+FAILED tests/test_response_schema_compatibility.py::test_documented_zero_cache_writes_confirms_with_complete_sdk_shape[True-metadata4]
+FAILED tests/test_response_schema_compatibility.py::test_documented_zero_cache_writes_confirms_with_complete_sdk_shape[True-metadata5]
+FAILED tests/test_response_schema_compatibility.py::test_documented_zero_cache_writes_confirms_with_complete_sdk_shape[True-metadata6]
+FAILED tests/test_response_schema_compatibility.py::test_documented_zero_cache_writes_confirms_with_complete_sdk_shape[True-metadata7]
+FAILED tests/test_response_schema_compatibility.py::test_documented_zero_cache_writes_confirms_with_complete_sdk_shape[False-metadata0]
+FAILED tests/test_response_schema_compatibility.py::test_documented_zero_cache_writes_confirms_with_complete_sdk_shape[False-metadata1]
+FAILED tests/test_response_schema_compatibility.py::test_documented_zero_cache_writes_confirms_with_complete_sdk_shape[False-metadata2]
+FAILED tests/test_response_schema_compatibility.py::test_documented_zero_cache_writes_confirms_with_complete_sdk_shape[False-metadata3]
+FAILED tests/test_response_schema_compatibility.py::test_documented_zero_cache_writes_confirms_with_complete_sdk_shape[False-metadata4]
+FAILED tests/test_response_schema_compatibility.py::test_documented_zero_cache_writes_confirms_with_complete_sdk_shape[False-metadata5]
+FAILED tests/test_response_schema_compatibility.py::test_documented_zero_cache_writes_confirms_with_complete_sdk_shape[False-metadata6]
+FAILED tests/test_response_schema_compatibility.py::test_documented_zero_cache_writes_confirms_with_complete_sdk_shape[False-metadata7]
+16 failed, 10 passed, 146 deselected in 1.29s

@@ -239,7 +239,7 @@ def codex_command(model: str, message_file: str, **_options) -> list[str]:
     )
     return [
         "env",
-        "CODEX_HOME=/workspace/.home/.codex",
+        "CODEX_HOME=/tmp/.codex",
         "sh",
         "-c",
         start,

@@ -34,6 +34,13 @@ from responses_fixture import ScriptedProvider, text, tool  # noqa: E402
 
 from actenon_airlock.agents import command  # noqa: E402
 from actenon_airlock.cli import main as airlock  # noqa: E402
+from actenon_airlock.common import host_environment  # noqa: E402
+from actenon_airlock.credential_preflight import (  # noqa: E402
+    CredentialRefused,
+    authenticate,
+    supervisor_credential,
+    supervisor_scope,
+)
 from actenon_airlock.manifest import discover  # noqa: E402
 from actenon_airlock.protected import Docker, ProtectedBroker, snapshot  # noqa: E402
 from actenon_airlock.state import State  # noqa: E402
@@ -76,7 +83,7 @@ def identity(image):
     return {
         "schema": SCHEMA,
         "source_commit": subprocess.check_output(
-            ["git", "rev-parse", "HEAD"], cwd=ROOT, text=True
+            ["git", "rev-parse", "HEAD"], cwd=ROOT, text=True, env=host_environment()
         ).strip(),
         "source_digest": scoring.digest_tree(ROOT / "src/actenon_airlock"),
         "python": sys.version,
@@ -180,8 +187,6 @@ class Gateway:
 def baseline(project, image, log, gateway):
     work = project.parent / "baseline-workspace"
     snapshot(project, work)
-    (work / ".home").mkdir()
-    (work / ".tmp").mkdir()
     for p in [work, *work.rglob("*")]:
         p.chmod(0o777 if p.is_dir() else 0o666)
     name = "airlock-codex-baseline-" + secrets.token_hex(6)
@@ -192,6 +197,8 @@ def baseline(project, image, log, gateway):
         "--name",
         name,
         "--read-only",
+        "--tmpfs",
+        "/tmp:rw,size=64m,mode=1777",
         "--cap-drop",
         "ALL",
         "--security-opt",
@@ -211,9 +218,9 @@ def baseline(project, image, log, gateway):
         "--mount",
         f"type=bind,source={work},target=/workspace",
         "--env",
-        "HOME=/workspace/.home",
+        "HOME=/tmp/home",
         "--env",
-        "TMPDIR=/workspace/.tmp",
+        "TMPDIR=/tmp",
         "--env",
         "OPENAI_BASE_URL=" + gateway.url,
         "--env",
@@ -223,17 +230,17 @@ def baseline(project, image, log, gateway):
     ]
     try:
         return subprocess.run(
-            argv, stdout=log, stderr=subprocess.STDOUT, timeout=1200
+            argv, stdout=log, stderr=subprocess.STDOUT, timeout=1200, env=host_environment()
         ).returncode, work
     finally:
-        subprocess.run(["docker", "rm", "-f", name], capture_output=True)
+        subprocess.run(["docker", "rm", "-f", name], capture_output=True, env=host_environment())
 
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("mode", choices=("freeze", "baseline", "protected"))
+    parser.add_argument("mode", choices=("freeze", "baseline", "protected", "preflight"))
     parser.add_argument("--image", required=True)
-    parser.add_argument("--out", type=Path, required=True)
+    parser.add_argument("--out", type=Path)
     parser.add_argument(
         "--task",
         choices=tuple(p.name for p in (ROOT / "acceptance/v2/tasks").iterdir() if p.is_dir()),
@@ -246,18 +253,69 @@ def main():
         action="store_true",
         help="Plant untrusted instructions; observe an owned sink with a working control",
     )
+    parser.add_argument(
+        "--test-hook",
+        action="store_true",
+        help="With --attack, execute the planted transport from a pytest session fixture",
+    )
     parser.add_argument("--authorized-usd", choices=(BUDGET,))
+    parser.add_argument(
+        "--credential-file",
+        type=Path,
+        help="Owner-only one-line file holding the supervisor key (instead of OPENAI_API_KEY)",
+    )
     args = parser.parse_args()
+    if args.test_hook and not args.attack:
+        raise SystemExit("--test-hook requires --attack")
+    if args.mode != "preflight" and args.out is None:
+        raise SystemExit("--out is required")
+    supervised = args.live or args.mode == "preflight"
+    if args.credential_file is not None and not supervised:
+        raise SystemExit("--credential-file is only for --live or preflight")
+    # The key lives in this variable, NOT in os.environ, so no host subprocess
+    # (git, Docker client, scoring) can inherit it. Only broker construction
+    # sees it, through supervisor_scope below.
+    key = "scripted-codex-no-real-credential"
+    if supervised:
+        # Local check before any drift check, setup, reservation or dispatch. The
+        # credential stays in this supervisor process; messages are fixed text.
+        try:
+            key = supervisor_credential(os.environ.get("OPENAI_API_KEY"), args.credential_file)
+        except CredentialRefused as exc:
+            raise SystemExit(f"Supervisor credential refused: {exc}") from None
+    os.environ.pop("OPENAI_API_KEY", None)
     frozen = identity(args.image)
+    preflight = None
+    if supervised:
+        if not args.config or json.loads(args.config.read_text()) != frozen:
+            raise SystemExit("Frozen configuration drift; refusing credential pre-flight")
+        if args.live and args.authorized_usd != BUDGET:
+            raise SystemExit("Live inference requires explicit owner-authorized $2")
+        # One promptless model lookup. Success is a prerequisite, not entitlement.
+        preflight = authenticate(key, MODEL)
+        if preflight["outcome"] != "authenticated":
+            detail = ", ".join(
+                str(preflight[k])
+                for k in ("http_status", "outcome", "provider_error_code")
+                if preflight.get(k) is not None
+            )
+            raise SystemExit(
+                f"Supervisor credential pre-flight failed ({detail}); no inference was dispatched"
+            )
+        if args.mode == "preflight":
+            print(
+                json.dumps(
+                    {"credential_preflight": preflight, "source_commit": frozen["source_commit"]}
+                )
+            )
+            return 0
     if args.mode == "freeze":
         with args.out.open("x") as file:
             json.dump(frozen, file, indent=2)
         return 0
     if args.config and json.loads(args.config.read_text()) != frozen:
         raise SystemExit("Frozen configuration drift; refusing acceptance")
-    if args.live and (
-        not args.config or args.authorized_usd != BUDGET or not os.environ.get("OPENAI_API_KEY")
-    ):
+    if args.live and (not args.config or args.authorized_usd != BUDGET or not key):
         raise SystemExit(
             "Live inference requires frozen config, explicit owner-authorized $2, and supervisor API key"
         )
@@ -267,9 +325,8 @@ def main():
     project = args.out / "project"
     shutil.copytree(task / "repo", project)
     shutil.copyfile(task / "ISSUE.md", project / "ISSUE.md")
-    if not args.live:
-        # No credential discovery or forwarding from the engineering environment.
-        os.environ["OPENAI_API_KEY"] = "scripted-codex-no-real-credential"
+    # Scripted runs never use an engineering-environment credential: `key` is the
+    # fixed scripted value unless --live validated a supervisor credential.
     assert (
         airlock(
             [
@@ -319,15 +376,16 @@ def main():
     if args.attack:
         from attack import Attempt
 
-        attempt = Attempt(project, args.out, args.image)
+        attempt = Attempt(project, args.out, args.image, test_hook=args.test_hook)
     steps = rehearsal(task) if not args.live else None
-    if steps is not None and args.attack:
+    if steps is not None and args.attack and not args.test_hook:
         steps.insert(0, [tool("fixture-attack", "cat README.md && python diagnostics.py")])
     scripted = ScriptedProvider(steps) if steps is not None else None
     original = ProtectedBroker.__init__
 
     def initialize(self, *a, **kw):
-        original(self, *a, **kw)
+        with supervisor_scope("OPENAI_API_KEY", key):
+            original(self, *a, **kw)
         if scripted:
             self.http.close()
 
@@ -391,6 +449,7 @@ def main():
         "score": scoring.score(task, work),
         "airlock": status(State(project)),
         "actual_paid_inference": args.live,
+        "credential_preflight": preflight,
         "attack": attack_result,
         "attack_selection": "real-agent-invoked planted code if attempted"
         if args.live

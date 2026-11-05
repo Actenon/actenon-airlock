@@ -44,17 +44,60 @@ def events(output, model=MODEL, response_id="resp_fixture"):
             "total_tokens": 120,
         },
     }
-    return [
+    result = [
         {
             "type": "response.created",
             "response": {**response, "status": "in_progress", "output": [], "usage": None},
-        },
-        *(
-            {"type": "response.output_item.done", "output_index": i, "item": item}
-            for i, item in enumerate(output)
-        ),
-        {"type": "response.completed", "response": response},
+        }
     ]
+    for i, value in enumerate(output):
+        partial = dict(value)
+        if "status" in partial:
+            partial["status"] = "in_progress"
+        kind = value["type"]
+        fields = {
+            "message": "content",
+            "reasoning": "summary",
+            "function_call": "arguments",
+            "custom_tool_call": "input",
+        }
+        field = fields[kind]
+        partial[field] = [] if field in {"content", "summary"} else ""
+        result.append({"type": "response.output_item.added", "output_index": i, "item": partial})
+        ref = {"output_index": i, "item_id": value["id"]}
+        if field in {"arguments", "input"}:
+            family = "function_call_arguments" if field == "arguments" else "custom_tool_call_input"
+            result.extend(
+                [
+                    {"type": f"response.{family}.delta", **ref, "delta": value[field]},
+                    {"type": f"response.{family}.done", **ref, field: value[field]},
+                ]
+            )
+        else:
+            for j, part in enumerate(value[field]):
+                summary = field == "summary"
+                part_family = "reasoning_summary_part" if summary else "content_part"
+                text_family = "reasoning_summary_text" if summary else "output_text"
+                ref_part = {**ref, "summary_index" if summary else "content_index": j}
+                result.extend(
+                    [
+                        {
+                            "type": f"response.{part_family}.added",
+                            **ref_part,
+                            "part": {**part, "text": ""},
+                        },
+                        {
+                            "type": f"response.{text_family}.delta",
+                            **ref_part,
+                            "delta": part["text"],
+                        },
+                        {"type": f"response.{text_family}.done", **ref_part, "text": part["text"]},
+                        {"type": f"response.{part_family}.done", **ref_part, "part": part},
+                    ]
+                )
+        result.append({"type": "response.output_item.done", "output_index": i, "item": value})
+    result.append({"type": "response.completed", "response": response})
+    return [{**event, "sequence_number": n} for n, event in enumerate(result)]
 
 
 def stream(output, **kw):

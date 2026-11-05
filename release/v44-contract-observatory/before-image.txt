@@ -1,0 +1,12 @@
+FFFFFFF...............................................................FF [100%]
+=========================== short test summary info ============================
+FAILED tests/test_responses_image.py::test_full_documented_supported_response_confirms[True-enabled]
+FAILED tests/test_responses_image.py::test_full_documented_supported_response_confirms[True-disabled]
+FAILED tests/test_responses_image.py::test_full_documented_supported_response_confirms[False-enabled]
+FAILED tests/test_responses_image.py::test_full_documented_supported_response_confirms[False-disabled]
+FAILED tests/test_responses_image.py::test_image_omission_is_no_echo_and_does_not_choose_a_policy[0]
+FAILED tests/test_responses_image.py::test_image_omission_is_no_echo_and_does_not_choose_a_policy[1]
+FAILED tests/test_responses_image.py::test_image_omission_is_no_echo_and_does_not_choose_a_policy[-1]
+FAILED tests/test_responses_image.py::test_full_broker_settlement_and_continuation[enabled]
+FAILED tests/test_responses_image.py::test_full_broker_settlement_and_continuation[disabled]
+9 failed, 63 passed in 0.33s

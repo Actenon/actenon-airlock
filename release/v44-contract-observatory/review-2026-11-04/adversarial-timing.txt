@@ -1,0 +1,7 @@
+named-delta-flood          bytes= 4194268 observatory=  0.17s peak=  20.0MiB report= 2725B truncated=True inspected=4096 skipped=17749 | observe() total=  0.26s confirmed=False
+unnamed-tiny-frames        bytes= 4194300 observatory=  0.15s peak=  20.0MiB report= 2966B truncated=True inspected=4096 skipped=28672 | observe() total=  1.91s confirmed=False
+blank-lines                bytes= 4194303 observatory=  0.02s peak=  20.0MiB report=  643B truncated=True inspected=0 skipped=0 | observe() total=  0.09s confirmed=False
+comment-lines              bytes= 4194303 observatory=  0.05s peak=  20.0MiB report=  643B truncated=True inspected=0 skipped=0 | observe() total=  0.01s confirmed=False
+lifecycle-snapshot-flood   bytes= 4193763 observatory=  0.29s peak=  22.0MiB report= 2796B truncated=True inspected=315 skipped=1 | observe() total=  0.16s confirmed=False
+nested-frames              bytes= 4194288 observatory=  0.42s peak=  20.0MiB report=  794B truncated=True inspected=0 skipped=5462 | observe() total=  0.07s confirmed=False
+single-string-frame        bytes= 4194301 observatory=  0.07s peak=  32.0MiB report=  656B truncated=True inspected=0 skipped=1 | observe() total=  0.07s confirmed=False

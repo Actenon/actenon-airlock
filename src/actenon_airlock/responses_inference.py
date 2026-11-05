@@ -7,10 +7,13 @@ contract does not support the ChatGPT-plan preview, which rejects that cap.
 
 from __future__ import annotations
 
+import hashlib
 import json
+from dataclasses import dataclass, replace
 
 from actenon.core.json import loads_no_duplicate_keys
 
+from . import provider_errors
 from .agent_inference import MAX_INPUT_BYTES, PRICES, Observation, cost
 from .common import AirlockError, canonical
 
@@ -163,7 +166,14 @@ def item(value, *, output=False):
             string(value["encrypted_content"], "Encrypted reasoning")
     elif kind in {"function_call", "custom_tool_call"}:
         field = "arguments" if kind == "function_call" else "input"
-        obj(value, common | {"call_id", "name", "namespace", field}, "local tool call")
+        obj(
+            value,
+            common | {"call_id", "name", "namespace", field} | ({"caller"} if output else set()),
+            "local tool call",
+        )
+        # Documented response-only metadata. Programmatic execution is not this contract.
+        if output and value.get("caller") not in (None, {"type": "direct"}):
+            raise AirlockError("Unsupported local tool caller")
         if value.get("name") not in LOCAL_TOOLS or value.get("namespace") not in {
             None,
             "functions",
@@ -278,28 +288,474 @@ def reservation(size, cap, prices):
     )
 
 
+class _Rejected(ValueError):
+    """Only fixed, content-free reason codes may enter observation diagnostics."""
+
+    def __init__(self, reason, *, diagnostic=None):
+        super().__init__(reason)
+        self.diagnostic = diagnostic or {}
+
+
+def _require(ok, reason):
+    if not ok:
+        raise _Rejected(reason)
+
+
+def _count(value):
+    return type(value) is int and value >= 0
+
+
+def _identifier(value):
+    return isinstance(value, str) and bool(value)
+
+
+def _output(value, *, partial=False):
+    try:
+        item(value, output=True)
+    except AirlockError as exc:
+        reason = {
+            "Unsupported local tool call fields": "local-tool-fields",
+            "Unsupported local tool caller": "local-tool-caller",
+            "Unreviewed tool call": "unreviewed-tool-call",
+        }.get(str(exc), "output-item-schema")
+        raise _Rejected(reason) from exc
+    _require(_identifier(value.get("id")), "output-item-id")
+    _require(
+        value.get("status") in ({None, "in_progress"} if partial else {None, "completed"}),
+        "output-item-status",
+    )
+    kind = value["type"]
+    if kind == "message":
+        _require(isinstance(value["content"], list), "output-content-schema")
+        _require(all(p["type"] == "output_text" for p in value["content"]), "output-content-type")
+    elif kind == "reasoning":
+        for field, part_type in (("summary", "summary_text"), ("content", "reasoning_text")):
+            parts = value.get(field) or []
+            _require(
+                isinstance(parts, list) and all(p["type"] == part_type for p in parts),
+                "reasoning-content-type",
+            )
+    else:
+        _require(_identifier(value["call_id"]), "tool-call-id")
+        if kind == "function_call" and not partial:
+            try:
+                args = loads_no_duplicate_keys(value["arguments"])
+                json.dumps(args, allow_nan=False)
+            except (ValueError, TypeError) as exc:
+                raise _Rejected("function-arguments-json") from exc
+            _require(isinstance(args, dict), "function-arguments-object")
+
+
+# Reviewed Responses fields, including live-observed generation settings. These
+# cannot add outbound authority; returned tools still pass the local contract.
+_RESPONSE_FIELDS = frozenset(
+    {
+        "id",
+        "object",
+        "model",
+        "status",
+        "output",
+        "usage",
+        "error",
+        "incomplete_details",
+        "created_at",
+        "completed_at",
+        "instructions",
+        "metadata",
+        "parallel_tool_calls",
+        "temperature",
+        "tool_choice",
+        "tools",
+        "top_p",
+        "background",
+        "max_output_tokens",
+        "max_tool_calls",
+        "previous_response_id",
+        "prompt",
+        "prompt_cache_key",
+        "prompt_cache_retention",
+        "reasoning",
+        "text",
+        "top_logprobs",
+        "truncation",
+        "user",
+        "safety_identifier",
+        "service_tier",
+        "store",
+        "access_programs",
+        "conversation",
+        "moderation",
+        "prompt_cache_options",
+        "presence_penalty",
+        "frequency_penalty",
+        "tool_usage",
+        "image",
+    }
+)
+
+
+# Optional in SDK 2.54.0. A populated conversation implies provider-held history;
+# moderation was not requested; prompt_cache_options requires GPT-5.6 or later.
+# Null is the only supported value, at EVERY lifecycle snapshot (including JSON).
+_NULL_RESPONSE_METADATA = ("conversation", "moderation", "prompt_cache_options")
+
+# A fixed public catalogue for diagnostics ONLY, never a source of acceptance.
+# These additional names appear in the official Responses reference but remain
+# outside the supported wire contract. Arbitrary names are hashed.
+_PUBLIC_RESPONSE_FIELDS = _RESPONSE_FIELDS | {"prompt_cache_diagnostics", "output_text"}
+
+
+def _unexpected_fields(unexpected, catalogue):
+    known = sorted(unexpected & catalogue)
+    hashed = sorted("sha256:" + _hash(name) for name in unexpected - catalogue)
+    return {
+        "unexpected_fields": (known + hashed)[:16],
+        "unexpected_field_count": len(unexpected),
+        "unexpected_fields_truncated": len(unexpected) > 16,
+    }
+
+
+def _response_schema(response):
+    diagnostic = {"validation_stage": "response-object"}
+    if not isinstance(response, dict):
+        raise _Rejected("response-schema", diagnostic=diagnostic)
+    unexpected = set(response) - _RESPONSE_FIELDS
+    if unexpected:
+        diagnostic.update(_unexpected_fields(unexpected, _PUBLIC_RESPONSE_FIELDS))
+        raise _Rejected("response-schema", diagnostic=diagnostic)
+
+
+# Fixed public nested names for diagnostics; this does not drive acceptance.
+_PUBLIC_TOOL_USAGE_FIELDS = frozenset(
+    {
+        "image_gen",
+        "web_search",
+        "num_requests",
+        "input_tokens",
+        "output_tokens",
+        "total_tokens",
+        "input_tokens_details",
+        "output_tokens_details",
+        "image_tokens",
+        "text_tokens",
+        "cached_tokens",
+        "cached_tokens_details",
+        "cached_image_tokens",
+        "cached_text_tokens",
+    }
+)
+
+
+def _tool_usage_object(value, required, optional, path):
+    # path is composed only from the fixed schema below, never provider strings.
+    diagnostic = {"validation_stage": "response-tool-usage", "rejected_field": path}
+    if not isinstance(value, dict):
+        raise _Rejected("response-tool-usage-schema", diagnostic=diagnostic)
+    unexpected = set(value) - required - optional
+    if unexpected:
+        diagnostic.update(_unexpected_fields(unexpected, _PUBLIC_TOOL_USAGE_FIELDS))
+    if unexpected or required - set(value):
+        raise _Rejected("response-tool-usage-schema", diagnostic=diagnostic)
+    return value
+
+
+def _zero_tool_count(value, path):
+    diagnostic = {"validation_stage": "response-tool-usage", "rejected_field": path}
+    if not _count(value):
+        raise _Rejected("response-tool-usage-schema", diagnostic=diagnostic)
+    if value != 0:
+        # Hosted effects have neither authority nor reviewed prices here. Never
+        # fold them into base-model usage or release a hold using partial prices.
+        raise _Rejected("response-hosted-tool-usage", diagnostic=diagnostic)
+
+
+def _tool_usage(value):
+    usage = _tool_usage_object(value, {"image_gen", "web_search"}, set(), "tool_usage")
+    web = _tool_usage_object(usage["web_search"], {"num_requests"}, set(), "tool_usage.web_search")
+    _zero_tool_count(web["num_requests"], "tool_usage.web_search.num_requests")
+    image = _tool_usage_object(
+        usage["image_gen"],
+        {"input_tokens", "output_tokens", "total_tokens", "input_tokens_details"},
+        {"cached_tokens", "cached_tokens_details", "output_tokens_details"},
+        "tool_usage.image_gen",
+    )
+    for field in ("input_tokens", "output_tokens", "total_tokens", "cached_tokens"):
+        if field in image:
+            _zero_tool_count(image[field], "tool_usage.image_gen." + field)
+    for field, counts in (
+        ("input_tokens_details", ("image_tokens", "text_tokens")),
+        ("output_tokens_details", ("image_tokens", "text_tokens")),
+        ("cached_tokens_details", ("cached_image_tokens", "cached_text_tokens")),
+    ):
+        if field in image:
+            path = "tool_usage.image_gen." + field
+            detail = _tool_usage_object(image[field], set(counts), set(), path)
+            for count in counts:
+                _zero_tool_count(detail[count], path + "." + count)
+    # Missing optional cache counts mean unknown, NOT measured zero. These
+    # counters alone never establish no hosted activity: request/output tool
+    # prohibitions remain mandatory (some provider activity is not counted).
+
+
+# Inbound echoes have a separate schema from outbound tools(). These defaults
+# never become request fields, tool grants, or inputs to consequence dispatch.
+_ECHO_BASE = {"type", "name", "description"}
+_ECHO_DEFAULTS = {"allowed_callers", "defer_loading", "async"}
+_ECHO_FUNCTION = _ECHO_BASE | _ECHO_DEFAULTS | {"parameters", "strict", "output_schema"}
+_ECHO_CUSTOM = _ECHO_BASE | _ECHO_DEFAULTS | {"format"}
+_ECHO_NAMESPACE = _ECHO_BASE | {"tools"}
+_PUBLIC_ECHO_FIELDS = _ECHO_FUNCTION | _ECHO_CUSTOM | _ECHO_NAMESPACE | {"syntax", "definition"}
+
+
+def _echo_reject(reason, path, field, unexpected=None):
+    # path contains bounded-depth list indices, field/reason fixed identifiers.
+    diagnostic = {
+        "validation_stage": "response-tool-echo",
+        "tool_rejection_reason": reason,
+        "tool_path": list(path),
+        "rejected_field": field,
+    }
+    if unexpected:
+        diagnostic.update(_unexpected_fields(unexpected, _PUBLIC_ECHO_FIELDS))
+    raise _Rejected("response-tools", diagnostic=diagnostic)
+
+
+def _echo_object(value, allowed, path, field):
+    if not isinstance(value, dict):
+        _echo_reject("field-type", path, field)
+    unexpected = set(value) - allowed
+    if unexpected:
+        _echo_reject("unsupported-field", path, field, unexpected)
+
+
+def _echo_tool(value, path):
+    if not isinstance(value, dict) or not isinstance(value.get("type"), str):
+        _echo_reject("field-type", path, "type")
+    kind = value["type"]
+    fields = {"function": _ECHO_FUNCTION, "custom": _ECHO_CUSTOM, "namespace": _ECHO_NAMESPACE}
+    if kind not in fields or (kind == "namespace" and len(path) > 1):
+        _echo_reject("unsupported-type", path, "type")
+    _echo_object(value, fields[kind], path, "tools")
+    if not _identifier(value.get("name")):
+        _echo_reject("field-type", path, "name")
+    description = value.get("description")
+    if description is not None and not isinstance(description, str):
+        _echo_reject("field-type", path, "description")
+    normalized = {"type": kind, "name": value["name"], "description": description or ""}
+    if kind == "namespace":
+        normalized["tools"] = value.get("tools")
+        return normalized
+    callers = value.get("allowed_callers")
+    if callers is not None:
+        if not isinstance(callers, list) or any(not isinstance(c, str) for c in callers):
+            _echo_reject("field-type", path, "allowed_callers")
+        if callers != ["direct"]:
+            _echo_reject("caller-mode", path, "allowed_callers")
+    deferred = value.get("defer_loading")
+    if deferred is not None and type(deferred) is not bool:
+        _echo_reject("field-type", path, "defer_loading")
+    if deferred is True:
+        _echo_reject("deferred-loading", path, "defer_loading")
+    # Current docs define async as optional boolean, not nullable. Unlike the
+    # pinned SDK's nullable defer_loading, explicit null is not a reviewed echo.
+    asynchronous = value.get("async", False)
+    if type(asynchronous) is not bool:
+        _echo_reject("field-type", path, "async")
+    if asynchronous:
+        _echo_reject("async-execution", path, "async")
+    if kind == "function":
+        output_schema = value.get("output_schema")
+        if output_schema is not None:
+            _echo_reject(
+                "output-schema" if isinstance(output_schema, dict) else "field-type",
+                path,
+                "output_schema",
+            )
+        if not isinstance(value.get("parameters"), dict):
+            _echo_reject("field-type", path, "parameters")
+        strict = value.get("strict")
+        if strict is not None and type(strict) is not bool:
+            _echo_reject("field-type", path, "strict")
+        normalized.update(parameters=value["parameters"], strict=strict)
+    else:
+        fmt = value.get("format")
+        if fmt is None:
+            fmt = {"type": "text"}
+        _echo_object(fmt, {"type", "syntax", "definition"}, path, "format")
+        if fmt.get("type") == "text":
+            _echo_object(fmt, {"type"}, path, "format")
+        elif fmt.get("type") == "grammar":
+            if not isinstance(fmt.get("syntax"), str) or not isinstance(fmt.get("definition"), str):
+                _echo_reject("field-type", path, "format")
+        else:
+            _echo_reject("definition", path, "format")
+        normalized["format"] = fmt
+    return normalized
+
+
+def _response_tools(echoed, approved, path=(), *, strictness=None, scope=()):
+    if not isinstance(echoed, list) or not isinstance(approved, list):
+        _echo_reject("field-type", path, "tools")
+    actual = [_echo_tool(t, (*path, i)) for i, t in enumerate(echoed)]
+    expected = [_echo_tool(t, (*path, i)) for i, t in enumerate(approved)]
+    for inventory in (actual, expected):
+        if len({t["name"] for t in inventory}) != len(inventory):
+            _echo_reject("duplicate-identity", path, "name")
+    if len(actual) != len(expected):
+        _echo_reject("count", path, "tools")
+    by_name = {t["name"]: t for t in expected}
+    for index, tool in enumerate(actual):
+        location = (*path, index)
+        other = by_name.get(tool["name"])
+        if other is None or tool["type"] != other["type"]:
+            _echo_reject("identity", location, "name")
+        for field in ("description", "parameters", "format", "strict"):
+            # An omitted request strictness explicitly leaves resolution to the
+            # provider. Boolean resolution is safe only with identical schema;
+            # no arbitrary provider schema normalization is authorized here.
+            if field == "strict" and other.get(field) is None:
+                continue
+            # Canonical JSON preserves bool/number distinctions and array order.
+            if canonical(tool.get(field)) != canonical(other.get(field)):
+                _echo_reject("definition", location, field)
+        if strictness is not None and type(tool.get("strict")) is bool:
+            identity = (*scope, tool["name"])
+            if identity in strictness and strictness[identity] != tool["strict"]:
+                _echo_reject("definition", location, "strict")
+            strictness[identity] = tool["strict"]
+        if tool["type"] == "namespace":
+            _response_tools(
+                tool["tools"],
+                other["tools"],
+                location,
+                strictness=strictness,
+                scope=(*scope, tool["name"]),
+            )
+
+
+def _image_metadata(value, policies=None):
+    # Effective response policy, not the request setting (which also has auto).
+    # The documented response object is optional but neither it nor its required
+    # member is nullable. This echo never enables image inputs, outputs or tools.
+    diagnostic = {"validation_stage": "response-image", "rejected_field": "image"}
+    if not isinstance(value, dict) or set(value) != {"context_compression"}:
+        if isinstance(value, dict):
+            diagnostic.update(
+                _unexpected_fields(set(value) - {"context_compression"}, {"context_compression"})
+            )
+        raise _Rejected("response-image-schema", diagnostic=diagnostic)
+    policy = value["context_compression"]
+    if not isinstance(policy, str) or policy not in {"enabled", "disabled"}:
+        raise _Rejected("response-image-policy", diagnostic=diagnostic)
+    if policies is not None:
+        if policies and policy not in policies:
+            raise _Rejected("response-image-mismatch", diagnostic=diagnostic)
+        policies.add(policy)
+
+
+def _response(response, request, *, tool_strictness=None, image_policies=None):
+    _response_schema(response)
+    if "image" in response:
+        _image_metadata(response["image"], image_policies)
+    for field in ("presence_penalty", "frequency_penalty"):
+        value = response.get(field)
+        # The signed request cannot specify penalties. Accept only unset/default
+        # metadata; exact numeric zero also excludes booleans and nonfinite values.
+        if value is not None and not (type(value) in (int, float) and value == 0):
+            raise _Rejected(
+                "response-unsupported-penalty",
+                diagnostic={"validation_stage": "response-metadata", "rejected_field": field},
+            )
+    if "tool_usage" in response:
+        _tool_usage(response["tool_usage"])
+    for field in _NULL_RESPONSE_METADATA:
+        if response.get(field) is not None:
+            raise _Rejected(
+                "response-unsupported-metadata",
+                diagnostic={"validation_stage": "response-metadata", "rejected_field": field},
+            )
+    _require(response.get("object") == "response", "response-object")
+    _require(response.get("model") == request["model"], "response-model")
+    _require(
+        response.get("background") in (None, False)
+        and response.get("store") in (None, False)
+        and response.get("access_programs") is None
+        and response.get("previous_response_id") is None,
+        "response-unsupported-state",
+    )
+    if response.get("max_output_tokens") is not None:
+        _require(
+            type(response["max_output_tokens"]) is int
+            and response["max_output_tokens"] == request["max_output_tokens"],
+            "response-output-cap",
+        )
+    if "tools" in response:
+        # This is the echo of request.tools, not a new grant. Inline
+        # additional_tools retain their original input position and are never
+        # silently lifted into this top-level inventory. Omission is no echo;
+        # an explicit empty list must match an empty approved list.
+        _response_tools(response["tools"], request.get("tools", []), strictness=tool_strictness)
+
+
 def _usage(response, request):
-    if response.get("model") != request["model"] or response.get("status") not in {
-        "completed",
-        "incomplete",
-    }:
-        return None
-    if (
-        response["status"] == "incomplete"
-        and response.get("incomplete_details", {}).get("reason") != "max_output_tokens"
-    ):
-        return None
+    _response(response, request)
+    _require(response.get("object") == "response", "response-object")
+    _require(_identifier(response.get("id")), "response-id")
+    _require(response.get("model") == request["model"], "response-model")
+    # An incomplete answer is not a confirmed completion, even if it reports usage.
+    _require(response.get("status") == "completed", "response-not-completed")
+    _require(
+        response.get("error") is None and response.get("incomplete_details") is None,
+        "response-error-or-incomplete",
+    )
+    _require(isinstance(response.get("output"), list), "response-output-schema")
+    identities, calls = set(), set()
     for entry in response["output"]:
-        item(entry, output=True)
-    usage = response["usage"]
-    inp, out = usage["input_tokens"], usage["output_tokens"]
-    cached = usage.get("input_tokens_details", {}).get("cached_tokens", 0)
-    if (
-        not all(type(n) is int and n >= 0 for n in (inp, out, cached))
-        or cached > inp
-        or out > request["max_output_tokens"]
-    ):
-        return None
+        _output(entry)
+        _require(entry["id"] not in identities, "duplicate-output-id")
+        identities.add(entry["id"])
+        if "call_id" in entry:
+            _require(entry["call_id"] not in calls, "duplicate-call-id")
+            calls.add(entry["call_id"])
+    usage = response.get("usage")
+    _require(isinstance(usage, dict), "usage-missing")
+    _require(
+        not set(usage)
+        - {
+            "input_tokens",
+            "output_tokens",
+            "total_tokens",
+            "input_tokens_details",
+            "output_tokens_details",
+        },
+        "usage-schema",
+    )
+    inp, out, total = (usage.get(k) for k in ("input_tokens", "output_tokens", "total_tokens"))
+    _require(all(_count(n) for n in (inp, out, total)), "usage-count")
+    _require(total == inp + out, "usage-total")
+    _require(out <= request["max_output_tokens"], "usage-output-bound")
+    _require(inp <= len(canonical(request)) + 4096, "usage-input-bound")
+    details = usage.get("input_tokens_details", {})
+    _require(
+        isinstance(details, dict) and not set(details) - {"cached_tokens", "cache_write_tokens"},
+        "usage-input-details",
+    )
+    # SDK 2.54.0 documents this count even when zero. A positive cache-write
+    # class is outside this reviewed-price contract; never silently price it at 0.
+    _require(
+        type(details.get("cache_write_tokens", 0)) is int
+        and details.get("cache_write_tokens", 0) == 0,
+        "usage-unsupported-cache-write",
+    )
+    cached = details.get("cached_tokens", 0)
+    _require(_count(cached) and cached <= inp, "usage-cache-count")
+    details = usage.get("output_tokens_details", {})
+    _require(
+        isinstance(details, dict) and not set(details) - {"reasoning_tokens"},
+        "usage-output-details",
+    )
+    reasoning = details.get("reasoning_tokens", 0)
+    _require(_count(reasoning) and reasoning <= out, "usage-reasoning-count")
     return {
         "input_tokens": inp - cached,
         "cache_creation_input_tokens": 0,
@@ -308,60 +764,361 @@ def _usage(response, request):
     }
 
 
-def observe(status, body, request):
+# Supported event families are explicit. No hosted tool or unknown event is ignored.
+_PARTS = {"content_part": "content", "reasoning_summary_part": "summary"}
+_TEXT = {
+    "output_text": ("content", "output_text"),
+    "reasoning_summary_text": ("summary", "summary_text"),
+    "reasoning_text": ("content", "reasoning_text"),
+}
+_TOOL = {
+    "function_call_arguments": ("function_call", "arguments"),
+    "custom_tool_call_input": ("custom_tool_call", "input"),
+}
+_EVENTS = {
+    "response.created",
+    "response.in_progress",
+    "response.completed",
+    "response.incomplete",
+    "response.output_item.added",
+    "response.output_item.done",
+} | {
+    "response." + family + "." + suffix
+    for families, suffixes in (
+        (_PARTS, ("added", "done")),
+        (_TEXT, ("delta", "done")),
+        (_TOOL, ("delta", "done")),
+    )
+    for family in families
+    for suffix in suffixes
+}
+
+
+def _hash(value):
+    return hashlib.sha256(json.dumps(value, sort_keys=True, ensure_ascii=True).encode()).hexdigest()
+
+
+class _Trace:
+    def __init__(self, body):
+        self.data = {
+            "schema": "actenon-airlock/responses-observation/v1",
+            "body_sha256": hashlib.sha256(body).hexdigest(),
+            "events": [],
+            "event_count": 0,
+        }
+        self.hash = hashlib.sha256()
+        self.records = []
+
+    def record(self, event):
+        kind = event.get("type")
+        record = {"type": kind if isinstance(kind, str) and kind in _EVENTS else "unsupported"}
+        if record["type"] == "unsupported":
+            record["type_sha256"] = _hash(kind)
+        for name in ("sequence_number", "output_index", "content_index", "summary_index"):
+            if name in event:
+                record[name] = event[name] if _count(event[name]) else "invalid"
+        for name, value in (
+            ("item_id", event.get("item_id")),
+            (
+                "item_id",
+                event.get("item", {}).get("id") if isinstance(event.get("item"), dict) else None,
+            ),
+            (
+                "response_id",
+                event.get("response", {}).get("id")
+                if isinstance(event.get("response"), dict)
+                else None,
+            ),
+        ):
+            if value is not None:
+                record[name + "_sha256"] = _hash(value)
+        if isinstance(event.get("item"), dict):
+            item_kind = event["item"].get("type")
+            record["item_type"] = (
+                item_kind
+                if item_kind in ("message", "reasoning", "function_call", "custom_tool_call")
+                else "unsupported"
+            )
+        if kind in ("response.completed", "response.incomplete"):
+            status = (
+                event.get("response", {}).get("status")
+                if isinstance(event.get("response"), dict)
+                else None
+            )
+            self.data["terminal_status"] = (
+                status
+                if status in ("completed", "incomplete", "failed", "in_progress")
+                else "invalid"
+            )
+        self.hash.update(json.dumps(record, sort_keys=True).encode() + b"\n")
+        self.records.append(record)
+        self.data["event_count"] += 1
+        if len(self.data["events"]) < 256:
+            self.data["events"].append(record)
+        else:
+            self.data["events_truncated"] = True
+        self.data["events_sha256"] = self.hash.hexdigest()
+
+
+def _events(body, trace):
+    text = body.decode().replace("\r\n", "\n")
+    _require(text.endswith("\n\n"), "sse-truncated-frame")
+    result = []
+    for block in text.split("\n\n"):
+        name, data = None, []
+        for line in block.split("\n"):
+            if not line or line.startswith(":"):
+                continue
+            if line.startswith("event:"):
+                _require(name is None, "sse-duplicate-event-name")
+                name = line[6:].strip()
+            elif line.startswith("data:"):
+                data.append(line[5:].removeprefix(" "))
+            else:
+                raise _Rejected("sse-unsupported-field")
+        if not data and name is None:
+            continue
+        event = loads_no_duplicate_keys("\n".join(data))
+        json.dumps(event, allow_nan=False)
+        _require(isinstance(event, dict), "event-not-object")
+        trace.record(event)
+        _require(name is None or name == event.get("type"), "sse-event-name-mismatch")
+        result.append(event)
+    return result
+
+
+def _stream_response(events, request, trace):
+    _require(bool(events), "stream-empty")
+    _require(events[0].get("type") == "response.created", "stream-created-missing")
+    response = events[0]["response"]
+    _require(isinstance(response, dict) and _identifier(response.get("id")), "created-response-id")
+    response_id = response["id"]
+    added, completed, parts, chunks, finished = {}, {}, {}, {}, set()
+    ids = set()
+    previous = None
+    terminal = None
+    tool_strictness = {}
+    image_policies = set()
+    for position, event in enumerate(events):
+        trace.data["checked_event"] = position
+        trace.data["checked_event_metadata"] = trace.records[position]
+        kind = event.get("type")
+        _require(isinstance(kind, str) and kind in _EVENTS, "unsupported-event-type")
+        seq = event.get("sequence_number")
+        _require(_count(seq) and (previous is None or seq == previous + 1), "event-sequence")
+        previous = seq
+        trace.data["checked_sequence_number"] = seq
+        _require(terminal is None, "event-after-terminal")
+        common = {"type", "sequence_number"}
+        if kind in {
+            "response.created",
+            "response.in_progress",
+            "response.completed",
+            "response.incomplete",
+        }:
+            _require(not set(event) - common - {"response"}, "response-event-schema")
+            current = event["response"]
+            _response(
+                current, request, tool_strictness=tool_strictness, image_policies=image_policies
+            )
+            _require(current.get("id") == response_id, "response-id-mismatch")
+            _require(current.get("model") == request["model"], "response-model-mismatch")
+            _require(current.get("object") == "response", "response-object")
+            if kind in {"response.completed", "response.incomplete"}:
+                _require(
+                    kind == "response.completed" and current.get("status") == "completed",
+                    "response-not-completed",
+                )
+                terminal = current
+            else:
+                _require(kind != "response.created" or position == 0, "duplicate-created")
+                _require(
+                    current.get("status") == "in_progress"
+                    and current.get("output") == []
+                    and current.get("usage") is None
+                    and not added,
+                    "response-progress-state",
+                )
+                _require(
+                    current.get("error") is None and current.get("incomplete_details") is None,
+                    "response-error-or-incomplete",
+                )
+            continue
+        index = event.get("output_index")
+        _require(_count(index), "output-index")
+        if kind in {"response.output_item.added", "response.output_item.done"}:
+            _require(not set(event) - common - {"output_index", "item"}, "output-event-schema")
+            value = event["item"]
+            if kind.endswith("added"):
+                _require(index == len(added), "output-add-order")
+                _output(value, partial=True)
+                _require(value["id"] not in ids, "duplicate-output-id")
+                for field in ("arguments", "input", "content", "summary"):
+                    if field in value:
+                        _require(value[field] in ("", [], None), "output-initial-content")
+                ids.add(value["id"])
+                added[index] = value
+            else:
+                _require(index in added and index not in completed, "output-done-order")
+                _output(value)
+                first = added[index]
+                for key in (
+                    "id",
+                    "type",
+                    "call_id",
+                    "name",
+                    "namespace",
+                    "role",
+                    "phase",
+                    "caller",
+                ):
+                    _require(first.get(key) == value.get(key), "output-item-identity")
+                for key, partial in chunks.items():
+                    if key[0] != index:
+                        continue
+                    _require(key in finished, "delta-done-missing")
+                    field, part_index = key[1:]
+                    final = value[field] if part_index is None else value[field][part_index]["text"]
+                    _require("".join(partial) == final, "delta-final-mismatch")
+                for key, part in parts.items():
+                    if key[0] == index:
+                        _require(
+                            part["done"] and part["value"] == value[key[1]][key[2]],
+                            "part-final-mismatch",
+                        )
+                if value["type"] in {"function_call", "custom_tool_call"}:
+                    field = "arguments" if value["type"] == "function_call" else "input"
+                    _require((index, field, None) in finished, "tool-input-done-missing")
+                for field in ("content", "summary"):
+                    for part_index, final_part in enumerate(value.get(field) or []):
+                        _require((index, field, part_index) in parts, "part-completion-missing")
+                completed[index] = value
+            continue
+        _require(index in added and index not in completed, "event-outside-item")
+        value = added[index]
+        _require(event.get("item_id") == value["id"], "event-item-id")
+        family, suffix = kind[len("response.") :].rsplit(".", 1)
+        allowed = common | {"output_index", "item_id"}
+        if family in _TOOL:
+            item_kind, field = _TOOL[family]
+            _require(value["type"] == item_kind, "tool-event-type")
+            key = (index, field, None)
+            payload = "delta" if suffix == "delta" else field
+        else:
+            field = _PARTS.get(family) or _TEXT[family][0]
+            index_field = "summary_index" if field == "summary" else "content_index"
+            part_index = event.get(index_field)
+            _require(_count(part_index), "part-index")
+            expected_kind = (
+                "reasoning" if field == "summary" or family == "reasoning_text" else "message"
+            )
+            _require(
+                value["type"] == expected_kind
+                or (family == "content_part" and value["type"] == "reasoning"),
+                "part-item-type",
+            )
+            key = (index, field, part_index)
+            allowed.add(index_field)
+            payload = "part" if family in _PARTS else "delta" if suffix == "delta" else "text"
+            if family in _TEXT:
+                _require(key in parts and not parts[key]["done"], "text-outside-part")
+                expected = _TEXT[family][1]
+                _require(parts[key]["value"]["type"] == expected, "text-part-type")
+                allowed.add("logprobs")
+                _require(event.get("logprobs", []) == [], "unsupported-logprobs")
+        allowed.add(payload)
+        # Documented random padding on delta events contains no execution data.
+        if suffix == "delta":
+            allowed.add("obfuscation")
+            _require(isinstance(event.get("obfuscation", ""), str), "delta-obfuscation-type")
+        _require(not set(event) - allowed, "event-schema")
+        if family in _PARTS:
+            part = event["part"]
+            content([part])
+            if suffix == "added":
+                _require(
+                    key not in parts and key[2] == sum(k[:2] == key[:2] for k in parts),
+                    "part-add-order",
+                )
+                _require(part.get("text") == "", "part-initial-text")
+                parts[key] = {"value": part, "done": False}
+            else:
+                _require(
+                    key in parts and not parts[key]["done"] and key in finished, "part-done-order"
+                )
+                _require(
+                    part["type"] == parts[key]["value"]["type"]
+                    and part["text"] == "".join(chunks[key]),
+                    "part-text-mismatch",
+                )
+                parts[key] = {"value": part, "done": True}
+        else:
+            _require(isinstance(event[payload], str), "delta-value-type")
+            _require(key not in finished, "duplicate-text-done")
+            if suffix == "delta":
+                chunks.setdefault(key, []).append(event[payload])
+            else:
+                _require("".join(chunks.get(key, [])) == event[payload], "delta-done-mismatch")
+                chunks.setdefault(key, [])
+                finished.add(key)
+    _require(terminal is not None, "terminal-missing")
+    _require(len(added) == len(completed), "output-done-missing")
+    _require(
+        [completed[i] for i in range(len(added))] == terminal.get("output"),
+        "terminal-output-mismatch",
+    )
+    return terminal
+
+
+@dataclass(frozen=True)
+class ResponsesObservation(Observation):
+    diagnostics: dict | None = None
+
+
+def _observe_authoritative(status, body, request):
+    trace = _Trace(body)
+    # Integer status and allowlisted code/type only; never provider text. This
+    # explains a failure; it does not change confirmation, decline or usage.
+    trace.data.update(provider_errors.status_diagnostic(status, body))
     try:
+        _require(len(body) <= 4 * 1024 * 1024, "response-byte-bound")
         if status == 429:
             error = loads_no_duplicate_keys(body)["error"]
-            return Observation(
-                declined=error.get("code") in {"rate_limit_exceeded", "insufficient_quota"}
-            )
-        if status != 200:
-            return Observation()
-        if not request["stream"]:
-            usage = _usage(loads_no_duplicate_keys(body), request)
-            return Observation(confirmed=usage is not None, usage=usage)
-        events = []
-        for block in body.decode().replace("\r\n", "\n").split("\n\n"):
-            lines = [line[5:].lstrip() for line in block.splitlines() if line.startswith("data:")]
-            if lines:
-                events.append(loads_no_duplicate_keys("\n".join(lines)))
-        if (
-            not events
-            or events[0].get("type") != "response.created"
-            or events[-1].get("type") not in {"response.completed", "response.incomplete"}
-        ):
-            return Observation()
-        response = events[-1]["response"]
-        if response["id"] != events[0]["response"]["id"]:
-            return Observation()
-        completed = []
-        for event in events[1:-1]:
-            kind = event["type"]
-            if kind == "response.output_item.done":
-                item(event["item"], output=True)
-                completed.append(event["item"])
-            elif kind not in {
-                "response.in_progress",
-                "response.output_item.added",
-                "response.content_part.added",
-                "response.content_part.done",
-                "response.output_text.delta",
-                "response.output_text.done",
-                "response.function_call_arguments.delta",
-                "response.function_call_arguments.done",
-                "response.custom_tool_call_input.delta",
-                "response.custom_tool_call_input.done",
-                "response.reasoning_summary_part.added",
-                "response.reasoning_summary_part.done",
-                "response.reasoning_summary_text.delta",
-                "response.reasoning_summary_text.done",
-                "response.reasoning_text.delta",
-                "response.reasoning_text.done",
-            }:
-                return Observation()
-        if completed != response["output"]:
-            return Observation()
+            declined = error.get("code") in {"rate_limit_exceeded", "insufficient_quota"}
+            # Unchanged decline semantics; only the evidence is now retained.
+            trace.data["rejection_reason"] = "provider-declined" if declined else "http-status"
+            return ResponsesObservation(declined=declined, diagnostics=trace.data)
+        _require(status == 200, "http-status")
+        if request["stream"]:
+            response = _stream_response(_events(body, trace), request, trace)
+        else:
+            response = loads_no_duplicate_keys(body)
+            json.dumps(response, allow_nan=False)
         usage = _usage(response, request)
-        return Observation(confirmed=usage is not None, usage=usage)
-    except (AirlockError, ValueError, KeyError, TypeError, AttributeError):
-        return Observation()
+        trace.data.update(rejection_reason=None, validated_usage=usage)
+        return ResponsesObservation(confirmed=True, usage=usage, diagnostics=trace.data)
+    except _Rejected as exc:
+        trace.data["rejection_reason"] = str(exc)
+        trace.data.update(exc.diagnostic)
+    except AirlockError:
+        trace.data["rejection_reason"] = "content-schema"
+    except (ValueError, KeyError, TypeError, AttributeError, IndexError, RecursionError):
+        trace.data["rejection_reason"] = "malformed-response"
+    return ResponsesObservation(diagnostics=trace.data)
+
+
+def observe(status, body, request):
+    # Complete the immutable authority/accounting decision first. Diagnostics
+    # cannot provide a verdict, alter usage, replay, dispatch or release a hold.
+    result = _observe_authoritative(status, body, request)
+    try:
+        from .responses_observatory import inspect_response
+
+        diagnostic = inspect_response(status, body, request)
+    except Exception:
+        # Diagnostic bugs/resource failures must not change an established
+        # verdict, and exception strings may contain private provider content.
+        diagnostic = {"authoritative": False, "unavailable": True}
+    return replace(
+        result, diagnostics={**(result.diagnostics or {}), "contract_observatory": diagnostic}
+    )

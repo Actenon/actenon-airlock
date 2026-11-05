@@ -1,0 +1,60 @@
+{
+  "openai": "2.54.0",
+  "models": {
+    "function_tool": {
+      "sha256": "f23d390ae7349fa95f9f43953d213b8ba51254161cddf2f58c706baf3a1f0866",
+      "fields": [
+        "allowed_callers",
+        "defer_loading",
+        "description",
+        "name",
+        "output_schema",
+        "parameters",
+        "strict",
+        "type"
+      ]
+    },
+    "custom_tool": {
+      "sha256": "5c01c3e3da2490a3751be9e68128f9b6f6e5a5a542ef3bc33f7104b33d9b9895",
+      "fields": [
+        "allowed_callers",
+        "defer_loading",
+        "description",
+        "format",
+        "name",
+        "type"
+      ]
+    },
+    "namespace_tool": {
+      "sha256": "3a5fa70eb93d956757c5ff5e6b10dc9ed6abc1f63d07dd4629140827eaecdb4f",
+      "fields": [
+        "description",
+        "name",
+        "tools",
+        "type"
+      ]
+    }
+  },
+  "official_docs": {
+    "responses": {
+      "sha256": "199755920b1cf429bea02f5d814cfb57f10aa8395d4d5230cfe00098b75d101b"
+    },
+    "programmatic": {
+      "sha256": "cc29bd59065ec079f4a6e2cabff63742992bcc8fdbf5a16f8c20f269bb0806f3"
+    },
+    "functions": {
+      "sha256": "46d01db6895d007a8cd79806055ca44ea55ac88e3ffbfae80d14ec7dc8411f93"
+    },
+    "async": {
+      "sha256": "0615053c6f766ef82641639178b560949ad1ea98130d4542395442cb77265e14"
+    }
+  },
+  "unchanged_functions": {
+    "tools": true,
+    "item": true,
+    "check_request": true,
+    "check_headers": true,
+    "reservation": true,
+    "_usage": true
+  }
+}

@@ -1,0 +1,406 @@
+.FFFFFFF.FFFFFFF.FFFFFFFFFFFFF.......................................... [ 49%]
+........................................................FFFFFFF.....FFFF [ 98%]
+FF                                                                       [100%]
+=================================== FAILURES ===================================
+_______ test_documented_absent_null_combinations_confirm[True-metadata1] _______
+tests/test_response_schema_compatibility.py:55: in test_documented_absent_null_combinations_confirm
+    assert result.confirmed
+E   AssertionError: assert False
+E    +  where False = ResponsesObservation(confirmed=False, declined=False, usage=None, diagnostics={'schema': 'actenon-airlock/responses-ob...1a2390e88f85ae39cc947751022fbaf1b58b8aa10bddce'}, 'checked_sequence_number': 0, 'rejection_reason': 'response-schema'}).confirmed
+_______ test_documented_absent_null_combinations_confirm[True-metadata2] _______
+tests/test_response_schema_compatibility.py:55: in test_documented_absent_null_combinations_confirm
+    assert result.confirmed
+E   AssertionError: assert False
+E    +  where False = ResponsesObservation(confirmed=False, declined=False, usage=None, diagnostics={'schema': 'actenon-airlock/responses-ob...1a2390e88f85ae39cc947751022fbaf1b58b8aa10bddce'}, 'checked_sequence_number': 0, 'rejection_reason': 'response-schema'}).confirmed
+_______ test_documented_absent_null_combinations_confirm[True-metadata3] _______
+tests/test_response_schema_compatibility.py:55: in test_documented_absent_null_combinations_confirm
+    assert result.confirmed
+E   AssertionError: assert False
+E    +  where False = ResponsesObservation(confirmed=False, declined=False, usage=None, diagnostics={'schema': 'actenon-airlock/responses-ob...1a2390e88f85ae39cc947751022fbaf1b58b8aa10bddce'}, 'checked_sequence_number': 0, 'rejection_reason': 'response-schema'}).confirmed
+_______ test_documented_absent_null_combinations_confirm[True-metadata4] _______
+tests/test_response_schema_compatibility.py:55: in test_documented_absent_null_combinations_confirm
+    assert result.confirmed
+E   AssertionError: assert False
+E    +  where False = ResponsesObservation(confirmed=False, declined=False, usage=None, diagnostics={'schema': 'actenon-airlock/responses-ob...1a2390e88f85ae39cc947751022fbaf1b58b8aa10bddce'}, 'checked_sequence_number': 0, 'rejection_reason': 'response-schema'}).confirmed
+_______ test_documented_absent_null_combinations_confirm[True-metadata5] _______
+tests/test_response_schema_compatibility.py:55: in test_documented_absent_null_combinations_confirm
+    assert result.confirmed
+E   AssertionError: assert False
+E    +  where False = ResponsesObservation(confirmed=False, declined=False, usage=None, diagnostics={'schema': 'actenon-airlock/responses-ob...1a2390e88f85ae39cc947751022fbaf1b58b8aa10bddce'}, 'checked_sequence_number': 0, 'rejection_reason': 'response-schema'}).confirmed
+_______ test_documented_absent_null_combinations_confirm[True-metadata6] _______
+tests/test_response_schema_compatibility.py:55: in test_documented_absent_null_combinations_confirm
+    assert result.confirmed
+E   AssertionError: assert False
+E    +  where False = ResponsesObservation(confirmed=False, declined=False, usage=None, diagnostics={'schema': 'actenon-airlock/responses-ob...1a2390e88f85ae39cc947751022fbaf1b58b8aa10bddce'}, 'checked_sequence_number': 0, 'rejection_reason': 'response-schema'}).confirmed
+_______ test_documented_absent_null_combinations_confirm[True-metadata7] _______
+tests/test_response_schema_compatibility.py:55: in test_documented_absent_null_combinations_confirm
+    assert result.confirmed
+E   AssertionError: assert False
+E    +  where False = ResponsesObservation(confirmed=False, declined=False, usage=None, diagnostics={'schema': 'actenon-airlock/responses-ob...1a2390e88f85ae39cc947751022fbaf1b58b8aa10bddce'}, 'checked_sequence_number': 0, 'rejection_reason': 'response-schema'}).confirmed
+______ test_documented_absent_null_combinations_confirm[False-metadata1] _______
+tests/test_response_schema_compatibility.py:55: in test_documented_absent_null_combinations_confirm
+    assert result.confirmed
+E   AssertionError: assert False
+E    +  where False = ResponsesObservation(confirmed=False, declined=False, usage=None, diagnostics={'schema': 'actenon-airlock/responses-ob...b3956ef6d94b70044ab9e3c0785d2ad4cf5bb5651fb34', 'events': [], 'event_count': 0, 'rejection_reason': 'response-schema'}).confirmed
+______ test_documented_absent_null_combinations_confirm[False-metadata2] _______
+tests/test_response_schema_compatibility.py:55: in test_documented_absent_null_combinations_confirm
+    assert result.confirmed
+E   AssertionError: assert False
+E    +  where False = ResponsesObservation(confirmed=False, declined=False, usage=None, diagnostics={'schema': 'actenon-airlock/responses-ob...c6ec3527c63c3b998aca751d4f46d83ff883260ade526', 'events': [], 'event_count': 0, 'rejection_reason': 'response-schema'}).confirmed
+______ test_documented_absent_null_combinations_confirm[False-metadata3] _______
+tests/test_response_schema_compatibility.py:55: in test_documented_absent_null_combinations_confirm
+    assert result.confirmed
+E   AssertionError: assert False
+E    +  where False = ResponsesObservation(confirmed=False, declined=False, usage=None, diagnostics={'schema': 'actenon-airlock/responses-ob...a08bc87dc33c164ed3793fc782d6ad06c85a7b0a786df', 'events': [], 'event_count': 0, 'rejection_reason': 'response-schema'}).confirmed
+______ test_documented_absent_null_combinations_confirm[False-metadata4] _______
+tests/test_response_schema_compatibility.py:55: in test_documented_absent_null_combinations_confirm
+    assert result.confirmed
+E   AssertionError: assert False
+E    +  where False = ResponsesObservation(confirmed=False, declined=False, usage=None, diagnostics={'schema': 'actenon-airlock/responses-ob...235faef712c87893a20a3699bee2882f28979dfc7f737', 'events': [], 'event_count': 0, 'rejection_reason': 'response-schema'}).confirmed
+______ test_documented_absent_null_combinations_confirm[False-metadata5] _______
+tests/test_response_schema_compatibility.py:55: in test_documented_absent_null_combinations_confirm
+    assert result.confirmed
+E   AssertionError: assert False
+E    +  where False = ResponsesObservation(confirmed=False, declined=False, usage=None, diagnostics={'schema': 'actenon-airlock/responses-ob...72d3685489d1eb547647035bdd27184e3d7bcef12d9e8', 'events': [], 'event_count': 0, 'rejection_reason': 'response-schema'}).confirmed
+______ test_documented_absent_null_combinations_confirm[False-metadata6] _______
+tests/test_response_schema_compatibility.py:55: in test_documented_absent_null_combinations_confirm
+    assert result.confirmed
+E   AssertionError: assert False
+E    +  where False = ResponsesObservation(confirmed=False, declined=False, usage=None, diagnostics={'schema': 'actenon-airlock/responses-ob...167bdf2912b68f8a2dc230fa9d01532ed528935b90e40', 'events': [], 'event_count': 0, 'rejection_reason': 'response-schema'}).confirmed
+______ test_documented_absent_null_combinations_confirm[False-metadata7] _______
+tests/test_response_schema_compatibility.py:55: in test_documented_absent_null_combinations_confirm
+    assert result.confirmed
+E   AssertionError: assert False
+E    +  where False = ResponsesObservation(confirmed=False, declined=False, usage=None, diagnostics={'schema': 'actenon-airlock/responses-ob...67ccde04bb535f343e021c5ee69bbc78a5357fce44173', 'events': [], 'event_count': 0, 'rejection_reason': 'response-schema'}).confirmed
+_______ test_existing_valid_metadata_with_nullable_extensions[metadata1] _______
+tests/test_response_schema_compatibility.py:62: in test_existing_valid_metadata_with_nullable_extensions
+    assert observed(sequence({**metadata, "prompt_cache_retention": "24h",
+E   AssertionError: assert False
+E    +  where False = ResponsesObservation(confirmed=False, declined=False, usage=None, diagnostics={'schema': 'actenon-airlock/responses-ob...1a2390e88f85ae39cc947751022fbaf1b58b8aa10bddce'}, 'checked_sequence_number': 0, 'rejection_reason': 'response-schema'}).confirmed
+E    +    where ResponsesObservation(confirmed=False, declined=False, usage=None, diagnostics={'schema': 'actenon-airlock/responses-ob...1a2390e88f85ae39cc947751022fbaf1b58b8aa10bddce'}, 'checked_sequence_number': 0, 'rejection_reason': 'response-schema'}) = observed([{'type': 'response.created', 'response': {'id': 'resp_fixture', 'object': 'response', 'model': 'gpt-5.5', 'status': '.....}, {'type': 'response.content_part.done', 'output_index': 0, 'item_id': 'msg_fixture', 'content_index': 0, ...}, ...])
+E    +      where [{'type': 'response.created', 'response': {'id': 'resp_fixture', 'object': 'response', 'model': 'gpt-5.5', 'status': '.....}, {'type': 'response.content_part.done', 'output_index': 0, 'item_id': 'msg_fixture', 'content_index': 0, ...}, ...] = sequence({'conversation': None, 'prompt_cache_retention': '24h', 'metadata': {}, 'created_at': 1793740800})
+_______ test_existing_valid_metadata_with_nullable_extensions[metadata2] _______
+tests/test_response_schema_compatibility.py:62: in test_existing_valid_metadata_with_nullable_extensions
+    assert observed(sequence({**metadata, "prompt_cache_retention": "24h",
+E   AssertionError: assert False
+E    +  where False = ResponsesObservation(confirmed=False, declined=False, usage=None, diagnostics={'schema': 'actenon-airlock/responses-ob...1a2390e88f85ae39cc947751022fbaf1b58b8aa10bddce'}, 'checked_sequence_number': 0, 'rejection_reason': 'response-schema'}).confirmed
+E    +    where ResponsesObservation(confirmed=False, declined=False, usage=None, diagnostics={'schema': 'actenon-airlock/responses-ob...1a2390e88f85ae39cc947751022fbaf1b58b8aa10bddce'}, 'checked_sequence_number': 0, 'rejection_reason': 'response-schema'}) = observed([{'type': 'response.created', 'response': {'id': 'resp_fixture', 'object': 'response', 'model': 'gpt-5.5', 'status': '.....}, {'type': 'response.content_part.done', 'output_index': 0, 'item_id': 'msg_fixture', 'content_index': 0, ...}, ...])
+E    +      where [{'type': 'response.created', 'response': {'id': 'resp_fixture', 'object': 'response', 'model': 'gpt-5.5', 'status': '.....}, {'type': 'response.content_part.done', 'output_index': 0, 'item_id': 'msg_fixture', 'content_index': 0, ...}, ...] = sequence({'moderation': None, 'prompt_cache_retention': '24h', 'metadata': {}, 'created_at': 1793740800})
+_______ test_existing_valid_metadata_with_nullable_extensions[metadata3] _______
+tests/test_response_schema_compatibility.py:62: in test_existing_valid_metadata_with_nullable_extensions
+    assert observed(sequence({**metadata, "prompt_cache_retention": "24h",
+E   AssertionError: assert False
+E    +  where False = ResponsesObservation(confirmed=False, declined=False, usage=None, diagnostics={'schema': 'actenon-airlock/responses-ob...1a2390e88f85ae39cc947751022fbaf1b58b8aa10bddce'}, 'checked_sequence_number': 0, 'rejection_reason': 'response-schema'}).confirmed
+E    +    where ResponsesObservation(confirmed=False, declined=False, usage=None, diagnostics={'schema': 'actenon-airlock/responses-ob...1a2390e88f85ae39cc947751022fbaf1b58b8aa10bddce'}, 'checked_sequence_number': 0, 'rejection_reason': 'response-schema'}) = observed([{'type': 'response.created', 'response': {'id': 'resp_fixture', 'object': 'response', 'model': 'gpt-5.5', 'status': '.....}, {'type': 'response.content_part.done', 'output_index': 0, 'item_id': 'msg_fixture', 'content_index': 0, ...}, ...])
+E    +      where [{'type': 'response.created', 'response': {'id': 'resp_fixture', 'object': 'response', 'model': 'gpt-5.5', 'status': '.....}, {'type': 'response.content_part.done', 'output_index': 0, 'item_id': 'msg_fixture', 'content_index': 0, ...}, ...] = sequence({'prompt_cache_options': None, 'prompt_cache_retention': '24h', 'metadata': {}, 'created_at': 1793740800})
+_______ test_existing_valid_metadata_with_nullable_extensions[metadata4] _______
+tests/test_response_schema_compatibility.py:62: in test_existing_valid_metadata_with_nullable_extensions
+    assert observed(sequence({**metadata, "prompt_cache_retention": "24h",
+E   AssertionError: assert False
+E    +  where False = ResponsesObservation(confirmed=False, declined=False, usage=None, diagnostics={'schema': 'actenon-airlock/responses-ob...1a2390e88f85ae39cc947751022fbaf1b58b8aa10bddce'}, 'checked_sequence_number': 0, 'rejection_reason': 'response-schema'}).confirmed
+E    +    where ResponsesObservation(confirmed=False, declined=False, usage=None, diagnostics={'schema': 'actenon-airlock/responses-ob...1a2390e88f85ae39cc947751022fbaf1b58b8aa10bddce'}, 'checked_sequence_number': 0, 'rejection_reason': 'response-schema'}) = observed([{'type': 'response.created', 'response': {'id': 'resp_fixture', 'object': 'response', 'model': 'gpt-5.5', 'status': '.....}, {'type': 'response.content_part.done', 'output_index': 0, 'item_id': 'msg_fixture', 'content_index': 0, ...}, ...])
+E    +      where [{'type': 'response.created', 'response': {'id': 'resp_fixture', 'object': 'response', 'model': 'gpt-5.5', 'status': '.....}, {'type': 'response.content_part.done', 'output_index': 0, 'item_id': 'msg_fixture', 'content_index': 0, ...}, ...] = sequence({'conversation': None, 'moderation': None, 'prompt_cache_retention': '24h', 'metadata': {}, ...})
+_______ test_existing_valid_metadata_with_nullable_extensions[metadata5] _______
+tests/test_response_schema_compatibility.py:62: in test_existing_valid_metadata_with_nullable_extensions
+    assert observed(sequence({**metadata, "prompt_cache_retention": "24h",
+E   AssertionError: assert False
+E    +  where False = ResponsesObservation(confirmed=False, declined=False, usage=None, diagnostics={'schema': 'actenon-airlock/responses-ob...1a2390e88f85ae39cc947751022fbaf1b58b8aa10bddce'}, 'checked_sequence_number': 0, 'rejection_reason': 'response-schema'}).confirmed
+E    +    where ResponsesObservation(confirmed=False, declined=False, usage=None, diagnostics={'schema': 'actenon-airlock/responses-ob...1a2390e88f85ae39cc947751022fbaf1b58b8aa10bddce'}, 'checked_sequence_number': 0, 'rejection_reason': 'response-schema'}) = observed([{'type': 'response.created', 'response': {'id': 'resp_fixture', 'object': 'response', 'model': 'gpt-5.5', 'status': '.....}, {'type': 'response.content_part.done', 'output_index': 0, 'item_id': 'msg_fixture', 'content_index': 0, ...}, ...])
+E    +      where [{'type': 'response.created', 'response': {'id': 'resp_fixture', 'object': 'response', 'model': 'gpt-5.5', 'status': '.....}, {'type': 'response.content_part.done', 'output_index': 0, 'item_id': 'msg_fixture', 'content_index': 0, ...}, ...] = sequence({'conversation': None, 'prompt_cache_options': None, 'prompt_cache_retention': '24h', 'metadata': {}, ...})
+_______ test_existing_valid_metadata_with_nullable_extensions[metadata6] _______
+tests/test_response_schema_compatibility.py:62: in test_existing_valid_metadata_with_nullable_extensions
+    assert observed(sequence({**metadata, "prompt_cache_retention": "24h",
+E   AssertionError: assert False
+E    +  where False = ResponsesObservation(confirmed=False, declined=False, usage=None, diagnostics={'schema': 'actenon-airlock/responses-ob...1a2390e88f85ae39cc947751022fbaf1b58b8aa10bddce'}, 'checked_sequence_number': 0, 'rejection_reason': 'response-schema'}).confirmed
+E    +    where ResponsesObservation(confirmed=False, declined=False, usage=None, diagnostics={'schema': 'actenon-airlock/responses-ob...1a2390e88f85ae39cc947751022fbaf1b58b8aa10bddce'}, 'checked_sequence_number': 0, 'rejection_reason': 'response-schema'}) = observed([{'type': 'response.created', 'response': {'id': 'resp_fixture', 'object': 'response', 'model': 'gpt-5.5', 'status': '.....}, {'type': 'response.content_part.done', 'output_index': 0, 'item_id': 'msg_fixture', 'content_index': 0, ...}, ...])
+E    +      where [{'type': 'response.created', 'response': {'id': 'resp_fixture', 'object': 'response', 'model': 'gpt-5.5', 'status': '.....}, {'type': 'response.content_part.done', 'output_index': 0, 'item_id': 'msg_fixture', 'content_index': 0, ...}, ...] = sequence({'moderation': None, 'prompt_cache_options': None, 'prompt_cache_retention': '24h', 'metadata': {}, ...})
+_______ test_existing_valid_metadata_with_nullable_extensions[metadata7] _______
+tests/test_response_schema_compatibility.py:62: in test_existing_valid_metadata_with_nullable_extensions
+    assert observed(sequence({**metadata, "prompt_cache_retention": "24h",
+E   AssertionError: assert False
+E    +  where False = ResponsesObservation(confirmed=False, declined=False, usage=None, diagnostics={'schema': 'actenon-airlock/responses-ob...1a2390e88f85ae39cc947751022fbaf1b58b8aa10bddce'}, 'checked_sequence_number': 0, 'rejection_reason': 'response-schema'}).confirmed
+E    +    where ResponsesObservation(confirmed=False, declined=False, usage=None, diagnostics={'schema': 'actenon-airlock/responses-ob...1a2390e88f85ae39cc947751022fbaf1b58b8aa10bddce'}, 'checked_sequence_number': 0, 'rejection_reason': 'response-schema'}) = observed([{'type': 'response.created', 'response': {'id': 'resp_fixture', 'object': 'response', 'model': 'gpt-5.5', 'status': '.....}, {'type': 'response.content_part.done', 'output_index': 0, 'item_id': 'msg_fixture', 'content_index': 0, ...}, ...])
+E    +      where [{'type': 'response.created', 'response': {'id': 'resp_fixture', 'object': 'response', 'model': 'gpt-5.5', 'status': '.....}, {'type': 'response.content_part.done', 'output_index': 0, 'item_id': 'msg_fixture', 'content_index': 0, ...}, ...] = sequence({'conversation': None, 'moderation': None, 'prompt_cache_options': None, 'prompt_cache_retention': '24h', ...})
+_______ test_absent_and_null_are_semantically_equivalent[0-conversation] _______
+tests/test_response_schema_compatibility.py:71: in test_absent_and_null_are_semantically_equivalent
+    assert observed(seq).confirmed
+E   AssertionError: assert False
+E    +  where False = ResponsesObservation(confirmed=False, declined=False, usage=None, diagnostics={'schema': 'actenon-airlock/responses-ob...1a2390e88f85ae39cc947751022fbaf1b58b8aa10bddce'}, 'checked_sequence_number': 0, 'rejection_reason': 'response-schema'}).confirmed
+E    +    where ResponsesObservation(confirmed=False, declined=False, usage=None, diagnostics={'schema': 'actenon-airlock/responses-ob...1a2390e88f85ae39cc947751022fbaf1b58b8aa10bddce'}, 'checked_sequence_number': 0, 'rejection_reason': 'response-schema'}) = observed([{'type': 'response.created', 'response': {'id': 'resp_fixture', 'object': 'response', 'model': 'gpt-5.5', 'status': '.....}, {'type': 'response.content_part.done', 'output_index': 0, 'item_id': 'msg_fixture', 'content_index': 0, ...}, ...])
+________ test_absent_and_null_are_semantically_equivalent[0-moderation] ________
+tests/test_response_schema_compatibility.py:71: in test_absent_and_null_are_semantically_equivalent
+    assert observed(seq).confirmed
+E   AssertionError: assert False
+E    +  where False = ResponsesObservation(confirmed=False, declined=False, usage=None, diagnostics={'schema': 'actenon-airlock/responses-ob...1a2390e88f85ae39cc947751022fbaf1b58b8aa10bddce'}, 'checked_sequence_number': 0, 'rejection_reason': 'response-schema'}).confirmed
+E    +    where ResponsesObservation(confirmed=False, declined=False, usage=None, diagnostics={'schema': 'actenon-airlock/responses-ob...1a2390e88f85ae39cc947751022fbaf1b58b8aa10bddce'}, 'checked_sequence_number': 0, 'rejection_reason': 'response-schema'}) = observed([{'type': 'response.created', 'response': {'id': 'resp_fixture', 'object': 'response', 'model': 'gpt-5.5', 'status': '.....}, {'type': 'response.content_part.done', 'output_index': 0, 'item_id': 'msg_fixture', 'content_index': 0, ...}, ...])
+___ test_absent_and_null_are_semantically_equivalent[0-prompt_cache_options] ___
+tests/test_response_schema_compatibility.py:71: in test_absent_and_null_are_semantically_equivalent
+    assert observed(seq).confirmed
+E   AssertionError: assert False
+E    +  where False = ResponsesObservation(confirmed=False, declined=False, usage=None, diagnostics={'schema': 'actenon-airlock/responses-ob...1a2390e88f85ae39cc947751022fbaf1b58b8aa10bddce'}, 'checked_sequence_number': 0, 'rejection_reason': 'response-schema'}).confirmed
+E    +    where ResponsesObservation(confirmed=False, declined=False, usage=None, diagnostics={'schema': 'actenon-airlock/responses-ob...1a2390e88f85ae39cc947751022fbaf1b58b8aa10bddce'}, 'checked_sequence_number': 0, 'rejection_reason': 'response-schema'}) = observed([{'type': 'response.created', 'response': {'id': 'resp_fixture', 'object': 'response', 'model': 'gpt-5.5', 'status': '.....}, {'type': 'response.content_part.done', 'output_index': 0, 'item_id': 'msg_fixture', 'content_index': 0, ...}, ...])
+______ test_absent_and_null_are_semantically_equivalent[-1-conversation] _______
+tests/test_response_schema_compatibility.py:71: in test_absent_and_null_are_semantically_equivalent
+    assert observed(seq).confirmed
+E   AssertionError: assert False
+E    +  where False = ResponsesObservation(confirmed=False, declined=False, usage=None, diagnostics={'schema': 'actenon-airlock/responses-ob...1a2390e88f85ae39cc947751022fbaf1b58b8aa10bddce'}, 'checked_sequence_number': 7, 'rejection_reason': 'response-schema'}).confirmed
+E    +    where ResponsesObservation(confirmed=False, declined=False, usage=None, diagnostics={'schema': 'actenon-airlock/responses-ob...1a2390e88f85ae39cc947751022fbaf1b58b8aa10bddce'}, 'checked_sequence_number': 7, 'rejection_reason': 'response-schema'}) = observed([{'type': 'response.created', 'response': {'id': 'resp_fixture', 'object': 'response', 'model': 'gpt-5.5', 'status': '.....}, {'type': 'response.content_part.done', 'output_index': 0, 'item_id': 'msg_fixture', 'content_index': 0, ...}, ...])
+_______ test_absent_and_null_are_semantically_equivalent[-1-moderation] ________
+tests/test_response_schema_compatibility.py:71: in test_absent_and_null_are_semantically_equivalent
+    assert observed(seq).confirmed
+E   AssertionError: assert False
+E    +  where False = ResponsesObservation(confirmed=False, declined=False, usage=None, diagnostics={'schema': 'actenon-airlock/responses-ob...1a2390e88f85ae39cc947751022fbaf1b58b8aa10bddce'}, 'checked_sequence_number': 7, 'rejection_reason': 'response-schema'}).confirmed
+E    +    where ResponsesObservation(confirmed=False, declined=False, usage=None, diagnostics={'schema': 'actenon-airlock/responses-ob...1a2390e88f85ae39cc947751022fbaf1b58b8aa10bddce'}, 'checked_sequence_number': 7, 'rejection_reason': 'response-schema'}) = observed([{'type': 'response.created', 'response': {'id': 'resp_fixture', 'object': 'response', 'model': 'gpt-5.5', 'status': '.....}, {'type': 'response.content_part.done', 'output_index': 0, 'item_id': 'msg_fixture', 'content_index': 0, ...}, ...])
+__ test_absent_and_null_are_semantically_equivalent[-1-prompt_cache_options] ___
+tests/test_response_schema_compatibility.py:71: in test_absent_and_null_are_semantically_equivalent
+    assert observed(seq).confirmed
+E   AssertionError: assert False
+E    +  where False = ResponsesObservation(confirmed=False, declined=False, usage=None, diagnostics={'schema': 'actenon-airlock/responses-ob...1a2390e88f85ae39cc947751022fbaf1b58b8aa10bddce'}, 'checked_sequence_number': 7, 'rejection_reason': 'response-schema'}).confirmed
+E    +    where ResponsesObservation(confirmed=False, declined=False, usage=None, diagnostics={'schema': 'actenon-airlock/responses-ob...1a2390e88f85ae39cc947751022fbaf1b58b8aa10bddce'}, 'checked_sequence_number': 7, 'rejection_reason': 'response-schema'}) = observed([{'type': 'response.created', 'response': {'id': 'resp_fixture', 'object': 'response', 'model': 'gpt-5.5', 'status': '.....}, {'type': 'response.content_part.done', 'output_index': 0, 'item_id': 'msg_fixture', 'content_index': 0, ...}, ...])
+_ test_completed_metadata_settles_and_allows_budgeted_continuation[metadata0] __
+tests/test_response_schema_compatibility.py:141: in test_completed_metadata_settles_and_allows_budgeted_continuation
+    assert subject.handle(message())["outcome"] == "COMMITTED"
+E   AssertionError: assert 'AMBIGUOUS' == 'COMMITTED'
+E     
+E     - COMMITTED
+E     + AMBIGUOUS
+----------------------------- Captured stdout call -----------------------------
+AIRLOCK AUTHORITY DIFF
+
++ http.post @ api.openai.com/v1/responses
+  Transport: https://api.openai.com/v1/responses
+  Scope: POST to exactly https://api.openai.com/v1/responses
++ Model authority expanded: {"anthropic_betas": [], "contract": "openai-responses-agent/v1", "endpoint": "https://api.openai.com/v1/responses", "max_input_bytes": 200000, "max_output_tokens": 16000, "max_run_microusd": 700000, "models": ["gpt-5.5"], "price_microusd_per_mtok": {"cache_read": 500000, "cache_write": 0, "input": 5000000, "output": 30000000}, "provider": "openai-responses", "read_timeout_seconds": 540}
+
+Runtime: BLOCKED UNTIL APPROVED
+
+Protected inference constraint (trusted only with --approve):
+{"anthropic_betas": [], "contract": "openai-responses-agent/v1", "endpoint": "https://api.openai.com/v1/responses", "max_input_bytes": 200000, "max_output_tokens": 16000, "max_run_microusd": 700000, "models": ["gpt-5.5"], "price_microusd_per_mtok": {"cache_read": 500000, "cache_write": 0, "input": 5000000, "output": 30000000}, "provider": "openai-responses", "read_timeout_seconds": 540}
+
+Approved 1 powers. Unresolved powers remain blocked; their calls are denied at runtime with signed receipts.
+----------------------------- Captured stderr call -----------------------------
+AIRLOCK ALLOW http.post @ https://api.openai.com/v1/responses: effect AMBIGUOUS; duplicate dispatch blocked [receipt_69d139f2a0e14aa09db01bdddc5949e1]
+_ test_completed_metadata_settles_and_allows_budgeted_continuation[metadata1] __
+tests/test_response_schema_compatibility.py:141: in test_completed_metadata_settles_and_allows_budgeted_continuation
+    assert subject.handle(message())["outcome"] == "COMMITTED"
+E   AssertionError: assert 'AMBIGUOUS' == 'COMMITTED'
+E     
+E     - COMMITTED
+E     + AMBIGUOUS
+----------------------------- Captured stdout call -----------------------------
+AIRLOCK AUTHORITY DIFF
+
++ http.post @ api.openai.com/v1/responses
+  Transport: https://api.openai.com/v1/responses
+  Scope: POST to exactly https://api.openai.com/v1/responses
++ Model authority expanded: {"anthropic_betas": [], "contract": "openai-responses-agent/v1", "endpoint": "https://api.openai.com/v1/responses", "max_input_bytes": 200000, "max_output_tokens": 16000, "max_run_microusd": 700000, "models": ["gpt-5.5"], "price_microusd_per_mtok": {"cache_read": 500000, "cache_write": 0, "input": 5000000, "output": 30000000}, "provider": "openai-responses", "read_timeout_seconds": 540}
+
+Runtime: BLOCKED UNTIL APPROVED
+
+Protected inference constraint (trusted only with --approve):
+{"anthropic_betas": [], "contract": "openai-responses-agent/v1", "endpoint": "https://api.openai.com/v1/responses", "max_input_bytes": 200000, "max_output_tokens": 16000, "max_run_microusd": 700000, "models": ["gpt-5.5"], "price_microusd_per_mtok": {"cache_read": 500000, "cache_write": 0, "input": 5000000, "output": 30000000}, "provider": "openai-responses", "read_timeout_seconds": 540}
+
+Approved 1 powers. Unresolved powers remain blocked; their calls are denied at runtime with signed receipts.
+----------------------------- Captured stderr call -----------------------------
+AIRLOCK ALLOW http.post @ https://api.openai.com/v1/responses: effect AMBIGUOUS; duplicate dispatch blocked [receipt_e5134b7a277646d798d4fe5986e79b4a]
+_ test_completed_metadata_settles_and_allows_budgeted_continuation[metadata2] __
+tests/test_response_schema_compatibility.py:141: in test_completed_metadata_settles_and_allows_budgeted_continuation
+    assert subject.handle(message())["outcome"] == "COMMITTED"
+E   AssertionError: assert 'AMBIGUOUS' == 'COMMITTED'
+E     
+E     - COMMITTED
+E     + AMBIGUOUS
+----------------------------- Captured stdout call -----------------------------
+AIRLOCK AUTHORITY DIFF
+
++ http.post @ api.openai.com/v1/responses
+  Transport: https://api.openai.com/v1/responses
+  Scope: POST to exactly https://api.openai.com/v1/responses
++ Model authority expanded: {"anthropic_betas": [], "contract": "openai-responses-agent/v1", "endpoint": "https://api.openai.com/v1/responses", "max_input_bytes": 200000, "max_output_tokens": 16000, "max_run_microusd": 700000, "models": ["gpt-5.5"], "price_microusd_per_mtok": {"cache_read": 500000, "cache_write": 0, "input": 5000000, "output": 30000000}, "provider": "openai-responses", "read_timeout_seconds": 540}
+
+Runtime: BLOCKED UNTIL APPROVED
+
+Protected inference constraint (trusted only with --approve):
+{"anthropic_betas": [], "contract": "openai-responses-agent/v1", "endpoint": "https://api.openai.com/v1/responses", "max_input_bytes": 200000, "max_output_tokens": 16000, "max_run_microusd": 700000, "models": ["gpt-5.5"], "price_microusd_per_mtok": {"cache_read": 500000, "cache_write": 0, "input": 5000000, "output": 30000000}, "provider": "openai-responses", "read_timeout_seconds": 540}
+
+Approved 1 powers. Unresolved powers remain blocked; their calls are denied at runtime with signed receipts.
+----------------------------- Captured stderr call -----------------------------
+AIRLOCK ALLOW http.post @ https://api.openai.com/v1/responses: effect AMBIGUOUS; duplicate dispatch blocked [receipt_a9988cdb06704dd7a614eb928c66e390]
+_ test_completed_metadata_settles_and_allows_budgeted_continuation[metadata3] __
+tests/test_response_schema_compatibility.py:141: in test_completed_metadata_settles_and_allows_budgeted_continuation
+    assert subject.handle(message())["outcome"] == "COMMITTED"
+E   AssertionError: assert 'AMBIGUOUS' == 'COMMITTED'
+E     
+E     - COMMITTED
+E     + AMBIGUOUS
+----------------------------- Captured stdout call -----------------------------
+AIRLOCK AUTHORITY DIFF
+
++ http.post @ api.openai.com/v1/responses
+  Transport: https://api.openai.com/v1/responses
+  Scope: POST to exactly https://api.openai.com/v1/responses
++ Model authority expanded: {"anthropic_betas": [], "contract": "openai-responses-agent/v1", "endpoint": "https://api.openai.com/v1/responses", "max_input_bytes": 200000, "max_output_tokens": 16000, "max_run_microusd": 700000, "models": ["gpt-5.5"], "price_microusd_per_mtok": {"cache_read": 500000, "cache_write": 0, "input": 5000000, "output": 30000000}, "provider": "openai-responses", "read_timeout_seconds": 540}
+
+Runtime: BLOCKED UNTIL APPROVED
+
+Protected inference constraint (trusted only with --approve):
+{"anthropic_betas": [], "contract": "openai-responses-agent/v1", "endpoint": "https://api.openai.com/v1/responses", "max_input_bytes": 200000, "max_output_tokens": 16000, "max_run_microusd": 700000, "models": ["gpt-5.5"], "price_microusd_per_mtok": {"cache_read": 500000, "cache_write": 0, "input": 5000000, "output": 30000000}, "provider": "openai-responses", "read_timeout_seconds": 540}
+
+Approved 1 powers. Unresolved powers remain blocked; their calls are denied at runtime with signed receipts.
+----------------------------- Captured stderr call -----------------------------
+AIRLOCK ALLOW http.post @ https://api.openai.com/v1/responses: effect AMBIGUOUS; duplicate dispatch blocked [receipt_ff3c6f2ecbd74f99a087dc8514f536ab]
+_ test_completed_metadata_settles_and_allows_budgeted_continuation[metadata4] __
+tests/test_response_schema_compatibility.py:141: in test_completed_metadata_settles_and_allows_budgeted_continuation
+    assert subject.handle(message())["outcome"] == "COMMITTED"
+E   AssertionError: assert 'AMBIGUOUS' == 'COMMITTED'
+E     
+E     - COMMITTED
+E     + AMBIGUOUS
+----------------------------- Captured stdout call -----------------------------
+AIRLOCK AUTHORITY DIFF
+
++ http.post @ api.openai.com/v1/responses
+  Transport: https://api.openai.com/v1/responses
+  Scope: POST to exactly https://api.openai.com/v1/responses
++ Model authority expanded: {"anthropic_betas": [], "contract": "openai-responses-agent/v1", "endpoint": "https://api.openai.com/v1/responses", "max_input_bytes": 200000, "max_output_tokens": 16000, "max_run_microusd": 700000, "models": ["gpt-5.5"], "price_microusd_per_mtok": {"cache_read": 500000, "cache_write": 0, "input": 5000000, "output": 30000000}, "provider": "openai-responses", "read_timeout_seconds": 540}
+
+Runtime: BLOCKED UNTIL APPROVED
+
+Protected inference constraint (trusted only with --approve):
+{"anthropic_betas": [], "contract": "openai-responses-agent/v1", "endpoint": "https://api.openai.com/v1/responses", "max_input_bytes": 200000, "max_output_tokens": 16000, "max_run_microusd": 700000, "models": ["gpt-5.5"], "price_microusd_per_mtok": {"cache_read": 500000, "cache_write": 0, "input": 5000000, "output": 30000000}, "provider": "openai-responses", "read_timeout_seconds": 540}
+
+Approved 1 powers. Unresolved powers remain blocked; their calls are denied at runtime with signed receipts.
+----------------------------- Captured stderr call -----------------------------
+AIRLOCK ALLOW http.post @ https://api.openai.com/v1/responses: effect AMBIGUOUS; duplicate dispatch blocked [receipt_eb8b354d82eb4c38b5bb05a8804342e6]
+_ test_completed_metadata_settles_and_allows_budgeted_continuation[metadata5] __
+tests/test_response_schema_compatibility.py:141: in test_completed_metadata_settles_and_allows_budgeted_continuation
+    assert subject.handle(message())["outcome"] == "COMMITTED"
+E   AssertionError: assert 'AMBIGUOUS' == 'COMMITTED'
+E     
+E     - COMMITTED
+E     + AMBIGUOUS
+----------------------------- Captured stdout call -----------------------------
+AIRLOCK AUTHORITY DIFF
+
++ http.post @ api.openai.com/v1/responses
+  Transport: https://api.openai.com/v1/responses
+  Scope: POST to exactly https://api.openai.com/v1/responses
++ Model authority expanded: {"anthropic_betas": [], "contract": "openai-responses-agent/v1", "endpoint": "https://api.openai.com/v1/responses", "max_input_bytes": 200000, "max_output_tokens": 16000, "max_run_microusd": 700000, "models": ["gpt-5.5"], "price_microusd_per_mtok": {"cache_read": 500000, "cache_write": 0, "input": 5000000, "output": 30000000}, "provider": "openai-responses", "read_timeout_seconds": 540}
+
+Runtime: BLOCKED UNTIL APPROVED
+
+Protected inference constraint (trusted only with --approve):
+{"anthropic_betas": [], "contract": "openai-responses-agent/v1", "endpoint": "https://api.openai.com/v1/responses", "max_input_bytes": 200000, "max_output_tokens": 16000, "max_run_microusd": 700000, "models": ["gpt-5.5"], "price_microusd_per_mtok": {"cache_read": 500000, "cache_write": 0, "input": 5000000, "output": 30000000}, "provider": "openai-responses", "read_timeout_seconds": 540}
+
+Approved 1 powers. Unresolved powers remain blocked; their calls are denied at runtime with signed receipts.
+----------------------------- Captured stderr call -----------------------------
+AIRLOCK ALLOW http.post @ https://api.openai.com/v1/responses: effect AMBIGUOUS; duplicate dispatch blocked [receipt_b089c860c01e47c7b70fb20fa01dabce]
+_ test_completed_metadata_settles_and_allows_budgeted_continuation[metadata6] __
+tests/test_response_schema_compatibility.py:141: in test_completed_metadata_settles_and_allows_budgeted_continuation
+    assert subject.handle(message())["outcome"] == "COMMITTED"
+E   AssertionError: assert 'AMBIGUOUS' == 'COMMITTED'
+E     
+E     - COMMITTED
+E     + AMBIGUOUS
+----------------------------- Captured stdout call -----------------------------
+AIRLOCK AUTHORITY DIFF
+
++ http.post @ api.openai.com/v1/responses
+  Transport: https://api.openai.com/v1/responses
+  Scope: POST to exactly https://api.openai.com/v1/responses
++ Model authority expanded: {"anthropic_betas": [], "contract": "openai-responses-agent/v1", "endpoint": "https://api.openai.com/v1/responses", "max_input_bytes": 200000, "max_output_tokens": 16000, "max_run_microusd": 700000, "models": ["gpt-5.5"], "price_microusd_per_mtok": {"cache_read": 500000, "cache_write": 0, "input": 5000000, "output": 30000000}, "provider": "openai-responses", "read_timeout_seconds": 540}
+
+Runtime: BLOCKED UNTIL APPROVED
+
+Protected inference constraint (trusted only with --approve):
+{"anthropic_betas": [], "contract": "openai-responses-agent/v1", "endpoint": "https://api.openai.com/v1/responses", "max_input_bytes": 200000, "max_output_tokens": 16000, "max_run_microusd": 700000, "models": ["gpt-5.5"], "price_microusd_per_mtok": {"cache_read": 500000, "cache_write": 0, "input": 5000000, "output": 30000000}, "provider": "openai-responses", "read_timeout_seconds": 540}
+
+Approved 1 powers. Unresolved powers remain blocked; their calls are denied at runtime with signed receipts.
+----------------------------- Captured stderr call -----------------------------
+AIRLOCK ALLOW http.post @ https://api.openai.com/v1/responses: effect AMBIGUOUS; duplicate dispatch blocked [receipt_75d26833b74a454dbdc7f52c66fdfe60]
+_ test_structural_diagnostic_is_bounded_and_never_copies_unknown_names_or_values[True] _
+tests/test_response_schema_compatibility.py:173: in test_structural_diagnostic_is_bounded_and_never_copies_unknown_names_or_values
+    assert diag["validation_stage"] == "response-object"
+           ^^^^^^^^^^^^^^^^^^^^^^^^
+E   KeyError: 'validation_stage'
+_ test_structural_diagnostic_is_bounded_and_never_copies_unknown_names_or_values[False] _
+tests/test_response_schema_compatibility.py:173: in test_structural_diagnostic_is_bounded_and_never_copies_unknown_names_or_values
+    assert diag["validation_stage"] == "response-object"
+           ^^^^^^^^^^^^^^^^^^^^^^^^
+E   KeyError: 'validation_stage'
+________ test_metadata_rejection_names_only_public_field[conversation] _________
+tests/test_response_schema_compatibility.py:187: in test_metadata_rejection_names_only_public_field
+    assert result.diagnostics["validation_stage"] == "response-metadata"
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   KeyError: 'validation_stage'
+_________ test_metadata_rejection_names_only_public_field[moderation] __________
+tests/test_response_schema_compatibility.py:187: in test_metadata_rejection_names_only_public_field
+    assert result.diagnostics["validation_stage"] == "response-metadata"
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   KeyError: 'validation_stage'
+____ test_metadata_rejection_names_only_public_field[prompt_cache_options] _____
+tests/test_response_schema_compatibility.py:187: in test_metadata_rejection_names_only_public_field
+    assert result.diagnostics["validation_stage"] == "response-metadata"
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   KeyError: 'validation_stage'
+_________ test_schema_diagnostic_is_signed_and_console_is_content_free _________
+tests/test_response_schema_compatibility.py:203: in test_schema_diagnostic_is_signed_and_console_is_content_free
+    assert row["inference_observation"]["validation_stage"] == "response-object"
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   KeyError: 'validation_stage'
+---------------------------- Captured stdout setup -----------------------------
+AIRLOCK AUTHORITY DIFF
+
++ http.post @ api.openai.com/v1/responses
+  Transport: https://api.openai.com/v1/responses
+  Scope: POST to exactly https://api.openai.com/v1/responses
++ Model authority expanded: {"anthropic_betas": [], "contract": "openai-responses-agent/v1", "endpoint": "https://api.openai.com/v1/responses", "max_input_bytes": 200000, "max_output_tokens": 16000, "max_run_microusd": 5000000, "models": ["gpt-5.5"], "price_microusd_per_mtok": {"cache_read": 500000, "cache_write": 0, "input": 5000000, "output": 30000000}, "provider": "openai-responses", "read_timeout_seconds": 540}
+
+Runtime: BLOCKED UNTIL APPROVED
+
+Protected inference constraint (trusted only with --approve):
+{"anthropic_betas": [], "contract": "openai-responses-agent/v1", "endpoint": "https://api.openai.com/v1/responses", "max_input_bytes": 200000, "max_output_tokens": 16000, "max_run_microusd": 5000000, "models": ["gpt-5.5"], "price_microusd_per_mtok": {"cache_read": 500000, "cache_write": 0, "input": 5000000, "output": 30000000}, "provider": "openai-responses", "read_timeout_seconds": 540}
+
+Approved 1 powers. Unresolved powers remain blocked; their calls are denied at runtime with signed receipts.
+=========================== short test summary info ============================
+FAILED tests/test_response_schema_compatibility.py::test_documented_absent_null_combinations_confirm[True-metadata1]
+FAILED tests/test_response_schema_compatibility.py::test_documented_absent_null_combinations_confirm[True-metadata2]
+FAILED tests/test_response_schema_compatibility.py::test_documented_absent_null_combinations_confirm[True-metadata3]
+FAILED tests/test_response_schema_compatibility.py::test_documented_absent_null_combinations_confirm[True-metadata4]
+FAILED tests/test_response_schema_compatibility.py::test_documented_absent_null_combinations_confirm[True-metadata5]
+FAILED tests/test_response_schema_compatibility.py::test_documented_absent_null_combinations_confirm[True-metadata6]
+FAILED tests/test_response_schema_compatibility.py::test_documented_absent_null_combinations_confirm[True-metadata7]
+FAILED tests/test_response_schema_compatibility.py::test_documented_absent_null_combinations_confirm[False-metadata1]
+FAILED tests/test_response_schema_compatibility.py::test_documented_absent_null_combinations_confirm[False-metadata2]
+FAILED tests/test_response_schema_compatibility.py::test_documented_absent_null_combinations_confirm[False-metadata3]
+FAILED tests/test_response_schema_compatibility.py::test_documented_absent_null_combinations_confirm[False-metadata4]
+FAILED tests/test_response_schema_compatibility.py::test_documented_absent_null_combinations_confirm[False-metadata5]
+FAILED tests/test_response_schema_compatibility.py::test_documented_absent_null_combinations_confirm[False-metadata6]
+FAILED tests/test_response_schema_compatibility.py::test_documented_absent_null_combinations_confirm[False-metadata7]
+FAILED tests/test_response_schema_compatibility.py::test_existing_valid_metadata_with_nullable_extensions[metadata1]
+FAILED tests/test_response_schema_compatibility.py::test_existing_valid_metadata_with_nullable_extensions[metadata2]
+FAILED tests/test_response_schema_compatibility.py::test_existing_valid_metadata_with_nullable_extensions[metadata3]
+FAILED tests/test_response_schema_compatibility.py::test_existing_valid_metadata_with_nullable_extensions[metadata4]
+FAILED tests/test_response_schema_compatibility.py::test_existing_valid_metadata_with_nullable_extensions[metadata5]
+FAILED tests/test_response_schema_compatibility.py::test_existing_valid_metadata_with_nullable_extensions[metadata6]
+FAILED tests/test_response_schema_compatibility.py::test_existing_valid_metadata_with_nullable_extensions[metadata7]
+FAILED tests/test_response_schema_compatibility.py::test_absent_and_null_are_semantically_equivalent[0-conversation]
+FAILED tests/test_response_schema_compatibility.py::test_absent_and_null_are_semantically_equivalent[0-moderation]
+FAILED tests/test_response_schema_compatibility.py::test_absent_and_null_are_semantically_equivalent[0-prompt_cache_options]
+FAILED tests/test_response_schema_compatibility.py::test_absent_and_null_are_semantically_equivalent[-1-conversation]
+FAILED tests/test_response_schema_compatibility.py::test_absent_and_null_are_semantically_equivalent[-1-moderation]
+FAILED tests/test_response_schema_compatibility.py::test_absent_and_null_are_semantically_equivalent[-1-prompt_cache_options]
+FAILED tests/test_response_schema_compatibility.py::test_completed_metadata_settles_and_allows_budgeted_continuation[metadata0]
+FAILED tests/test_response_schema_compatibility.py::test_completed_metadata_settles_and_allows_budgeted_continuation[metadata1]
+FAILED tests/test_response_schema_compatibility.py::test_completed_metadata_settles_and_allows_budgeted_continuation[metadata2]
+FAILED tests/test_response_schema_compatibility.py::test_completed_metadata_settles_and_allows_budgeted_continuation[metadata3]
+FAILED tests/test_response_schema_compatibility.py::test_completed_metadata_settles_and_allows_budgeted_continuation[metadata4]
+FAILED tests/test_response_schema_compatibility.py::test_completed_metadata_settles_and_allows_budgeted_continuation[metadata5]
+FAILED tests/test_response_schema_compatibility.py::test_completed_metadata_settles_and_allows_budgeted_continuation[metadata6]
+FAILED tests/test_response_schema_compatibility.py::test_structural_diagnostic_is_bounded_and_never_copies_unknown_names_or_values[True]
+FAILED tests/test_response_schema_compatibility.py::test_structural_diagnostic_is_bounded_and_never_copies_unknown_names_or_values[False]
+FAILED tests/test_response_schema_compatibility.py::test_metadata_rejection_names_only_public_field[conversation]
+FAILED tests/test_response_schema_compatibility.py::test_metadata_rejection_names_only_public_field[moderation]
+FAILED tests/test_response_schema_compatibility.py::test_metadata_rejection_names_only_public_field[prompt_cache_options]
+FAILED tests/test_response_schema_compatibility.py::test_schema_diagnostic_is_signed_and_console_is_content_free
+40 failed, 106 passed in 0.70s

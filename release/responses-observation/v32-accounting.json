@@ -1,0 +1,63 @@
+{
+  "evidence_class": "historical-signed-accounting-no-raw-SSE",
+  "source_commit": "4991dc89c09b0e5f44a6c82002a1fe2ec09a576b",
+  "artifacts": {
+    "result.json": "6bde76d1a17af000aec4b6594ae8a311829e4ed0d602f3f04b7ca733388ba450",
+    "agent.log": "b693b7f5faaa09d89279dc6f4f72eb96dafb40386173c78db938de2366ce37af",
+    "receipts.jsonl": "5fa662c4fe03a2155ecda60f75ef21aa60d4553c7cc7103b70b65f3fef77574c",
+    "public-key.json": "b711e3ed01bc2fc1da6b04a84ec611971a6d49c3bc68c63026b06ca84f934bfd",
+    "checkpoint.json": "6c936f7988638e6a65836dfc34e9ca6368183487563f71f585ec41ab27c48c29"
+  },
+  "inference": [
+    {
+      "stage": "authorized",
+      "inference_invocation": 1,
+      "reason": "allowed"
+    },
+    {
+      "stage": "response-received",
+      "inference_invocation": 1,
+      "outcome": "COMMITTED",
+      "inference_cost_microusd": 9768,
+      "inference_usage": {
+        "cache_creation_input_tokens": 0,
+        "cache_read_input_tokens": 6656,
+        "input_tokens": 484,
+        "output_tokens": 134
+      },
+      "reason": "Model inference observed at the protected boundary"
+    },
+    {
+      "stage": "authorized",
+      "inference_invocation": 2,
+      "reason": "allowed"
+    },
+    {
+      "stage": "response-received",
+      "inference_invocation": 2,
+      "outcome": "AMBIGUOUS",
+      "inference_cost_microusd": 694370,
+      "reason": "HTTP response received; remote consequence remains unconfirmed"
+    },
+    {
+      "stage": "authorized",
+      "inference_invocation": 3,
+      "reason": "allowed"
+    },
+    {
+      "stage": "response-received",
+      "inference_invocation": 3,
+      "outcome": "AMBIGUOUS",
+      "inference_cost_microusd": 726820,
+      "reason": "HTTP response received; remote consequence remains unconfirmed"
+    },
+    {
+      "reason": "Model spend bound reached for this run"
+    },
+    {
+      "stage": "contained-compute-exited",
+      "reason": "Contained child exit observed; this is not a per-syscall or remote-effect attestation"
+    }
+  ],
+  "interpretation": "The two held costs are conservative reservations, not known provider usage or actual billed spend. Raw provider SSE was not retained in the inspected archive; original rejecting predicate is unknown."
+}

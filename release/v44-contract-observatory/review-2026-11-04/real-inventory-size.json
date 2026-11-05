@@ -1,0 +1,90 @@
+{
+ "schema": "actenon-airlock/real-codex-inventory-size/v1",
+ "method": "unchanged Codex CLI 0.166.0 in image sha256:c449dec5..., scripted mock provider; structural token counts only, no request content retained",
+ "requests": [
+  {
+   "request_index": 0,
+   "tool_count": 8,
+   "tool_types": [
+    "custom",
+    "function"
+   ],
+   "request_structural_tokens_depth": [
+    443,
+    12
+   ],
+   "echoed_tools_tokens_depth": [
+    425,
+    11
+   ],
+   "with_in_progress_snapshot_tokens_events": [
+    1464,
+    13,
+    7
+   ]
+  },
+  {
+   "request_index": 1,
+   "tool_count": 8,
+   "tool_types": [
+    "custom",
+    "function"
+   ],
+   "request_structural_tokens_depth": [
+    465,
+    12
+   ],
+   "echoed_tools_tokens_depth": [
+    425,
+    11
+   ],
+   "with_in_progress_snapshot_tokens_events": [
+    1464,
+    13,
+    7
+   ]
+  },
+  {
+   "request_index": 2,
+   "tool_count": 8,
+   "tool_types": [
+    "custom",
+    "function"
+   ],
+   "request_structural_tokens_depth": [
+    487,
+    12
+   ],
+   "echoed_tools_tokens_depth": [
+    425,
+    11
+   ],
+   "with_in_progress_snapshot_tokens_events": [
+    1464,
+    13,
+    7
+   ]
+  },
+  {
+   "request_index": 3,
+   "tool_count": 8,
+   "tool_types": [
+    "custom",
+    "function"
+   ],
+   "request_structural_tokens_depth": [
+    509,
+    12
+   ],
+   "echoed_tools_tokens_depth": [
+    425,
+    11
+   ],
+   "with_in_progress_snapshot_tokens_events": [
+    1521,
+    13,
+    9
+   ]
+  }
+ ]
+}

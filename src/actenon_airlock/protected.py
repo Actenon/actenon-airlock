@@ -26,10 +26,10 @@ from actenon_permit.model import Budget, Grant, Scopes
 from actenon_protocol.effects import effect_identity
 from actenon_scan.authority import classify_http
 
-from . import agent_inference, responses_inference
+from . import agent_inference, provider_errors, responses_inference
 from .agent_inference import CONTRACT, check_request, cost, reservation
 from .broker import Broker, HttpDispatch
-from .common import AirlockError, canonical, power, validate_url
+from .common import AirlockError, canonical, host_environment, power, validate_url
 from .github_runtime import (
     GitHubCreateDispatch,
     effect_descriptor,
@@ -56,11 +56,7 @@ class Docker:
         self.binary = shutil.which("docker")
         if not self.binary:
             raise AirlockError("Protected Mode requires a running local Linux Docker engine")
-        self.environment = {
-            name: os.environ[name]
-            for name in ("HOME", "PATH", "TMPDIR", "DOCKER_CONFIG", "DOCKER_CONTEXT", "DOCKER_HOST")
-            if name in os.environ
-        }
+        self.environment = host_environment()
         self.host_path_prefix = None
 
     def call(self, args, *, timeout=45):
@@ -255,7 +251,13 @@ class InferenceDispatch(HttpDispatch):
     def receipt_fields(self):
         if not self.reserved:
             return {}
-        fields = {"inference_cost_microusd": self.charged}
+        fields = {
+            "inference_cost_microusd": self.charged,
+            "inference_reserved_microusd": self.reserved,
+        }
+        diagnostics = getattr(self.observation, "diagnostics", None)
+        if diagnostics is not None:
+            fields["inference_observation"] = diagnostics
         if self.observation is not None and self.observation.usage is not None:
             fields["inference_usage"] = self.observation.usage
         if self.observation is not None and self.observation.declined:
@@ -413,6 +415,27 @@ class ProtectedBroker(Broker):
     def http_deadline(self, url):
         # An agent's reply is released whole, so a trickled stream gets one overall limit.
         return time.monotonic() + self.http_timeout(url) if self.agent_profile(url) else None
+
+    def relay_policy(self, dispatch):
+        # A failed inference-provider reply is untrusted text that can echo
+        # masked credential fragments the exact-secret redaction cannot match.
+        # The agent gets the status and a fixed local error; the signed
+        # observation (already made from the received bytes) is unaffected.
+        status = dispatch.response.get("status")
+        if status == 200:
+            return
+        profile = self.agent_profile(dispatch.url)
+        if profile is not None:
+            flavour = "anthropic" if profile.get("provider") == "anthropic" else "openai"
+        elif dispatch.url in self.model_transports:
+            flavour = self.model_transports[dispatch.url]
+        else:
+            return
+        received = base64.b64decode(dispatch.response.get("body", ""), validate=True)
+        code, headers, content = provider_errors.sanitized_reply(status, received, flavour)
+        dispatch.response.update(
+            status=code, headers=headers, body=base64.b64encode(content).decode()
+        )
 
     def agent_profile(self, url):
         profile = self.approval.get("protected_model", {})
@@ -782,6 +805,8 @@ def launch_protected(root, command, *, image=DEFAULT_IMAGE):
             "--network",
             "none",
             "--read-only",
+            "--tmpfs",
+            "/tmp:rw,size=64m,mode=1777",
             "--no-healthcheck",
             "--cap-drop",
             "ALL",
@@ -808,9 +833,9 @@ def launch_protected(root, command, *, image=DEFAULT_IMAGE):
             "--env",
             "PATH=/usr/local/bin:/usr/bin:/bin",
             "--env",
-            "HOME=/workspace/.home",
+            "HOME=/tmp/home",
             "--env",
-            "TMPDIR=/workspace/.tmp",
+            "TMPDIR=/tmp",
             "--env",
             "PYTHONDONTWRITEBYTECODE=1",
             "--env",

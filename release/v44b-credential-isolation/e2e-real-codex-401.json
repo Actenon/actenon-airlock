@@ -1,0 +1,20 @@
+{
+ "agent_exit": 1,
+ "provider_requests": 1,
+ "codex_saw_status_401": true,
+ "codex_saw_sanitized_message": true,
+ "observations": [
+  {
+   "rejection_reason": "http-status",
+   "http_status": 401,
+   "provider_error_code": "invalid_api_key",
+   "provider_error_type": "invalid_request_error",
+   "provider_error_body": "json"
+  }
+ ],
+ "outcomes": [
+  "AMBIGUOUS"
+ ],
+ "files_scanned": 24,
+ "leaks": {}
+}

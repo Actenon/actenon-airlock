@@ -1,0 +1,137 @@
+............FFF.............FF                                           [100%]
+=================================== FAILURES ===================================
+_ test_malformed_credentials_are_refused_locally[sk-ant-api03-Zy9Xw8Vu7Ts6Rq5Po4Nm3Lk2Ji1Hg0FeZy9Xw8Vu7Ts6Rq5Po4Nm3Lk2Ji1Hg0FeZy9Xw8Vu7Ts6Rq5Po4Nm3Lk2Ji1Hg0Fe-AbCdEfAA-anthropic-key] _
+
+value = 'sk-ant-api03-Zy9Xw8Vu7Ts6Rq5Po4Nm3Lk2Ji1Hg0FeZy9Xw8Vu7Ts6Rq5Po4Nm3Lk2Ji1Hg0FeZy9Xw8Vu7Ts6Rq5Po4Nm3Lk2Ji1Hg0Fe-AbCdEfAA'
+reason = 'anthropic-key'
+
+    @pytest.mark.parametrize(
+        "value,reason",
+        [
+            (None, "missing"),
+            ("", "empty"),
+            (SWALLOWED, "whitespace"),
+            (" " + GOOD, "whitespace"),
+            (GOOD + "\n", "whitespace"),
+            (GOOD[:20] + "\x00" + GOOD[20:], "control-characters"),
+            (GOOD + "é", "non-ascii"),
+            ("sk-short", "too-short"),
+            ("sk-" + "a" * 600, "too-long"),
+            ("pk-" + "a" * 60, "unexpected-prefix"),
+            ("sk-" + "a" * 30 + "/bin/python", "unexpected-characters"),
+            ("scripted-codex-no-real-credential", "unexpected-prefix"),
+            (ANTHROPIC_API, "anthropic-key"),
+            (ANTHROPIC_OAUTH, "anthropic-key"),
+            ("SK-ANT-" + "a" * 40, "anthropic-key"),
+        ],
+    )
+    def test_malformed_credentials_are_refused_locally(value, reason):
+>       assert reason in preflight.format_problems(value)
+E       AssertionError: assert 'anthropic-key' in []
+E        +  where [] = <function format_problems at 0x10bcea2a0>('sk-ant-api03-Zy9Xw8Vu7Ts6Rq5Po4Nm3Lk2Ji1Hg0FeZy9Xw8Vu7Ts6Rq5Po4Nm3Lk2Ji1Hg0FeZy9Xw8Vu7Ts6Rq5Po4Nm3Lk2Ji1Hg0Fe-AbCdEfAA')
+E        +    where <function format_problems at 0x10bcea2a0> = preflight.format_problems
+
+tests/test_credential_preflight.py:63: AssertionError
+_ test_malformed_credentials_are_refused_locally[sk-ant-oat01-Qw2Er3Ty4Ui5Op6As7Df8Gh9Jk0LzQw2Er3Ty4Ui5Op6As7Df8Gh9Jk0LzQw2Er3Ty4Ui5Op6As7Df8Gh9Jk0Lz-XcVbNmAA-anthropic-key] _
+
+value = 'sk-ant-oat01-Qw2Er3Ty4Ui5Op6As7Df8Gh9Jk0LzQw2Er3Ty4Ui5Op6As7Df8Gh9Jk0LzQw2Er3Ty4Ui5Op6As7Df8Gh9Jk0Lz-XcVbNmAA'
+reason = 'anthropic-key'
+
+    @pytest.mark.parametrize(
+        "value,reason",
+        [
+            (None, "missing"),
+            ("", "empty"),
+            (SWALLOWED, "whitespace"),
+            (" " + GOOD, "whitespace"),
+            (GOOD + "\n", "whitespace"),
+            (GOOD[:20] + "\x00" + GOOD[20:], "control-characters"),
+            (GOOD + "é", "non-ascii"),
+            ("sk-short", "too-short"),
+            ("sk-" + "a" * 600, "too-long"),
+            ("pk-" + "a" * 60, "unexpected-prefix"),
+            ("sk-" + "a" * 30 + "/bin/python", "unexpected-characters"),
+            ("scripted-codex-no-real-credential", "unexpected-prefix"),
+            (ANTHROPIC_API, "anthropic-key"),
+            (ANTHROPIC_OAUTH, "anthropic-key"),
+            ("SK-ANT-" + "a" * 40, "anthropic-key"),
+        ],
+    )
+    def test_malformed_credentials_are_refused_locally(value, reason):
+>       assert reason in preflight.format_problems(value)
+E       AssertionError: assert 'anthropic-key' in []
+E        +  where [] = <function format_problems at 0x10bcea2a0>('sk-ant-oat01-Qw2Er3Ty4Ui5Op6As7Df8Gh9Jk0LzQw2Er3Ty4Ui5Op6As7Df8Gh9Jk0LzQw2Er3Ty4Ui5Op6As7Df8Gh9Jk0Lz-XcVbNmAA')
+E        +    where <function format_problems at 0x10bcea2a0> = preflight.format_problems
+
+tests/test_credential_preflight.py:63: AssertionError
+_ test_malformed_credentials_are_refused_locally[SK-ANT-aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa-anthropic-key] _
+
+value = 'SK-ANT-aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa'
+reason = 'anthropic-key'
+
+    @pytest.mark.parametrize(
+        "value,reason",
+        [
+            (None, "missing"),
+            ("", "empty"),
+            (SWALLOWED, "whitespace"),
+            (" " + GOOD, "whitespace"),
+            (GOOD + "\n", "whitespace"),
+            (GOOD[:20] + "\x00" + GOOD[20:], "control-characters"),
+            (GOOD + "é", "non-ascii"),
+            ("sk-short", "too-short"),
+            ("sk-" + "a" * 600, "too-long"),
+            ("pk-" + "a" * 60, "unexpected-prefix"),
+            ("sk-" + "a" * 30 + "/bin/python", "unexpected-characters"),
+            ("scripted-codex-no-real-credential", "unexpected-prefix"),
+            (ANTHROPIC_API, "anthropic-key"),
+            (ANTHROPIC_OAUTH, "anthropic-key"),
+            ("SK-ANT-" + "a" * 40, "anthropic-key"),
+        ],
+    )
+    def test_malformed_credentials_are_refused_locally(value, reason):
+>       assert reason in preflight.format_problems(value)
+E       AssertionError: assert 'anthropic-key' in ['unexpected-prefix']
+E        +  where ['unexpected-prefix'] = <function format_problems at 0x10bcea2a0>('SK-ANT-aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa')
+E        +    where <function format_problems at 0x10bcea2a0> = preflight.format_problems
+
+tests/test_credential_preflight.py:63: AssertionError
+_ test_live_runner_refuses_bad_credentials_before_any_work[sk-ant-api03-Zy9Xw8Vu7Ts6Rq5Po4Nm3Lk2Ji1Hg0FeZy9Xw8Vu7Ts6Rq5Po4Nm3Lk2Ji1Hg0FeZy9Xw8Vu7Ts6Rq5Po4Nm3Lk2Ji1Hg0Fe-AbCdEfAA] _
+
+tmp_path = PosixPath('/private/var/folders/tz/y04t4d0900xdbmz96jp608180000gn/T/pytest-of-ross/pytest-43/test_live_runner_refuses_bad_c4')
+value = 'sk-ant-api03-Zy9Xw8Vu7Ts6Rq5Po4Nm3Lk2Ji1Hg0FeZy9Xw8Vu7Ts6Rq5Po4Nm3Lk2Ji1Hg0FeZy9Xw8Vu7Ts6Rq5Po4Nm3Lk2Ji1Hg0Fe-AbCdEfAA'
+
+    @pytest.mark.parametrize("value", [SWALLOWED, "", None, "sk-short", ANTHROPIC_API])
+    def test_live_runner_refuses_bad_credentials_before_any_work(tmp_path, value):
+        result, out = run_live(value, tmp_path)
+        assert result.returncode != 0
+>       assert "credential" in result.stderr.lower()
+E       assert 'credential' in 'traceback (most recent call last):\n  file "/users/ross/src/actenon-audit/airlock-pr23/acceptance/codex-cli/run.py", ...r operation failed: " + args[0])\nactenon_airlock.common.airlockerror: protected mode docker operation failed: image\n'
+E        +  where 'traceback (most recent call last):\n  file "/users/ross/src/actenon-audit/airlock-pr23/acceptance/codex-cli/run.py", ...r operation failed: " + args[0])\nactenon_airlock.common.airlockerror: protected mode docker operation failed: image\n' = <built-in method lower of str object at 0x7823d21900>()
+E        +    where <built-in method lower of str object at 0x7823d21900> = 'Traceback (most recent call last):\n  File "/Users/ross/src/actenon-audit/airlock-pr23/acceptance/codex-cli/run.py", ...r operation failed: " + args[0])\nactenon_airlock.common.AirlockError: Protected Mode Docker operation failed: image\n'.lower
+E        +      where 'Traceback (most recent call last):\n  File "/Users/ross/src/actenon-audit/airlock-pr23/acceptance/codex-cli/run.py", ...r operation failed: " + args[0])\nactenon_airlock.common.AirlockError: Protected Mode Docker operation failed: image\n' = CompletedProcess(args=['/Users/ross/src/actenon-audit/airlock-pr23/.venv/bin/python', '/Users/ross/src/actenon-audit/a... operation failed: " + args[0])\nactenon_airlock.common.AirlockError: Protected Mode Docker operation failed: image\n').stderr
+
+tests/test_credential_preflight.py:174: AssertionError
+_______________ test_anthropic_key_is_refused_before_any_request _______________
+
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x10bd590d0>
+
+    def test_anthropic_key_is_refused_before_any_request(monkeypatch):
+        sent = []
+    
+        def record(request):
+            sent.append(request)
+            return httpx.Response(401)
+    
+>       with pytest.raises(preflight.CredentialRefused, match="Anthropic") as refused:
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       Failed: DID NOT RAISE CredentialRefused
+
+tests/test_credential_preflight.py:188: Failed
+=========================== short test summary info ============================
+FAILED tests/test_credential_preflight.py::test_malformed_credentials_are_refused_locally[sk-ant-api03-Zy9Xw8Vu7Ts6Rq5Po4Nm3Lk2Ji1Hg0FeZy9Xw8Vu7Ts6Rq5Po4Nm3Lk2Ji1Hg0FeZy9Xw8Vu7Ts6Rq5Po4Nm3Lk2Ji1Hg0Fe-AbCdEfAA-anthropic-key]
+FAILED tests/test_credential_preflight.py::test_malformed_credentials_are_refused_locally[sk-ant-oat01-Qw2Er3Ty4Ui5Op6As7Df8Gh9Jk0LzQw2Er3Ty4Ui5Op6As7Df8Gh9Jk0LzQw2Er3Ty4Ui5Op6As7Df8Gh9Jk0Lz-XcVbNmAA-anthropic-key]
+FAILED tests/test_credential_preflight.py::test_malformed_credentials_are_refused_locally[SK-ANT-aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa-anthropic-key]
+FAILED tests/test_credential_preflight.py::test_live_runner_refuses_bad_credentials_before_any_work[sk-ant-api03-Zy9Xw8Vu7Ts6Rq5Po4Nm3Lk2Ji1Hg0FeZy9Xw8Vu7Ts6Rq5Po4Nm3Lk2Ji1Hg0FeZy9Xw8Vu7Ts6Rq5Po4Nm3Lk2Ji1Hg0Fe-AbCdEfAA]
+FAILED tests/test_credential_preflight.py::test_anthropic_key_is_refused_before_any_request
+5 failed, 25 passed in 1.08s

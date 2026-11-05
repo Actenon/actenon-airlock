@@ -1,0 +1,84 @@
+{
+  "source_commit": "9d1edf8172fbc5e3b3ea05293e94f2a1dc166343",
+  "first_outcome": "AMBIGUOUS",
+  "retained_microusd": 509795,
+  "retry_ok": false,
+  "second_ok": false,
+  "second_reason": "Model spend bound reached for this run",
+  "dispatches": 1,
+  "diagnostic": {
+    "body_sha256": "2b427dac441f010c2cc05c9d1116f7216c2784419ec5db7c450ce26139d57107",
+    "checked_event": 0,
+    "checked_event_metadata": {
+      "response_id_sha256": "9cbbbce3924493c41b1a2390e88f85ae39cc947751022fbaf1b58b8aa10bddce",
+      "sequence_number": 0,
+      "type": "response.created"
+    },
+    "checked_sequence_number": 0,
+    "event_count": 9,
+    "events": [
+      {
+        "response_id_sha256": "9cbbbce3924493c41b1a2390e88f85ae39cc947751022fbaf1b58b8aa10bddce",
+        "sequence_number": 0,
+        "type": "response.created"
+      },
+      {
+        "response_id_sha256": "9cbbbce3924493c41b1a2390e88f85ae39cc947751022fbaf1b58b8aa10bddce",
+        "sequence_number": 1,
+        "type": "response.in_progress"
+      },
+      {
+        "item_id_sha256": "f8c53bd3866d4822377e53015ed4533834b2ba9e300d02d80bf3b51bc3682917",
+        "item_type": "message",
+        "output_index": 0,
+        "sequence_number": 2,
+        "type": "response.output_item.added"
+      },
+      {
+        "content_index": 0,
+        "item_id_sha256": "f8c53bd3866d4822377e53015ed4533834b2ba9e300d02d80bf3b51bc3682917",
+        "output_index": 0,
+        "sequence_number": 3,
+        "type": "response.content_part.added"
+      },
+      {
+        "content_index": 0,
+        "item_id_sha256": "f8c53bd3866d4822377e53015ed4533834b2ba9e300d02d80bf3b51bc3682917",
+        "output_index": 0,
+        "sequence_number": 4,
+        "type": "response.output_text.delta"
+      },
+      {
+        "content_index": 0,
+        "item_id_sha256": "f8c53bd3866d4822377e53015ed4533834b2ba9e300d02d80bf3b51bc3682917",
+        "output_index": 0,
+        "sequence_number": 5,
+        "type": "response.output_text.done"
+      },
+      {
+        "content_index": 0,
+        "item_id_sha256": "f8c53bd3866d4822377e53015ed4533834b2ba9e300d02d80bf3b51bc3682917",
+        "output_index": 0,
+        "sequence_number": 6,
+        "type": "response.content_part.done"
+      },
+      {
+        "item_id_sha256": "f8c53bd3866d4822377e53015ed4533834b2ba9e300d02d80bf3b51bc3682917",
+        "item_type": "message",
+        "output_index": 0,
+        "sequence_number": 7,
+        "type": "response.output_item.done"
+      },
+      {
+        "response_id_sha256": "9cbbbce3924493c41b1a2390e88f85ae39cc947751022fbaf1b58b8aa10bddce",
+        "sequence_number": 8,
+        "type": "response.completed"
+      }
+    ],
+    "events_sha256": "db99b660e7cae6e14fdcd8e3a7750228f111b31217ae0115281b670db047e3ca",
+    "rejection_reason": "response-tools",
+    "schema": "actenon-airlock/responses-observation/v1",
+    "terminal_status": "completed"
+  },
+  "signature_ok": true
+}

@@ -183,6 +183,9 @@ class HttpDispatch:
                 "execution_occurred": occurred,
                 "evidence_hash": digest(self.response),
             }
+        # After observation and evidence hashing over what was received: a
+        # subclass may replace what the agent is GIVEN, never what was observed.
+        broker.relay_policy(self)
         return payload
 
     def reply(self) -> dict:
@@ -551,6 +554,9 @@ class Broker:
     def http_outcome(self, dispatch):
         # Generic HTTP does not establish the remote consequence.
         return "AMBIGUOUS", None
+
+    def relay_policy(self, dispatch):
+        """Generic HTTP is relayed as received (exact secrets already redacted)."""
 
     def handle(self, message: dict) -> dict:
         if message.get("kind") == "audit-deny":
