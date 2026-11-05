@@ -163,8 +163,8 @@ def _cache_control(block: dict) -> None:
     if "cache_control" not in block:
         return
     control = _object(block["cache_control"], frozenset({"type", "ttl"}), "cache_control")
-    if control.get("type") != "ephemeral" or control.get("ttl", "5m") not in {"5m", "1h"}:
-        raise AirlockError("Only ephemeral cache control is supported")
+    if control.get("type") != "ephemeral" or control.get("ttl", "5m") != "5m":
+        raise AirlockError("Only 5-minute ephemeral cache control is supported")
 
 
 def _source(block: dict) -> None:

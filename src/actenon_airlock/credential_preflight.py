@@ -34,6 +34,7 @@ MEANING = (
     "not proof of model entitlement, quota, spend limit or billing"
 )
 MODELS_ENDPOINT = "https://api.openai.com/v1/models/"
+ANTHROPIC_MODELS_ENDPOINT = "https://api.anthropic.com/v1/models/"
 MIN_LENGTH = 20
 MAX_LENGTH = 512
 _BODY = re.compile(r"[A-Za-z0-9_-]+")
@@ -119,6 +120,70 @@ def supervisor_credential(environment_value, credential_file=None) -> str:
     return value
 
 
+def format_problems_anthropic(value) -> list[str]:
+    """Fixed reasons why `value` cannot be an Anthropic API key. Empty if plausible."""
+    if value is None:
+        return ["missing"]
+    if not isinstance(value, str):
+        return ["invalid-type"]
+    if value == "":
+        return ["empty"]
+    problems = []
+    if any(ch.isspace() for ch in value):
+        problems.append("whitespace")
+    if any((ord(ch) < 32 or ord(ch) == 127) and not ch.isspace() for ch in value):
+        problems.append("control-characters")
+    if not value.isascii():
+        problems.append("non-ascii")
+    if len(value) < MIN_LENGTH:
+        problems.append("too-short")
+    if len(value) > MAX_LENGTH:
+        problems.append("too-long")
+    lower = value.lower()
+    if lower.startswith("sk-ant-oat"):
+        problems.append("subscription-token")
+    elif (
+        lower.startswith("sk-proj-")
+        or lower.startswith("sk-admin-")
+        or lower.startswith("sk-svcacct-")
+    ):
+        problems.append("openai-key")
+    elif not lower.startswith(_ANTHROPIC_PREFIX):
+        if lower.startswith("sk-"):
+            problems.append("openai-key")
+        else:
+            problems.append("unexpected-prefix")
+    elif not _BODY.fullmatch(value):
+        problems.append("unexpected-characters")
+    return problems
+
+
+def supervisor_anthropic_credential(environment_value, credential_file=None) -> str:
+    """Load and locally validate the Anthropic credential from exactly one source."""
+    if credential_file is not None and environment_value:
+        raise CredentialRefused(
+            "supply the credential from exactly one source (file or environment)"
+        )
+    value = (
+        read_credential_file(credential_file) if credential_file is not None else environment_value
+    )
+    problems = format_problems_anthropic(value)
+    if "openai-key" in problems:
+        raise CredentialRefused(
+            "this is an OpenAI API key; this run needs an Anthropic API key. Nothing was sent"
+        )
+    if "subscription-token" in problems:
+        raise CredentialRefused(
+            "subscription tokens cannot be used here: use a Console API key. Nothing was sent"
+        )
+    if problems:
+        size = f"; {len(value)} characters" if isinstance(value, str) else ""
+        raise CredentialRefused(
+            f"malformed credential input ({', '.join(problems)}{size}); nothing was sent"
+        )
+    return value
+
+
 @contextlib.contextmanager
 def supervisor_scope(name: str, value: str):
     """Expose a credential in os.environ only while the broker reads it.
@@ -160,6 +225,54 @@ def authenticate(key: str, model: str, *, client: httpx.Client | None = None) ->
             status = response.status_code
     except httpx.HTTPError:
         return result  # exception text can carry request details; never copy it
+    finally:
+        if owned:
+            client.close()
+    result["http_status"] = status
+    result["outcome"] = (
+        "authenticated"
+        if status == 200
+        else "rejected"
+        if status in (401, 403)
+        else "model-unavailable"
+        if status == 404
+        else "unavailable"
+    )
+    if status != 200:
+        code = provider_errors.status_diagnostic(status, bytes(body)).get("provider_error_code")
+        if code in provider_errors.PROVIDER_ERROR_CODES:
+            result["provider_error_code"] = code
+    return result
+
+
+def authenticate_anthropic(key: str, model: str, *, client: httpx.Client | None = None) -> dict:
+    """One promptless, non-inference authentication check against the Anthropic model lookup."""
+    if not _MODEL.fullmatch(model):
+        raise CredentialRefused("model identifier is not a plain provider model name")
+    if isinstance(key, str) and (
+        not key.lower().startswith(_ANTHROPIC_PREFIX) or key.lower().startswith("sk-ant-oat")
+    ):
+        raise CredentialRefused(
+            "refusing to send a non-Anthropic or subscription credential to Anthropic"
+        )
+    owned = client is None
+    if owned:
+        client = httpx.Client(timeout=15.0, follow_redirects=False, trust_env=False)
+    result: dict = {"http_status": None, "outcome": "unreachable", "meaning": MEANING}
+    try:
+        with client.stream(
+            "GET",
+            ANTHROPIC_MODELS_ENDPOINT + model,
+            headers={"x-api-key": key, "anthropic-version": "2023-06-01"},
+        ) as response:
+            body = bytearray()
+            for part in response.iter_bytes():
+                body.extend(part)
+                if len(body) > provider_errors.MAX_ERROR_BYTES:
+                    break
+            status = response.status_code
+    except httpx.HTTPError:
+        return result
     finally:
         if owned:
             client.close()

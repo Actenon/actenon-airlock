@@ -194,3 +194,72 @@ def test_anthropic_key_is_refused_before_any_request(monkeypatch):
     with pytest.raises(preflight.CredentialRefused, match="Anthropic"):
         preflight.authenticate(ANTHROPIC_API, MODEL, client=client)
     assert sent == []
+
+
+@pytest.mark.parametrize(
+    "value,reason",
+    [
+        (None, "missing"),
+        ("", "empty"),
+        (SWALLOWED, "whitespace"),
+        (" " + ANTHROPIC_API, "whitespace"),
+        (ANTHROPIC_API + "\n", "whitespace"),
+        (ANTHROPIC_API[:20] + "\x00" + ANTHROPIC_API[20:], "control-characters"),
+        (ANTHROPIC_API + "é", "non-ascii"),
+        ("sk-short", "too-short"),
+        ("sk-ant-" + "a" * 600, "too-long"),
+        (GOOD, "openai-key"),
+        ("sk-proj-something", "openai-key"),
+        ("sk-admin-something", "openai-key"),
+        (ANTHROPIC_OAUTH, "subscription-token"),
+        ("pk-" + "a" * 60, "unexpected-prefix"),
+        ("sk-ant-" + "a" * 30 + "/bin/python", "unexpected-characters"),
+        ("scripted-anthropic-no-real-credential", "unexpected-prefix"),
+    ],
+)
+def test_anthropic_malformed_credentials_are_refused_locally(value, reason):
+    assert reason in preflight.format_problems_anthropic(value)
+
+
+def test_a_plausible_anthropic_key_passes_the_local_check():
+    assert preflight.format_problems_anthropic(ANTHROPIC_API) == []
+
+
+def test_openai_key_is_refused_for_anthropic_before_any_request():
+    sent = []
+
+    def record(request):
+        sent.append(request)
+        return httpx.Response(401)
+
+    with pytest.raises(preflight.CredentialRefused, match="OpenAI"):
+        preflight.supervisor_anthropic_credential(GOOD)
+    assert sent == []
+
+    client = httpx.Client(transport=httpx.MockTransport(record))
+    with pytest.raises(preflight.CredentialRefused, match="non-Anthropic"):
+        preflight.authenticate_anthropic(GOOD, "claude-opus-5-5", client=client)
+    assert sent == []
+
+
+def test_subscription_token_is_refused_for_anthropic():
+    with pytest.raises(preflight.CredentialRefused, match="subscription tokens"):
+        preflight.supervisor_anthropic_credential(ANTHROPIC_OAUTH)
+
+
+def test_anthropic_authentication_check_is_one_promptless_model_lookup():
+    seen = []
+    result = preflight.authenticate_anthropic(
+        ANTHROPIC_API, "claude-opus-5-5", client=provider(200, seen=seen)
+    )
+    assert result == {
+        "http_status": 200,
+        "outcome": "authenticated",
+        "meaning": preflight.MEANING,
+    }
+    assert len(seen) == 1
+    request = seen[0]
+    assert request.method == "GET" and request.content == b""
+    assert str(request.url) == "https://api.anthropic.com/v1/models/claude-opus-5-5"
+    assert request.headers["x-api-key"] == ANTHROPIC_API
+    assert request.headers["anthropic-version"] == "2023-06-01"
