@@ -75,12 +75,33 @@ def ensure_image(image: str, dockerfile: str | None = None) -> None:
 
 
 def _approved(state: State, config: dict) -> bool:
-    """Already signed for exactly this run. Changed code stays blocked at dispatch regardless."""
+    """Already signed for exactly this run, judged from the signed approval itself.
+
+    agent.json only records what was last proposed; a proposal that was declined must not
+    be mistaken for an approval. Changed code stays blocked at dispatch regardless.
+    """
     path = state.path / "agent.json"
     if not (state.path / "approved.json").exists() or not path.exists():
         return False
     recorded = json.loads(path.read_text())
-    return all(recorded.get(key) == value for key, value in config.items())
+    if not all(recorded.get(key) == value for key, value in config.items()):
+        return False
+    from .agents import parse_prices, usd_to_micro
+    from .model_constraints import endpoint
+
+    try:
+        signed = state.approved().get("protected_model") or {}
+        checks = {
+            "model": lambda v: v in signed.get("models", []),
+            "model_endpoint": lambda v: endpoint(signed) == v,
+            "max_run_usd": lambda v: signed.get("max_run_microusd") == usd_to_micro(v),
+            "price_per_mtok": lambda v: signed.get("price_microusd_per_mtok") == parse_prices(v),
+        }
+        return bool(signed) and all(
+            check(config[key]) for key, check in checks.items() if key in config
+        )
+    except (AirlockError, KeyError, ValueError):
+        return False
 
 
 def _ask() -> bool:
@@ -99,27 +120,72 @@ def _usd(microusd: int) -> str:
     return f"${Decimal(microusd) / 1_000_000:.2f}"
 
 
-def report(manifest, verdict, activity, patch, *, agent_exit, spend_limit, root) -> None:
+SPEND_BOUND = "Model spend bound reached for this run"
+
+
+def headline(*, agent_exit, manifest, passed, verdict, stopped_by_budget) -> str:
+    """One sentence from observed facts only. An agent saying it is done proves nothing."""
+    if stopped_by_budget:
+        return "Stopped early: Airlock's spend limit refused a model call, so the agent did not finish."
+    if agent_exit not in (0, None):
+        return f"The agent did not finish (exit {agent_exit})."
+    if manifest is None:
+        return "The agent finished but changed nothing."
+    if passed is None:
+        return "The agent proposed a change. It is not verified: pass --tests DIR to check it."
+    if passed:
+        return "The agent proposed a change, and your checks passed."
+    return f"The agent proposed a change, but your checks did not pass ({verdict.split(':')[0]})."
+
+
+def report(
+    manifest, verdict, activity, patch, *, agent_exit, spend_limit, root, passed=None
+) -> None:
     """What happened in this run, in the order a person cares about."""
     blocked, calls = activity["refused"], activity["inference"]
+    reasons = activity["refusal_reasons"]
+    stopped = any(SPEND_BOUND in reason for reason in reasons)
     print("\nRESULT")
-    print(f"  Agent     finished, exit {agent_exit}")
+    print("  " + headline(agent_exit=agent_exit, manifest=manifest, passed=passed,
+                          verdict=verdict or "", stopped_by_budget=stopped))  # fmt: skip
+    print()
+    print(f"  Agent     exit {agent_exit}")
     if manifest:
         print(f"  Changed   {len(manifest['changes'])} file(s)")
         for change in manifest["changes"]:
             print(f"              {change['status']:<9}{change['path']}")
     else:
         print("  Changed   nothing")
-    print(f"  Tests     {verdict or 'not run. Pass --tests DIR to check it with your own tests'}")
-    print(f"  Blocked   {blocked} attempt(s)")
-    for reason in activity["refusal_reasons"]:
+    print(f"  Checks    {verdict or 'not run. Pass --tests DIR to check it with your own tests'}")
+    print(f"  Refused   {blocked} attempt(s)")
+    for reason in reasons:
         print(f"              {reason}")
-    spent = _usd(activity["model_spend"]["estimated_microusd"])
-    print(f"  Model     {calls['dispatched']} call(s), about {spent} of {spend_limit}")
+    spent = activity["model_spend"]["estimated_microusd"]
+    limit = int(Decimal(spend_limit.lstrip("$")) * 1_000_000)
+    print(
+        f"  Model     {calls['dispatched']} call(s), about {_usd(spent)} of {spend_limit}"
+        f" (estimate from signed usage; {_usd(max(limit - spent, 0))} left)"
+    )
+    if stopped:
+        print("  Why it stopped")
+        print("            Before each call Airlock reserves that call's worst-case cost. The")
+        print(
+            f"            next call could have cost more than the {_usd(max(limit - spent, 0))} left,"
+        )
+        print("            so it was refused and nothing was sent. Your safeguard held; the task")
+        print("            is unfinished. To allow longer runs, approve a higher limit:")
+        print('              airlock protect --max-run-usd <amount> "<task>"')
+    if calls.get("unconfirmed"):
+        print(f"  Uncertain {calls['unconfirmed']} model call(s) got no confirmed answer;")
+        print("            they are counted at their worst-case cost and are not retried.")
+    if activity["unresolved_effects"]:
+        print(
+            f"  Uncertain {len(activity['unresolved_effects'])} effect(s) with no confirmed outcome"
+        )
+    print("  External  none: this command never changes anything outside the sealed copy")
     state = "OK" if activity["integrity_ok"] else "FAILED"
     print(f"  Evidence  {activity['receipts']} signed receipt(s), integrity {state}")
-    if activity["unresolved_effects"]:
-        print(f"  Uncertain {len(activity['unresolved_effects'])} call(s) with no confirmed answer")
+    print("            inspect: airlock receipts --path .")
     if manifest:
         relative = patch.relative_to(root)
         print("\nYour project has not been changed. Read the patch, then take it if you want it:")
@@ -157,12 +223,18 @@ def protect(args, root: Path, run) -> int:
         "price_per_mtok": prices,
     }
     if not _approved(state, wanted):
-        print(f"\n{agent} will run in a sealed container with a copy of this project.")
-        print(f"  It can call one model: {model} at {endpoint}, up to ${limit} a run.")
-        print(f"  Prices used for that bound, USD per million tokens: {prices}")
-        print("  Input, cache write, cache read, output. Check them against your provider.")
-        print("  It has no network, no credentials, and no access to your home directory.")
-        print(f"  {credential} stays on this machine, outside the container.\n")
+        # Show exactly what would be signed, from the same review the approval uses.
+        review = io.StringIO()
+        with contextlib.redirect_stdout(review):
+            proposed = run(setup)
+        if proposed:
+            print(review.getvalue())
+            return proposed
+        print(f"\n{agent} will run in a sealed container with a copy of this project.\n")
+        print(review.getvalue().strip())
+        print(f"\nPrices used for the spend bound, USD per million tokens: {prices}")
+        print("(input, cache write, cache read, output). Check them against your provider.")
+        print(f"{credential} stays on this machine, outside the container.\n")
         if not (args.approve or _ask()):
             print("Nothing was approved and nothing ran.")
             return 2
@@ -197,7 +269,10 @@ def protect(args, root: Path, run) -> int:
     verdict = passed = None
     if manifest and args.tests:
         sha256 = manifest["candidate_sha256"]
-        result = verify_candidate(state, sha256, args.tests.resolve())
+        result = verify_candidate(
+            state, sha256, args.tests.resolve(), image=image,
+            accept_skips=args.accept_skips, allow_config_change=args.allow_config_change,
+        )  # fmt: skip
         verdict = f"{result['verdict']}: {result['detail']}"
         passed = result["verdict"] == TESTS_PASSED
     patch = None
@@ -211,6 +286,7 @@ def protect(args, root: Path, run) -> int:
         agent_exit=json.loads((finished / "result.json").read_text())["exit_code"],
         spend_limit="$" + limit,
         root=root,
+        passed=passed,
     )
     if code not in FINISHED:
         return code

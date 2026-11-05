@@ -191,7 +191,7 @@ def test_each_agent_goes_from_a_key_to_a_patch(project, monkeypatch, capsys, key
     assert any(binary in part for part in seen["command"])
     assert seen["task"] == "Fix add\n"
     assert "git apply .airlock/local/candidates/" in shown and "of $2.00" in shown
-    assert "Tests     not run" in shown
+    assert "Checks    not run" in shown
     assert not (project / TASK_FILE).exists()
     assert (project / "calculator.py").read_text().endswith("a - b\n")
 
@@ -204,7 +204,7 @@ def test_a_second_run_asks_nothing_and_reports_only_itself(project, monkeypatch,
     shutil.rmtree(State(project).local / "runs")
     monkeypatch.setattr("sys.stdin", io.StringIO(""))
     assert protect(project) == 0
-    assert "Blocked   0 attempt(s)" in capsys.readouterr().out
+    assert "Refused   0 attempt(s)" in capsys.readouterr().out
 
 
 def test_a_refusal_is_reported_and_keeps_its_exit_code(project, monkeypatch, capsys):
@@ -378,7 +378,7 @@ def test_protect_takes_a_task_to_a_reviewed_patch(tmp_path, monkeypatch, capsys)
     assert code == 0, shown
     assert "RESULT" in shown and "TESTS_PASSED" in shown and "git apply" in shown
     assert "modified calculator.py" in " ".join(shown.split())
-    assert "Blocked   0 attempt(s)" in shown
+    assert "Refused   0 attempt(s)" in shown
     assert (root / "calculator.py").read_text() == original
     assert not (root / TASK_FILE).exists()
     patch = next(Path(root, ".airlock/local/candidates").glob("*/candidate.patch"))
