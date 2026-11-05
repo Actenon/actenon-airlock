@@ -232,7 +232,8 @@ def _workflow_command(args, root: Path) -> int:
         config_path.write_text(json.dumps(config, indent=2) + "\n")
         if args.reconciler_key:
             forwarded += ["--reconciler-key", str(args.reconciler_key)]
-        return main([*forwarded, *(["--approve"] if args.approve else [])])
+        flags = (["--approve"] if args.approve else []) + (["--details"] if args.details else [])
+        return main([*forwarded, *flags])
     if args.cmd == "work":
         from .protected import launch_protected
 
@@ -270,15 +271,27 @@ def _workflow_command(args, root: Path) -> int:
         return 0
     if args.cmd == "verify-candidate":
         from .protected import DEFAULT_IMAGE
+        from .workflow import OUTCOMES, detect_profile, planned_checks
 
+        image = args.image or DEFAULT_IMAGE
+        profile = detect_profile(root) if args.profile == "auto" else args.profile
+        checks = [shlex.split(text) for text in args.check] or None
+        if not args.json:
+            print(f"Checking candidate {args.candidate[:12]} as a {profile} project, in {image}:")
+            print("  no network, no credentials, a private copy of the agent's files,")
+            print(f"  with your trusted tests from {args.tests} laid over them.")
+            for command in planned_checks(root, profile, checks):
+                print("  run: " + " ".join(command))
         result = verify_candidate(
-            state, args.candidate, args.tests.resolve(), image=args.image or DEFAULT_IMAGE
-        )
+            state, args.candidate, args.tests.resolve(), image=image, profile=profile,
+            checks=checks, accept_skips=args.accept_skips,
+            allow_config_change=args.allow_config_change,
+        )  # fmt: skip
         if args.json:
             print(json.dumps(result, indent=2))
         else:
-            print(f"{result['verdict']}: {result['detail']}")
-            print("Specified tests only. This is not a safety finding and approves nothing.")
+            print(f"\n{OUTCOMES[result['verdict']]}  {result['verdict']}: {result['detail']}")
+            print("These checks only. Passing is not a safety finding and approves nothing.")
         return 0 if result["verdict"] == TESTS_PASSED else 2
     if args.cmd == "review-candidate":
         from .github_consequence import ReviewedGitHubCreate
@@ -422,6 +435,15 @@ def main(argv=None):
             p.add_argument("--agent", help="Default: the agent whose model key is in this shell")
             p.add_argument("--model", help="Default: the agent's supported model")
             p.add_argument("--max-run-usd", help="Spend limit per run. Default: 2.00")
+            p.add_argument(
+                "--accept-skips",
+                action="store_true",
+                help="With --tests: count skipped tests as acceptable (recorded)",
+            )
+            p.add_argument(
+                "--allow-config-change", action="store_true",
+                help="With --tests: accept that the agent changed what defines the checks",
+            )  # fmt: skip
             p.add_argument("--price-per-mtok", help="input,cache_write,cache_read,output")
             p.add_argument("--model-endpoint", help="Exact model URL the supervisor calls")
             p.add_argument("--image", help="Your own image, built on the agent's image")
@@ -461,6 +483,9 @@ def main(argv=None):
                 help="Exact model URL the supervisor calls (HTTPS or loopback)",
             )  # fmt: skip
             p.add_argument("--max-run-usd", help="Supervisor-enforced model spend bound per run")
+            p.add_argument(
+                "--details", action="store_true", help="Show the full internal authority review"
+            )
             p.add_argument("--max-output-tokens", type=int, help="Lower the signed reply bound")
             p.add_argument(
                 "--no-thinking", action="store_true", help="Ask the agent not to request thinking"
@@ -482,6 +507,28 @@ def main(argv=None):
                 help="Trusted tests held outside the project",
             )  # fmt: skip
             p.add_argument("--image", help="Test image (default: the compute image)")
+            p.add_argument(
+                "--profile",
+                choices=("auto", "python", "go", "node"),
+                default="auto",
+                help="Which built-in checks to run (default: detected from your project)",
+            )
+            p.add_argument(
+                "--check",
+                action="append",
+                default=[],
+                metavar="COMMAND",
+                help="Run this exact command instead (repeatable; no shell)",
+            )
+            p.add_argument(
+                "--accept-skips",
+                action="store_true",
+                help="Count skipped tests as acceptable (recorded in the receipt)",
+            )
+            p.add_argument(
+                "--allow-config-change", action="store_true",
+                help="Accept that the agent changed files that define the checks (recorded)",
+            )  # fmt: skip
         if cmd == "review-candidate":
             p.add_argument("--candidate", required=True, help="Candidate SHA-256")
             p.add_argument("--output", type=Path, required=True, help="Profile to review")
@@ -559,6 +606,19 @@ def main(argv=None):
                 "--approve",
                 action="store_true",
                 help="Explicitly approve the displayed resolved powers",
+            )
+            p.add_argument(
+                "--grant-discovered",
+                action="store_true",
+                help="Also grant powers found in your own code (only for airlock run)",
+            )
+            p.add_argument(
+                "--details", action="store_true", help="Show the full internal authority review"
+            )
+            p.add_argument(
+                "--only-reviewed",
+                action="store_true",
+                help="Grant only reviewed consequences (model, GitHub creates), nothing discovered",
             )
             p.add_argument("--command", help='Python script and arguments, or "-m module"')
             p.add_argument("--credential", action="append", default=[], metavar="NAME=HTTPS_ORIGIN")
@@ -944,32 +1004,58 @@ def main(argv=None):
                 current["command"] = before.get("command") or (
                     candidates[:1] if len(candidates) == 1 else []
                 )
+            # Discovery is not approval. A protected agent project is granted only what the
+            # Protected Mode boundary can use; other discovered powers are recorded, not signed.
+            if args.only_reviewed and args.grant_discovered:
+                raise AirlockError("Choose --only-reviewed or --grant-discovered, not both")
+            simple = (
+                (state.path / "agent.json").exists() or args.only_reviewed
+            ) and not args.grant_discovered
+            if simple:
+                from .authority_review import protected_grants, render_review
+
+                granted, withheld = protected_grants(current)
+                review_text = render_review(current, granted, withheld)
+                current["powers"] = granted
+                current["not_granted"] = withheld
             atomic_json(state.path / "proposed.json", current)
             result = authority_diff(before, current)
-            print(json.dumps(current, indent=2) if args.json else render(result))
-            if not args.json and bindings:
+            if args.json:
+                print(json.dumps(current, indent=2))
+            elif simple and not args.details:
+                print(review_text)
+            else:
+                print(render(result))
+            show_internal = not args.json and not (simple and not args.details)
+            if show_internal and bindings:
                 print("\nCredential origin bindings:")
                 for name, url in sorted(bindings.items()):
                     print(f"  {name} -> {url}")
-            if not args.json and current["reconciliation_keys"]:
+            if show_internal and current["reconciliation_keys"]:
                 print("\nReconciliation observer keys (trusted only with --approve):")
                 for kid in sorted(current["reconciliation_keys"]):
                     print("  " + kid)
-            if not args.json and current["protected_model"]:
+            if show_internal and current["protected_model"]:
                 print("\nProtected inference constraint (trusted only with --approve):")
                 print(json.dumps(current["protected_model"], sort_keys=True))
-            if not args.json and current["protected_github"]:
+            if show_internal and current["protected_github"]:
                 print("\nExact GitHub creations (trusted only with --approve):")
                 print(json.dumps(current["protected_github"], sort_keys=True))
             if current["parse_errors"]:
                 raise AirlockError("Parse errors prevent approval")
             if args.approve:
                 state.approve(current)
-                if not args.json:
+                if not args.json and simple:
+                    print(
+                        f"\nApproved and signed: {len(current['powers'])} grant(s). Nothing else."
+                    )
+                elif not args.json:
                     print(
                         f"\nApproved {len(current['powers'])} powers. Unresolved powers remain blocked;"
                         " their calls are denied at runtime with signed receipts."
                     )
+            elif not args.json and simple:
+                print("\nNothing is granted until you approve.")
             elif not args.json:
                 print("\nReview these powers, then run airlock init --approve to activate them.")
             return 0

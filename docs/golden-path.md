@@ -24,8 +24,11 @@ python acceptance/v2/flagship.py --model qwen2.5-coder:14b --out flagship-run
 ## 1. Install
 
 ```bash
-python -m pip install "git+https://github.com/Actenon/actenon-airlock.git@feat/airlock-north-star"
+pipx install "git+https://github.com/Actenon/actenon-airlock.git@feat/airlock-north-star"
 ```
+
+pipx keeps Airlock in its own environment, which system Pythons such as Homebrew's require
+(PEP 668). Without pipx, install into a virtual environment instead.
 
 Build the images from a checkout of the same commit:
 

@@ -83,6 +83,22 @@ if relay:
 """
 
 
+# Honest about what the real thing needs: a project, a key, and money you approve.
+NEXT_STEP = r"""That is Airlock. To try it with a real agent, make a practice project with one bug
+(or cd into a project of your own, set your key and run airlock protect with your task):
+
+  mkdir -p ~/airlock-practice && cd ~/airlock-practice
+  printf 'def add(a, b):\n    return a - b\n' > calculator.py
+  printf 'from calculator import add\n\n\ndef test_add():\n    assert add(2, 3) == 5\n' > test_calculator.py
+  mkdir -p ~/airlock-practice-tests && cp test_calculator.py ~/airlock-practice-tests/
+  export ANTHROPIC_API_KEY=...      # your key; it never enters the container
+  airlock protect --tests ~/airlock-practice-tests "Fix the failing test"
+
+Unlike this demo, that calls a real model and costs money: a few cents for this project.
+Airlock first shows you the spend limit per run ($2.00 unless you choose another) and runs
+nothing until you approve. Your project is never changed: you get a patch to review."""
+
+
 def _project(root: Path) -> Path:
     root.mkdir()
     (root / "calculator.py").write_text(SOURCE)
@@ -163,6 +179,7 @@ def run() -> int:
     network, sink, other = (f"airlock-demo-{kind}-{identity}" for kind in ("net", "sink", "sink2"))
     base = Path(tempfile.mkdtemp(prefix="airlock-demo-")).resolve()
     base.chmod(0o755)
+    print("Part 1: an agent turns hostile, and nothing gets out\n")
     print("A script does a small job, then acts like a hijacked agent. Every secret is a fake.\n")
     try:
         docker.call(["network", "create", "--internal", network])
@@ -209,8 +226,24 @@ def run() -> int:
             for problem in problems or ["the supervisor recorded no refusal"]:
                 print("  " + problem)
             return 1
-        print("\nThat is Airlock. Try it on your own project:")
-        print('  airlock protect "Fix the failing test"')
+        print("\n" + "-" * 78 + "\n", flush=True)
+        from . import demo_consequence
+        from .cli import main as cli_main
+
+        run_dir = workspace.parent
+        try:
+            facts = demo_consequence.run(state, run_dir, base, cli_main, DEFAULT_IMAGE)
+        except AirlockError as exc:
+            print(f"Part 2 could not be shown, so it claims nothing: {exc}")
+            return 1
+        lines, problems = demo_consequence.render(facts)
+        print("\n".join(lines))
+        if problems:
+            print("\nThis run does not show what it should, so it claims nothing:")
+            for problem in problems:
+                print("  " + problem)
+            return 1
+        print("\n" + NEXT_STEP)
         return 0
     finally:
         for container in (sink, other):

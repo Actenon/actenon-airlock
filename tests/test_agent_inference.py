@@ -684,9 +684,24 @@ def test_review_shows_every_bound_and_activates_nothing(tmp_path, capsys):
     arguments = ["setup", "--path", str(tmp_path), "--agent", "claude-code", "--model", MODEL]
     assert main([*arguments, "--max-run-usd", "1", "--price-per-mtok", PRICES]) == 0
     output = capsys.readouterr().out
-    assert "Review these powers" in output
+    assert "Nothing is granted until you approve" in output
+    # Every signed bound is shown, in words: spend, prices, features, format and sizes.
+    for bound in (
+        "spending at most $1.00 per run",
+        "Prices for the spend bound",
+        "output $",
+        "Model features allowed: claude-code-20250219",
+        "Request format enforced:",
+        "output tokens per call",
+        "KiB per request",
+    ):
+        assert bound in output, bound
+    # The full internal review stays one flag away.
+    full = [*arguments, "--max-run-usd", "1", "--price-per-mtok", PRICES, "--details"]
+    assert main(full) == 0
+    raw = capsys.readouterr().out
     for bound in ("max_run_microusd", "price_microusd_per_mtok", "anthropic_betas", "contract"):
-        assert bound in output
+        assert bound in raw
     assert not (tmp_path / ".airlock" / "approved.json").exists()
 
 
