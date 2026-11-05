@@ -83,6 +83,18 @@ if relay:
 """
 
 
+# Honest about what the real thing needs: a project, a key, and money you approve.
+NEXT_STEP = """That is Airlock. To try it with a real agent on your own project:
+
+  cd path/to/your-project
+  export ANTHROPIC_API_KEY=...      # or OPENAI_API_KEY for Codex; it never enters the container
+  airlock protect "Fix the failing test"
+
+Unlike this demo, that calls a real model and costs money. Airlock first shows you the
+spend limit per run ($2.00 unless you choose another) and runs nothing until you approve.
+Your project is never changed: you get a patch to review."""
+
+
 def _project(root: Path) -> Path:
     root.mkdir()
     (root / "calculator.py").write_text(SOURCE)
@@ -227,8 +239,7 @@ def run() -> int:
             for problem in problems:
                 print("  " + problem)
             return 1
-        print("\nThat is Airlock. Try it on your own project:")
-        print('  airlock protect "Fix the failing test"')
+        print("\n" + NEXT_STEP)
         return 0
     finally:
         for container in (sink, other):

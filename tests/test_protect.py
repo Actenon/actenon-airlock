@@ -409,4 +409,29 @@ def test_the_demo_runs_with_its_control_and_cleans_up(capsys):
     assert "1 file created on GitHub, confirmed independently" in shown
     assert "Outcome    CONFIRMED (from airlock explain)" in shown
     assert "claims nothing" not in shown
+    assert "cd path/to/your-project" in shown and "costs money" in shown
     assert networks() == before
+
+
+def test_protect_refuses_a_home_folder_before_anything_else(tmp_path, monkeypatch, capsys):
+    home = tmp_path / "home" / "you"
+    (home / "code" / "app").mkdir(parents=True)
+    monkeypatch.setenv("HOME", str(home))
+    # No key and no Docker needed to be told: the folder is checked first.
+    monkeypatch.delenv("ANTHROPIC_API_KEY", raising=False)
+    monkeypatch.delenv("OPENAI_API_KEY", raising=False)
+    for folder in (home, home.parent, Path("/")):
+        assert main(["protect", "--path", str(folder), "Fix it"]) != 0
+        err = capsys.readouterr().err
+        assert "is not one. Nothing ran." in err and "cd into the project first" in err, err
+        assert not (folder / ".airlock").exists() or folder == Path("/")
+    assert not (home / ".airlock").exists() and not (home / TASK_FILE).exists()
+    assert protect_module.broad_folder(home / "code" / "app") is None
+
+
+def test_the_demo_says_what_the_real_thing_needs():
+    from actenon_airlock.demo import NEXT_STEP
+
+    assert "cd path/to/your-project" in NEXT_STEP
+    assert "ANTHROPIC_API_KEY" in NEXT_STEP and "never enters the container" in NEXT_STEP
+    assert "costs money" in NEXT_STEP and "runs nothing until you approve" in NEXT_STEP

@@ -192,9 +192,28 @@ def report(
         print(f"  git apply {relative}")
 
 
+def broad_folder(root: Path) -> str | None:
+    """Why this folder is not one project, or None. A home folder is never a project."""
+    root, home = root.resolve(), Path.home().resolve()
+    if root == home:
+        return "your home folder"
+    if root == Path(root.anchor):
+        return "the top of the filesystem"
+    if home.is_relative_to(root):
+        return f"{root}, which holds your home folder"
+    return None
+
+
 def protect(args, root: Path, run) -> int:
     from .workflow import TESTS_PASSED, capture_candidate, status, verify_candidate
 
+    # First, before keys or Docker: a whole home folder must never be handed to an agent.
+    where = broad_folder(root)
+    if where:
+        raise AirlockError(
+            f"airlock protect works on one project, and {where} is not one. Nothing ran. "
+            "cd into the project first (for example: cd ~/code/my-app), or pass --path"
+        )
     agent = choose_agent(args.agent)
     profile = require_supported(agent)
     if "default_model" not in profile:
