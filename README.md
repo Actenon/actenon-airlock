@@ -13,11 +13,22 @@ read it and take it.
 
 ## See it in a minute
 
-No key, no model and no cost. You need Python 3.11+, Git and a running Docker.
+No key, no model and no cost. You need Python 3.11+, Git, [pipx](https://pipx.pypa.io) and
+a running Docker.
 
 ~~~sh
-python3 -m pip install "git+https://github.com/Actenon/actenon-airlock.git@feat/stranger-ready-product"
+pipx install "git+https://github.com/Actenon/actenon-airlock.git@feat/stranger-ready-product"
 airlock demo
+~~~
+
+pipx gives Airlock its own environment, so it works with Homebrew and other system Pythons
+that refuse a plain `pip install` (PEP 668). No pipx? `brew install pipx` on macOS, or use
+a virtual environment:
+
+~~~sh
+python3 -m venv ~/.airlock
+~/.airlock/bin/pip install "git+https://github.com/Actenon/actenon-airlock.git@feat/stranger-ready-product"
+~/.airlock/bin/airlock demo
 ~~~
 
 **Part 1.** A script does a small job, then acts like a hijacked agent. It runs once in an
