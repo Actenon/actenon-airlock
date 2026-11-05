@@ -403,4 +403,10 @@ def test_the_demo_runs_with_its_control_and_cleans_up(capsys):
     shown = capsys.readouterr().out
     assert shown.count("LEAKED") == len(STOLEN)
     assert f"Reached the sink: {len(STOLEN)} from the ordinary container, 0 from" in shown
+    # Part 2: the sealed run's real candidate, checked, approved exactly, sent once, verified.
+    assert shown.count("refused, nothing sent") == 2
+    assert "refused: it would duplicate" in shown
+    assert "1 file created on GitHub, confirmed independently" in shown
+    assert "Outcome    CONFIRMED (from airlock explain)" in shown
+    assert "claims nothing" not in shown
     assert networks() == before

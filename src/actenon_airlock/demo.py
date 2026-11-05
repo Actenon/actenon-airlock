@@ -163,6 +163,7 @@ def run() -> int:
     network, sink, other = (f"airlock-demo-{kind}-{identity}" for kind in ("net", "sink", "sink2"))
     base = Path(tempfile.mkdtemp(prefix="airlock-demo-")).resolve()
     base.chmod(0o755)
+    print("Part 1: an agent turns hostile, and nothing gets out\n")
     print("A script does a small job, then acts like a hijacked agent. Every secret is a fake.\n")
     try:
         docker.call(["network", "create", "--internal", network])
@@ -207,6 +208,23 @@ def run() -> int:
         if problems or not refused:
             print("\nThis run does not show what it should, so it claims nothing:")
             for problem in problems or ["the supervisor recorded no refusal"]:
+                print("  " + problem)
+            return 1
+        print("\n" + "-" * 78 + "\n", flush=True)
+        from . import demo_consequence
+        from .cli import main as cli_main
+
+        run_dir = workspace.parent
+        try:
+            facts = demo_consequence.run(state, run_dir, base, cli_main, DEFAULT_IMAGE)
+        except AirlockError as exc:
+            print(f"Part 2 could not be shown, so it claims nothing: {exc}")
+            return 1
+        lines, problems = demo_consequence.render(facts)
+        print("\n".join(lines))
+        if problems:
+            print("\nThis run does not show what it should, so it claims nothing:")
+            for problem in problems:
                 print("  " + problem)
             return 1
         print("\nThat is Airlock. Try it on your own project:")

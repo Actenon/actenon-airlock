@@ -16,13 +16,13 @@ read it and take it.
 No key, no model and no cost. You need Python 3.11+, Git and a running Docker.
 
 ~~~sh
-python3 -m pip install "git+https://github.com/Actenon/actenon-airlock.git@feat/airlock-release-candidate"
+python3 -m pip install "git+https://github.com/Actenon/actenon-airlock.git@feat/stranger-ready-product"
 airlock demo
 ~~~
 
-A script does a small job, then acts like a hijacked agent. It runs once in an ordinary
-container and once in Protected Mode, and the result comes from what reached an independent
-sink:
+**Part 1.** A script does a small job, then acts like a hijacked agent. It runs once in an
+ordinary container and once in Protected Mode, and the result comes from what reached an
+independent sink:
 
 ~~~text
                               Ordinary container    Protected Mode
@@ -35,8 +35,37 @@ Change your real files        yes                   no, your files are untouched
 Ask the supervisor to send it -                     refused, signed receipt
 ~~~
 
-Every secret in the demo is a fake made for that run. If the attacks do not land in the
-ordinary container, the demo says so and claims nothing.
+**Part 2.** The fix that the sealed run really produced goes through the same path a real
+publish uses: your tests check it in a sealed container, Airlock proposes the one grant it
+needs, refuses what was not approved, sends the approved change once, and settles it only by
+reading the result back, which an independent check confirms:
+
+~~~text
+1 Check         PASS  2 of your tests passed, in a sealed container with no network
+2 Review        Airlock found what this project's code could do, and proposes one grant:
+                  create fixes/calculator.patch in airlock-demo/calculator, branch main,
+                  on commit 0eb05a2794ad, with exactly these bytes (sha256 d4cfa44d774f)
+3 Refuse        an edited copy of the approved patch (it also passes)   refused, nothing sent
+                a write to another file in the same repository          refused, nothing sent
+4 Act           the approved file creation                              sent once, held as unconfirmed
+                the same request again                                  refused: it would duplicate
+5 Verify        Airlock read GitHub back                                CONFIRMED
+                an independent check of GitHub's own record             bytes, parent and path match
+
+RECEIPT
+  Changed    1 file (calculator.py)
+  Checked    PASS: 2 tests passed
+  Approved   1 exact file creation, nothing else
+  Refused    3 attempts, none reached GitHub
+  Happened   1 file created on GitHub, confirmed independently
+  Uncertain  nothing
+  Evidence   12 signed receipts, integrity OK
+~~~
+
+Every secret is a fake made for that run, and "GitHub" in part 2 is Airlock's local stand-in,
+which records every request; nothing leaves your machine. If the attacks do not land in the
+ordinary container, or any line above is not backed by evidence, the demo says so and claims
+nothing. It takes about ten seconds once the image is built.
 
 ## Use it on your project
 
@@ -46,11 +75,26 @@ export ANTHROPIC_API_KEY=...    # or OPENAI_API_KEY for Codex
 airlock protect "Fix the failing test"
 ~~~
 
-The first run builds the sealed image and asks you to approve one thing: this agent, this
-model, this spend limit for each run. The default limit is $2.00. The key stays on your
-machine, outside the container. When the agent finishes, you get what it changed, what was
-blocked, what it cost, and a patch you can take with `git apply`. Add `--tests DIR` to check
-the change with tests you hold outside the project.
+The first run builds the sealed image and shows you, in plain words, the one thing you are
+asked to approve: this agent may call this model, up to this spend limit per run (default
+$2.00), with every bound listed. Anything else Airlock finds in your code, such as a call to
+`xdg-open` or a write to a file, is listed as **found but not granted**: the sealed agent
+cannot use it, and nothing is signed for it. The key stays on your machine, outside the
+container.
+
+When the agent finishes you get a receipt that says only what was observed: what changed,
+whether your checks passed, what was refused, what it cost and what is still uncertain. A run
+that hit the spend limit says so and why, instead of looking finished. Your project is not
+touched; take the patch with `git apply` if you want it.
+
+Add `--tests DIR` to check the change with tests you hold outside the project. Airlock picks
+the checks from your own project, never from the agent's copy, and shows them before running
+them in a sealed container: pytest with your project's pytest settings for Python, `go vet`
+and `go test` for Go, and `tsc` and `vitest` (or `npm test`) for TypeScript. Each check ends
+as PASS, FAIL, SKIPPED, UNSUPPORTED (the image lacks the toolchain) or INCONCLUSIVE (for
+example nothing ran, or the agent edited the files that define the checks). Skips and edited
+check configuration are never counted as a pass unless you say so (`--accept-skips`,
+`--allow-config-change`), and that choice is recorded.
 
 | Agent | Version | Status |
 |---|---|---|
