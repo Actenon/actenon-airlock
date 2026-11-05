@@ -111,9 +111,16 @@ def test_full_rehearsal_with_controls(tmp_path):
     assert completed.returncode == 0, completed.stderr[-3000:]
     result = json.loads((out / "result.json").read_text())
     controls = {c["control"]: c for c in result["controls"]}
-    for name in ("publish-before-approval", "publish-altered-candidate", "unauthorised-path-write"):
+    for name in gate6.PRE_APPROVAL_CONTROLS:
         assert controls[name]["status"] == "REFUSED" and controls[name]["provider_puts_after"] == 0
-    assert controls["unauthorised-path-write"]["credential_released"] is False
+    for name in ("unauthorised-path-write", "altered-repository-write",
+                 "modified-payload-write", "update-exceeds-create"):  # fmt: skip
+        assert controls[name]["credential_released"] is False, controls[name]
+        assert controls[name]["decision"] == "DENY", controls[name]
+    assert result["credentials_absent_from_agent_surfaces"] == {
+        "github_write": True,
+        "anthropic": True,
+    }
     assert controls["approved-publish"]["status"] == "AMBIGUOUS"  # acknowledgement lost
     assert result["effect_id"] in result["unresolved_before_readback"]
     assert controls["identical-replay"]["status"] == "REFUSED"
@@ -125,6 +132,31 @@ def test_full_rehearsal_with_controls(tmp_path):
     report = (out / "CONSEQUENCE.md").read_text()
     assert report.startswith("# Consequence report: CONFIRMED\n")
     assert "acknowledgement of the write never arrived" in report
+
+
+def test_broker_controls_never_include_the_reviewed_write():
+    patch = b"+fix\n"
+    controls = gate6.broker_write_controls(FACTS, patch)
+    assert [c[0] for c in controls] == list(gate6.PRE_APPROVAL_CONTROLS[2:])
+    reviewed_url = f"{gate6.API}/repos/owner/disposable/contents/{gate6.PATH_IN_REPO}"
+    reviewed_body = {"branch": "main", "message": gate6.MESSAGE, "content": "K2ZpeAo="}
+    for _, url, fields in controls:
+        assert (url, fields) != (reviewed_url, reviewed_body)
+
+
+def test_credential_isolation_reports_names_never_values(tmp_path):
+    (tmp_path / "run/workspace").mkdir(parents=True)
+    (tmp_path / "run/workspace/notes.txt").write_text("leaked ghp_write_synthetic here")
+    (tmp_path / "agent.log").write_text("clean")
+    result = gate6.credentials_absent(
+        [tmp_path / "run", tmp_path / "agent.log"],
+        {
+            "github_write": "ghp_write_synthetic",
+            "github_readback": "ghp_read_synthetic",
+            "none": "",
+        },
+    )
+    assert result == {"github_write": False, "github_readback": True}
 
 
 def proposed(tmp_path):
