@@ -1,0 +1,25 @@
+{
+  "schema": "actenon-airlock/acceptance-referee/v1",
+  "runner": [
+    "adversarial_matched.py",
+    "protected",
+    "--out",
+    "/Users/ross/src/actenon-audit/evidence-gate6-rehearsal/gate5-matched/protected",
+    "--key-pin-log",
+    "/Users/ross/src/actenon-audit/evidence-gate6-rehearsal/gate5-matched/key-pins.jsonl"
+  ],
+  "runner_sha256": "be3e79a17187893051e4275091098284b92e97a62cf1a1b0696a6e27dab85ad8",
+  "out": "/Users/ross/src/actenon-audit/evidence-gate6-rehearsal/gate5-matched/protected",
+  "started_at": 1793866261.9842181,
+  "finished_at": 1793866269.388391,
+  "observed_exit_code": 0,
+  "self_reported_runner_exit": 0,
+  "self_report_matches": true,
+  "evidence_sha256": {
+    "result.json": "f312ba06ec845160030b3d10ae6c304a0da814a42193291abb066b9a7d10e38d",
+    "receipts.jsonl": "a7416c539f05ec93dda00b8d598d31536eb8618a49a73359421173392defabce",
+    "checkpoint.json": "7506af607e3c3523c70846e59f6fe3407294aa7fc1514d53e32f1e53c684c9da",
+    "public-key.json": "2695c8cbb1a816ba77a364f7ce3f691f5cd02221b9ccab67bab943357f292707",
+    "sink.json": "0cea540fe966153aefdc31b1db5d993acd743ec8b0d39d61183a323a24462677"
+  }
+}
