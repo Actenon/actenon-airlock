@@ -2,9 +2,9 @@
   "payload": {
     "schema": "actenon-airlock/journal-checkpoint/v1",
     "journal_entries": 19,
-    "chain_head_sha256": "bf6c22b8aefb544d598a957a98c10442eb5f41dc278f17b2f2272ba759e8f0a3",
-    "created_at": "2026-11-05T08:11:18.489878+00:00",
-    "signer_key_id": "ed25519-52ae08a81229"
+    "chain_head_sha256": "9ec4e7993b8973c2478829c3d0a3ae2a972808828c01ff9dd4039135a510bfbe",
+    "created_at": "2026-11-05T09:41:41.390446+00:00",
+    "signer_key_id": "ed25519-84f3abd5eba4"
   },
-  "signature": "KDOsNxyUm9Fq2/FID3WYKjf6R9OnKBF1scHgRCmfhaevAjSLzdoRDLlwqf39zjPWiK7EO9ALkw3hTNXVhReiDQ=="
+  "signature": "eXIOmnBRY0km6nlkjeAOKJZFNwAQJwzI0cN8UDOZsnE83GcZ1hbhzw9Pb0J6Ez/AXhqG4aa4Fzu0EgJG1lb/AA=="
 }

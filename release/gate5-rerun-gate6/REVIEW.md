@@ -66,6 +66,7 @@ Programme: `acceptance/github-consequence/run.py`. Live procedure: `GATE6_LIVE_P
 |---|---|
 | 1. Unchanged agent requests a legitimate change | Claude Code 2.1.308 fixes the original token-bucket task in Protected Mode; Airlock captures the exact patch |
 | 2. Airlock discovers and reviews the exact write | `review-candidate` derives one create-only profile: repository ID and node ID, branch, parent commit, path, message, content SHA-256 |
+| 2a. The operator reviews the exact proposed write | Live mode (and rehearsal with `--interactive-approval`) prints the profile and the exact patch, and approves only when the owner types the first 12 characters of the content SHA-256. Anything else stops with nothing approved or written; tests show 0 PUTs after a bare Return or "yes" |
 | 3. Permit and Kernel enforce the boundary | The approved write passes; an unreviewed path is denied at the broker before any credential is released |
 | 4. Strictly scoped credential, supervisor only | The write token is read from an owner-only file into the supervisor only, scoped to the publish and readback calls. The referee uses a **different** read-only token |
 | 5. Mutation only when authorised | Publish before approval, and a passing altered variant: refused, **0 provider requests** |
@@ -75,7 +76,7 @@ Programme: `acceptance/github-consequence/run.py`. Live procedure: `GATE6_LIVE_P
 | 9. Unauthorised or altered write refused | See 3 and 5 |
 | 10. Ambiguity persists until reconciled | The effect is listed unresolved after publish and settles only through readback reconciliation |
 
-Rehearsal (`rehearsal/gate6/`, synthetic GitHub, scripted model, real binary): passed. Agent exit 0; tests passed; 4/4 model calls confirmed. Five controls behaved as listed. Airlock readback COMMITTED; the independent readback confirmed bytes, parent and single path. No unresolved effects remain.
+Rehearsal (`rehearsal/gate6/`, regenerated at clean head `2e12874` with the typed owner approval; synthetic GitHub, scripted model, real binary): passed. Agent exit 0; tests passed; 4/4 model calls confirmed. Five controls behaved as listed. Airlock readback COMMITTED; the independent readback confirmed bytes, parent and single path. No unresolved effects remain.
 
 ## C. Consequence receipt for people
 

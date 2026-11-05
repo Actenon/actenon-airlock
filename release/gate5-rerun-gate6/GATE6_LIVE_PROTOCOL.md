@@ -30,6 +30,8 @@ python acceptance/github-consequence/run.py live --out <outside>/gate6-live \
 
 Before anything is created, the runner checks locally that every credential file is owner-only and single-line, the two GitHub tokens differ, the facts have exactly the six fields, and the authorisation string names exactly the reviewed repository, branch and path. Then, before approval, it checks the frozen identity and the referee's read-only view of GitHub: repository ID and node ID match, the branch head equals `expected_parent_sha`, and the target path is absent. Any mismatch stops the run with nothing approved or written. Record the `KEY-PIN gate6` line it prints somewhere outside the evidence folder.
 
+**You approve the exact bytes, not just the path.** The patch only exists after the agent has run, so the runner pauses. It prints the exact proposed write (repository, branch, parent commit, path, commit message, content SHA-256) and the patch itself, then asks you to type the **first 12 characters of the content SHA-256**. Read the patch first. Anything else, including a bare Return or "yes", stops the run with nothing approved and nothing written to GitHub (exit code 2, `STOPPED_BY_OWNER`).
+
 ## 3. What success requires
 
 - Agent exit 0; the operator's tests pass on the captured patch.
