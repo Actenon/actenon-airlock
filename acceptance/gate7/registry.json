@@ -1,6 +1,6 @@
 {
   "schema": "actenon-airlock/gate7-registry/v1",
-  "cases_sha256": "281b8c319736f8db3ae96e6e5a301067866d4049aeda204677b5def8d790fa5b",
+  "cases_sha256": "0a96066919561955f40d69894f8c9059e3fba825461623802c22eb3c2f4964a5",
   "repositories": {
     "click": {
       "url": "https://github.com/pallets/click.git",
@@ -65,7 +65,7 @@
         "src/index.bench.ts": "799afecd2ad14feb8a910158da2a1f3b1ff2e32b",
         "tsconfig.json": "e89a674b586fb49e8b299365d515fec2834b7ceb"
       },
-      "issue_sha256": "42ffe3b94bd47dfe4b1f22db74ec0de9664bd61f64e84a65af40a115a3d4edcd"
+      "issue_sha256": "feaaf8d576a31c83cd5447150151dcbdd912ea9671facb8e9ae117c642c12b0d"
     },
     "04-pflag-custom-bool-flags": {
       "repository": "pflag",

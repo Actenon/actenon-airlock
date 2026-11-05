@@ -152,7 +152,7 @@ def rehearsal_steps(case_id: str, cache: Path) -> list:
     item, _ = programme.case(case_id)
     toolchain = programme.load_cases()["repositories"][item["repository"]]["toolchain"]
     test = TEST_COMMANDS[toolchain]
-    if item["checks"]["visible"] == ["ts-index-spec"]:
+    if "ts-index-spec" in item["checks"]["visible"]:
         test = " ".join(programme.load_cases()["checks"]["ts-index-spec"])
     steps = [[tool("inspect", "Bash", command=test, description="Run the tests")]]
     if item.get("provider_failure"):

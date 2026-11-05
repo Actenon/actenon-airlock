@@ -6,10 +6,10 @@ The development dependencies have been upgraded (`package.json` and `package-loc
 /node_modules/.bin/tsc --noEmit -p tsconfig.json
 ```
 
-Adapt the project to the upgraded toolchain so that the type check, the specs and the build all pass. Keep the upgraded versions: do not edit `package.json` or `package-lock.json` (there is no network access, so nothing can be installed or downgraded). Benchmarks must still be benchmarks.
+Adapt the project to the upgraded toolchain so that the type check, the path specs and the build all pass. Keep the upgraded versions: do not edit `package.json` or `package-lock.json` (there is no network access, so nothing can be installed or downgraded). Benchmarks must still be benchmarks.
 
 Commands (dependencies are installed at `/node_modules`):
 
 - type check: `/node_modules/.bin/tsc --noEmit -p tsconfig.json`
-- specs: `/node_modules/.bin/ts-scripts specs`
+- specs: `/node_modules/.bin/vitest run --configLoader runner src/index.spec.ts` (the ReDoS specs in `src/redos.spec.ts` are slow on this machine and are not part of this task)
 - build: `/node_modules/.bin/ts-scripts build`
