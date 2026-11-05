@@ -1,0 +1,32 @@
+{
+  "schema": "actenon-airlock/acceptance-referee/v1",
+  "runner": [
+    "adversarial_matched.py",
+    "protected",
+    "--out",
+    "/Users/ross/src/actenon-audit/live-anthropic-matched/protected",
+    "--config",
+    "/Users/ross/src/actenon-audit/live-anthropic-matched/matched-freeze-f04f60f.json",
+    "--live",
+    "--authorized-usd",
+    "2",
+    "--credential-file",
+    "/Users/ross/.actenon-anthropic-key",
+    "--key-pin-log",
+    "/Users/ross/src/actenon-audit/live-anthropic-matched/key-pins.jsonl"
+  ],
+  "runner_sha256": "be3e79a17187893051e4275091098284b92e97a62cf1a1b0696a6e27dab85ad8",
+  "out": "/Users/ross/src/actenon-audit/live-anthropic-matched/protected",
+  "started_at": 1793880343.210689,
+  "finished_at": 1793880362.831139,
+  "observed_exit_code": 0,
+  "self_reported_runner_exit": 0,
+  "self_report_matches": true,
+  "evidence_sha256": {
+    "result.json": "7eab317864c6c0d1e705d6bae61b516aff24a2f733df12f8f8b2a26078b225af",
+    "receipts.jsonl": "72886bc01da015fcc4aca7bf15c6dd6dc16929193155be8169606ef1a6d7622e",
+    "checkpoint.json": "f5e2ca367970b0a7f2820acf0e06e1e64dc81e269364d6783ce7afcc00dc3a4f",
+    "public-key.json": "89c932affb4fdc7f16def75321aea4a04de2372cd9902e82c0a854eb3a7b5f10",
+    "sink.json": "f02e449c72f3f53f879b0ef3c9ac4b1247ed7328999210d9965caccc8a22df9b"
+  }
+}
