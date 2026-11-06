@@ -153,6 +153,7 @@ def test_declining_in_protect_signs_nothing(tmp_path, capsys, monkeypatch):
     root = project(tmp_path)
     monkeypatch.setenv("ANTHROPIC_API_KEY", "sk-ant-api03-" + "x" * 80)
     monkeypatch.setattr(protect_module, "ensure_image", lambda *args: None)
+    monkeypatch.setattr("actenon_airlock.preflight.require_docker", lambda retry: True)
     monkeypatch.setattr(protect_module, "_ask", lambda: False)
     launched = []
     monkeypatch.setattr("actenon_airlock.protected.launch_protected",

@@ -7,6 +7,7 @@ The real-engine paths are covered by the container suites.
 from __future__ import annotations
 
 import json
+import os
 import stat
 from pathlib import Path
 
@@ -227,3 +228,16 @@ def test_ctrl_c_says_what_is_true_instead_of_a_traceback(monkeypatch, capsys, tm
     assert "Traceback" not in err and err.strip().startswith("Stopped")
     if command[0] == "protect":
         assert "your project is unchanged" in err and "may still be billed" in err
+
+
+CLAUDE_IMAGE = os.environ.get("AIRLOCK_TEST_CLAUDE_CODE_IMAGE")
+
+
+@pytest.mark.skipif(not CLAUDE_IMAGE, reason="requires the Claude Code image")
+def test_the_toolchain_probe_asks_the_real_image(tmp_path):
+    from actenon_airlock.protect import missing_tools
+    from actenon_airlock.workflow import PROFILES
+
+    assert missing_tools(CLAUDE_IMAGE, PROFILES["python"]["checks"]) == []
+    assert missing_tools(CLAUDE_IMAGE, PROFILES["go"]["checks"]) == ["go"]
+    assert missing_tools(CLAUDE_IMAGE, [["tsc"], ["vitest"]]) == ["tsc", "vitest"]

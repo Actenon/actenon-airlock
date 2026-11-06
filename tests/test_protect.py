@@ -18,7 +18,7 @@ from actenon_airlock.cli import main
 from actenon_airlock.common import AirlockError
 from actenon_airlock.demo import STOLEN, verdict
 from actenon_airlock.protect import TASK_FILE, _approved, _new_run, choose_agent
-from actenon_airlock.protected import Docker, ProtectedBroker, snapshot
+from actenon_airlock.protected import Docker, ProtectedBroker, availability, snapshot
 from actenon_airlock.state import State
 
 IMAGE = os.environ.get("AIRLOCK_TEST_CLAUDE_CODE_IMAGE")
@@ -35,6 +35,19 @@ def project(tmp_path, monkeypatch):
     monkeypatch.setenv("ANTHROPIC_API_KEY", "sk-ant-supervisor-held-test-value")
     monkeypatch.delenv("OPENAI_API_KEY", raising=False)
     monkeypatch.setattr(protect_module, "ensure_image", lambda *args: None)
+    # The plain-English Docker preflight is covered in test_first_run_failures; the real
+    # engine check (verify_engine) still runs wherever a test reaches Docker.
+    monkeypatch.setattr("actenon_airlock.preflight.require_docker", lambda retry: True)
+    # The pre-spend toolchain probe asks the real image when it exists (the container job);
+    # without the image these unit tests stand in for it, as they do for ensure_image.
+    real_probe = protect_module.missing_tools
+    monkeypatch.setattr(
+        protect_module,
+        "missing_tools",
+        lambda image, commands: (
+            real_probe(image, commands) if availability(image)["available"] else []
+        ),
+    )
     return root
 
 
