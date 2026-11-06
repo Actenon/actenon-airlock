@@ -209,3 +209,21 @@ def test_colour_only_on_a_real_terminal(monkeypatch, env, tty, expected):
 
     assert style.enabled(Stream()) is expected
     assert (style.paint("PASS", "good", Stream()) != "PASS") is expected
+
+
+@pytest.mark.parametrize("command", [["demo"], ["protect", "Fix it"], ["status"]])
+def test_ctrl_c_says_what_is_true_instead_of_a_traceback(monkeypatch, capsys, tmp_path, command):
+    import actenon_airlock.demo as demo
+    import actenon_airlock.protect as protect
+
+    def interrupted(*args, **kwargs):
+        raise KeyboardInterrupt
+
+    monkeypatch.setattr(demo, "run", interrupted)
+    monkeypatch.setattr(protect, "protect", interrupted)
+    monkeypatch.setattr("actenon_airlock.workflow.status", interrupted)
+    assert main([command[0], "--path", str(tmp_path), *command[1:]]) == 130
+    err = capsys.readouterr().err
+    assert "Traceback" not in err and err.strip().startswith("Stopped")
+    if command[0] == "protect":
+        assert "your project is unchanged" in err and "may still be billed" in err

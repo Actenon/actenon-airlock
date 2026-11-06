@@ -191,6 +191,20 @@ def doctor(root: Path):
     }
 
 
+# What is true after Ctrl-C. Every container Airlock starts is removed in a finally block.
+STOPPED = {
+    "demo": "Stopped. The demo's containers, network and temporary files were removed; "
+    "nothing else was touched. Run `airlock demo` again whenever you like.",
+    "protect": "Stopped. Airlock removed the containers it started. The agent only ever worked "
+    "on a copy, so your project is unchanged, and nothing it did left the container. A model "
+    "call that was in progress may still be billed by your provider. Run the same command "
+    "again for a fresh run; `airlock status` shows what was recorded.",
+    "work": "Stopped. Airlock removed the containers it started; your project is unchanged. "
+    "`airlock status` shows what was recorded.",
+    None: "Stopped before it finished. `airlock status` shows what was recorded.",
+}
+
+
 def doctor_text(result: dict) -> str:
     """What a person needs from doctor: is it ready, and if not, the one thing to do next."""
     from .style import paint
@@ -1188,6 +1202,9 @@ def main(argv=None):
         else:
             print("AIRLOCK BLOCKED: " + str(exc), file=sys.stderr)
         return 2
+    except KeyboardInterrupt:
+        print("\n" + STOPPED.get(args.cmd, STOPPED[None]), file=sys.stderr)
+        return 130
 
 
 if __name__ == "__main__":
