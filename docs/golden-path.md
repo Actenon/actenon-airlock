@@ -24,13 +24,20 @@ python acceptance/v2/flagship.py --model qwen2.5-coder:14b --out flagship-run
 ## 1. Install
 
 ```bash
-pipx install "git+https://github.com/Actenon/actenon-airlock.git@feat/airlock-north-star"
+pipx install "git+https://github.com/Actenon/actenon-airlock.git@15f5db3234f48062c894f57df65b3e17971b92f1"
 ```
 
-pipx keeps Airlock in its own environment, which system Pythons such as Homebrew's require
-(PEP 668). Without pipx, install into a virtual environment instead.
+This is the same exact commit as the [README](../README.md#install). pipx keeps Airlock in its
+own environment, which system Pythons such as Homebrew's require (PEP 668). Without pipx,
+install into a virtual environment instead.
 
-Build the images from a checkout of the same commit:
+`airlock protect` and `airlock demo` build the images they need on first use. For this guided
+path, build them from a checkout of the same commit:
+
+```bash
+git clone https://github.com/Actenon/actenon-airlock.git && cd actenon-airlock
+git checkout 15f5db3234f48062c894f57df65b3e17971b92f1
+```
 
 ```bash
 docker build -f containers/Dockerfile.compute -t actenon-airlock-compute:dev .
