@@ -19,7 +19,7 @@ pipx install "git+https://github.com/Actenon/actenon-airlock.git@733bd48bb391cc4
 airlock doctor
 ~~~
 
-This installs one exact, reviewed commit of the development candidate, together with the
+This installs one exact commit of the development candidate, together with the
 other Actenon components it needs at their pinned commits. Airlock is **not on PyPI yet**
 and this is **not a release**. No pipx? `brew install pipx` on macOS, `sudo apt install pipx`
 on Debian or Ubuntu, or use a virtual environment:
