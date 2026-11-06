@@ -73,15 +73,17 @@ jobs:
           python-version: ${{ matrix.python }}
       - name: Install pipx, as the README tells a newcomer to
         run: python -m pip install "pipx==1.8.0"
-      - name: Run the documented install, doctor and demo in a fresh HOME, from cold images
+      - name: Every guide pins one commit that installs this branch's code
+        run: python scripts/check_readme_install.py
+      - name: The documented first-run journey in a fresh HOME, from cold images
         run: |
           docker image ls --format '{{.Repository}}:{{.Tag}}' | grep actenon-airlock && exit 1 || true
-          python scripts/check_readme_install.py --install --demo | tee documented-install.json
+          python scripts/stranger_acceptance.py --python "$(command -v python)" --output stranger-acceptance.json
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
         if: always()
         with:
-          name: documented-install-${{ matrix.python }}
-          path: documented-install.json
+          name: stranger-acceptance-${{ matrix.python }}
+          path: stranger-acceptance.json
   package:
     name: Package and lint
     runs-on: ubuntu-latest
