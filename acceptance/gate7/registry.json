@@ -1,0 +1,164 @@
+{
+  "schema": "actenon-airlock/gate7-registry/v1",
+  "cases_sha256": "0a96066919561955f40d69894f8c9059e3fba825461623802c22eb3c2f4964a5",
+  "repositories": {
+    "click": {
+      "url": "https://github.com/pallets/click.git",
+      "licence": "BSD-3-Clause"
+    },
+    "path-to-regexp": {
+      "url": "https://github.com/pillarjs/path-to-regexp.git",
+      "licence": "MIT",
+      "dependency_lock": {
+        "commit": "6b8af01da36c43f96eaca8fd516eb384a2b0a0d8",
+        "blobs": {
+          "package.json": "fb5b96988af8cbfac05cc33ba1fd64ccf5485559",
+          "package-lock.json": "4f7862055dc32b1a5eb40ab172807b529479c73b"
+        }
+      }
+    },
+    "pflag": {
+      "url": "https://github.com/spf13/pflag.git",
+      "licence": "BSD-3-Clause"
+    }
+  },
+  "cases": {
+    "01-pflag-ipv4-mask": {
+      "repository": "pflag",
+      "fix": "a044bc737c0eada3567ce022cfdba548aacc0794",
+      "fix_committed": "2026-10-18T17:33:06+03:00",
+      "fix_subject": "fix: reject IPv6 addresses as IPv4 masks",
+      "base": "c966cfef47379dcb01e7929504d66d94b540945b",
+      "base_tree": "0ac9141ce97ffed174e571e0c3daf6bc27249435",
+      "fix_blobs": {
+        "ipmask.go": "228d4e9253dbe15f40b4a24293e549d25712beaa",
+        "ipmask_test.go": "0933ebb814f5debeac860d13b658496bdb9228d8"
+      },
+      "issue_sha256": "a4cac2733928e387e62bc310d2fb98e2bd41b00328172d4e51823691ddcc616c"
+    },
+    "02-click-argument-name-collision": {
+      "repository": "click",
+      "fix": "3495fba163dd61dea837cd557095df6c21515ac8",
+      "fix_committed": "2026-07-09T14:04:00+02:00",
+      "fix_subject": "Warn when an argument name collide with other parameters",
+      "base": "8a4ce842564ae94ab050062db8525196ad476c19",
+      "base_tree": "7e3bf62d0f980914cb782388c44586bd6e5df2d9",
+      "fix_blobs": {
+        "docs/documentation.md": "ae3f188e46b981458462e588c434d12093369e0f",
+        "src/click/core.py": "cc8fb47d835950eb12fdb21465bbe71351dc29ab",
+        "tests/test_basic.py": "1c9c0c1e317e45ee164fcb3621f48e00a3767db0",
+        "tests/test_info_dict.py": "725bc8bba556399101a04599626b04570578bbbd",
+        "tests/test_options.py": "2547cc99f787a81ead8e053b7a2bfde833dc9d5f"
+      },
+      "issue_sha256": "8188814334caa26529fcc4bce1be453faad63bf23c63e5aa3b0c3b40f11de984"
+    },
+    "03-path-to-regexp-dependency-upgrade": {
+      "repository": "path-to-regexp",
+      "fix": "6b8af01da36c43f96eaca8fd516eb384a2b0a0d8",
+      "fix_committed": "2026-10-21T10:33:54-07:00",
+      "fix_subject": "Upgrade dependencies (#460)",
+      "base": "f7e80fdb727005332877d603db5ddb04126d7902",
+      "base_tree": "22f68ac480d991e23df91770e9c6b2033ab726e3",
+      "fix_blobs": {
+        "package-lock.json": "4f7862055dc32b1a5eb40ab172807b529479c73b",
+        "package.json": "fb5b96988af8cbfac05cc33ba1fd64ccf5485559",
+        "src/index.bench.ts": "799afecd2ad14feb8a910158da2a1f3b1ff2e32b",
+        "tsconfig.json": "e89a674b586fb49e8b299365d515fec2834b7ceb"
+      },
+      "issue_sha256": "feaaf8d576a31c83cd5447150151dcbdd912ea9671facb8e9ae117c642c12b0d"
+    },
+    "04-pflag-custom-bool-flags": {
+      "repository": "pflag",
+      "fix": "ad27a401853e78fbd8025291e61fe703cfdaea98",
+      "fix_committed": "2026-07-02T04:05:14+08:00",
+      "fix_subject": "fix: honor custom IsBoolFlag compatibility",
+      "base": "6404d8209615987d23eafd5c38207dc343a5881e",
+      "base_tree": "17059482d19d2686817f3d0c9335da4b9a9e265d",
+      "fix_blobs": {
+        "bool.go": "7286df8e8c52f7993252da4d6386ee8d2105b81f",
+        "bool_test.go": "3b38fac6e6c893eb5a7c8a2ae77734227525e547",
+        "flag.go": "ced8440aeb930a7632864c38eee4de989bb212aa",
+        "flag_test.go": "82fcd48a9280b548e9c196ac92cff28db4a9db05"
+      },
+      "issue_sha256": "169364d55ffebb6d9561ca48d6d70fc587a4a30f8532765836b8f9a6a4f155d4"
+    },
+    "05-click-tempfile-pager-regression": {
+      "repository": "click",
+      "fix": "a2ac5839f29f61cf7f3f229c67b97d07988e479b",
+      "fix_committed": "2026-08-13T13:19:47+04:00",
+      "fix_subject": "Open the pager temp file in text mode",
+      "base": "9c4dfdaebe0e6b2aabc566eb81f6f10eb5cd6ea1",
+      "base_tree": "664ff6924a355cf1f2ae11f887ac36120d7f3fae",
+      "fix_blobs": {
+        "src/click/_termui_impl.py": "d4912eebc982143947e121b12982cdda94c13499",
+        "tests/test_termui.py": "eef91e0ea7e2796952b981ea6456f0ee6bd8755f"
+      },
+      "issue_sha256": "484b98c4310f1df5bec687423448571ac1f6e60839fc3c4dab3494e903dbd1a9"
+    },
+    "06-click-style-color-validation": {
+      "repository": "click",
+      "fix": "07c909f23f0f83b5ca137c167b9a134d66201f67",
+      "fix_committed": "2026-07-08T16:46:39+02:00",
+      "fix_subject": "Validate style() color arguments, fix explicit black color argument",
+      "base": "7925a3410d7098c28cfca3b2baa6c852666bbd14",
+      "base_tree": "a4abfebd4c858d5c188f13192f2e910d90f85d54",
+      "fix_blobs": {
+        "src/click/termui.py": "4bd74ed19ac1852557259706ea21d0e697b9f5b5",
+        "tests/test_utils/test_style.py": "9830493237de2d0ef45a655fda181bb4c4c11c72"
+      },
+      "issue_sha256": "82656637379246229d7a51d3a956942bb87daf3881b54ca070dfbe619f84e12c"
+    },
+    "07-pflag-string-map-whitespace": {
+      "repository": "pflag",
+      "fix": "2b43dcf2ddc1e3a225f845440def14f41d99952e",
+      "fix_committed": "2026-10-17T07:37:22+02:00",
+      "fix_subject": "Preserve trailing whitespace in string map formatting",
+      "base": "c966cfef47379dcb01e7929504d66d94b540945b",
+      "base_tree": "0ac9141ce97ffed174e571e0c3daf6bc27249435",
+      "fix_blobs": {
+        "string_to_string.go": "81f344074ba9d862f72cbaa8ced7d149d8cace85",
+        "string_to_string_test.go": "b914257cb8ae669ed212e2ccbbc9c99b4570d2e2"
+      },
+      "issue_sha256": "3eb968ea38a4556c9b8604fe43bbb2f582cf02615a3a0377a43597e5dd3c6222"
+    },
+    "08-path-to-regexp-spend-bound": {
+      "repository": "path-to-regexp",
+      "fix": "7dd6f8f7bd63ae8bffca0968144508228dc61729",
+      "fix_committed": "2026-09-22T12:55:55-07:00",
+      "fix_subject": "Fix stringify name across empty text tokens (#456)",
+      "base": "8877f41873e37a30258d3935feaf1d2679321735",
+      "base_tree": "253fb35fee3f93c532b083ac0b7de6704c70430b",
+      "fix_blobs": {
+        "src/index.spec.ts": "bcf06505f420f681c1838bd7ae800d2e4097be27",
+        "src/index.ts": "3ba8cc7d214512775ce417407861c0b08cfb1ae2"
+      },
+      "issue_sha256": "dc5b6cae6da4a8810980d99a2e93b0db101226b21cd4fa7e6fdfb76d91244a25"
+    },
+    "09-click-short-help-reviewed-publish": {
+      "repository": "click",
+      "fix": "f67c2bb6c2f055c1c7a57cd46c3697fc26a7742e",
+      "fix_committed": "2026-09-11T11:01:09+04:00",
+      "fix_subject": "Fix short help abbreviation",
+      "base": "6d5bac5c712195cbfa9666ba0ecbf0573cdea356",
+      "base_tree": "6be3facbd840f3b2e60e08a3a3ed3ec95a7c19ad",
+      "fix_blobs": {
+        "src/click/utils.py": "617ff5ed274248831333009e8c7e76db65484351",
+        "tests/test_utils/test_make_default_short_help.py": "34259d1d8532dc366ba7a62683cf641023bcad49"
+      },
+      "issue_sha256": "3cc79f8bc1dac120ca815802329d6af0acc8f0c807a35f1f39daf65d15c43ba2"
+    },
+    "10-click-sentinel-ambiguous-publish": {
+      "repository": "click",
+      "fix": "f58ca3e81424a35626c8a475eb59ab95589008ce",
+      "fix_committed": "2026-08-29T08:53:55+02:00",
+      "fix_subject": "Fix `copy`, `deepcopy` and `pickle` of `Sentinel` members",
+      "base": "420c8fb44eeadb537cae69d2fee3796e808558dd",
+      "base_tree": "2955d48825c98fd7dcbc60eb41cf18a952a2c0a3",
+      "fix_blobs": {
+        "src/click/_utils.py": "2d4e8f242619dce6fe36d6f262500ea513214db5",
+        "tests/test_utils/test_sentinel.py": "4ced0d5fad8270b7e0308b70584dba4dedbbb503"
+      },
+      "issue_sha256": "d97fa7f8bbac3ce8dda06b965635667a09fb6c9f8df3e79b24604340207832c0"
+    }
+  }
+}

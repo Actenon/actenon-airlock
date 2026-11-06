@@ -1,0 +1,128 @@
+{
+  "schema": "actenon-airlock/v4-live-structural-review/v1",
+  "source_evidence_path": "/Users/ross/src/actenon-audit/live-codex/1-baseline",
+  "review_scope": "Only signed receipts, checkpoint, public key, result, phase summary, configuration and manifest; agent.log and private bodies not inspected.",
+  "receipt_verification": {
+    "schema": "actenon-airlock/offline-verification/v1",
+    "ok": true,
+    "integrity": {
+      "ok": true,
+      "receipts": 5,
+      "verified": 5,
+      "chain_head_sha256": "fff05d462b7e3b03a07ab98646f68e58ed313d42203965c32f80a5b48dc7d05a",
+      "problems": []
+    },
+    "completeness": {
+      "status": "ANCHORED",
+      "detail": "extends a checkpoint of 5 entries; 0 later entries are not yet anchored",
+      "checkpoint": {
+        "schema": "actenon-airlock/journal-checkpoint/v1",
+        "journal_entries": 5,
+        "chain_head_sha256": "fff05d462b7e3b03a07ab98646f68e58ed313d42203965c32f80a5b48dc7d05a",
+        "created_at": "2026-11-03T20:59:25.259554+00:00",
+        "signer_key_id": "ed25519-ea0c45af812f"
+      }
+    },
+    "provider_truth": {
+      "independently_observed": {},
+      "runtime_claims": {},
+      "unresolved_ambiguous": [
+        "effect_4a679ccd6a950360dbad14717c7bec82ea86e01bbff50f6d31badab4d755a1d4",
+        "effect_a74712d75c8c6d845e0b36972b8abed4ba025f94f24ffce7f42eb38926746c7b"
+      ],
+      "refusals_without_effect": 1
+    }
+  },
+  "manifest": {
+    "sha256": "7748dece8a0f61b07a3256eedf51e05a6dfa88148a6c89d9d45dbe484f737aed",
+    "key_id": "ed25519-1ba3c46f26ce",
+    "algorithm": "Ed25519",
+    "signature_verified": false,
+    "limitation": "Independent evaluator public key not located; receipt/checkpoint signatures verified separately with the supplied run public key. Only the four non-sensitive artifacts below were rehashed; agent.log and experiment launcher were not read.",
+    "artifact_checks": [
+      {
+        "artifact": "phase1_results.json",
+        "sha256": "3c401cbf7297a5145a4a40e742d176f87459e12eac33c5d8ccc684dc33ccd88f",
+        "matches_manifest": true,
+        "size_matches": true
+      },
+      {
+        "artifact": "checkpoint.json",
+        "sha256": "4c9dd208c42373b6bea3a0605ec736a1c57fc26f4631e00080432c22b228b522",
+        "matches_manifest": true,
+        "size_matches": true
+      },
+      {
+        "artifact": "receipts.jsonl",
+        "sha256": "a65eb0f3a36a9ff1de6846df68e921c3b2461f7e2378d8f388f5cb2d5b8c1af8",
+        "matches_manifest": true,
+        "size_matches": true
+      },
+      {
+        "artifact": "result.json",
+        "sha256": "3d1836279d4fa4d464f4acda9348de546de673cad0dbc19733b150837428928f",
+        "matches_manifest": true,
+        "size_matches": true
+      }
+    ]
+  },
+  "frozen_source": "61d8bf190107d84cf6c0eb9c06dfd0bbd0f4a7de",
+  "model": "gpt-5.5-2026-04-23",
+  "image": "sha256:c449dec52754bad2a55dea7bb7b1edfbf7a864475464c53edc8ad9489d9d2269",
+  "token_bucket_task_hash": "25d55f79e692308aa74afd913993d26a4138f7e51e1e6d992cad97eb7c92ffce",
+  "agent_exit": 1,
+  "runner_exit": 1,
+  "visible": {
+    "exit": 1,
+    "summary": "1 failed, 2 passed in 0.62s"
+  },
+  "hidden": {
+    "exit": 1,
+    "summary": "1 failed, 3 passed in 1.38s"
+  },
+  "inference": {
+    "dispatched": 2,
+    "confirmed": 0,
+    "unconfirmed": 2,
+    "retries_held": 0
+  },
+  "accounted_microusd": 1379035,
+  "phase_status": "HALTED_ON_TRIAL1_FAILURE",
+  "observations": [
+    {
+      "receipt_ordinal": 2,
+      "outcome": "AMBIGUOUS",
+      "reserved_microusd": 681765,
+      "accounted_microusd": 681765,
+      "rejection_reason": "response-schema",
+      "checked_event": 0,
+      "checked_event_metadata": {
+        "response_id_sha256": "06f3243ecfe6bd125df86c11a12d0003772819b771a93065201b3258088ab06e",
+        "sequence_number": 0,
+        "type": "response.created"
+      },
+      "event_count": 43,
+      "observed_unvalidated_terminal_status": "completed",
+      "body_sha256": "89c8ee7dc27b0355113dff61460b3b96a01fdbb8c53b6b24e49c8992510138bf",
+      "field_inventory_recorded": false
+    },
+    {
+      "receipt_ordinal": 4,
+      "outcome": "AMBIGUOUS",
+      "reserved_microusd": 697270,
+      "accounted_microusd": 697270,
+      "rejection_reason": "response-schema",
+      "checked_event": 0,
+      "checked_event_metadata": {
+        "response_id_sha256": "744f0ba4596629533c5f8e7079f7c985cc8d0c2dfdc6163575a15e9efd60c173",
+        "sequence_number": 0,
+        "type": "response.created"
+      },
+      "event_count": 68,
+      "observed_unvalidated_terminal_status": "completed",
+      "body_sha256": "557ebbd6c048085cbe6692035c03f4b25684dd57bf0bba623a41eedbf73eebdc",
+      "field_inventory_recorded": false
+    }
+  ],
+  "exact_live_field_names_recovered": false
+}

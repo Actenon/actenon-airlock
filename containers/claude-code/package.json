@@ -1,0 +1,8 @@
+{
+  "name": "airlock-claude-code-image",
+  "private": true,
+  "description": "Pins the unchanged upstream Claude Code release installed into the trusted compute image.",
+  "dependencies": {
+    "@anthropic-ai/claude-code": "2.1.308"
+  }
+}

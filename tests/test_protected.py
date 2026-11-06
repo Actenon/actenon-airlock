@@ -20,6 +20,7 @@ from actenon_airlock.protected import (
     snapshot,
 )
 from actenon_airlock.state import State
+from actenon_airlock.workflow import status
 
 URL = "https://api.openai.com/v1/chat/completions"
 PROFILE = {"provider": "openai", "models": ["test-model"], "max_output_tokens": 256}
@@ -234,8 +235,12 @@ def test_protected_model_uses_real_engine_exact_bytes_and_observed_completion(
         assert len(observed) == 1
         assert observed[0].headers["authorization"] == "Bearer supervisor-test-secret"
         assert json.loads(observed[0].content)["max_tokens"] == 256
-        assert not broker.handle(request())["ok"]
-        assert len(observed) == 1  # Same logical inference is not charged/executed twice.
+        # Owner decision: after a confirmed answer an identical request is a new call, with
+        # its own effect, budget and receipts. Nothing is cached or answered from memory.
+        repeat = broker.handle(request())
+        assert repeat["ok"] and repeat["outcome"] == "COMMITTED"
+        assert repeat["effect_id"] != result["effect_id"]
+        assert len(observed) == 2
         rows = state.verify_receipts()
         assert rows["ok"]
         completed = next(
@@ -245,7 +250,7 @@ def test_protected_model_uses_real_engine_exact_bytes_and_observed_completion(
         assert completed["credential_released"] is True
         assert completed["proof_id"]
         assert "supervisor-test-secret" not in state.receipts_path.read_text()
-        assert broker.store.get_grant(broker.grant.id).budget.remaining == 127
+        assert broker.store.get_grant(broker.grant.id).budget.remaining == 126
     finally:
         broker.close()
 
@@ -399,3 +404,77 @@ Path("acceptance.json").write_text(json.dumps(outcomes,sort_keys=True))
             )
             + "\n"
         )
+
+
+REPEATED_CALL = """from openai import OpenAI, PermissionDeniedError
+from pathlib import Path
+import json
+client = OpenAI(max_retries=0)
+request = {"model": "test-model", "messages": [{"role": "user", "content": "summarize"}]}
+answers = []
+for _ in range(3):
+    try:
+        answers.append(client.chat.completions.create(**request).choices[0].message.content)
+    except PermissionDeniedError:
+        answers.append("refused")
+Path("answers.json").write_text(json.dumps(answers))
+"""
+
+
+def run_repeated_call(root, monkeypatch, provider):
+    image = os.environ.get("AIRLOCK_TEST_PROTECTED_IMAGE")
+    if not image:
+        pytest.skip("Protected container acceptance runs in its required separate CI job")
+    state = model_project(root, REPEATED_CALL)
+    monkeypatch.setenv("OPENAI_API_KEY", "supervisor-test-secret")
+    original = ProtectedBroker.__init__
+
+    def initialize(self, *args, **kwargs):
+        original(self, *args, **kwargs)
+        self.http.close()
+        self.http = httpx.Client(transport=httpx.MockTransport(provider))
+
+    monkeypatch.setattr(ProtectedBroker, "__init__", initialize)
+    code = launch_protected(root, ["python3", "main.py"], image=image)
+    workspace = next((state.local / "runs").iterdir()) / "workspace"
+    return code, json.loads((workspace / "answers.json").read_text()), state
+
+
+def test_identical_inference_repeats_through_the_real_boundary(tmp_path, monkeypatch):
+    observed = []
+
+    def provider(request):
+        observed.append(request.content)
+        return httpx.Response(200, json=model_reply(f"answer {len(observed)}"))
+
+    code, answers, state = run_repeated_call(tmp_path, monkeypatch, provider)
+    assert code == 0
+    assert answers == ["answer 1", "answer 2", "answer 3"]
+    assert len(observed) == 3 and len(set(observed)) == 1
+    assert status(state)["inference"] == {
+        "dispatched": 3,
+        "confirmed": 3,
+        "unconfirmed": 0,
+        "retries_held": 0,
+    }
+
+
+def test_lost_inference_reply_holds_its_retry_through_the_real_boundary(tmp_path, monkeypatch):
+    observed = []
+
+    def provider(request):
+        observed.append(request)
+        raise httpx.ReadTimeout("response lost", request=request)
+
+    code, answers, state = run_repeated_call(tmp_path, monkeypatch, provider)
+    assert code == 3
+    assert answers == ["refused", "refused", "refused"]
+    assert len(observed) == 1
+    summary = status(state)
+    assert summary["inference"] == {
+        "dispatched": 1,
+        "confirmed": 0,
+        "unconfirmed": 1,
+        "retries_held": 2,
+    }
+    assert len(summary["unresolved_effects"]) == 1

@@ -1,0 +1,19 @@
+{
+  "python": "3.12.13",
+  "platform": "macOS-27.0.1-arm64-arm-64bit",
+  "installed_from_wheel": true,
+  "source_matches_wheel": true,
+  "files_sha256": {
+    "responses_inference.py": "62510e28206dd86d24e0adc465134d560b0ea6eaf258f7a4376145f4766958a1",
+    "protected.py": "8db330ad8288612a25bf2f6a7ece053075a7f53ade0f1c364c47f00af742a3de",
+    "contained_agent.py": "9587cf7b48b16b688cfd1a14b751f5774aa5326291127e71d1af61ca63ddad93",
+    "agents.py": "3fd45b3c9bd72b2a3fcb74758269c64668d1d431c1109a0dd8ab0b9552f2433b"
+  },
+  "dependency_commits": {
+    "actenon-protocol": "a2e0e08fcd24b71eb1668204ba6bed00e4c63551",
+    "actenon-kernel": "ead6a00aa38e7e3e21f6129a8565803f8ac48dd2",
+    "actenon-permit": "b63cf8ac6968f72e45a082dc4fb91f3d4d08d689",
+    "actenon-scan": "16388227a55a3b5a3ec392d1c70f3940b0c291c1"
+  },
+  "wheel_sha256": "e413ffbe8d530e00f056e8013d7908534a693b55e495cb1f0d0e1a68e78dfc60"
+}

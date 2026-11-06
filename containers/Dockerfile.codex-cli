@@ -1,0 +1,6 @@
+# No login, host configuration, auth cache or API key enters this image.
+ARG COMPUTE_IMAGE=actenon-airlock-compute:dev
+FROM ${COMPUTE_IMAGE}
+COPY containers/codex-cli/upstream.json /opt/codex-upstream.json
+COPY containers/codex-cli/install.py /opt/install-codex.py
+RUN python /opt/install-codex.py && rm /opt/install-codex.py && codex --version

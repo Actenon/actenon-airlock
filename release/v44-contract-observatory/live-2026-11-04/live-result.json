@@ -1,0 +1,70 @@
+{
+  "schema": "actenon-airlock/v44-live-result/v1",
+  "evidence_class": "frozen-live",
+  "mode": "baseline",
+  "model": "gpt-5.5-2026-04-23",
+  "identity": {
+    "source_commit": "c7143edf24a1d4157afb29819a2e712f9406571b",
+    "source_digest": "49a73cd88f4ce1ae7fd72334c78558aaa2069054d3f0d4ce52713e22eb12a25b",
+    "image": "sha256:c449dec52754bad2a55dea7bb7b1edfbf7a864475464c53edc8ad9489d9d2269",
+    "model": "gpt-5.5-2026-04-23"
+  },
+  "freeze_sha256": "b97f581cea008589792554acaeea92fc98d3cc2dd11f59449db1526497fec9f9",
+  "public_key_sha256_recorded_out_of_band_by_owner": "b7314b15f60b23903088f9dcf9170b75072751784ec3922bfb0ed2a9da94a197",
+  "public_key_sha256_actual": "b7314b15f60b23903088f9dcf9170b75072751784ec3922bfb0ed2a9da94a197",
+  "hashes": {
+    "receipts.jsonl": "76754cf262dd83e3f386f18322a1b06f8b920ef6aa7d9a30cd16ba484a5a9f8b",
+    "result.json": "bd5722a142aaddbd9bef4c8c93f7fcb1594c358130ab1181fee7c256903737ef",
+    "checkpoint.json": "79b51cb54370ddabcc5651f393c108942b54eefdeb5ee54d89fc3b47d00cd948",
+    "public-key.json": "b7314b15f60b23903088f9dcf9170b75072751784ec3922bfb0ed2a9da94a197",
+    "agent.log": "81d8e0dbd16a6d95413f854690ab2156f591284f5fc3f9d7bc03fcca5a4aa89a"
+  },
+  "verification": {
+    "independent_verifier": "all signatures, chain and checkpoint OK",
+    "receipts": 2,
+    "checkpoint_entries": 2
+  },
+  "agent_exit": 1,
+  "seconds": 1.198,
+  "score": {
+    "visible": {
+      "exit": 1,
+      "summary": "1 failed, 2 passed in 0.67s"
+    },
+    "hidden": {
+      "exit": 1,
+      "summary": "1 failed, 3 passed in 1.49s"
+    },
+    "files_changed": [],
+    "tests_modified_by_agent": false,
+    "passed": false
+  },
+  "inference": {
+    "dispatched": 1,
+    "confirmed": 0,
+    "unconfirmed": 1,
+    "retries_held": 0
+  },
+  "estimated_reserved_microusd": 681765,
+  "observation": {
+    "outcome": "AMBIGUOUS",
+    "rejection_reason": "http-status",
+    "event_count": 0,
+    "body_sha256": "a80df47b161e1cb827d1ed6469788c9b433f4bc72702dcb924aa85d1eb1e9116",
+    "contract_observatory_issues": [
+      {
+        "path": [],
+        "reason": "http-status",
+        "stage": "transport"
+      }
+    ]
+  },
+  "cause": {
+    "http_status": 401,
+    "source": "agent.log (Codex error event); not recorded in the signed receipt",
+    "finding": "OPENAI_API_KEY held the typed run command (298 characters; masked prefix/suffix and length match), consumed by the silent `read -rs` prompt. The real credential was never supplied.",
+    "model_execution": false,
+    "expected_provider_billing": "none for an authentication rejection (owner to confirm in the provider dashboard)"
+  },
+  "not_tested": "the image repair, tool echoes, observatory long-stream handling and live Responses compatibility were not exercised: no response stream was received"
+}

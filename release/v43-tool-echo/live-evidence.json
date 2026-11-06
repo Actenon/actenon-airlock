@@ -1,0 +1,56 @@
+{
+  "observations": [
+    {
+      "receipt": 2,
+      "diagnostic": {
+        "rejection_reason": "response-tools",
+        "checked_event": 0,
+        "checked_event_metadata": {
+          "response_id_sha256": "09994a429ab53b26464bfc950e2d233fa96c42bf94a411daccbf283a66a34253",
+          "sequence_number": 0,
+          "type": "response.created"
+        }
+      },
+      "outcome": "AMBIGUOUS",
+      "inference_cost_microusd": 681765
+    },
+    {
+      "receipt": 4,
+      "diagnostic": {
+        "rejection_reason": "response-tools",
+        "checked_event": 0,
+        "checked_event_metadata": {
+          "response_id_sha256": "41d96146af7a9c88bca3298b005df8fde761c065a6a5a39bbb45e09658b4da50",
+          "sequence_number": 0,
+          "type": "response.created"
+        }
+      },
+      "outcome": "AMBIGUOUS",
+      "inference_cost_microusd": 697605
+    }
+  ],
+  "agent_exit": 1,
+  "scores": {
+    "visible": {
+      "exit": 1,
+      "summary": "1 failed, 2 passed in 0.69s"
+    },
+    "hidden": {
+      "exit": 1,
+      "summary": "1 failed, 3 passed in 1.50s"
+    },
+    "passed": false
+  },
+  "source_commit": "9d1edf8172fbc5e3b3ea05293e94f2a1dc166343",
+  "verification": {
+    "ok": true,
+    "receipts": 5,
+    "checkpoint": "ANCHORED"
+  },
+  "hashes": {
+    "receipts.jsonl": "f3d17cad6b46292cc9f6d76919741b232fa87c5324f5514371cdd9dd581a7be0",
+    "result.json": "f57c32ac0c2eb58baf01e7b66a200ac0557f2ca598fb82165bd2caedbab8676f",
+    "checkpoint.json": "00126c8733609c0673b7715619c55865864568f492371f5e69562c613d87e9c0",
+    "public-key.json": "c3a4387a8c26530b9f60e1de48078a1771fb4de5e49b99f9fb62d7090621addb"
+  }
+}

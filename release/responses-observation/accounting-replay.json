@@ -1,0 +1,66 @@
+{
+  "original_observer": {
+    "first": {
+      "ok": true,
+      "outcome": "AMBIGUOUS"
+    },
+    "second": {
+      "ok": false,
+      "outcome": null,
+      "reason": "Model spend bound reached for this run"
+    },
+    "dispatched": 1,
+    "accounted_microusd": 501335,
+    "receipts": [
+      {
+        "stage": "response-received",
+        "outcome": "AMBIGUOUS",
+        "reserved_microusd": 501335,
+        "accounted_microusd": 501335,
+        "usage": null
+      }
+    ],
+    "journal_integrity": true
+  },
+  "repaired_observer": {
+    "first": {
+      "ok": true,
+      "outcome": "COMMITTED"
+    },
+    "second": {
+      "ok": true,
+      "outcome": "COMMITTED",
+      "reason": null
+    },
+    "dispatched": 2,
+    "accounted_microusd": 2110,
+    "receipts": [
+      {
+        "stage": "response-received",
+        "outcome": "COMMITTED",
+        "reserved_microusd": 501335,
+        "accounted_microusd": 1055,
+        "usage": {
+          "cache_creation_input_tokens": 0,
+          "cache_read_input_tokens": 10,
+          "input_tokens": 90,
+          "output_tokens": 20
+        }
+      },
+      {
+        "stage": "response-received",
+        "outcome": "COMMITTED",
+        "reserved_microusd": 501465,
+        "accounted_microusd": 1055,
+        "usage": {
+          "cache_creation_input_tokens": 0,
+          "cache_read_input_tokens": 10,
+          "input_tokens": 90,
+          "output_tokens": 20
+        }
+      }
+    ],
+    "journal_integrity": true
+  },
+  "scope": "Specification-derived direct-caller fixture through real Scan, Permit, Kernel and broker, with an httpx synthetic provider. Not original V3.2 SSE, provider billing or live autonomous acceptance."
+}

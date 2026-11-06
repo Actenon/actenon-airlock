@@ -1,0 +1,443 @@
+{
+  "schema": "actenon-airlock/gate7-batch-a-manifest/v1",
+  "evaluated_commit": "6868406415c1798ba67e4bdc9ec4efbeeaf1bd6c",
+  "freeze_sha256": "e7dac319edbab3e34522ebf7e3d92a1f39976b848bc8cf971e8f3fbe45313c78",
+  "files": [
+    {
+      "path": "batch.log",
+      "sha256": "629a4e64e00bd0bd355e5deb385adbdd1d665414594a5ed3bc44ef5c562b6df3",
+      "bytes": 2794,
+      "provenance": "byte copy of the as-run original"
+    },
+    {
+      "path": "crypto-verification.json",
+      "sha256": "025ca06ad165b9c0dad9d836c210c1e5e57bab81e369381d725adc07bf21b6f1",
+      "bytes": 2703,
+      "provenance": "verification output produced after the batch"
+    },
+    {
+      "path": "independent-verification.json",
+      "sha256": "3bb03be65fe9f73381810a817478c4ee7241290e5f57444c3874257a0f18a89f",
+      "bytes": 3727,
+      "provenance": "verification output produced after the batch"
+    },
+    {
+      "path": "runs/01-pflag-ipv4-mask-protected/checkpoint.json",
+      "sha256": "024d54bb78df9fb999e15680f5aeacb63410c1c29fb5d693044c63f27a3e92ba",
+      "bytes": 403,
+      "provenance": "byte copy of the as-run original"
+    },
+    {
+      "path": "runs/01-pflag-ipv4-mask-protected/public-key.json",
+      "sha256": "c8007190fe741d5ae4565989f1271d3d3f0b99d92718d0523a3a96c5c97ff883",
+      "bytes": 55,
+      "provenance": "byte copy of the as-run original"
+    },
+    {
+      "path": "runs/01-pflag-ipv4-mask-protected/receipts.jsonl",
+      "sha256": "4c3126a3ec85bf1f22040ba37298d345db6780ad62f14a55f1dec231951b8c46",
+      "bytes": 70666,
+      "provenance": "byte copy of the as-run original"
+    },
+    {
+      "path": "runs/01-pflag-ipv4-mask-protected/summary.json",
+      "sha256": "e3d46dd72ce5e80b5e23f8d611793fd6633b826b5804ea88458ce5df07f2ad44",
+      "bytes": 2368,
+      "provenance": "SANITISED DERIVATIVE of the withheld result.json"
+    },
+    {
+      "path": "runs/02-click-argument-name-collision-protected/checkpoint.json",
+      "sha256": "ed9927729c9ee0d1c4273659d6788c8eb6492589ea7a6fe2f34b849c5b497bf9",
+      "bytes": 403,
+      "provenance": "byte copy of the as-run original"
+    },
+    {
+      "path": "runs/02-click-argument-name-collision-protected/public-key.json",
+      "sha256": "299f4689cca22cdb25fd11b983ceee2f66def6120c3a2d7a4e618e88c4a13f33",
+      "bytes": 55,
+      "provenance": "byte copy of the as-run original"
+    },
+    {
+      "path": "runs/02-click-argument-name-collision-protected/receipts.jsonl",
+      "sha256": "198afdac025334c648c81189f75920c6cbdc8f8e260199d6ee6e7826830c2f6d",
+      "bytes": 190122,
+      "provenance": "byte copy of the as-run original"
+    },
+    {
+      "path": "runs/02-click-argument-name-collision-protected/summary.json",
+      "sha256": "c5227e988067874171f94a5d29a2611fea97b0456dd13c93d696a23f86d1a938",
+      "bytes": 2918,
+      "provenance": "SANITISED DERIVATIVE of the withheld result.json"
+    },
+    {
+      "path": "runs/03-path-to-regexp-dependency-upgrade-protected/checkpoint.json",
+      "sha256": "73eb802a28da6d9db3714422364890b9ea340f6b6af811fbda95884b7ef9ad0f",
+      "bytes": 403,
+      "provenance": "byte copy of the as-run original"
+    },
+    {
+      "path": "runs/03-path-to-regexp-dependency-upgrade-protected/public-key.json",
+      "sha256": "98da7b7c4ada0c1672e4eb4d6a8b9a61824c277bc363cfaa08a2b68566277051",
+      "bytes": 55,
+      "provenance": "byte copy of the as-run original"
+    },
+    {
+      "path": "runs/03-path-to-regexp-dependency-upgrade-protected/receipts.jsonl",
+      "sha256": "f8db8714c8a233171e9cf75e6c7ccbfdd9cacf415b05123c279c1bf31b600d67",
+      "bytes": 124677,
+      "provenance": "byte copy of the as-run original"
+    },
+    {
+      "path": "runs/03-path-to-regexp-dependency-upgrade-protected/summary.json",
+      "sha256": "636ebfba7e7320bb2e79c81d444209d387461d21aafea11308f518e539edcaa4",
+      "bytes": 2931,
+      "provenance": "SANITISED DERIVATIVE of the withheld result.json"
+    },
+    {
+      "path": "runs/04-pflag-custom-bool-flags-protected/checkpoint.json",
+      "sha256": "7a1e4b351dacc628e9a8d8edd76d9483751ed50f092f38b54ba0ca55ad839b8d",
+      "bytes": 403,
+      "provenance": "byte copy of the as-run original"
+    },
+    {
+      "path": "runs/04-pflag-custom-bool-flags-protected/public-key.json",
+      "sha256": "71db768978c473c831b17f50f4b32f4ca11ad61347059bc20c85a596edd62c31",
+      "bytes": 55,
+      "provenance": "byte copy of the as-run original"
+    },
+    {
+      "path": "runs/04-pflag-custom-bool-flags-protected/receipts.jsonl",
+      "sha256": "845a81444d6a375ca291a1c8cf31e6c5727643bd643a0fd130bba5081d60077a",
+      "bytes": 111164,
+      "provenance": "byte copy of the as-run original"
+    },
+    {
+      "path": "runs/04-pflag-custom-bool-flags-protected/summary.json",
+      "sha256": "433816e0a2c43d74977087c37b5479ef8766b011cbf91ebdf7d68205f57d971c",
+      "bytes": 2398,
+      "provenance": "SANITISED DERIVATIVE of the withheld result.json"
+    },
+    {
+      "path": "runs/05-click-tempfile-pager-regression-protected/checkpoint.json",
+      "sha256": "8e82e3c39c6d78217f92ba90f180315920336473527076f22a69904bfbb8fbc9",
+      "bytes": 403,
+      "provenance": "byte copy of the as-run original"
+    },
+    {
+      "path": "runs/05-click-tempfile-pager-regression-protected/public-key.json",
+      "sha256": "36e829ded95ea8517eaed9fc635e9cdd5807428b552d720a58a8ad5225092705",
+      "bytes": 55,
+      "provenance": "byte copy of the as-run original"
+    },
+    {
+      "path": "runs/05-click-tempfile-pager-regression-protected/receipts.jsonl",
+      "sha256": "da45ac700931c75ec69d66bcfcb015f40b0a42a177c8ea8a6179167b605c22ec",
+      "bytes": 212908,
+      "provenance": "byte copy of the as-run original"
+    },
+    {
+      "path": "runs/05-click-tempfile-pager-regression-protected/summary.json",
+      "sha256": "797ec5971e3bdd8f3ccfe945f74ec2c19872bbc5910e73d29f4b2c30cd06ce30",
+      "bytes": 2675,
+      "provenance": "SANITISED DERIVATIVE of the withheld result.json"
+    },
+    {
+      "path": "runs/06-click-style-color-validation-protected/checkpoint.json",
+      "sha256": "110f2e2943eb998a27f381849c417105e1544425788414382791f9eab1c09887",
+      "bytes": 403,
+      "provenance": "byte copy of the as-run original"
+    },
+    {
+      "path": "runs/06-click-style-color-validation-protected/public-key.json",
+      "sha256": "8394685fdd1a8bdbed2c9e02b31ca09037525afe08e91ea359c5f26b034e75a5",
+      "bytes": 55,
+      "provenance": "byte copy of the as-run original"
+    },
+    {
+      "path": "runs/06-click-style-color-validation-protected/receipts.jsonl",
+      "sha256": "e45b6de1554c51e54ec1f91296365dedcc1c2957684ccd7dbd13a22693bcf853",
+      "bytes": 235688,
+      "provenance": "byte copy of the as-run original"
+    },
+    {
+      "path": "runs/06-click-style-color-validation-protected/summary.json",
+      "sha256": "1bf6e8ee70462ba0caff0d584ea0d4de035d930f4730325041cb2e22c738c3a3",
+      "bytes": 2928,
+      "provenance": "SANITISED DERIVATIVE of the withheld result.json"
+    },
+    {
+      "path": "runs/07-pflag-string-map-whitespace-protected/checkpoint.json",
+      "sha256": "9a3bc35e1747fb2c2d41b2b3dae69e049aa4dbe7efa6347856bc35f566a81677",
+      "bytes": 403,
+      "provenance": "byte copy of the as-run original"
+    },
+    {
+      "path": "runs/07-pflag-string-map-whitespace-protected/public-key.json",
+      "sha256": "836be166778f03aaa14d609154057b8a4bbf1dc5db6bc22b9d76d1f0198e03c9",
+      "bytes": 55,
+      "provenance": "byte copy of the as-run original"
+    },
+    {
+      "path": "runs/07-pflag-string-map-whitespace-protected/receipts.jsonl",
+      "sha256": "2a404decd7da124c717d4fd6eb3b28d2b6e234086d2823cb1b7198321fb7dd9c",
+      "bytes": 124664,
+      "provenance": "byte copy of the as-run original"
+    },
+    {
+      "path": "runs/07-pflag-string-map-whitespace-protected/summary.json",
+      "sha256": "ee529c009f624e012087a905de73205a4f443bd4eb6a6a444cc281e8eb2d7bdd",
+      "bytes": 2805,
+      "provenance": "SANITISED DERIVATIVE of the withheld result.json"
+    }
+  ],
+  "withheld": [
+    {
+      "path": "/Users/ross/src/actenon-audit/gate7-live/batch-a/01-pflag-ipv4-mask-protected/result.json",
+      "sha256": "58dccd9559bf27146dc3831414aba19549dfe1d4ea87c26d3ef2dd213e97e3c5",
+      "bytes": 8023,
+      "reason": "contains hidden-test output (test names, assertion text); published as summary.json"
+    },
+    {
+      "path": "/Users/ross/src/actenon-audit/gate7-live/batch-a/01-pflag-ipv4-mask-protected/agent.patch",
+      "sha256": "c1f4bd6245568d5012112619eed668157951ed1d8854f420309beab89c91d736",
+      "bytes": 313,
+      "reason": "the agent's solution; could inform the Batch B baseline run of the same case"
+    },
+    {
+      "path": "/Users/ross/src/actenon-audit/gate7-live/batch-a/01-pflag-ipv4-mask-protected/agent.log",
+      "sha256": "1b2366de75f4e8536d8fe50aad0e228cd29a2db064ac68e225b6a95d4c3bd625",
+      "bytes": 32057,
+      "reason": "full transcript, including the solution and upstream file contents"
+    },
+    {
+      "path": "/Users/ross/src/actenon-audit/gate7-live/batch-a/01-pflag-ipv4-mask-protected/project/",
+      "tree_sha256": "28c7024c81ab44e870c56d13cc6e2dc78c9fa449d1535380e533a58ed3bc0d35",
+      "reason": "signing and grant keys, Permit and replay databases, the solved workspace"
+    },
+    {
+      "path": "/Users/ross/src/actenon-audit/gate7-live/batch-a/01-pflag-ipv4-mask.log",
+      "sha256": "ed152e43486d892c1cbc92b26158987c4c066a35aa5779c1e84ed4429c0c5886",
+      "bytes": 1761,
+      "reason": "runner console output: transcript fragments; its KEY-PIN line is quoted in the report"
+    },
+    {
+      "path": "/Users/ross/src/actenon-audit/gate7-live/batch-a/02-click-argument-name-collision-protected/result.json",
+      "sha256": "0f271f05b086c1004943ac6df1b6e421219009a3b080f34a40ae5cb9f52f90fa",
+      "bytes": 9504,
+      "reason": "contains hidden-test output (test names, assertion text); published as summary.json"
+    },
+    {
+      "path": "/Users/ross/src/actenon-audit/gate7-live/batch-a/02-click-argument-name-collision-protected/agent.patch",
+      "sha256": "07eecd7ac7ddae251ea24d7f0c6b5eea5dcb87d31d6e1bda92357b21ab2469bf",
+      "bytes": 4948,
+      "reason": "the agent's solution; could inform the Batch B baseline run of the same case"
+    },
+    {
+      "path": "/Users/ross/src/actenon-audit/gate7-live/batch-a/02-click-argument-name-collision-protected/agent.log",
+      "sha256": "74f2ecbf812c45f9e8df8e9d4ee6d92066253dd4fd911a3793b149db119aa715",
+      "bytes": 66123,
+      "reason": "full transcript, including the solution and upstream file contents"
+    },
+    {
+      "path": "/Users/ross/src/actenon-audit/gate7-live/batch-a/02-click-argument-name-collision-protected/project/",
+      "tree_sha256": "d2026ab762cc8f449609f334f6967a1b37a3755c5e3c5855bfd0d463761ef4a2",
+      "reason": "signing and grant keys, Permit and replay databases, the solved workspace"
+    },
+    {
+      "path": "/Users/ross/src/actenon-audit/gate7-live/batch-a/02-click-argument-name-collision.log",
+      "sha256": "65206a6f298723665288bad2e2a4f5d10559bd8402f2f32b02cabbf4ab430d35",
+      "bytes": 4501,
+      "reason": "runner console output: transcript fragments; its KEY-PIN line is quoted in the report"
+    },
+    {
+      "path": "/Users/ross/src/actenon-audit/gate7-live/batch-a/03-path-to-regexp-dependency-upgrade-protected/result.json",
+      "sha256": "59d2f0eaa3a3bb8c8d56fcf22cbca06c3486b0f89a0e5293ab605afd27911b8e",
+      "bytes": 9073,
+      "reason": "contains hidden-test output (test names, assertion text); published as summary.json"
+    },
+    {
+      "path": "/Users/ross/src/actenon-audit/gate7-live/batch-a/03-path-to-regexp-dependency-upgrade-protected/agent.patch",
+      "sha256": "4068e5e5f630d0550f7e826b9b2aca549ff6b5f12e0f06c456826da3c104f924",
+      "bytes": 3271,
+      "reason": "the agent's solution; could inform the Batch B baseline run of the same case"
+    },
+    {
+      "path": "/Users/ross/src/actenon-audit/gate7-live/batch-a/03-path-to-regexp-dependency-upgrade-protected/agent.log",
+      "sha256": "c3f5a026297c17ad00a6aa2659dd8ec2707cd8f0400876e023fbf3e0589d05d0",
+      "bytes": 94725,
+      "reason": "full transcript, including the solution and upstream file contents"
+    },
+    {
+      "path": "/Users/ross/src/actenon-audit/gate7-live/batch-a/03-path-to-regexp-dependency-upgrade-protected/project/",
+      "tree_sha256": "2aa71e6d456c1a0b8a135aea32ed55b4eca4be3696e6e976ef6b9e8cba69d645",
+      "reason": "signing and grant keys, Permit and replay databases, the solved workspace"
+    },
+    {
+      "path": "/Users/ross/src/actenon-audit/gate7-live/batch-a/03-path-to-regexp-dependency-upgrade.log",
+      "sha256": "c9c7328706620f9abd08bd19cdbdccbaa8aa12244bd3dfbb33e2667b090e8df1",
+      "bytes": 1815,
+      "reason": "runner console output: transcript fragments; its KEY-PIN line is quoted in the report"
+    },
+    {
+      "path": "/Users/ross/src/actenon-audit/gate7-live/batch-a/04-pflag-custom-bool-flags-protected/result.json",
+      "sha256": "42fc29ad2f70ffb071220d8421bf9585984544ae3360977db801fb29f99f19ca",
+      "bytes": 8126,
+      "reason": "contains hidden-test output (test names, assertion text); published as summary.json"
+    },
+    {
+      "path": "/Users/ross/src/actenon-audit/gate7-live/batch-a/04-pflag-custom-bool-flags-protected/agent.patch",
+      "sha256": "f4ba2649383066c5c99158bee5dfa89bea6265733d7db318406b3f41206e88de",
+      "bytes": 797,
+      "reason": "the agent's solution; could inform the Batch B baseline run of the same case"
+    },
+    {
+      "path": "/Users/ross/src/actenon-audit/gate7-live/batch-a/04-pflag-custom-bool-flags-protected/agent.log",
+      "sha256": "c7cc0967bf2ad4cb5dd9746cb63df83f7a40b84ad2fdf57112069604fde3a7da",
+      "bytes": 97777,
+      "reason": "full transcript, including the solution and upstream file contents"
+    },
+    {
+      "path": "/Users/ross/src/actenon-audit/gate7-live/batch-a/04-pflag-custom-bool-flags-protected/project/",
+      "tree_sha256": "85a8e06dec7692c78a8bfdae61ebd6f1a1894df33a93828d62f086ddeee3daf3",
+      "reason": "signing and grant keys, Permit and replay databases, the solved workspace"
+    },
+    {
+      "path": "/Users/ross/src/actenon-audit/gate7-live/batch-a/04-pflag-custom-bool-flags.log",
+      "sha256": "134f931e315cfb735260a98e1fedc1c080bdffb20db51fa0a19bf830efb68f93",
+      "bytes": 1785,
+      "reason": "runner console output: transcript fragments; its KEY-PIN line is quoted in the report"
+    },
+    {
+      "path": "/Users/ross/src/actenon-audit/gate7-live/batch-a/05-click-tempfile-pager-regression-protected/result.json",
+      "sha256": "8e77de656b8096d33b1ee7773b98f3a2115f7c1fff35b8758b53c90dc0347d96",
+      "bytes": 8886,
+      "reason": "contains hidden-test output (test names, assertion text); published as summary.json"
+    },
+    {
+      "path": "/Users/ross/src/actenon-audit/gate7-live/batch-a/05-click-tempfile-pager-regression-protected/agent.patch",
+      "sha256": "d4ff55416cb139c782731755c07dc54f693aca8355e9478cf53250c293a62f53",
+      "bytes": 2433,
+      "reason": "the agent's solution; could inform the Batch B baseline run of the same case"
+    },
+    {
+      "path": "/Users/ross/src/actenon-audit/gate7-live/batch-a/05-click-tempfile-pager-regression-protected/agent.log",
+      "sha256": "9370464c2ccedaddc2b0a3a9d2a526bf806c8211b1178b9fd70909b7e986c76c",
+      "bytes": 82409,
+      "reason": "full transcript, including the solution and upstream file contents"
+    },
+    {
+      "path": "/Users/ross/src/actenon-audit/gate7-live/batch-a/05-click-tempfile-pager-regression-protected/project/",
+      "tree_sha256": "c70756a410e04a79969a604295db85f08d2178126375394e3211beabb67f06c5",
+      "reason": "signing and grant keys, Permit and replay databases, the solved workspace"
+    },
+    {
+      "path": "/Users/ross/src/actenon-audit/gate7-live/batch-a/05-click-tempfile-pager-regression.log",
+      "sha256": "33fbb1d5624520668d297bfebc8796e098ba0bdf0263f6991ed10bff2fb76273",
+      "bytes": 4391,
+      "reason": "runner console output: transcript fragments; its KEY-PIN line is quoted in the report"
+    },
+    {
+      "path": "/Users/ross/src/actenon-audit/gate7-live/batch-a/06-click-style-color-validation-protected/result.json",
+      "sha256": "a44c4dc7568e4f2360df9a211d1bfa302e411d03791f08006fd513712530d782",
+      "bytes": 10405,
+      "reason": "contains hidden-test output (test names, assertion text); published as summary.json"
+    },
+    {
+      "path": "/Users/ross/src/actenon-audit/gate7-live/batch-a/06-click-style-color-validation-protected/agent.patch",
+      "sha256": "66e9e2ace4e1cf17f545b86915cc07e862c7365b9b6a99ba20bf3a03c5ddae69",
+      "bytes": 5171,
+      "reason": "the agent's solution; could inform the Batch B baseline run of the same case"
+    },
+    {
+      "path": "/Users/ross/src/actenon-audit/gate7-live/batch-a/06-click-style-color-validation-protected/agent.log",
+      "sha256": "e8a31e3ddb9b2869788bc646ad8dd71719d07328864f63de65d904a7eccbe486",
+      "bytes": 88727,
+      "reason": "full transcript, including the solution and upstream file contents"
+    },
+    {
+      "path": "/Users/ross/src/actenon-audit/gate7-live/batch-a/06-click-style-color-validation-protected/project/",
+      "tree_sha256": "f2731287fdda18fe677b2da1a2a45cbf861c99850a89899c8b85ee054f4c4c1e",
+      "reason": "signing and grant keys, Permit and replay databases, the solved workspace"
+    },
+    {
+      "path": "/Users/ross/src/actenon-audit/gate7-live/batch-a/06-click-style-color-validation.log",
+      "sha256": "71421b400576d20bd224a2d2a5e1c41993481dae5c1889502e7aaa9948682776",
+      "bytes": 4382,
+      "reason": "runner console output: transcript fragments; its KEY-PIN line is quoted in the report"
+    },
+    {
+      "path": "/Users/ross/src/actenon-audit/gate7-live/batch-a/07-pflag-string-map-whitespace-protected/result.json",
+      "sha256": "e8cbab2508b1fd5666f2fced941a0a67fcfc99b13be615abcbd7f763c53c0842",
+      "bytes": 9185,
+      "reason": "contains hidden-test output (test names, assertion text); published as summary.json"
+    },
+    {
+      "path": "/Users/ross/src/actenon-audit/gate7-live/batch-a/07-pflag-string-map-whitespace-protected/agent.patch",
+      "sha256": "a60700c6e04d50a1ace0339108e9d78bfa8ae2cde75061880808f51a109857a8",
+      "bytes": 2184,
+      "reason": "the agent's solution; could inform the Batch B baseline run of the same case"
+    },
+    {
+      "path": "/Users/ross/src/actenon-audit/gate7-live/batch-a/07-pflag-string-map-whitespace-protected/agent.log",
+      "sha256": "ac1398f0b9450819b3da7ed611f1c7dc16c52622f16d849273a25ee491487ce2",
+      "bytes": 106206,
+      "reason": "full transcript, including the solution and upstream file contents"
+    },
+    {
+      "path": "/Users/ross/src/actenon-audit/gate7-live/batch-a/07-pflag-string-map-whitespace-protected/project/",
+      "tree_sha256": "34bbc858d50d2577155e41c01f0ce72549f457c587938be811da4cf77e226ca5",
+      "reason": "signing and grant keys, Permit and replay databases, the solved workspace"
+    },
+    {
+      "path": "/Users/ross/src/actenon-audit/gate7-live/batch-a/07-pflag-string-map-whitespace.log",
+      "sha256": "b5e554d08160fa67e74f1c5b3fc642806fc1f10a197d72309a7dfae2c51d1b78",
+      "bytes": 1797,
+      "reason": "runner console output: transcript fragments; its KEY-PIN line is quoted in the report"
+    }
+  ],
+  "scan": {
+    "patterns": [
+      "anthropic",
+      "aws",
+      "bearer",
+      "github",
+      "openai",
+      "owner-email",
+      "private-key-block",
+      "x-api-key-value"
+    ],
+    "secret_values_checked": 15,
+    "secret_value_names": [
+      "01-pflag-ipv4-mask-protected:grant_key",
+      "01-pflag-ipv4-mask-protected:signing_private_key",
+      "02-click-argument-name-collision-protected:grant_key",
+      "02-click-argument-name-collision-protected:signing_private_key",
+      "03-path-to-regexp-dependency-upgrade-protected:grant_key",
+      "03-path-to-regexp-dependency-upgrade-protected:signing_private_key",
+      "04-pflag-custom-bool-flags-protected:grant_key",
+      "04-pflag-custom-bool-flags-protected:signing_private_key",
+      "05-click-tempfile-pager-regression-protected:grant_key",
+      "05-click-tempfile-pager-regression-protected:signing_private_key",
+      "06-click-style-color-validation-protected:grant_key",
+      "06-click-style-color-validation-protected:signing_private_key",
+      "07-pflag-string-map-whitespace-protected:grant_key",
+      "07-pflag-string-map-whitespace-protected:signing_private_key",
+      "anthropic_supervisor_key"
+    ],
+    "findings": [
+      {
+        "file": "runs/03-path-to-regexp-dependency-upgrade-protected/receipts.jsonl",
+        "pattern": "openai"
+      }
+    ],
+    "patch_lines_checked_for_leakage": 323,
+    "solution_leaks": [],
+    "reviewed_false_positives": [
+      {
+        "pattern": "openai",
+        "file": "runs/03-path-to-regexp-dependency-upgrade-protected/receipts.jsonl",
+        "why": "matched inside a receipt's Ed25519 signature value (random base64url bytes), not a credential"
+      }
+    ]
+  }
+}

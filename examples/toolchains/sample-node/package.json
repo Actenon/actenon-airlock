@@ -1,0 +1,10 @@
+{
+  "name": "airlock-toolchain-sample",
+  "private": true,
+  "type": "module",
+  "devDependencies": {
+    "@types/node": "22.19.1",
+    "typescript": "5.9.3",
+    "vitest": "3.2.4"
+  }
+}

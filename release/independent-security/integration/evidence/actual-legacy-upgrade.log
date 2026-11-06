@@ -1,0 +1,2 @@
+AIRLOCK DENY http.post @ http://127.0.0.1:63148/unchanged_identity: effect already reserved, committed, or unresolved [receipt_b95f4c7dcf8f4fe993766d1803a429b3]
+{"legacy_commit": "341ce3a2f10d2eafa5b07e74539a36e16d3dfac2", "verified_scenarios": ["legacy_ambiguous_header_identity", "legacy_nonexecution_without_bound_completion", "unchanged_identity"]}

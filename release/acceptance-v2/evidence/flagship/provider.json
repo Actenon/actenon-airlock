@@ -1,0 +1,138 @@
+{
+  "schema": "actenon-airlock/synthetic-github/v1",
+  "notice": "SYNTHETIC PROVIDER: not GitHub; no account or network involved",
+  "repository": {
+    "id": 4242,
+    "node_id": "R_synthetic",
+    "owner": "acme",
+    "name": "disposable"
+  },
+  "branch": "review",
+  "head": "cce2c57cbbf58629033dc55d31a08d5dd43f8db6",
+  "commits": {
+    "b35b7ec0498686f24f4dcd0b23d3d1025fbf46d2": {
+      "parent": null,
+      "message": "initial",
+      "files": []
+    },
+    "d7c6bf9f7fb4a498d8a5d28e05d18d2e2e3e41c0": {
+      "parent": "b35b7ec0498686f24f4dcd0b23d3d1025fbf46d2",
+      "message": "Publish the reviewed token bucket fix",
+      "files": [
+        {
+          "filename": "patches/token-bucket.patch",
+          "status": "added",
+          "sha": "1caead8bf15fa283162be4ee40924407ce1379bb"
+        }
+      ]
+    },
+    "cce2c57cbbf58629033dc55d31a08d5dd43f8db6": {
+      "parent": "d7c6bf9f7fb4a498d8a5d28e05d18d2e2e3e41c0",
+      "message": "Publish the reviewed token bucket fix",
+      "files": [
+        {
+          "filename": "patches/token-bucket-copy.patch",
+          "status": "added",
+          "sha": "1caead8bf15fa283162be4ee40924407ce1379bb"
+        }
+      ]
+    }
+  },
+  "files": {
+    "patches/token-bucket.patch": {
+      "content": "LS0tIGEvcmF0ZWxpbWl0L2J1Y2tldC5weQorKysgYi9yYXRlbGltaXQvYnVja2V0LnB5CkBAIC0xNyw5ICsxNyw4IEBACiAgICAgICAgIG5vdyA9IHRpbWUubW9ub3RvbmljKCkKICAgICAgICAgZWxhcHNlZCA9IG5vdyAtIHNlbGYubGFzdF91cGRhdGUKICAgICAgICAgc2VsZi5sYXN0X3VwZGF0ZSA9IG5vdwotICAgICAgICBhZGRlZCA9IGludChlbGFwc2VkICogc2VsZi5maWxsX3JhdGUpCi0gICAgICAgIGlmIGFkZGVkID4gMDoKLSAgICAgICAgICAgIHNlbGYudG9rZW5zID0gbWluKGZsb2F0KHNlbGYuY2FwYWNpdHkpLCBzZWxmLnRva2VucyArIGFkZGVkKQorICAgICAgICBhZGRlZCA9IGVsYXBzZWQgKiBzZWxmLmZpbGxfcmF0ZQorICAgICAgICBzZWxmLnRva2VucyA9IG1pbihmbG9hdChzZWxmLmNhcGFjaXR5KSwgc2VsZi50b2tlbnMgKyBhZGRlZCkKICAgICAgICAgaWYgc2VsZi50b2tlbnMgPj0gdG9rZW5zOgogICAgICAgICAgICAgc2VsZi50b2tlbnMgLT0gdG9rZW5zCiAgICAgICAgICAgICByZXR1cm4gVHJ1ZQo=",
+      "commit": "d7c6bf9f7fb4a498d8a5d28e05d18d2e2e3e41c0"
+    },
+    "patches/token-bucket-copy.patch": {
+      "content": "LS0tIGEvcmF0ZWxpbWl0L2J1Y2tldC5weQorKysgYi9yYXRlbGltaXQvYnVja2V0LnB5CkBAIC0xNyw5ICsxNyw4IEBACiAgICAgICAgIG5vdyA9IHRpbWUubW9ub3RvbmljKCkKICAgICAgICAgZWxhcHNlZCA9IG5vdyAtIHNlbGYubGFzdF91cGRhdGUKICAgICAgICAgc2VsZi5sYXN0X3VwZGF0ZSA9IG5vdwotICAgICAgICBhZGRlZCA9IGludChlbGFwc2VkICogc2VsZi5maWxsX3JhdGUpCi0gICAgICAgIGlmIGFkZGVkID4gMDoKLSAgICAgICAgICAgIHNlbGYudG9rZW5zID0gbWluKGZsb2F0KHNlbGYuY2FwYWNpdHkpLCBzZWxmLnRva2VucyArIGFkZGVkKQorICAgICAgICBhZGRlZCA9IGVsYXBzZWQgKiBzZWxmLmZpbGxfcmF0ZQorICAgICAgICBzZWxmLnRva2VucyA9IG1pbihmbG9hdChzZWxmLmNhcGFjaXR5KSwgc2VsZi50b2tlbnMgKyBhZGRlZCkKICAgICAgICAgaWYgc2VsZi50b2tlbnMgPj0gdG9rZW5zOgogICAgICAgICAgICAgc2VsZi50b2tlbnMgLT0gdG9rZW5zCiAgICAgICAgICAgICByZXR1cm4gVHJ1ZQo=",
+      "commit": "cce2c57cbbf58629033dc55d31a08d5dd43f8db6"
+    }
+  },
+  "lose_next_acknowledgement": false,
+  "requests": [
+    {
+      "method": "GET",
+      "url": "https://api.github.com/repos/acme/disposable",
+      "authorized": true,
+      "body_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "method": "GET",
+      "url": "https://api.github.com/repos/acme/disposable/git/ref/heads/review",
+      "authorized": true,
+      "body_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "method": "GET",
+      "url": "https://api.github.com/repos/acme/disposable/contents/patches/token-bucket.patch?ref=b35b7ec0498686f24f4dcd0b23d3d1025fbf46d2",
+      "authorized": true,
+      "body_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "method": "PUT",
+      "url": "https://api.github.com/repos/acme/disposable/contents/patches/token-bucket.patch",
+      "authorized": true,
+      "body_sha256": "cae13174c8574c23740f0c51aafa09273682c034693d9a6ee7bea76f11807524"
+    },
+    {
+      "method": "GET",
+      "url": "https://api.github.com/repos/acme/disposable",
+      "authorized": true,
+      "body_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "method": "GET",
+      "url": "https://api.github.com/repos/acme/disposable/commits/review",
+      "authorized": true,
+      "body_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "method": "GET",
+      "url": "https://api.github.com/repos/acme/disposable/contents/patches/token-bucket.patch?ref=d7c6bf9f7fb4a498d8a5d28e05d18d2e2e3e41c0",
+      "authorized": true,
+      "body_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "method": "GET",
+      "url": "https://api.github.com/repos/acme/disposable",
+      "authorized": true,
+      "body_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "method": "GET",
+      "url": "https://api.github.com/repos/acme/disposable/git/ref/heads/review",
+      "authorized": true,
+      "body_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "method": "GET",
+      "url": "https://api.github.com/repos/acme/disposable/contents/patches/token-bucket-copy.patch?ref=d7c6bf9f7fb4a498d8a5d28e05d18d2e2e3e41c0",
+      "authorized": true,
+      "body_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "method": "PUT",
+      "url": "https://api.github.com/repos/acme/disposable/contents/patches/token-bucket-copy.patch",
+      "authorized": true,
+      "body_sha256": "cae13174c8574c23740f0c51aafa09273682c034693d9a6ee7bea76f11807524"
+    },
+    {
+      "method": "GET",
+      "url": "https://api.github.com/repos/acme/disposable",
+      "authorized": true,
+      "body_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "method": "GET",
+      "url": "https://api.github.com/repos/acme/disposable/commits/review",
+      "authorized": true,
+      "body_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "method": "GET",
+      "url": "https://api.github.com/repos/acme/disposable/contents/patches/token-bucket-copy.patch?ref=cce2c57cbbf58629033dc55d31a08d5dd43f8db6",
+      "authorized": true,
+      "body_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    }
+  ]
+}

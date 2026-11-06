@@ -1,0 +1,84 @@
+{
+  "schema": "actenon-airlock/gate7-live-summary/v1",
+  "derivative": "SANITISED DERIVATIVE of the withheld result.json, not byte-identical: test output tails (hidden test names and assertion text) and the patch are omitted.",
+  "derived_from_sha256": "58dccd9559bf27146dc3831414aba19549dfe1d4ea87c26d3ef2dd213e97e3c5",
+  "case": "01-pflag-ipv4-mask",
+  "capability": 1,
+  "repository": "pflag",
+  "upstream_base": "c966cfef47379dcb01e7929504d66d94b540945b",
+  "mode": "protected",
+  "model": "claude-opus-5-5",
+  "evidence_class": "frozen-live",
+  "actual_paid_inference": true,
+  "verdict": "PASS",
+  "verdict_reasons": [],
+  "agent_exit": 0,
+  "seconds": 42.8,
+  "visible": {
+    "passed": true,
+    "checks": {
+      "go-test": {
+        "exit": 0,
+        "passed": true,
+        "counts": []
+      }
+    }
+  },
+  "hidden": {
+    "passed": true,
+    "checks": {
+      "go-test": {
+        "exit": 0,
+        "passed": true,
+        "counts": []
+      }
+    }
+  },
+  "conditions": {
+    "source_changed": true,
+    "visible_passed": true,
+    "hidden_passed": true,
+    "existing_tests_unmodified": true
+  },
+  "source_files_changed": [
+    "ipmask.go"
+  ],
+  "test_files_changed": [],
+  "existing_tests_changed": [],
+  "agent_tests": {},
+  "inference": {
+    "dispatched": 5,
+    "confirmed": 5,
+    "unconfirmed": 0,
+    "retries_held": 0,
+    "declined": 0,
+    "refused_at_spend_bound": 0
+  },
+  "accounting": {
+    "estimated_microusd": 79937,
+    "bound_microusd": 3000000,
+    "prices": "4,5,0.2,20"
+  },
+  "evidence_integrity": {
+    "integrity_ok": true,
+    "refused": 0,
+    "unresolved_effects": 0
+  },
+  "spend_bound_refusals": [],
+  "refusal_reasons": [],
+  "powers_authorised": [
+    "http.post api.anthropic.com/v1/messages"
+  ],
+  "public_key_sha256": "c8007190fe741d5ae4565989f1271d3d3f0b99d92718d0523a3a96c5c97ff883",
+  "patch_sha256": "c1f4bd6245568d5012112619eed668157951ed1d8854f420309beab89c91d736",
+  "identity_equals_freeze": true,
+  "identity_source_commit": "6868406415c1798ba67e4bdc9ec4efbeeaf1bd6c",
+  "prepared": {
+    "case": "01-pflag-ipv4-mask",
+    "upstream": "c966cfef47379dcb01e7929504d66d94b540945b",
+    "files": 90,
+    "tree_sha256": "591cb7699f680845937fb370ba29583cf166359e0b5f744e673d76fa595d3c79",
+    "issue_sha256": "a4cac2733928e387e62bc310d2fb98e2bd41b00328172d4e51823691ddcc616c",
+    "git_history": "none"
+  }
+}

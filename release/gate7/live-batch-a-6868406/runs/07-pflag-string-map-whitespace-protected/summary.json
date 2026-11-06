@@ -1,0 +1,107 @@
+{
+  "schema": "actenon-airlock/gate7-live-summary/v1",
+  "derivative": "SANITISED DERIVATIVE of the withheld result.json, not byte-identical: test output tails (hidden test names and assertion text) and the patch are omitted.",
+  "derived_from_sha256": "e8cbab2508b1fd5666f2fced941a0a67fcfc99b13be615abcbd7f763c53c0842",
+  "case": "07-pflag-string-map-whitespace",
+  "capability": 7,
+  "repository": "pflag",
+  "upstream_base": "c966cfef47379dcb01e7929504d66d94b540945b",
+  "mode": "protected",
+  "model": "claude-opus-5-5",
+  "evidence_class": "frozen-live",
+  "actual_paid_inference": true,
+  "verdict": "PASS",
+  "verdict_reasons": [],
+  "agent_exit": 0,
+  "seconds": 78.1,
+  "visible": {
+    "passed": true,
+    "checks": {
+      "go-test": {
+        "exit": 0,
+        "passed": true,
+        "counts": []
+      }
+    }
+  },
+  "hidden": {
+    "passed": true,
+    "checks": {
+      "go-test": {
+        "exit": 0,
+        "passed": true,
+        "counts": []
+      },
+      "go-vet": {
+        "exit": 0,
+        "passed": true,
+        "counts": []
+      },
+      "gofmt": {
+        "exit": 0,
+        "passed": true,
+        "counts": []
+      }
+    }
+  },
+  "conditions": {
+    "source_changed": true,
+    "visible_passed": true,
+    "hidden_passed": true,
+    "agent_tests_pass_on_final": true,
+    "agent_tests_fail_on_base": true
+  },
+  "source_files_changed": [
+    "string_to_string.go"
+  ],
+  "test_files_changed": [
+    "string_to_string_test.go"
+  ],
+  "existing_tests_changed": [],
+  "agent_tests": {
+    "files": [
+      "string_to_string_test.go"
+    ],
+    "on_final": {
+      "passed": true
+    },
+    "on_base": {
+      "passed": false
+    }
+  },
+  "inference": {
+    "dispatched": 9,
+    "confirmed": 9,
+    "unconfirmed": 0,
+    "retries_held": 0,
+    "declined": 0,
+    "refused_at_spend_bound": 0
+  },
+  "accounting": {
+    "estimated_microusd": 164604,
+    "bound_microusd": 3000000,
+    "prices": "4,5,0.2,20"
+  },
+  "evidence_integrity": {
+    "integrity_ok": true,
+    "refused": 0,
+    "unresolved_effects": 0
+  },
+  "spend_bound_refusals": [],
+  "refusal_reasons": [],
+  "powers_authorised": [
+    "http.post api.anthropic.com/v1/messages"
+  ],
+  "public_key_sha256": "836be166778f03aaa14d609154057b8a4bbf1dc5db6bc22b9d76d1f0198e03c9",
+  "patch_sha256": "a60700c6e04d50a1ace0339108e9d78bfa8ae2cde75061880808f51a109857a8",
+  "identity_equals_freeze": true,
+  "identity_source_commit": "6868406415c1798ba67e4bdc9ec4efbeeaf1bd6c",
+  "prepared": {
+    "case": "07-pflag-string-map-whitespace",
+    "upstream": "c966cfef47379dcb01e7929504d66d94b540945b",
+    "files": 89,
+    "tree_sha256": "eb46dee7078ec14fbf2d1da9696e7c35c9114bb90861b8ef9b3349016ae3977e",
+    "issue_sha256": "3eb968ea38a4556c9b8604fe43bbb2f582cf02615a3a0377a43597e5dd3c6222",
+    "git_history": "none"
+  }
+}

@@ -1,0 +1,576 @@
+{
+  "schema": "actenon-airlock/response-compatibility-matrix/v1",
+  "review_date": "2026-11-03",
+  "sdk_version": "2.54.0",
+  "sdk_response_sha256": "38c562a4c9a104cae472bf2e9af097bad9311fad82906b1de8cf61a78b717cb1",
+  "reference_url": "https://developers.openai.com/api/reference/resources/responses/methods/retrieve",
+  "reference_markdown_sha256": "9ed55a6d8a1a9753b3b99ae45ff2c38535500d1e51667a37a7f78dfe056a70fe",
+  "v4_limitation": "V4 only proved response-schema at event zero; conversation/moderation/prompt_cache_options were SDK candidates, not recovered live names.",
+  "fields": [
+    {
+      "field": "access_programs",
+      "airlock": true,
+      "sdk_2_54_0_declared": false,
+      "current_reference": true,
+      "status": "restricted",
+      "relevance": [
+        "authority",
+        "state"
+      ],
+      "rule": "Absent/null only; no access-program grant.",
+      "live": "No field-specific signed diagnostic identification",
+      "sdk_annotation": null
+    },
+    {
+      "field": "background",
+      "airlock": true,
+      "sdk_2_54_0_declared": true,
+      "current_reference": true,
+      "status": "restricted",
+      "relevance": [
+        "state",
+        "completion"
+      ],
+      "rule": "Absent/null/false; inherited equality check also admits numeric zero. No background request authority.",
+      "live": "No field-specific signed diagnostic identification",
+      "sdk_annotation": "typing.Optional[bool]"
+    },
+    {
+      "field": "completed_at",
+      "airlock": true,
+      "sdk_2_54_0_declared": true,
+      "current_reference": true,
+      "status": "accepted",
+      "relevance": [
+        "completion",
+        "descriptive"
+      ],
+      "rule": "Admitted metadata; timestamp value is not a completion proof and is not independently type-validated.",
+      "live": "No field-specific signed diagnostic identification",
+      "sdk_annotation": "typing.Optional[float]"
+    },
+    {
+      "field": "conversation",
+      "airlock": true,
+      "sdk_2_54_0_declared": true,
+      "current_reference": true,
+      "status": "restricted",
+      "relevance": [
+        "state"
+      ],
+      "rule": "Absent/null only. Populated conversation IDs remain unsupported.",
+      "live": "No field-specific signed diagnostic identification",
+      "sdk_annotation": "typing.Optional[openai.types.responses.response.Conversation]"
+    },
+    {
+      "field": "created_at",
+      "airlock": true,
+      "sdk_2_54_0_declared": true,
+      "current_reference": true,
+      "status": "accepted",
+      "relevance": [
+        "descriptive"
+      ],
+      "rule": "Admitted timestamp metadata, not independently type-validated or used as authority.",
+      "live": "No field-specific signed diagnostic identification",
+      "sdk_annotation": "<class 'float'>"
+    },
+    {
+      "field": "error",
+      "airlock": true,
+      "sdk_2_54_0_declared": true,
+      "current_reference": true,
+      "status": "restricted",
+      "relevance": [
+        "completion"
+      ],
+      "rule": "Must be absent/null for a confirmed result; private error text is never copied to diagnostics.",
+      "live": "No field-specific signed diagnostic identification",
+      "sdk_annotation": "typing.Optional[openai.types.responses.response_error.ResponseError]"
+    },
+    {
+      "field": "frequency_penalty",
+      "airlock": true,
+      "sdk_2_54_0_declared": false,
+      "current_reference": false,
+      "status": "restricted",
+      "relevance": [
+        "generation"
+      ],
+      "rule": "Absent/null or exact int/float zero; bool, nonfinite and nonzero refused. Live name proven; response enumeration absent from pinned SDK and current retrieve reference.",
+      "live": "V4.1 signed property-name hash; value unknown",
+      "sdk_annotation": null
+    },
+    {
+      "field": "id",
+      "airlock": true,
+      "sdk_2_54_0_declared": true,
+      "current_reference": true,
+      "status": "restricted",
+      "relevance": [
+        "identity"
+      ],
+      "rule": "Nonempty string; same response identity across lifecycle snapshots.",
+      "live": "No field-specific signed diagnostic identification",
+      "sdk_annotation": "<class 'str'>"
+    },
+    {
+      "field": "image",
+      "airlock": true,
+      "sdk_2_54_0_declared": false,
+      "current_reference": true,
+      "status": "restricted",
+      "relevance": [
+        "descriptive",
+        "generation"
+      ],
+      "rule": "Omit or exact object with required context_compression enabled/disabled; no null, auto, extras or changed effective policy. No image-input/output/tool grant.",
+      "live": "V4.3 signed public property identifier; value unknown",
+      "sdk_annotation": null
+    },
+    {
+      "field": "incomplete_details",
+      "airlock": true,
+      "sdk_2_54_0_declared": true,
+      "current_reference": true,
+      "status": "restricted",
+      "relevance": [
+        "completion"
+      ],
+      "rule": "Must be absent/null for confirmation; incomplete outcomes retain reservations.",
+      "live": "No field-specific signed diagnostic identification",
+      "sdk_annotation": "typing.Optional[openai.types.responses.response.IncompleteDetails]"
+    },
+    {
+      "field": "instructions",
+      "airlock": true,
+      "sdk_2_54_0_declared": true,
+      "current_reference": true,
+      "status": "accepted",
+      "relevance": [
+        "descriptive"
+      ],
+      "rule": "Admitted response echo; no inbound value/type parity check. Never used to rewrite the approved request or supervisor policy.",
+      "live": "No field-specific signed diagnostic identification",
+      "sdk_annotation": "typing.Union[str, typing.List[typing.Annotated[typing.Union[openai.types.responses.easy_input_message.EasyInputMessage, openai.types.responses.response_input_item.Message, openai.types.responses.response_output_message.ResponseOutputMessage, openai.types.responses.response_file_search_tool_call.ResponseFileSearchToolCall, openai.types.responses.response_computer_tool_call.ResponseComputerToolCall, openai.types.responses.response_input_item.ComputerCallOutput, openai.types.responses.response_function_web_search.ResponseFunctionWebSearch, openai.types.responses.response_function_tool_call.ResponseFunctionToolCall, openai.types.responses.response_input_item.FunctionCallOutput, openai.types.responses.response_input_item.ToolSearchCall, openai.types.responses.response_tool_search_output_item_param.ResponseToolSearchOutputItemParam, openai.types.responses.response_input_item.AdditionalTools, openai.types.responses.response_reasoning_item.ResponseReasoningItem, openai.types.responses.response_compaction_item_param.ResponseCompactionItemParam, openai.types.responses.response_input_item.ImageGenerationCall, openai.types.responses.response_code_interpreter_tool_call.ResponseCodeInterpreterToolCall, openai.types.responses.response_input_item.LocalShellCall, openai.types.responses.response_input_item.LocalShellCallOutput, openai.types.responses.response_input_item.ShellCall, openai.types.responses.response_input_item.ShellCallOutput, openai.types.responses.response_input_item.ApplyPatchCall, openai.types.responses.response_input_item.ApplyPatchCallOutput, openai.types.responses.response_input_item.McpListTools, openai.types.responses.response_input_item.McpApprovalRequest, openai.types.responses.response_input_item.McpApprovalResponse, openai.types.responses.response_input_item.McpCall, openai.types.responses.response_custom_tool_call_output.ResponseCustomToolCallOutput, openai.types.responses.response_custom_tool_call.ResponseCustomToolCall, openai.types.responses.response_input_item.CompactionTrigger, openai.types.responses.response_input_item.ItemReference, openai.types.responses.response_input_item.Program, openai.types.responses.response_input_item.ProgramOutput], PropertyInfo(alias='None', format=None, format_template='None', discriminator='type')]], NoneType]"
+    },
+    {
+      "field": "max_output_tokens",
+      "airlock": true,
+      "sdk_2_54_0_declared": true,
+      "current_reference": true,
+      "status": "restricted",
+      "relevance": [
+        "billing",
+        "generation"
+      ],
+      "rule": "Absent/null or exact integer equal to dispatched request cap; actual token usage independently bounded.",
+      "live": "No field-specific signed diagnostic identification",
+      "sdk_annotation": "typing.Optional[int]"
+    },
+    {
+      "field": "max_tool_calls",
+      "airlock": true,
+      "sdk_2_54_0_declared": true,
+      "current_reference": true,
+      "status": "accepted",
+      "relevance": [
+        "authority",
+        "billing"
+      ],
+      "rule": "Admitted echo, no independent value validation; cannot grant hosted tools. Hosted activity/output checks remain separate.",
+      "live": "No field-specific signed diagnostic identification",
+      "sdk_annotation": "typing.Optional[int]"
+    },
+    {
+      "field": "metadata",
+      "airlock": true,
+      "sdk_2_54_0_declared": true,
+      "current_reference": true,
+      "status": "accepted",
+      "relevance": [
+        "descriptive"
+      ],
+      "rule": "Admitted opaque response metadata, not independently type-validated; values are not copied into receipts.",
+      "live": "No field-specific signed diagnostic identification",
+      "sdk_annotation": "typing.Optional[typing.Dict[str, str]]"
+    },
+    {
+      "field": "model",
+      "airlock": true,
+      "sdk_2_54_0_declared": true,
+      "current_reference": true,
+      "status": "restricted",
+      "relevance": [
+        "identity",
+        "billing"
+      ],
+      "rule": "Exact equality with the signed approved model at every snapshot.",
+      "live": "No field-specific signed diagnostic identification",
+      "sdk_annotation": "typing.Union[str, typing.Literal['gpt-5.6-sol', 'gpt-5.6-terra', 'gpt-5.6-luna', 'gpt-5.5', 'gpt-5.4', 'gpt-5.4-mini', 'gpt-5.4-nano', 'gpt-5.4-mini-2026-03-17', 'gpt-5.4-nano-2026-03-17', 'gpt-5.3-chat-latest', 'gpt-5.2', 'gpt-5.2-2025-12-11', 'gpt-5.2-chat-latest', 'gpt-5.2-pro', 'gpt-5.2-pro-2025-12-11', 'gpt-5.1', 'gpt-5.1-2025-11-13', 'gpt-5.1-codex', 'gpt-5.1-mini', 'gpt-5.1-chat-latest', 'gpt-5', 'gpt-5-mini', 'gpt-5-nano', 'gpt-5-2025-08-07', 'gpt-5-mini-2025-08-07', 'gpt-5-nano-2025-08-07', 'gpt-5-chat-latest', 'gpt-4.1', 'gpt-4.1-mini', 'gpt-4.1-nano', 'gpt-4.1-2025-04-14', 'gpt-4.1-mini-2025-04-14', 'gpt-4.1-nano-2025-04-14', 'o4-mini', 'o4-mini-2025-04-16', 'o3', 'o3-2025-04-16', 'o3-mini', 'o3-mini-2025-01-31', 'o1', 'o1-2024-12-17', 'o1-preview', 'o1-preview-2024-09-12', 'o1-mini', 'o1-mini-2024-09-12', 'gpt-4o', 'gpt-4o-2024-11-20', 'gpt-4o-2024-08-06', 'gpt-4o-2024-05-13', 'gpt-4o-audio-preview', 'gpt-4o-audio-preview-2024-10-01', 'gpt-4o-audio-preview-2024-12-17', 'gpt-4o-audio-preview-2025-06-03', 'gpt-4o-mini-audio-preview', 'gpt-4o-mini-audio-preview-2024-12-17', 'gpt-4o-search-preview', 'gpt-4o-mini-search-preview', 'gpt-4o-search-preview-2025-03-11', 'gpt-4o-mini-search-preview-2025-03-11', 'chatgpt-4o-latest', 'codex-mini-latest', 'gpt-4o-mini', 'gpt-4o-mini-2024-07-18', 'gpt-4-turbo', 'gpt-4-turbo-2024-04-09', 'gpt-4-0125-preview', 'gpt-4-turbo-preview', 'gpt-4-1106-preview', 'gpt-4-vision-preview', 'gpt-4', 'gpt-4-0314', 'gpt-4-0613', 'gpt-4-32k', 'gpt-4-32k-0314', 'gpt-4-32k-0613', 'gpt-3.5-turbo', 'gpt-3.5-turbo-16k', 'gpt-3.5-turbo-0301', 'gpt-3.5-turbo-0613', 'gpt-3.5-turbo-1106', 'gpt-3.5-turbo-0125', 'gpt-3.5-turbo-16k-0613'], typing.Literal['o1-pro', 'o1-pro-2025-03-19', 'o3-pro', 'o3-pro-2025-06-10', 'o3-deep-research', 'o3-deep-research-2025-06-26', 'o4-mini-deep-research', 'o4-mini-deep-research-2025-06-26', 'computer-use-preview', 'computer-use-preview-2025-03-11', 'gpt-5-codex', 'gpt-5-pro', 'gpt-5-pro-2025-10-06', 'gpt-5.1-codex-max', 'gpt-daybreak-blue-latest', 'gpt-daybreak-red-latest', 'gpt-5.6-cyber']]"
+    },
+    {
+      "field": "moderation",
+      "airlock": true,
+      "sdk_2_54_0_declared": true,
+      "current_reference": true,
+      "status": "restricted",
+      "relevance": [
+        "generation"
+      ],
+      "rule": "Absent/null only; no moderated-completions feature was requested. Populated results/errors unsupported.",
+      "live": "No field-specific signed diagnostic identification",
+      "sdk_annotation": "typing.Optional[openai.types.responses.response.Moderation]"
+    },
+    {
+      "field": "object",
+      "airlock": true,
+      "sdk_2_54_0_declared": true,
+      "current_reference": true,
+      "status": "restricted",
+      "relevance": [
+        "identity"
+      ],
+      "rule": "Exactly response.",
+      "live": "No field-specific signed diagnostic identification",
+      "sdk_annotation": "typing.Literal['response']"
+    },
+    {
+      "field": "output",
+      "airlock": true,
+      "sdk_2_54_0_declared": true,
+      "current_reference": true,
+      "status": "restricted",
+      "relevance": [
+        "completion",
+        "authority",
+        "billing"
+      ],
+      "rule": "Only reviewed text/reasoning/local function/custom outputs; typed IDs/calls, complete stream parity. No hosted operations or generated images.",
+      "live": "No field-specific signed diagnostic identification",
+      "sdk_annotation": "typing.List[typing.Annotated[typing.Union[openai.types.responses.response_output_message.ResponseOutputMessage, openai.types.responses.response_file_search_tool_call.ResponseFileSearchToolCall, openai.types.responses.response_function_tool_call.ResponseFunctionToolCall, openai.types.responses.response_function_tool_call_output_item.ResponseFunctionToolCallOutputItem, openai.types.responses.response_function_web_search.ResponseFunctionWebSearch, openai.types.responses.response_computer_tool_call.ResponseComputerToolCall, openai.types.responses.response_computer_tool_call_output_item.ResponseComputerToolCallOutputItem, openai.types.responses.response_reasoning_item.ResponseReasoningItem, openai.types.responses.response_output_item.Program, openai.types.responses.response_output_item.ProgramOutput, openai.types.responses.response_tool_search_call.ResponseToolSearchCall, openai.types.responses.response_tool_search_output_item.ResponseToolSearchOutputItem, openai.types.responses.response_output_item.AdditionalTools, openai.types.responses.response_compaction_item.ResponseCompactionItem, openai.types.responses.response_output_item.ImageGenerationCall, openai.types.responses.response_code_interpreter_tool_call.ResponseCodeInterpreterToolCall, openai.types.responses.response_output_item.LocalShellCall, openai.types.responses.response_output_item.LocalShellCallOutput, openai.types.responses.response_function_shell_tool_call.ResponseFunctionShellToolCall, openai.types.responses.response_function_shell_tool_call_output.ResponseFunctionShellToolCallOutput, openai.types.responses.response_apply_patch_tool_call.ResponseApplyPatchToolCall, openai.types.responses.response_apply_patch_tool_call_output.ResponseApplyPatchToolCallOutput, openai.types.responses.response_output_item.McpCall, openai.types.responses.response_output_item.McpListTools, openai.types.responses.response_output_item.McpApprovalRequest, openai.types.responses.response_output_item.McpApprovalResponse, openai.types.responses.response_custom_tool_call.ResponseCustomToolCall, openai.types.responses.response_custom_tool_call_output_item.ResponseCustomToolCallOutputItem], PropertyInfo(alias='None', format=None, format_template='None', discriminator='type')]]"
+    },
+    {
+      "field": "output_text",
+      "airlock": false,
+      "sdk_2_54_0_declared": false,
+      "current_reference": true,
+      "status": "unsupported",
+      "relevance": [
+        "descriptive"
+      ],
+      "rule": "SDK-only convenience property, not a declared SDK model field or accepted wire extension; use validated output items.",
+      "live": "No field-specific signed diagnostic identification",
+      "sdk_annotation": null
+    },
+    {
+      "field": "parallel_tool_calls",
+      "airlock": true,
+      "sdk_2_54_0_declared": true,
+      "current_reference": true,
+      "status": "accepted",
+      "relevance": [
+        "generation",
+        "authority"
+      ],
+      "rule": "Admitted echo, not independently type/parity-validated. Each local consequence still requires its own authority.",
+      "live": "No field-specific signed diagnostic identification",
+      "sdk_annotation": "<class 'bool'>"
+    },
+    {
+      "field": "presence_penalty",
+      "airlock": true,
+      "sdk_2_54_0_declared": false,
+      "current_reference": false,
+      "status": "restricted",
+      "relevance": [
+        "generation"
+      ],
+      "rule": "Absent/null or exact int/float zero; bool, nonfinite and nonzero refused. No outbound penalty setting is authorized.",
+      "live": "V4.1 signed property-name hash; value unknown",
+      "sdk_annotation": null
+    },
+    {
+      "field": "previous_response_id",
+      "airlock": true,
+      "sdk_2_54_0_declared": true,
+      "current_reference": true,
+      "status": "restricted",
+      "relevance": [
+        "state"
+      ],
+      "rule": "Absent/null only; no provider-held history chaining.",
+      "live": "No field-specific signed diagnostic identification",
+      "sdk_annotation": "typing.Optional[str]"
+    },
+    {
+      "field": "prompt",
+      "airlock": true,
+      "sdk_2_54_0_declared": true,
+      "current_reference": true,
+      "status": "accepted",
+      "relevance": [
+        "state",
+        "generation"
+      ],
+      "rule": "Legacy admitted echo without nested validation; no outbound stored-prompt reference is authorized or resolved. This remains a semantic-validation limitation, not new authority.",
+      "live": "No field-specific signed diagnostic identification",
+      "sdk_annotation": "typing.Optional[openai.types.responses.response_prompt.ResponsePrompt]"
+    },
+    {
+      "field": "prompt_cache_diagnostics",
+      "airlock": false,
+      "sdk_2_54_0_declared": false,
+      "current_reference": true,
+      "status": "unsupported",
+      "relevance": [
+        "state",
+        "descriptive"
+      ],
+      "rule": "Every value, including null, deliberately unsupported. Comparison was not requested; counts are not billing usage.",
+      "live": "No field-specific signed diagnostic identification",
+      "sdk_annotation": null
+    },
+    {
+      "field": "prompt_cache_key",
+      "airlock": true,
+      "sdk_2_54_0_declared": true,
+      "current_reference": true,
+      "status": "accepted",
+      "relevance": [
+        "state",
+        "billing"
+      ],
+      "rule": "Admitted echo without parity validation; cache routing cannot change signed authority, replay identity or usage settlement.",
+      "live": "No field-specific signed diagnostic identification",
+      "sdk_annotation": "typing.Optional[str]"
+    },
+    {
+      "field": "prompt_cache_options",
+      "airlock": true,
+      "sdk_2_54_0_declared": true,
+      "current_reference": true,
+      "status": "restricted",
+      "relevance": [
+        "state",
+        "billing"
+      ],
+      "rule": "Absent/null only under pinned SDK nullable representation. Current populated options concern GPT-5.6+; not authorized for this GPT-5.5 profile.",
+      "live": "No field-specific signed diagnostic identification",
+      "sdk_annotation": "typing.Optional[openai.types.responses.response.PromptCacheOptions]"
+    },
+    {
+      "field": "prompt_cache_retention",
+      "airlock": true,
+      "sdk_2_54_0_declared": true,
+      "current_reference": true,
+      "status": "accepted",
+      "relevance": [
+        "state",
+        "billing"
+      ],
+      "rule": "Legacy admitted echo without enum/parity validation; cannot alter outbound request. Extended caching semantics require separate contract review.",
+      "live": "No field-specific signed diagnostic identification",
+      "sdk_annotation": "typing.Optional[typing.Literal['in_memory', '24h']]"
+    },
+    {
+      "field": "reasoning",
+      "airlock": true,
+      "sdk_2_54_0_declared": true,
+      "current_reference": true,
+      "status": "accepted",
+      "relevance": [
+        "generation"
+      ],
+      "rule": "Admitted configuration echo without nested parity checks. Reasoning output content follows separate output validation and is never logged.",
+      "live": "No field-specific signed diagnostic identification",
+      "sdk_annotation": "typing.Optional[openai.types.shared.reasoning.Reasoning]"
+    },
+    {
+      "field": "safety_identifier",
+      "airlock": true,
+      "sdk_2_54_0_declared": true,
+      "current_reference": true,
+      "status": "accepted",
+      "relevance": [
+        "descriptive"
+      ],
+      "rule": "Admitted echo, no independent value/type validation, never copied into diagnostic records.",
+      "live": "No field-specific signed diagnostic identification",
+      "sdk_annotation": "typing.Optional[str]"
+    },
+    {
+      "field": "service_tier",
+      "airlock": true,
+      "sdk_2_54_0_declared": true,
+      "current_reference": true,
+      "status": "accepted",
+      "relevance": [
+        "billing"
+      ],
+      "rule": "Legacy admitted echo without tier/parity validation; does not change the reviewed accounting price schedule. Actual provider billing is not established.",
+      "live": "No field-specific signed diagnostic identification",
+      "sdk_annotation": "typing.Optional[typing.Literal['auto', 'default', 'flex', 'scale', 'priority', 'fast']]"
+    },
+    {
+      "field": "status",
+      "airlock": true,
+      "sdk_2_54_0_declared": true,
+      "current_reference": true,
+      "status": "restricted",
+      "relevance": [
+        "completion"
+      ],
+      "rule": "Created/progress must be in_progress; only internally consistent terminal completed can confirm.",
+      "live": "No field-specific signed diagnostic identification",
+      "sdk_annotation": "typing.Optional[typing.Literal['completed', 'failed', 'in_progress', 'cancelled', 'queued', 'incomplete']]"
+    },
+    {
+      "field": "store",
+      "airlock": true,
+      "sdk_2_54_0_declared": false,
+      "current_reference": false,
+      "status": "restricted",
+      "relevance": [
+        "state"
+      ],
+      "rule": "Absent/null/false; inherited equality check also admits numeric zero. No storage request authority. Response declaration absent from pinned SDK/current retrieve reference.",
+      "live": "No field-specific signed diagnostic identification",
+      "sdk_annotation": null
+    },
+    {
+      "field": "temperature",
+      "airlock": true,
+      "sdk_2_54_0_declared": true,
+      "current_reference": true,
+      "status": "accepted",
+      "relevance": [
+        "generation"
+      ],
+      "rule": "Legacy admitted echo without range/parity validation; no additional supervisor authority.",
+      "live": "No field-specific signed diagnostic identification",
+      "sdk_annotation": "typing.Optional[float]"
+    },
+    {
+      "field": "text",
+      "airlock": true,
+      "sdk_2_54_0_declared": true,
+      "current_reference": true,
+      "status": "accepted",
+      "relevance": [
+        "generation"
+      ],
+      "rule": "Admitted format configuration echo without nested parity checks; actual output still requires reviewed text structure.",
+      "live": "No field-specific signed diagnostic identification",
+      "sdk_annotation": "typing.Optional[openai.types.responses.response_text_config.ResponseTextConfig]"
+    },
+    {
+      "field": "tool_choice",
+      "airlock": true,
+      "sdk_2_54_0_declared": true,
+      "current_reference": true,
+      "status": "accepted",
+      "relevance": [
+        "authority",
+        "generation"
+      ],
+      "rule": "Admitted selection echo without independent nested parity checks; returned tool inventory and actual calls remain separately validated.",
+      "live": "No field-specific signed diagnostic identification",
+      "sdk_annotation": "typing.Union[typing.Literal['none', 'auto', 'required'], openai.types.responses.tool_choice_allowed.ToolChoiceAllowed, openai.types.responses.tool_choice_types.ToolChoiceTypes, openai.types.responses.tool_choice_function.ToolChoiceFunction, openai.types.responses.tool_choice_mcp.ToolChoiceMcp, openai.types.responses.tool_choice_custom.ToolChoiceCustom, openai.types.responses.response.ToolChoiceSpecificProgrammaticToolCallingParam, openai.types.responses.tool_choice_apply_patch.ToolChoiceApplyPatch, openai.types.responses.tool_choice_shell.ToolChoiceShell]"
+    },
+    {
+      "field": "tool_usage",
+      "airlock": true,
+      "sdk_2_54_0_declared": false,
+      "current_reference": true,
+      "status": "restricted",
+      "relevance": [
+        "authority",
+        "billing"
+      ],
+      "rule": "Absent or exact reviewed families image_gen/web_search, required members and exact integer-zero counters; optional detail omissions allowed. Unknown categories/nonzero counts remain unpriced and unconfirmed.",
+      "live": "V4.1 signed property-name hash; value unknown",
+      "sdk_annotation": null
+    },
+    {
+      "field": "tools",
+      "airlock": true,
+      "sdk_2_54_0_declared": true,
+      "current_reference": true,
+      "status": "restricted",
+      "relevance": [
+        "authority",
+        "billing"
+      ],
+      "rule": "Omission is no echo; otherwise exact approved function/custom/namespace inventory and definitions with reviewed direct-only defaults. Boolean strictness resolution must remain consistent.",
+      "live": "V4.2 response-tools rejection; nested offending names/values unknown",
+      "sdk_annotation": "typing.List[typing.Annotated[typing.Union[openai.types.responses.function_tool.FunctionTool, openai.types.responses.file_search_tool.FileSearchTool, openai.types.responses.computer_tool.ComputerTool, openai.types.responses.computer_use_preview_tool.ComputerUsePreviewTool, openai.types.responses.web_search_tool.WebSearchTool, openai.types.responses.tool.Mcp, openai.types.responses.tool.CodeInterpreter, openai.types.responses.tool.ProgrammaticToolCalling, openai.types.responses.tool.ImageGeneration, openai.types.responses.tool.LocalShell, openai.types.responses.function_shell_tool.FunctionShellTool, openai.types.responses.custom_tool.CustomTool, openai.types.responses.namespace_tool.NamespaceTool, openai.types.responses.tool_search_tool.ToolSearchTool, openai.types.responses.web_search_preview_tool.WebSearchPreviewTool, openai.types.responses.apply_patch_tool.ApplyPatchTool], PropertyInfo(alias='None', format=None, format_template='None', discriminator='type')]]"
+    },
+    {
+      "field": "top_logprobs",
+      "airlock": true,
+      "sdk_2_54_0_declared": true,
+      "current_reference": true,
+      "status": "accepted",
+      "relevance": [
+        "generation"
+      ],
+      "rule": "Legacy admitted echo without type/range/parity validation; unsupported output extensions still fail output validation.",
+      "live": "No field-specific signed diagnostic identification",
+      "sdk_annotation": "typing.Optional[int]"
+    },
+    {
+      "field": "top_p",
+      "airlock": true,
+      "sdk_2_54_0_declared": true,
+      "current_reference": true,
+      "status": "accepted",
+      "relevance": [
+        "generation"
+      ],
+      "rule": "Legacy admitted echo without type/range/parity validation; no new execution authority.",
+      "live": "No field-specific signed diagnostic identification",
+      "sdk_annotation": "typing.Optional[float]"
+    },
+    {
+      "field": "truncation",
+      "airlock": true,
+      "sdk_2_54_0_declared": true,
+      "current_reference": true,
+      "status": "accepted",
+      "relevance": [
+        "generation"
+      ],
+      "rule": "Legacy admitted echo without enum/parity validation; incomplete responses cannot confirm.",
+      "live": "No field-specific signed diagnostic identification",
+      "sdk_annotation": "typing.Optional[typing.Literal['auto', 'disabled']]"
+    },
+    {
+      "field": "usage",
+      "airlock": true,
+      "sdk_2_54_0_declared": true,
+      "current_reference": true,
+      "status": "restricted",
+      "relevance": [
+        "billing",
+        "completion"
+      ],
+      "rule": "Exact reviewed base-token schema, nonnegative integers, sums/bounds/cache consistency. Cache-write count must be zero; unknown financial categories refused.",
+      "live": "No field-specific signed diagnostic identification",
+      "sdk_annotation": "typing.Optional[openai.types.responses.response_usage.ResponseUsage]"
+    },
+    {
+      "field": "user",
+      "airlock": true,
+      "sdk_2_54_0_declared": true,
+      "current_reference": true,
+      "status": "accepted",
+      "relevance": [
+        "descriptive"
+      ],
+      "rule": "Legacy admitted identity echo, not independently type-validated; not copied into diagnostics.",
+      "live": "No field-specific signed diagnostic identification",
+      "sdk_annotation": "typing.Optional[str]"
+    }
+  ]
+}

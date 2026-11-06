@@ -1,0 +1,71 @@
+{
+  "schema": "actenon-airlock/doctor/v1",
+  "checks": [
+    {
+      "component": "actenon-scan",
+      "version": "1.6.0",
+      "expected": "1.6.0",
+      "ok": true
+    },
+    {
+      "component": "actenon-permit",
+      "version": "2.0.0rc1",
+      "expected": "2.0.0rc1",
+      "ok": true
+    },
+    {
+      "component": "actenon-kernel",
+      "version": "1.3.0",
+      "expected": "1.3.0",
+      "ok": true
+    },
+    {
+      "component": "actenon-protocol",
+      "version": "1.6.0",
+      "expected": "1.6.0",
+      "ok": true
+    },
+    {
+      "component": "integrated interfaces",
+      "ok": true
+    },
+    {
+      "component": "Linux/macOS broker launcher",
+      "ok": true
+    }
+  ],
+  "guarantees": {
+    "local": "cooperative Python interception",
+    "protected": {
+      "available": true,
+      "engine": {
+        "server_version": "29.9.2",
+        "os": "linux",
+        "seccomp": true
+      },
+      "image_id": "sha256:8ccf4af11d3af9b9c967b4b82474156b96ce6ccb6b5f73d0df43bb2163c71586"
+    }
+  },
+  "agents": {
+    "codex-cli": {
+      "version": "codex-cli 0.166.0",
+      "image": "actenon-airlock-codex-cli:v1",
+      "image_ready": true,
+      "status": "integration candidate: no scored live acceptance result yet"
+    },
+    "aider": {
+      "version": "aider-chat 0.86.2",
+      "image": "actenon-airlock-aider:v2",
+      "image_ready": true,
+      "status": "scored under acceptance v2"
+    },
+    "claude-code": {
+      "version": "@anthropic-ai/claude-code 2.1.308",
+      "image": "actenon-airlock-claude-code:v1",
+      "image_ready": true,
+      "status": "integration candidate: no scored live acceptance result yet"
+    }
+  },
+  "supervisor_credentials": [],
+  "ok": true
+}

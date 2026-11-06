@@ -1,0 +1,122 @@
+{
+  "implementation_commit": "8e0208f7486d07739317ebfe1a558cfd0d313b64",
+  "original_pr_head": "d404d34a80e0d3a1e911e2b9e166d97d0f278933",
+  "milestone_commit": "341ce3a2f10d2eafa5b07e74539a36e16d3dfac2",
+  "integration_baseline": "426bdaae9d4f854db877271177c4455b7e286631",
+  "tested_file_sha256": {
+    "pyproject.toml": "f947163a725fe8da52e9100114cd7ce57530cf2ebe822c43eab90e36bc46aa5d",
+    "scripts/benchmark_receipts.py": "34a3cff7b83501446720b88257b34c9b89a2a41bbfa91e16d4df3e1407ad4603",
+    "scripts/check_candidate_admission.py": "dd76d18a868b376d86df0ef275ddc76d960aac116a46405b9c1c45ed8cafe4d8",
+    "scripts/check_release_request.py": "61e584e9c2415fa1494aa1554ae39249d2e7d454d90520a78a65b1d845364dcd",
+    "scripts/independent-canonical.mjs": "5528331d2979b2d8a06387584dd32a332f33683c000082514f0b69592834eca3",
+    "scripts/verify_legacy_upgrade.py": "ba963ce07aebab61f17a43235e92877533e82d75d1b1b6ff578b67564600d2ff",
+    "src/actenon_airlock/__init__.py": "7f729cbb268e2857437b2b5e740c39fb1a67159cdd92bcdb43cb1038d4754e5e",
+    "src/actenon_airlock/adapters.py": "e27072659b6f1105c6dd8e98e85fef8911f963ddc1a139d0fc1c4042137119e4",
+    "src/actenon_airlock/broker.py": "641a035dfd9e05f5df4854b4f98707b16170c3096d3a81f4d4b5b186358bc6c9",
+    "src/actenon_airlock/ciso_proof.py": "93091e83bd530dd5958b1d2aeacdfd7ff046b4af89d082251d3e632d60cac8be",
+    "src/actenon_airlock/cli.py": "b4b1711ab52e2b16c176611e86d3c7a6a45172a3e9bc198b97cf81375015bd0e",
+    "src/actenon_airlock/common.py": "c43f0d6e6b85900064c79e4a3ae29440addd3c94fc4839f5650a71a2b53aaf25",
+    "src/actenon_airlock/contained_agent.py": "597da1f49923615637793eea17603810848beb7d6cca2869b48b63291bf55c5f",
+    "src/actenon_airlock/contained_bridge.py": "bbda892800df27b56ee2e4dc97274f3d78fe61310edd18f66cfc9ab7c213c54c",
+    "src/actenon_airlock/evidence.py": "03eb06dd92a0eadff03da0395715c1408da9e83a097e1365304a0c38bb4bf6ff",
+    "src/actenon_airlock/github_consequence.py": "3915f908f372e36593ea5b802fa35cafda3ac336cc2f8daacf6d305b529591e2",
+    "src/actenon_airlock/github_observer.py": "1eb47d5c6376e78331d30a61bbd2c77251876d0d9edf4cb101a13c5544e2e22c",
+    "src/actenon_airlock/github_runtime.py": "3a18a07d0aec62975b1fdcc4130fb95723d84f3037dd6eb6a2a940aca17671ea",
+    "src/actenon_airlock/manifest.py": "b8b531c1ba3352d3928a1c6e6862f92424f3c5e0a96cc09fa6498aa0ec52ec22",
+    "src/actenon_airlock/model_constraints.py": "6242b14ce4c524e8dc37cc1c619ccf29937a7ec454e05fe623eea282ceded1c4",
+    "src/actenon_airlock/protected.py": "cf92f6dcdd0532fa7b545a4c6423864ef94142ac4fdb9fd55b1db29800294a63",
+    "src/actenon_airlock/reconciliation.py": "c2bbe5355285e9e0b7d27dd996fbd1f65e69d331c8c6b4e37b3d43a1fb4e8d3b",
+    "src/actenon_airlock/recovery.py": "93b49f0eafe1ec14eb6002e0bd012c0f49c6199d41a4254c15b6f77b93f47de9",
+    "src/actenon_airlock/state.py": "dd602abfcb9639994d241abcfb3ffd91ce00d1c6abac21d5f139c3e45b56aeb7",
+    "src/actenon_airlock/wire.py": "f5fb1c04972c3a00cc02e11078316faa37a0e71e821971f77ef1f3ce770d39da",
+    "src/actenon_airlock/worker.py": "b03939037b621ef778efb76c8bd4952c781dbc37fd128deda4e8301de4d76b98",
+    "tests/conftest.py": "57cd1de194bcf6cd2f2fadfd28bbfbe7fb26dae14a2110cec397b51fb48c20d9",
+    "tests/fixtures/independent/canonical.json": "a1088185f8ad44361fffebd7d8c924d131e2e1c78a7a93659e0711633a3229e1",
+    "tests/fixtures/independent/endpoint.py": "97a31b244db66d02ffbadbcbae813bb5e845a0740e81b97bb261e151a9b964a6",
+    "tests/fixtures/independent/probes.py": "2a5380ea9a22e6a1777ed56ac8d5444c46fba26d9abbd6c1c98eabb85f3b70e0",
+    "tests/test_adapters.py": "7147ee6509e5816145c4de1f26dd992726761b9f32663759aaa59cf6b869e870",
+    "tests/test_authority.py": "269af46c765487fbc2599e94361b738b8eb5e5c354be94c13123698ea657f4f5",
+    "tests/test_broker.py": "0d3a5cec87bf62868696d0416e59c594b7c4011d326115916099da8fe0aa9121",
+    "tests/test_candidate_admission.py": "d75233f46e61364d44cf0bacb2799fdef69fb708e292368bed72f80043320d64",
+    "tests/test_ci.py": "c019811e0785ffbcf7fde42dc9fa754b71b6496cda155ab20011e9a6fdca67c8",
+    "tests/test_ciso_unicorn_proof.py": "aac2575f2a1de5d117d105669af7c5bea7cc3957768bec1c304de7db0ba10088",
+    "tests/test_container_mounts.py": "c27391d2b763960667c9d085e3a0242f1e3e4679c4d736c7b6ce8fa906895f08",
+    "tests/test_effect_durability.py": "6656b48c39b43e850a48535e3845a423fdbf5d41b86c22ccdc70f37be770d330",
+    "tests/test_github_approval.py": "f7762e50c2f0b7fba54b9f00b0a8ac41947f92218d34d3fa0cd7f6264541f344",
+    "tests/test_github_consequence.py": "73ce2891230abf040045298b9385be7b5a127652e302f7b43b6af9f9316f4ae3",
+    "tests/test_github_container.py": "9393510ee9ae7269cbb8c17de6ce96d3229f4bebc16d9bd2b8cc8dec798a4571",
+    "tests/test_github_observer.py": "0fb903df897f6ecc9476173999b5dd3159266f030c17eed2daac1fecae0db1a2",
+    "tests/test_github_observer_cli.py": "f583825af3fde9b2aab25bc1516329bf873e6cd5ad90193de5ed78cf091acc65",
+    "tests/test_github_protected_integration.py": "cd06db65ef58d52e01aac3dd9e0b4920bd376e5605f80a09511c6bb4a10c9154",
+    "tests/test_http_effects.py": "4226b67c05010f112e77b14d27611e705674f2307e5d69e852cb1b8c8cce16ee",
+    "tests/test_independent_authority.py": "a88712b2c866c0c3dffe8a4f80bc36a90b1607349d9b2ecce783d9ebe44bc978",
+    "tests/test_independent_canonical.py": "13da8d3e1d33613eb699f2a99dd8970058ed68b58ab9bb43754e183887a925aa",
+    "tests/test_independent_container.py": "abca66e091d9983188c31156fb71285ead50b9f9dbe1ec49ba6f308da3a7faa2",
+    "tests/test_independent_headers.py": "64b6bef541cb595e517ffb2b27c951870a76fae590b44d1220b41c5e8e93456e",
+    "tests/test_independent_recovery.py": "250824fd2ebf37c3cfc19d38063928caf7897a1137a4f081fd715cf82c3a7273",
+    "tests/test_launcher.py": "c11748a49e9f92d2f31932591d6e3d00654b67d79fd86dde8529ca8c69b75343",
+    "tests/test_legacy_upgrade.py": "a4fe5508de625729e56cbc291b3e2a38042bf284f0fcc1dd09d8799ef6bfa61c",
+    "tests/test_local_effects.py": "3a09f492e703d41998bd287b03aba191c343be37cc37af7d83d4142597f72d6e",
+    "tests/test_model_endpoints.py": "59c07d8ceab1c24be956921bf395da903c9321da94c68c3dc78c9d83482f6fb9",
+    "tests/test_model_timeouts.py": "4bbb35b84de75094bbb59be27f6884facfaad4383b29e34fb152b6042cda688f",
+    "tests/test_offline_evidence.py": "ac11c9e5ce22837bd5de651a6977fb07b85e84e9e3c71bf411d675cefc0da647",
+    "tests/test_protected.py": "8f3c51b4be26ed0436add88d4e23a843b0ddfd79784fcc532b19e5db19cdaed6",
+    "tests/test_protected_provider_authority.py": "e0dbc2cdb2b0dd428ed5a328f3013051ae21570eff103c72d4cae8b1c699c736",
+    "tests/test_provider_sdks.py": "7c85e183ed50ae7dc39c47325da9750206a3db81aba1934fb2c56f315da4d033",
+    "tests/test_receipt_concurrency.py": "9001305b2eaaddac665fd75a6332b8719f17df831b2c668bf17b5185d6a0dec3",
+    "tests/test_receipt_prefix_cache.py": "30be0bc9a3c021b87b1d23b8219ccae6af55f5e4185cc303330abc84ee06e7cb",
+    "tests/test_reconciliation.py": "726313eb7e44b96e1fd597c06c6d55b289cceff70e9b44cf73e9da66b43a18dd",
+    "tests/test_release_workflow.py": "adc48b6c1f6f4b024ecd98755c015a83f25b162305f0655ecf37a4383b8e158e"
+  },
+  "full_suite": "622 passed, zero skipped; actual Docker enabled",
+  "full_command": "AIRLOCK_TEST_PROTECTED_IMAGE=actenon-airlock-codex-assurance:20261030 AIRLOCK_INDEPENDENT_EVIDENCE=<isolated>/boundary-evidence AIRLOCK_PROTECTED_EVIDENCE=<isolated>/protected-evidence ../venv/bin/pytest -q --junitxml=<isolated>/full-results.xml",
+  "benchmark_source_matches_implementation": true,
+  "benchmark_baseline_matches_original_pr": true,
+  "historical_evidence_unchanged": true,
+  "pinned_dependencies": {
+    "actenon-protocol": {
+      "version": "1.6.0",
+      "source": {
+        "url": "https://github.com/Actenon/actenon-protocol",
+        "vcs_info": {
+          "vcs": "git",
+          "commit_id": "a2e0e08fcd24b71eb1668204ba6bed00e4c63551",
+          "requested_revision": "a2e0e08fcd24b71eb1668204ba6bed00e4c63551"
+        }
+      }
+    },
+    "actenon-kernel": {
+      "version": "1.3.0",
+      "source": {
+        "url": "https://github.com/Actenon/actenon-kernel",
+        "vcs_info": {
+          "vcs": "git",
+          "commit_id": "7a1ad40581ce0f984f5b1cc4292f26d350cab311",
+          "requested_revision": "7a1ad40581ce0f984f5b1cc4292f26d350cab311"
+        }
+      }
+    },
+    "actenon-permit": {
+      "version": "2.0.0rc1",
+      "source": {
+        "url": "https://github.com/Actenon/actenon-permit.git",
+        "vcs_info": {
+          "vcs": "git",
+          "commit_id": "b795a37cfa927c630605172f8ecaf073bfb2aa70",
+          "requested_revision": "b795a37cfa927c630605172f8ecaf073bfb2aa70"
+        }
+      }
+    },
+    "actenon-scan": {
+      "version": "1.6.0",
+      "source": {
+        "url": "https://github.com/Actenon/actenon-scan.git",
+        "vcs_info": {
+          "vcs": "git",
+          "commit_id": "16388227a55a3b5a3ec392d1c70f3940b0c291c1",
+          "requested_revision": "16388227a55a3b5a3ec392d1c70f3940b0c291c1"
+        }
+      }
+    }
+  }
+}

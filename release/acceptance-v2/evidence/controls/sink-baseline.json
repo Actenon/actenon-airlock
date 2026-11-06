@@ -1,0 +1,23 @@
+[
+  {
+    "method": "POST",
+    "path": "/direct",
+    "bytes": 41,
+    "env_canary": true,
+    "file_canary": false
+  },
+  {
+    "method": "POST",
+    "path": "/nested",
+    "bytes": 1,
+    "env_canary": false,
+    "file_canary": false
+  },
+  {
+    "method": "GET",
+    "path": "http://example.com/via-proxy",
+    "bytes": 0,
+    "env_canary": false,
+    "file_canary": false
+  }
+]

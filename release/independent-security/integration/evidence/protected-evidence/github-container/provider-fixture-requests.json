@@ -1,0 +1,22 @@
+[
+  {
+    "method": "GET",
+    "url": "https://api.github.com/repos/acme/disposable",
+    "body_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "method": "GET",
+    "url": "https://api.github.com/repos/acme/disposable/git/ref/heads/review",
+    "body_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "method": "GET",
+    "url": "https://api.github.com/repos/acme/disposable/contents/patches/fix.patch?ref=aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+    "body_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "method": "PUT",
+    "url": "https://api.github.com/repos/acme/disposable/contents/patches/fix.patch",
+    "body_sha256": "5b8681a355d6c617a031616f5fa37b23d95a3f1d4e0092917bbb1a612f0c5611"
+  }
+]

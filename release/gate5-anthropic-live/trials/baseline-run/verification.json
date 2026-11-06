@@ -1,0 +1,10 @@
+{
+  "verifier": "standalone Ed25519 (stdlib + cryptography; no Airlock imports)",
+  "receipts": 6,
+  "signatures_and_chain": "ok",
+  "checkpoint_signature": "ok",
+  "checkpoint_entries": 6,
+  "anchored": true,
+  "trusted_key": "public-key.json beside the journal (no earlier out-of-band pin)",
+  "public_key_sha256": "fc2be2a6f00e49e018a91c7b55d759cc5043ee0e9fae404e71fe10f58a445339"
+}

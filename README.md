@@ -1,38 +1,141 @@
 # Actenon Airlock
 
-**See what new powers your AI agent gained—and block them until approved.**
+**Give an AI coding agent real work, without giving it your keys, your machine or the power
+to act beyond what you approve, and check what actually happened.**
 
-Airlock scans Python source, shows new and removed powers, and checks supported HTTP calls
-before they execute. New and unresolved powers stay blocked. Consequential requests reserve
-their effect before dispatch; duplicates and blind retries of uncertain outcomes are refused.
-Signed receipts preserve each decision and its evidence.
-
-This is an installable development product, version 0.1.0.dev0. Its dependencies are pinned to the
-coherent integration candidate, including unmerged Kernel and Permit candidates. These are staging source pins; public registry dependencies are still
-a release gate. No Airlock package, tag, or release has been published.
+Your unchanged agent (Claude Code or Codex CLI) works on a copy of your project inside a
+sealed container: no network, no credentials, no home folder. Its only way out is Airlock,
+which lets through exactly what you approved, such as calls to one model up to a spend
+limit, and refuses everything else with a signed receipt. You get a patch to review and a
+receipt that says only what was observed.
 
 ## Install
 
-Airlock is **not published to PyPI or any other package registry**, and there is no release.
-You install the development candidate directly from GitHub, at an exact commit, so every
-install gets the same code.
-
-Python 3.11+ on Linux or macOS, with Git installed. Install into your agent's own Python
-environment (create one first if you need to):
+You need macOS or Linux, Python 3.11 or newer, Git, [pipx](https://pipx.pypa.io) and Docker
+running. Not sure? `airlock doctor` checks everything after the install.
 
 ~~~sh
-python3 -m venv .venv
-. .venv/bin/activate
-python -m pip install "git+https://github.com/Actenon/actenon-airlock.git@c38093e8a521fac4f5dbeaef32eb454b989260d0"
+pipx install "git+https://github.com/Actenon/actenon-airlock.git@733bd48bb391cc4e7fee1c3810bc22b79d0d2c9a"
 airlock doctor
 ~~~
 
-One Airlock installation includes Scan, Permit, Kernel, and Protocol at the exact commits in
-[dependency-pins.json](evidence/dependency-pins.json). Install your agent's own requirements
-in the same environment. To try the latest development state instead, replace the commit with
-`@main`. That changes with every merge and is not a fixed release. Neither is a production release.
+This installs one exact commit of the development candidate, together with the
+other Actenon components it needs at their pinned commits. Airlock is **not on PyPI yet**
+and this is **not a release**. No pipx? `brew install pipx` on macOS, `sudo apt install pipx`
+on Debian or Ubuntu, or use a virtual environment:
 
-## Quickstart
+~~~sh
+python3 -m venv ~/.airlock
+~/.airlock/bin/pip install "git+https://github.com/Actenon/actenon-airlock.git@733bd48bb391cc4e7fee1c3810bc22b79d0d2c9a"
+~/.airlock/bin/airlock doctor
+~~~
+
+A plain `pip install` into Homebrew's or the system Python is refused (PEP 668); that is why
+the commands above use pipx or a virtual environment. Problems: [troubleshooting](docs/troubleshooting.md).
+
+## See it work: free, no key, no account
+
+~~~sh
+airlock demo
+~~~
+
+**Part 1.** A script does a small job, then acts like a hijacked agent. It runs once in an
+ordinary container and once in Protected Mode. The results come from what actually reached
+an independent listener:
+
+~~~text
+                              Ordinary container    Protected Mode
+Fix the bug                   done                  done, as a patch to review
+Steal the GitHub token        LEAKED                nothing got out
+Steal the project's .env      LEAKED                nothing got out
+Steal the SSH private key     LEAKED                nothing got out
+Send data straight out        LEAKED                nothing got out
+Change your real files        yes                   no, your files are untouched
+Ask the supervisor to send it -                     REFUSED, signed receipt
+~~~
+
+**Part 2.** The fix from the sealed run goes through the path a real publish uses. Your tests
+check it in a sealed container. You see the one exact grant it needs. Airlock refuses an
+edited copy and a write to another file, sends the approved write once and refuses a replay.
+It counts the write as done only after reading the result back, and an independent check
+agrees:
+
+~~~text
+RECEIPT
+  Changed    1 file (calculator.py)
+  Checked    PASS: 2 tests passed
+  Approved   1 exact file creation, nothing else
+  Refused    3 attempts, none reached the stand-in
+  Happened   1 file created on the local stand-in, confirmed independently
+  Uncertain  nothing
+  Evidence   12 signed receipts, integrity OK
+~~~
+
+The secrets are fakes made for the run, and "GitHub" in Part 2 is Airlock's local stand-in;
+nothing is written to real GitHub and nothing leaves your machine. If the attacks do not land
+in the ordinary container, or any line is not backed by evidence, the demo says so and claims
+nothing. The first run builds a small image; after that it takes a few seconds.
+
+## Use it on your own project
+
+~~~sh
+cd my-project
+export ANTHROPIC_API_KEY=...       # or OPENAI_API_KEY for Codex CLI
+airlock protect --tests ../my-project-tests "Fix the failing test"
+~~~
+
+1. **Review.** Airlock shows, in plain words, the one thing you are asked to approve: this
+   agent may call this model, up to a spend limit per run ($2.00 unless you choose another),
+   with every bound listed. Powers Airlock finds in your code, such as a call to `xdg-open`,
+   are listed as *found but not granted*. Nothing runs until you say yes.
+2. **Work.** The agent works on a copy in the sealed container. You see short progress lines;
+   anything it says about itself is labelled as its own claim. The key stays on your machine.
+3. **Check.** With `--tests DIR`, your own tests, held outside the project, check the change in
+   a sealed container. The check commands come from your project, never from the agent's copy:
+   pytest for Python, `go vet` and `go test` for Go, `tsc` and `vitest` (or `npm test`) for
+   TypeScript. The result is PASS, FAIL, SKIPPED, UNSUPPORTED or INCONCLUSIVE, and skips or
+   edited test settings never count as a pass unless you say so.
+4. **Receipt.** What changed, what the checks found, what was refused, what it cost and what is
+   still uncertain. A run stopped by the spend limit says so instead of looking finished.
+5. **Take it or leave it.** Your project is untouched. Apply the patch with the `git apply`
+   command the receipt prints.
+
+Go and TypeScript checks need an image with your toolchain. Airlock checks for it before the
+agent runs and prints the one command that builds it. See [real projects](docs/real-project.md)
+and the step-by-step [getting started](docs/getting-started.md) guide.
+
+| Agent | Version | Status on this candidate |
+|---|---|---|
+| Claude Code | 2.1.308, unchanged | Real binary through the real boundary in CI with a scripted model. Live-model runs exist for earlier candidates; none is a formal result for this one |
+| Codex CLI | 0.166.0, unchanged | Same, with a scripted model |
+| Aider | 0.86.2, unchanged | Scored with a local model under [acceptance v2](release/acceptance-v2/VERDICT.md); uses the [guided path](docs/golden-path.md) |
+
+## What Airlock does and does not promise
+
+| | |
+|---|---|
+| **Enforced** | In Protected Mode the agent has no network, no credentials and no route to your home folder. Only approved model calls and reviewed GitHub file creations leave, each bound to exact parameters you signed. Other requests are refused, with a signed receipt. |
+| **Kept from the agent** | API keys and tokens stay with Airlock on your machine. `.env` files and known credential folders are not copied in. |
+| **Recorded** | Every decision is in a signed, hash-chained journal that `airlock receipts` verifies. |
+| **Confirmed only by readback** | An external effect counts as done only after Airlock reads the provider back. A lost response stays AMBIGUOUS and identical retries stay blocked. |
+| **Not promised** | That the agent's work is right. That a secret written in ordinary source stays private: the agent can send anything in its copy to the model you allowed. Local Mode (`airlock run`) is cooperative Python interception, not a sandbox for hostile code. |
+
+The full list, with what each guarantee rests on, is in the [security model](docs/security-model.md).
+
+## Status
+
+Development candidate 0.1.0.dev0. **Not a release and not on any package registry.** It depends on
+exact source commits of Actenon Scan, Permit, Kernel and Protocol, some of them unmerged
+candidates ([pins](evidence/dependency-pins.json)). The [release admission gate](release/README.md)
+reports NOT READY; the [release bar](release/RELEASE_BAR.md) says what a release needs and the
+[checkpoint](release/CHECKPOINT.md) shows where each item stands.
+
+Questions, bugs and offers to test it: [contributing](CONTRIBUTING.md).
+
+## Protect your own Python agent
+
+This is a separate, lighter path for agents you write yourself. It runs in Local Mode, which
+is cooperative Python interception and not a container boundary.
 
 In your agent's project:
 
@@ -74,19 +177,26 @@ Existing approved powers can continue. New powers are denied by Permit. Removed 
 automatically removed from the runtime grant. Re-run init --approve after reviewing the change
 to activate the new resolved powers. Templates and unknown targets stay blocked after approval.
 
-For a demonstration without any external account, get the examples first; they are not part of
-the pip install:
+For a demonstration without any external account, run examples/server.py directly in one terminal.
+In another terminal, change into examples/agent and run init --approve followed by run.
+Then change the POST to DELETE in main.py: diff shows the new power and run denies it.
+
+## The guided path
+
+`airlock protect` runs the first half of the [ten-step golden path](docs/golden-path.md). Use
+the steps directly when you want to see each one, or to publish a reviewed change:
 
 ~~~sh
-git clone https://github.com/Actenon/actenon-airlock.git
-cd actenon-airlock
-git checkout c38093e8a521fac4f5dbeaef32eb454b989260d0
+airlock doctor
+airlock setup --agent aider --model MODEL --model-endpoint URL --approve
+airlock work --message-file ISSUE.md --test-command "python -m pytest -q"
+airlock capture
+airlock status
 ~~~
 
-Run examples/server.py directly in one terminal. In another terminal, change into examples/agent
-and run init --approve followed by run. Then change the POST to DELETE in main.py: diff shows the
-new power and run denies it. Running the unchanged agent a second time is also denied. The first
-POST's outcome is uncertain to Airlock, and it refuses blind retries of an uncertain effect.
+Details for each agent are in [Claude Code](docs/claude-code.md) and
+[Codex CLI](docs/codex-cli.md). For stopping, rotating and recovering, see
+[operations](docs/operations.md).
 
 ## Credentials and receipts
 
@@ -118,7 +228,7 @@ linked completion record. Consequential HTTP uses Permit's durable effect reserv
 and claimed independently by Kernel before credential release. Lost responses leave AMBIGUOUS
 ownership held, and identical retries remain blocked across new runs and grants. In Local Mode,
 read-only classification comes from Scan; those requests remain repeatable. Protected Mode
-supports reviewed text inference and exact GitHub file creation. Other outbound calls, including
+supports reviewed model inference and exact GitHub file creation. Other outbound calls, including
 arbitrary GETs, are denied: an HTTP verb alone does not establish harmless consequences.
 
 A generic HTTP response is returned to the agent, but does not prove the remote consequence
@@ -210,3 +320,9 @@ proof mutation/replay, JSON/CI output, and attempted runtime bypasses.
 The local signed receipt journal serializes appends across threads and broker
 processes. An interrupted partial record stops further appends until recovery;
 evidence is preserved. See [the journal attack evidence and guarantees](docs/evidence/receipt-journal/README.md).
+
+### Codex CLI integration candidate
+
+[Run unchanged Codex CLI inside Protected Mode](docs/codex-cli.md). The pinned
+Responses integration has a scripted real-binary rehearsal and independent Docker
+controls. Live-model acceptance is not yet run; historical release gates still apply.

@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import argparse
+import dataclasses
 import hashlib
 import importlib.metadata
 import json
@@ -135,26 +136,548 @@ def doctor(root: Path):
             checks.append({"component": "local approval signature", "ok": True})
         except AirlockError:
             checks.append({"component": "local approval signature", "ok": False})
-    protected = availability()
+    from .preflight import docker_problem, installed_commit
+
+    problem = docker_problem("airlock doctor")
+    protected = {"available": False, "reason": problem.category} if problem else availability()
+    from .agents import SUPPORTED
+
+    agents = {}
+    for name, profile in SUPPORTED.items():
+        # Unknown (None) while Docker is not usable, never a guess.
+        ready = None if problem else availability(profile["image"])["available"]
+        agents[name] = {
+            "version": profile["version"],
+            "image": profile["image"],
+            "image_ready": ready,
+            "status": profile.get("status", "scored under acceptance v2"),
+        }
+    import platform
+
+    try:
+        version = importlib.metadata.version("actenon-airlock")
+    except importlib.metadata.PackageNotFoundError:
+        version = "unknown"
+    keys = sorted(name for name in ("ANTHROPIC_API_KEY", "OPENAI_API_KEY") if os.environ.get(name))
+    if not all(c["ok"] for c in checks):
+        next_step = "Reinstall Airlock with the command in the README; a component is wrong."
+    elif problem:
+        next_step = problem.fix[0] if problem.fix else "Fix Docker, then run airlock doctor again."
+    elif not keys:
+        next_step = (
+            "Run `airlock demo` (free, no key). Set a model key later for `airlock protect`."
+        )
+    else:
+        next_step = 'Run `airlock demo`, or cd into a project and run `airlock protect "<task>"`.'
     return {
         "schema": "actenon-airlock/doctor/v1",
+        "airlock": {"version": version, "commit": installed_commit()},
+        "system": {
+            "os": {"Darwin": "macOS"}.get(platform.system(), platform.system()),
+            "machine": platform.machine(),
+            "python": platform.python_version(),
+        },  # fmt: skip
+        "docker": None
+        if not problem
+        else {"category": problem.category, "what": problem.what, "fix": problem.fix},
+        "ready": all(c["ok"] for c in checks) and not problem,
+        "demo_image_ready": None if problem else availability()["available"],
+        "next_step": next_step,
         "checks": checks,
         "guarantees": {"local": "cooperative Python interception", "protected": protected},
+        "agents": agents,
+        "supervisor_credentials": keys,
         "ok": all(c["ok"] for c in checks),
     }
 
 
-def main(argv=None):
-    parser = argparse.ArgumentParser(
-        description="See and control the powers of your Python AI agent."
+# What is true after Ctrl-C. Every container Airlock starts is removed in a finally block.
+STOPPED = {
+    "demo": "Stopped. The demo's containers, network and temporary files were removed; "
+    "nothing else was touched. Run `airlock demo` again whenever you like.",
+    "protect": "Stopped. Airlock removed the containers it started. The agent only ever worked "
+    "on a copy, so your project is unchanged, and nothing it did left the container. A model "
+    "call that was in progress may still be billed by your provider. Run the same command "
+    "again for a fresh run; `airlock status` shows what was recorded.",
+    "work": "Stopped. Airlock removed the containers it started; your project is unchanged. "
+    "`airlock status` shows what was recorded.",
+    None: "Stopped before it finished. `airlock status` shows what was recorded.",
+}
+
+
+def doctor_text(result: dict) -> str:
+    """What a person needs from doctor: is it ready, and if not, the one thing to do next."""
+    from .style import paint
+
+    w = 13
+    airlock = result["airlock"]
+    where = f", from commit {airlock['commit'][:12]}" if airlock["commit"] else ""
+    lines = [paint("Airlock doctor", "head"), ""]
+    lines.append(
+        f"  {'Airlock':<{w}}{airlock['version']}{where} (development candidate, not a release)"
     )
+    parts = [c for c in result["checks"] if "version" in c]
+    wrong = [c for c in result["checks"] if not c["ok"]]
+    names = ", ".join(
+        f"{c['component'].removeprefix('actenon-').title()} {c['version']}" for c in parts
+    )
+    lines.append(
+        f"  {'Components':<{w}}{names}: "
+        + (paint("as pinned", "good") if not wrong else paint("PROBLEM", "bad"))
+    )
+    for c in wrong:
+        expected = f" (expected {c['expected']})" if c.get("expected") else ""
+        lines.append(
+            f"  {'':<{w}}{paint('wrong', 'bad')}: {c['component']} {c.get('version', '')}{expected}"
+        )
+    system = result["system"]
+    lines.append(f"  {'System':<{w}}{system['os']} {system['machine']}, Python {system['python']}")
+    docker = result["docker"]
+    if docker:
+        lines.append(f"  {'Docker':<{w}}" + paint(docker["what"].splitlines()[0], "bad"))
+        lines.append(f"  {'Images':<{w}}unknown until Docker is running")
+    else:
+        lines.append(
+            f"  {'Docker':<{w}}" + paint("running", "good") + ", Linux containers, seccomp on"
+        )
+        built = [name for name, a in result["agents"].items() if a["image_ready"]]
+        demo = (
+            "demo image ready"
+            if result["demo_image_ready"]
+            else "demo image builds on first `airlock demo`"
+        )
+        lines.append(f"  {'Images':<{w}}{demo}")
+        lines.append(
+            f"  {'':<{w}}agents ready: {', '.join(built) or 'none yet'}"
+            + ("; the rest build on first use, once" if len(built) < len(result["agents"]) else "")
+        )
+    keys = ", ".join(result["supervisor_credentials"])
+    lines.append(
+        f"  {'Model keys':<{w}}"
+        + (f"{keys} set. Kept by Airlock; never enters the container." if keys
+           else "none set. Only `airlock protect` needs one; `airlock demo` does not.")
+    )  # fmt: skip
+    if not result["ok"]:
+        lines += ["", paint("Not ready.", "bad") + " " + result["next_step"]]
+    elif docker:
+        lines += [
+            "",
+            paint("Not ready", "bad")
+            + " for `airlock demo` or `airlock protect`: "
+            + docker["what"].splitlines()[0],
+            "To fix it:",
+            *(f"  {step}" for step in docker["fix"]),
+            "Then run again:",
+            "  airlock doctor",
+            "",
+            "Local Mode (`airlock init` and `airlock run`) works without Docker.",
+        ]
+    else:
+        lines += ["", paint("Ready.", "good") + " " + result["next_step"]]
+    return "\n".join(lines)
+
+
+WORKFLOW_COMMANDS = {
+    "setup", "work", "capture", "verify-candidate", "review-candidate", "publish", "status",
+    "synthetic-provider", "stop", "resume", "protect",
+}  # fmt: skip
+
+
+def _workflow_command(args, root: Path) -> int:
+    """The guided path. Every consequence still goes through the existing broker."""
+    from .agents import command, declaration, require_supported, write_declaration
+    from .model_constraints import DEFAULT_ENDPOINTS
+    from .synthetic_github import TOKEN, create_provider, synthetic_client
+    from .workflow import (
+        TESTS_PASSED,
+        capture_candidate,
+        publish_candidate,
+        status,
+        verify_candidate,
+    )
+
+    if args.cmd == "protect":
+        from .protect import protect
+
+        return protect(args, root, main)
+    state = State(root)
+    config_path = state.path / "agent.json"
+    if args.cmd == "setup":
+        profile = require_supported(args.agent)
+        contract = profile.get("contract")
+        endpoint_url = args.model_endpoint or (
+            DEFAULT_ENDPOINTS[profile.get("provider", "anthropic")] if contract else None
+        )
+        if not endpoint_url:
+            raise AirlockError("--model-endpoint is required for this agent")
+        if contract and not (args.max_run_usd and args.price_per_mtok):
+            raise AirlockError(
+                "This agent needs --max-run-usd and --price-per-mtok: the spend bound is "
+                "enforced from signed prices you review, so Airlock will not guess them"
+            )
+        state.initialize()
+        write_declaration(root, declaration(args.model, endpoint_url))
+        config = {
+            "agent": args.agent,
+            "model": args.model,
+            "model_endpoint": endpoint_url,
+            "image": profile["image"],
+        }
+        forwarded = [
+            "init", "--path", str(root), "--command", "airlock_agent.py", "--model", args.model,
+            "--model-endpoint", endpoint_url,
+        ]  # fmt: skip
+        if contract:
+            output_tokens = args.max_output_tokens or profile["max_output_tokens"]
+            config["command_options"] = {
+                "max_output_tokens": output_tokens,
+                "budget_usd": args.max_run_usd,
+                "thinking": not args.no_thinking,
+            }
+            config.update(max_run_usd=args.max_run_usd, price_per_mtok=args.price_per_mtok)
+            forwarded += [
+                "--model-provider", profile.get("provider", "anthropic"),
+                "--model-contract", contract,
+                "--model-max-tokens", str(output_tokens),
+                "--model-max-input-bytes", str(profile["max_input_bytes"]),
+                "--model-max-run-usd", args.max_run_usd, "--model-price", args.price_per_mtok,
+                "--model-read-timeout", "540",
+                *(arg for flag in profile["anthropic_betas"] for arg in ("--model-beta", flag)),
+            ]  # fmt: skip
+        else:
+            forwarded += ["--model-max-tokens", "4096", "--model-read-timeout", "600"]
+        config_path.write_text(json.dumps(config, indent=2) + "\n")
+        if args.reconciler_key:
+            forwarded += ["--reconciler-key", str(args.reconciler_key)]
+        flags = (["--approve"] if args.approve else []) + (["--details"] if args.details else [])
+        return main([*forwarded, *flags])
+    if args.cmd == "work":
+        from .protected import launch_protected
+
+        try:
+            config = json.loads(config_path.read_text())
+        except OSError as exc:
+            raise AirlockError("No agent configured; run airlock setup first") from exc
+        if not (root / args.message_file).resolve().is_relative_to(root.resolve()):
+            raise AirlockError("The message file must be inside the project the agent receives")
+        if os.environ.get("ANTHROPIC_API_KEY", "").startswith("sk-ant-oat"):
+            raise AirlockError(
+                "ANTHROPIC_API_KEY holds a subscription token. Claude subscription credentials "
+                "cannot be held by an intermediary: use an API key from the Claude Console"
+            )
+        return launch_protected(
+            root,
+            command(
+                config["agent"],
+                config["model"],
+                args.message_file,
+                args.test_command,
+                **config.get("command_options", {}),
+            ),
+            image=args.image or config["image"],
+        )
+    if args.cmd == "capture":
+        manifest = capture_candidate(state)
+        if args.json:
+            print(json.dumps(manifest, indent=2))
+        else:
+            print("UNTRUSTED agent output captured; nothing was executed or approved.")
+            for change in manifest["changes"]:
+                print(f"  {change['status']:<9}{change['path']}")
+            print("Candidate " + manifest["candidate_sha256"])
+        return 0
+    if args.cmd == "verify-candidate":
+        from .protected import DEFAULT_IMAGE
+        from .workflow import OUTCOMES, detect_profile, planned_checks
+
+        image = args.image or DEFAULT_IMAGE
+        profile = detect_profile(root) if args.profile == "auto" else args.profile
+        checks = [shlex.split(text) for text in args.check] or None
+        if not args.json:
+            print(f"Checking candidate {args.candidate[:12]} as a {profile} project, in {image}:")
+            print("  no network, no credentials, a private copy of the agent's files,")
+            print(f"  with your trusted tests from {args.tests} laid over them.")
+            for command in planned_checks(root, profile, checks):
+                print("  run: " + " ".join(command))
+        result = verify_candidate(
+            state, args.candidate, args.tests.resolve(), image=image, profile=profile,
+            checks=checks, accept_skips=args.accept_skips,
+            allow_config_change=args.allow_config_change,
+        )  # fmt: skip
+        if args.json:
+            print(json.dumps(result, indent=2))
+        else:
+            print(f"\n{OUTCOMES[result['verdict']]}  {result['verdict']}: {result['detail']}")
+            print("These checks only. Passing is not a safety finding and approves nothing.")
+        return 0 if result["verdict"] == TESTS_PASSED else 2
+    if args.cmd == "review-candidate":
+        from .github_consequence import ReviewedGitHubCreate
+        from .github_runtime import PROFILE_SCHEMA
+
+        patch = state.local / "candidates" / args.candidate / "candidate.patch"
+        if not patch.is_file():
+            raise AirlockError("Unknown candidate; run airlock capture first")
+        facts = {
+            "repo_id": args.repo_id,
+            "repo_node_id": args.repo_node_id,
+            "owner": args.owner,
+            "repo": args.repo,
+            "branch": args.branch,
+            "expected_parent_sha": args.parent,
+        }
+        if args.synthetic_provider:
+            provider = json.loads(args.synthetic_provider.read_text())
+            repository = provider["repository"]
+            facts = {
+                "repo_id": repository["id"],
+                "repo_node_id": repository["node_id"],
+                "owner": repository["owner"],
+                "repo": repository["name"],
+                "branch": provider["branch"],
+                "expected_parent_sha": provider["head"],
+            }
+        missing = sorted(name for name, value in facts.items() if value is None)
+        if missing:
+            raise AirlockError("Repository facts are required: " + ", ".join(missing))
+        review = ReviewedGitHubCreate(
+            **facts,
+            path=args.path_in_repo,
+            message=args.message,
+            content_sha256=args.candidate,
+        )
+        profile = {
+            "schema": PROFILE_SCHEMA,
+            "exclusive_writer": True,
+            "credential_name": "GITHUB_TOKEN",
+            "review": dataclasses.asdict(review),
+        }
+        args.output.write_text(json.dumps(profile, indent=2) + "\n")
+        config = json.loads(config_path.read_text())
+        write_declaration(
+            root, declaration(config["model"], config["model_endpoint"], (review.contents_url,))
+        )
+        print(f"Proposed: create {review.path} in {review.owner}/{review.repo}@{review.branch}")
+        print(f"Exact bytes: sha256 {args.candidate}")
+        print("Nothing is authorized yet. Review the candidate, then sign with:")
+        print(f"  airlock init --approve --github-create {args.output} --reconciler-key <key>")
+        return 0
+    if args.cmd == "publish":
+        client = None
+        if args.synthetic_provider:
+            os.environ["GITHUB_TOKEN"] = TOKEN  # in-process; no network transport exists
+            client = synthetic_client(args.synthetic_provider)
+        result = publish_candidate(state, args.candidate, client=client)
+        if args.json:
+            print(json.dumps(result, indent=2))
+        elif result["status"] == "REFUSED":
+            print("REFUSED: " + str(result["reason"]))
+        else:
+            print(
+                f"{result['status']}: effect {result['effect_id']} outcome {result['outcome']}. "
+                "Not confirmed until independent readback settles it:"
+            )
+            print(
+                f"  airlock reconcile {result['effect_id']} --github-readback --operator-key <key>"
+            )
+        return 0 if result["status"] == "DISPATCHED_UNCONFIRMED" else 3
+    if args.cmd in {"stop", "resume"}:
+        (state.set_emergency_stop if args.cmd == "stop" else state.clear_emergency_stop)(
+            args.reason
+        )
+        print(
+            "EMERGENCY STOP ACTIVE: no dispatch, no new run; reconcile still works."
+            if args.cmd == "stop"
+            else "Emergency stop cleared. Held effects remain held."
+        )
+        return 0
+    if args.cmd == "status":
+        result = status(state)
+        if args.json:
+            print(json.dumps(result, indent=2))
+        else:
+            print(
+                f"Receipts: {result['receipts']} (integrity {'OK' if result['integrity_ok'] else 'FAILED'})"
+            )
+            print(f"History completeness: {result['completeness']}")
+            if result["emergency_stop"]:
+                print("EMERGENCY STOP ACTIVE: " + result["emergency_stop"]["reason"])
+            print(f"Refused: {result['refused']}")
+            for reason in result["refusal_reasons"]:
+                print("  " + reason)
+            calls = result["inference"]
+            print(
+                f"Model calls: {calls['dispatched']} dispatched, {calls['confirmed']} confirmed, "
+                f"{calls['unconfirmed']} unconfirmed, {calls['retries_held']} retries held"
+            )
+            spend = result["model_spend"]
+            if spend["estimated_microusd"] or spend["declined_calls"]:
+                print(
+                    f"Model spend estimate: ${spend['estimated_microusd'] / 1_000_000:.4f} "
+                    f"(not billing); {spend['declined_calls']} calls declined by the provider"
+                )
+            print(f"Independently observed: {result['independently_observed'] or 'none'}")
+            print(f"Unresolved effects: {len(result['unresolved_effects'])}")
+            for effect in result["unresolved_effects"]:
+                print("  " + effect)
+        return 0 if result["integrity_ok"] else 2
+    if args.create:
+        create_provider(args.file)
+    provider = json.loads(args.file.read_text())
+    if args.lose_next_ack:
+        provider["lose_next_acknowledgement"] = True
+        args.file.write_text(json.dumps(provider, indent=2))
+    mutations = [r for r in provider["requests"] if r["method"] not in {"GET", "HEAD"}]
+    print(provider["notice"])
+    print(f"Requests received: {len(provider['requests'])}; mutations: {len(mutations)}")
+    print(f"Files: {sorted(provider['files']) or 'none'}")
+    return 0
+
+
+def main(argv=None):
+    parser = argparse.ArgumentParser(description="Let AI agents work. Never surrender control.")
     parser.add_argument("--version", action="version", version=__version__)
     sub = parser.add_subparsers(dest="cmd", required=True)
-    for cmd in ("init", "diff", "check", "doctor", "run", "receipts", "reconcile"):
+    for cmd in (
+        "init", "diff", "check", "doctor", "run", "receipts", "reconcile",
+        "checkpoint", "verify-evidence", "recovery-inventory",
+        "setup", "work", "capture", "verify-candidate", "review-candidate", "publish", "status",
+        "synthetic-provider", "stop", "resume", "protect", "demo", "explain",
+    ):  # fmt: skip
         p = sub.add_parser(cmd)
         p.add_argument("--path", type=Path, default=Path.cwd())
-        if cmd != "run":
+        if cmd not in {"run", "protect", "demo"}:
             p.add_argument("--json", action="store_true", help="Print machine-readable JSON")
+        if cmd == "protect":
+            p.add_argument("task", help="What the agent should do, in plain words")
+            p.add_argument("--agent", help="Default: the agent whose model key is in this shell")
+            p.add_argument("--model", help="Default: the agent's supported model")
+            p.add_argument("--max-run-usd", help="Spend limit per run. Default: 2.00")
+            p.add_argument(
+                "--accept-skips",
+                action="store_true",
+                help="With --tests: count skipped tests as acceptable (recorded)",
+            )
+            p.add_argument(
+                "--allow-config-change", action="store_true",
+                help="With --tests: accept that the agent changed what defines the checks",
+            )  # fmt: skip
+            p.add_argument("--price-per-mtok", help="input,cache_write,cache_read,output")
+            p.add_argument("--model-endpoint", help="Exact model URL the supervisor calls")
+            p.add_argument("--image", help="Your own image, built on the agent's image")
+            p.add_argument(
+                "--tests", type=Path,
+                help="Tests you hold outside the project, run against the change",
+            )  # fmt: skip
+            p.add_argument("--approve", action="store_true", help="Approve without being asked")
+        if cmd == "explain":
+            p.add_argument("effect_id", help="The consequential effect to explain")
+            p.add_argument(
+                "--independent", type=Path,
+                help="An independent readback verdict (JSON) to include and check",
+            )  # fmt: skip
+            p.add_argument("--output", type=Path, help="Also write the report here")
+        if cmd == "checkpoint":
+            p.add_argument(
+                "--output", type=Path, required=True,
+                help="Where to write the signed checkpoint; keep it outside the project",
+            )  # fmt: skip
+        if cmd == "verify-evidence":
+            p.add_argument("--journal", type=Path, required=True, help="Exported receipts.jsonl")
+            p.add_argument(
+                "--public-key", required=True,
+                help="Trusted base64 Ed25519 key or public-key.json you obtained independently",
+            )  # fmt: skip
+            p.add_argument("--checkpoint", type=Path, help="Newest signed checkpoint you hold")
+            p.add_argument(
+                "--integrity-only", action="store_true",
+                help="Exit 0 on integrity alone; completeness stays UNANCHORED",
+            )  # fmt: skip
+        if cmd == "setup":
+            p.add_argument("--agent", required=True, help="A supported agent, e.g. claude-code")
+            p.add_argument("--model", required=True, help="The one model the agent may call")
+            p.add_argument(
+                "--model-endpoint",
+                help="Exact model URL the supervisor calls (HTTPS or loopback)",
+            )  # fmt: skip
+            p.add_argument("--max-run-usd", help="Supervisor-enforced model spend bound per run")
+            p.add_argument(
+                "--details", action="store_true", help="Show the full internal authority review"
+            )
+            p.add_argument("--max-output-tokens", type=int, help="Lower the signed reply bound")
+            p.add_argument(
+                "--no-thinking", action="store_true", help="Ask the agent not to request thinking"
+            )
+            p.add_argument(
+                "--price-per-mtok",
+                help="USD per million tokens: input,cache_write,cache_read,output",
+            )  # fmt: skip
+            p.add_argument("--reconciler-key", type=Path, help="External operator key path")
+            p.add_argument("--approve", action="store_true", help="Sign the reviewed authority")
+        if cmd == "work":
+            p.add_argument("--message-file", required=True, help="Task, relative to the project")
+            p.add_argument("--test-command", default="python -m pytest -q")
+            p.add_argument("--image", help="Override the agent's image")
+        if cmd == "verify-candidate":
+            p.add_argument("--candidate", required=True, help="Candidate SHA-256")
+            p.add_argument(
+                "--tests", type=Path, required=True,
+                help="Trusted tests held outside the project",
+            )  # fmt: skip
+            p.add_argument("--image", help="Test image (default: the compute image)")
+            p.add_argument(
+                "--profile",
+                choices=("auto", "python", "go", "node"),
+                default="auto",
+                help="Which built-in checks to run (default: detected from your project)",
+            )
+            p.add_argument(
+                "--check",
+                action="append",
+                default=[],
+                metavar="COMMAND",
+                help="Run this exact command instead (repeatable; no shell)",
+            )
+            p.add_argument(
+                "--accept-skips",
+                action="store_true",
+                help="Count skipped tests as acceptable (recorded in the receipt)",
+            )
+            p.add_argument(
+                "--allow-config-change", action="store_true",
+                help="Accept that the agent changed files that define the checks (recorded)",
+            )  # fmt: skip
+        if cmd == "review-candidate":
+            p.add_argument("--candidate", required=True, help="Candidate SHA-256")
+            p.add_argument("--output", type=Path, required=True, help="Profile to review")
+            p.add_argument("--path-in-repo", required=True, help="New file to create")
+            p.add_argument("--message", required=True, help="Commit message")
+            p.add_argument("--repo-id", type=int)
+            p.add_argument("--repo-node-id")
+            p.add_argument("--owner")
+            p.add_argument("--repo")
+            p.add_argument("--branch")
+            p.add_argument("--parent", help="Expected parent commit SHA")
+            p.add_argument("--synthetic-provider", type=Path, help="Read repo facts from this file")
+        if cmd == "publish":
+            p.add_argument("--candidate", required=True, help="Candidate SHA-256")
+            p.add_argument(
+                "--synthetic-provider", type=Path,
+                help="Use this disposable synthetic provider; nothing reaches a network",
+            )  # fmt: skip
+        if cmd in {"stop", "resume"}:
+            p.add_argument("--reason", required=True, help="Recorded in the signed journal")
+        if cmd == "synthetic-provider":
+            p.add_argument("--file", type=Path, required=True)
+            p.add_argument("--create", action="store_true")
+            p.add_argument(
+                "--lose-next-ack", action="store_true",
+                help="Commit the next creation, then lose its acknowledgement",
+            )  # fmt: skip
+        if cmd == "recovery-inventory":
+            p.add_argument("--public-key", help="Independently retained public key or key file")
+            p.add_argument(
+                "--checkpoint", type=Path, help="Newest independently retained checkpoint"
+            )
         if cmd in {"diff", "check"}:
             p.add_argument("--base", help="Compare to the signed approval at this trusted Git ref")
             p.add_argument("--output", type=Path, help="Save JSON authority diff")
@@ -175,10 +698,21 @@ def main(argv=None):
             p.add_argument(
                 "--model", action="append", default=[], help="Approve this exact inference model"
             )
-            p.add_argument("--model-provider", choices=("openai", "anthropic"), default="openai")
+            p.add_argument(
+                "--model-provider",
+                choices=("openai", "anthropic", "openai-responses"),
+                default="openai",
+            )
             p.add_argument("--model-max-tokens", type=int, default=2048)
             p.add_argument(
                 "--model-endpoint", help="Exact full inference endpoint also discovered by Scan"
+            )
+            p.add_argument("--model-contract", help="Review a named agent inference contract")
+            p.add_argument("--model-beta", action="append", default=[], help="Exact model feature")
+            p.add_argument("--model-max-input-bytes", type=int, default=2 * 1024 * 1024)
+            p.add_argument("--model-max-run-usd", help="Per-run model spend bound in USD")
+            p.add_argument(
+                "--model-price", help="USD per million tokens: input,cache_write,cache_read,output"
             )
             p.add_argument(
                 "--model-read-timeout",
@@ -189,6 +723,19 @@ def main(argv=None):
                 "--approve",
                 action="store_true",
                 help="Explicitly approve the displayed resolved powers",
+            )
+            p.add_argument(
+                "--grant-discovered",
+                action="store_true",
+                help="Also grant powers found in your own code (only for airlock run)",
+            )
+            p.add_argument(
+                "--details", action="store_true", help="Show the full internal authority review"
+            )
+            p.add_argument(
+                "--only-reviewed",
+                action="store_true",
+                help="Grant only reviewed consequences (model, GitHub creates), nothing discovered",
             )
             p.add_argument("--command", help='Python script and arguments, or "-m module"')
             p.add_argument("--credential", action="append", default=[], metavar="NAME=HTTPS_ORIGIN")
@@ -207,6 +754,10 @@ def main(argv=None):
                 action="store_true",
                 help="Observe the exact reviewed GitHub creation; uncertainty remains held",
             )
+            p.add_argument(
+                "--synthetic-provider", type=Path,
+                help="Observe this disposable synthetic provider; nothing reaches a network",
+            )  # fmt: skip
             p.add_argument(
                 "--operator-key", type=Path, help="External approved operator private key"
             )
@@ -241,25 +792,87 @@ def main(argv=None):
     try:
         if not root.is_dir():
             raise AirlockError("Project directory does not exist")
+        if args.cmd == "demo":
+            from .demo import run
+
+            return run()
         if args.cmd == "doctor":
             result = doctor(root)
             if args.json:
                 print(json.dumps(result, indent=2))
             else:
-                for c in result["checks"]:
-                    print(
-                        ("OK " if c["ok"] else "FAIL ")
-                        + c["component"]
-                        + (" " + c["version"] if "version" in c else "")
-                    )
-                print("Candidate dependencies are pinned; registry releases remain pending.")
-                print("LOCAL MODE: cooperative Python protection")
-                print(
-                    "PROTECTED MODE AVAILABLE"
-                    if result["guarantees"]["protected"]["available"]
-                    else "COOPERATIVE MODE ONLY: " + result["guarantees"]["protected"]["reason"]
-                )
+                print(doctor_text(result))
             return 0 if result["ok"] else 2
+        if args.cmd == "checkpoint":
+            from .evidence import create_checkpoint
+
+            output = args.output.resolve()
+            if output.is_relative_to(root):
+                print(
+                    "WARNING: the checkpoint is inside the project; anything that can "
+                    "rewrite the journal can rewrite it too",
+                    file=sys.stderr,
+                )
+            checkpoint = create_checkpoint(State(root))
+            output.write_text(json.dumps(checkpoint, indent=2) + "\n")
+            payload = checkpoint["payload"]
+            print(
+                json.dumps(checkpoint, indent=2)
+                if args.json
+                else f"Checkpoint of {payload['journal_entries']} receipts written to {output}"
+            )
+            return 0
+        if args.cmd == "verify-evidence":
+            from .evidence import load_public_key, verify_offline
+
+            report = verify_offline(
+                args.journal.read_bytes(),
+                load_public_key(args.public_key),
+                json.loads(args.checkpoint.read_text()) if args.checkpoint else None,
+            )
+            if args.json:
+                print(json.dumps(report, indent=2))
+            else:
+                integrity, completeness = report["integrity"], report["completeness"]
+                truth = report["provider_truth"]
+                print(
+                    f"INTEGRITY    {'OK' if integrity['ok'] else 'FAILED'}: "
+                    f"{integrity['verified']} of {integrity['receipts']} receipts verify"
+                )
+                for problem in integrity["problems"]:
+                    print("  " + problem)
+                print(f"COMPLETENESS {completeness['status']}: {completeness['detail']}")
+                print(
+                    f"PROVIDER     observed {truth['independently_observed'] or 'none'}; "
+                    f"runtime claims {truth['runtime_claims'] or 'none'}; "
+                    f"unresolved {len(truth['unresolved_ambiguous'])}"
+                )
+            if report["integrity"]["ok"] and args.integrity_only:
+                return 0
+            return 0 if report["ok"] else 2
+        if args.cmd == "recovery-inventory":
+            from .evidence import load_public_key
+            from .recovery import recovery_inventory
+
+            report = recovery_inventory(
+                root,
+                public_key=load_public_key(args.public_key) if args.public_key else None,
+                checkpoint=json.loads(args.checkpoint.read_text()) if args.checkpoint else None,
+            )
+            print(json.dumps(report, indent=2))
+            return 0 if report["status"] == "NO_DETECTED_BLOCKER" else 2
+        if args.cmd == "explain":
+            from .consequence_report import build_report, render_markdown
+
+            independent = json.loads(args.independent.read_text()) if args.independent else None
+            report = build_report(State(root), args.effect_id, independent=independent)
+            text = json.dumps(report, indent=2) if args.json else render_markdown(report)
+            if args.output:
+                args.output.write_text(text if text.endswith("\n") else text + "\n")
+            print(text)
+            return 0 if report["status"] in {"CONFIRMED", "CONFIRMED_BY_AIRLOCK_READBACK"} else 3
+        if args.cmd in WORKFLOW_COMMANDS:
+            return _workflow_command(args, root)
         if args.cmd == "receipts":
             result = State(root).verify_receipts()
             print(json.dumps(result, indent=2) if args.json else render_receipts(result))
@@ -300,7 +913,13 @@ def main(argv=None):
                         "GitHub readback requires --operator-key and obtains its own evidence"
                     )
                 private = load_operator_key(state, args.operator_key)
-                result = observe_github(state, args.effect_id, private)
+                seam = {}
+                if args.synthetic_provider:
+                    from .synthetic_github import TOKEN, synthetic_client
+
+                    os.environ["GITHUB_TOKEN"] = TOKEN  # in-process; no network transport exists
+                    seam["client"] = synthetic_client(args.synthetic_provider)
+                result = observe_github(state, args.effect_id, private, **seam)
                 envelope = result.pop("envelope", None)
                 if envelope is not None:
                     if args.output:
@@ -422,7 +1041,7 @@ def main(argv=None):
             if args.model:
                 from .model_constraints import endpoint, validate_profile
 
-                if not 1 <= args.model_max_tokens <= 4096 or any(
+                if (not args.model_contract and not 1 <= args.model_max_tokens <= 4096) or any(
                     not model.strip() for model in args.model
                 ):
                     raise AirlockError("Models require names and a token bound between 1 and 4096")
@@ -431,6 +1050,20 @@ def main(argv=None):
                     "models": sorted(set(args.model)),
                     "max_output_tokens": args.model_max_tokens,
                 }
+                if args.model_contract:
+                    from .agents import parse_prices, usd_to_micro
+
+                    if not args.model_price or not args.model_max_run_usd:
+                        raise AirlockError(
+                            "An agent contract needs signed prices and a spend bound"
+                        )
+                    current["protected_model"].update(
+                        contract=args.model_contract,
+                        max_input_bytes=args.model_max_input_bytes,
+                        anthropic_betas=sorted(set(args.model_beta)),
+                        price_microusd_per_mtok=parse_prices(args.model_price),
+                        max_run_microusd=usd_to_micro(args.model_max_run_usd),
+                    )
                 if args.model_endpoint:
                     current["protected_model"]["endpoint"] = args.model_endpoint
                 elif before.get("protected_model", {}).get(
@@ -469,32 +1102,58 @@ def main(argv=None):
                 current["command"] = before.get("command") or (
                     candidates[:1] if len(candidates) == 1 else []
                 )
+            # Discovery is not approval. A protected agent project is granted only what the
+            # Protected Mode boundary can use; other discovered powers are recorded, not signed.
+            if args.only_reviewed and args.grant_discovered:
+                raise AirlockError("Choose --only-reviewed or --grant-discovered, not both")
+            simple = (
+                (state.path / "agent.json").exists() or args.only_reviewed
+            ) and not args.grant_discovered
+            if simple:
+                from .authority_review import protected_grants, render_review
+
+                granted, withheld = protected_grants(current)
+                review_text = render_review(current, granted, withheld)
+                current["powers"] = granted
+                current["not_granted"] = withheld
             atomic_json(state.path / "proposed.json", current)
             result = authority_diff(before, current)
-            print(json.dumps(current, indent=2) if args.json else render(result))
-            if not args.json and bindings:
+            if args.json:
+                print(json.dumps(current, indent=2))
+            elif simple and not args.details:
+                print(review_text)
+            else:
+                print(render(result))
+            show_internal = not args.json and not (simple and not args.details)
+            if show_internal and bindings:
                 print("\nCredential origin bindings:")
                 for name, url in sorted(bindings.items()):
                     print(f"  {name} -> {url}")
-            if not args.json and current["reconciliation_keys"]:
+            if show_internal and current["reconciliation_keys"]:
                 print("\nReconciliation observer keys (trusted only with --approve):")
                 for kid in sorted(current["reconciliation_keys"]):
                     print("  " + kid)
-            if not args.json and current["protected_model"]:
+            if show_internal and current["protected_model"]:
                 print("\nProtected inference constraint (trusted only with --approve):")
                 print(json.dumps(current["protected_model"], sort_keys=True))
-            if not args.json and current["protected_github"]:
+            if show_internal and current["protected_github"]:
                 print("\nExact GitHub creations (trusted only with --approve):")
                 print(json.dumps(current["protected_github"], sort_keys=True))
             if current["parse_errors"]:
                 raise AirlockError("Parse errors prevent approval")
             if args.approve:
                 state.approve(current)
-                if not args.json:
+                if not args.json and simple:
+                    print(
+                        f"\nApproved and signed: {len(current['powers'])} grant(s). Nothing else."
+                    )
+                elif not args.json:
                     print(
                         f"\nApproved {len(current['powers'])} powers. Unresolved powers remain blocked;"
                         " their calls are denied at runtime with signed receipts."
                     )
+            elif not args.json and simple:
+                print("\nNothing is granted until you approve.")
             elif not args.json:
                 print("\nReview these powers, then run airlock init --approve to activate them.")
             return 0
@@ -543,6 +1202,9 @@ def main(argv=None):
         else:
             print("AIRLOCK BLOCKED: " + str(exc), file=sys.stderr)
         return 2
+    except KeyboardInterrupt:
+        print("\n" + STOPPED.get(args.cmd, STOPPED[None]), file=sys.stderr)
+        return 130
 
 
 if __name__ == "__main__":

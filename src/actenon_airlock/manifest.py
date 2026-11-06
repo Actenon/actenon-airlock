@@ -9,6 +9,7 @@ from pathlib import Path
 from actenon_scan.authority import ResourceState, extract_authority
 
 from .adapters import adapter_for, http_candidates
+from .agent_inference import bounds_expanded
 from .common import (
     SECRET_NAME,
     AirlockError,
@@ -41,6 +42,9 @@ __all__ = [
 EXCLUDED = {
     ".git",
     ".airlock",
+    ".codex",
+    ".home",
+    ".tmp",
     ".venv",
     "venv",
     "env",
@@ -151,6 +155,8 @@ def authority_diff(before: dict, after: dict) -> dict:
             or not set(new_model["models"]).issubset(old_model["models"])
             or new_model["max_output_tokens"] > old_model["max_output_tokens"]
             or new_model.get("read_timeout_seconds", 30) > old_model.get("read_timeout_seconds", 30)
+            or new_model.get("contract") != old_model.get("contract")
+            or ("contract" in new_model and bounds_expanded(new_model, old_model))
         )
     except (AirlockError, KeyError, TypeError):
         model_expanded = True

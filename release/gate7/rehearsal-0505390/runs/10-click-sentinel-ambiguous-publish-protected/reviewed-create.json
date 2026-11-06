@@ -1,0 +1,16 @@
+{
+  "schema": "actenon-airlock/github-create/v1",
+  "exclusive_writer": true,
+  "credential_name": "GITHUB_TOKEN",
+  "review": {
+    "repo_id": 4242,
+    "repo_node_id": "R_synthetic",
+    "owner": "acme",
+    "repo": "disposable",
+    "branch": "review",
+    "path": "airlock-gate7/case-10-sentinel.patch",
+    "message": "Airlock Gate 7 case 10: reviewed patch from Claude Code",
+    "content_sha256": "60b96f062c3f85a2f3bc73882f2651b24c9c9f8810d9097ca61c85d20b6b5c11",
+    "expected_parent_sha": "b35b7ec0498686f24f4dcd0b23d3d1025fbf46d2"
+  }
+}

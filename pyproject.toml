@@ -5,15 +5,15 @@ build-backend = "setuptools.build_meta"
 [project]
 name = "actenon-airlock"
 version = "0.1.0.dev0"
-description = "See and control the powers of your Python AI agent."
+description = "Let AI agents work. Never surrender control."
 readme = "README.md"
 requires-python = ">=3.11"
 license = "Apache-2.0"
 dependencies = [
-  "actenon-scan @ git+https://github.com/Actenon/actenon-scan.git@ef8487af836158a028f9a68eb96fd59a0be9cc0b",
-  "actenon-protocol @ git+https://github.com/Actenon/actenon-protocol.git@d79af481be6badc99b13e15118026b96883fa171",
-  "actenon-kernel @ git+https://github.com/Actenon/actenon-kernel.git@1491379c40e95b8d64e7332b1be9c98c4b1ee8a8",
-  "actenon-permit @ git+https://github.com/Actenon/actenon-permit.git@4d9bc08ab4934cdae5133a42b1b66ae7896ba678",
+  "actenon-scan @ git+https://github.com/Actenon/actenon-scan.git@16388227a55a3b5a3ec392d1c70f3940b0c291c1",
+  "actenon-protocol @ git+https://github.com/Actenon/actenon-protocol.git@a2e0e08fcd24b71eb1668204ba6bed00e4c63551",
+  "actenon-kernel @ git+https://github.com/Actenon/actenon-kernel.git@ead6a00aa38e7e3e21f6129a8565803f8ac48dd2",
+  "actenon-permit @ git+https://github.com/Actenon/actenon-permit.git@85aa3ae2a141f76fd78fe95db4aa1d196bc733da",
   "requests>=2.32,<3",
   "httpx>=0.27,<1",
 ]
@@ -33,6 +33,22 @@ Issues = "https://github.com/Actenon/actenon-airlock/issues"
 
 [tool.setuptools.packages.find]
 where = ["src"]
+
+# `airlock protect` builds the pinned agent images on first use.
+[tool.setuptools.data-files]
+"share/actenon-airlock/containers" = [
+  "containers/Dockerfile.compute",
+  "containers/Dockerfile.claude-code",
+  "containers/Dockerfile.codex-cli",
+]
+"share/actenon-airlock/containers/claude-code" = [
+  "containers/claude-code/package.json",
+  "containers/claude-code/package-lock.json",
+]
+"share/actenon-airlock/containers/codex-cli" = [
+  "containers/codex-cli/install.py",
+  "containers/codex-cli/upstream.json",
+]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]

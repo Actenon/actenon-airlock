@@ -1,0 +1,84 @@
+{
+  "schema": "actenon-airlock/source-digest-provenance/v1",
+  "question": "origin of pre-flight source digest 4e724a87... for 208163b",
+  "evidence_source": "local Antigravity/Gemini session 058d6c9d transcript_full.jsonl (not committed; private prompts)",
+  "transcript_prefix_lines_hashed": 3327,
+  "transcript_prefix_sha256": "d727ab6463f54e16bb9536c6e1a8240a5f35ad15c172df6cc73874d68498eec9",
+  "occurrences": [
+    {
+      "line": 3327,
+      "step_index": 3326,
+      "source": "MODEL",
+      "type": "PLANNER_RESPONSE",
+      "created_at": "2026-11-03T23:15:46Z"
+    },
+    {
+      "line": 3333,
+      "step_index": 3332,
+      "source": "MODEL",
+      "type": "PLANNER_RESPONSE",
+      "created_at": "2026-11-03T23:16:20Z"
+    },
+    {
+      "line": 3335,
+      "step_index": 3334,
+      "source": "MODEL",
+      "type": "PLANNER_RESPONSE",
+      "created_at": "2026-11-03T23:17:00Z"
+    },
+    {
+      "line": 3336,
+      "step_index": 3335,
+      "source": "USER_EXPLICIT",
+      "type": "USER_INPUT",
+      "created_at": "2026-11-03T23:19:01Z"
+    },
+    {
+      "line": 3339,
+      "step_index": 3338,
+      "source": "MODEL",
+      "type": "PLANNER_RESPONSE",
+      "created_at": "2026-11-03T23:19:10Z"
+    },
+    {
+      "line": 3343,
+      "step_index": 3342,
+      "source": "MODEL",
+      "type": "PLANNER_RESPONSE",
+      "created_at": "2026-11-03T23:19:21Z"
+    }
+  ],
+  "first_occurrence_is_model_authored": true,
+  "later_tool_computed_digests_for_same_tree": {
+    "32364460c3b395420ec7dd036001bb6a113b768e9bba0b2e9fabc48ea51f89e9": {
+      "scheme": "actenon_airlock.manifest.source_fingerprint (scanned project rows)",
+      "step_index": 3339,
+      "created_at": "2026-11-03T23:19:15Z"
+    },
+    "6e141812c3ca5194eafaed2f234a9c41a51b88d344354e4dfd6220695c243a6e": {
+      "scheme": "acceptance runner digest_tree(src/actenon_airlock)",
+      "step_index": 3351,
+      "created_at": "2026-11-03T23:19:53Z"
+    }
+  },
+  "git_object_sweep": {
+    "revisions": 85,
+    "since": "2026-10-25",
+    "scopes": [
+      "src/actenon_airlock/",
+      "src/",
+      "acceptance/codex-cli/",
+      "tests/",
+      "acceptance/",
+      "<repo root>"
+    ],
+    "schemes": [
+      "relative and full path, NUL, bytes",
+      "git tree id"
+    ],
+    "matches": 0
+  },
+  "conclusion": "No tool in the pre-flight session ever computed 4e724a87...; it first appears in model-authored scorecard text labelled VERIFIED, and was then copied into the V4.3 live prompt as the expected digest. The live runner computed 6e141812..., which is independently reproducible from Git objects at 208163b. The value is an unverified model-generated figure, not evidence of source drift or tampering.",
+  "occurrences_in_any_tool_output": 0,
+  "occurrence_kinds": "model-authored text or tool-call arguments (PLANNER_RESPONSE) and one owner prompt (USER_INPUT); never command output"
+}

@@ -1,0 +1,60 @@
+--- a/bool.go
++++ b/bool.go
+@@ -10,6 +10,13 @@
+ type boolFlag interface {
+ 	Value
+ 	IsBoolFlag() bool
++}
++
++func isNoOptBoolValue(v Value) bool {
++	if bf, ok := v.(boolFlag); ok {
++		return bf.IsBoolFlag()
++	}
++	return false
+ }
+ 
+ // -- bool Value
+--- a/flag.go
++++ b/flag.go
+@@ -614,9 +614,10 @@
+ // defaultIsZeroValue returns true if the default value for this flag represents
+ // a zero value.
+ func (f *Flag) defaultIsZeroValue() bool {
++	if isNoOptBoolValue(f.Value) {
++		return f.DefValue == "false" || f.DefValue == ""
++	}
+ 	switch f.Value.(type) {
+-	case boolFlag:
+-		return f.DefValue == "false" || f.DefValue == ""
+ 	case *durationValue:
+ 		// Beginning in Go 1.7, duration zero values are "0s"
+ 		return f.DefValue == "0" || f.DefValue == "0s"
+@@ -665,6 +666,9 @@
+ 	}
+ 
+ 	name = flag.Value.Type()
++	if isNoOptBoolValue(flag.Value) {
++		name = ""
++	}
+ 	switch name {
+ 	case "bool", "boolfunc":
+ 		name = ""
+@@ -779,7 +783,7 @@
+ 		}
+ 
+ 		varname, usage := UnquoteUsage(flag)
+-		if flag.Value.Type() == "bool" {
++		if isNoOptBoolValue(flag.Value) && flag.Value.Type() == "bool" {
+ 			line += "[=true|false]"
+ 		} else if varname != "" {
+ 			line += " " + varname
+@@ -941,6 +945,9 @@
+ 	}
+ 
+ 	flag.Name = string(normalizedFlagName)
++	if flag.NoOptDefVal == "" && isNoOptBoolValue(flag.Value) {
++		flag.NoOptDefVal = "true"
++	}
+ 	f.formal[normalizedFlagName] = flag
+ 	f.orderedFormal = append(f.orderedFormal, flag)
+ 

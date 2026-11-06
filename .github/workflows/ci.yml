@@ -55,8 +55,13 @@ jobs:
             installed.txt
             pip-audit.installed.json
   documented-install:
-    name: README install command
+    name: Documented install and first run (Python ${{ matrix.python }})
+    strategy:
+      fail-fast: false
+      matrix:
+        python: ["3.11", "3.12"]
     runs-on: ubuntu-latest
+    timeout-minutes: 25
     steps:
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
         with:
@@ -65,9 +70,20 @@ jobs:
           fetch-depth: 0
       - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065
         with:
-          python-version: "3.12"
-      - name: Install exactly what the README documents, in a fresh venv and HOME
-        run: python scripts/check_readme_install.py --install
+          python-version: ${{ matrix.python }}
+      - name: Install pipx, as the README tells a newcomer to
+        run: python -m pip install "pipx==1.8.0"
+      - name: Every guide pins one commit that installs this branch's code
+        run: python scripts/check_readme_install.py
+      - name: The documented first-run journey in a fresh HOME, from cold images
+        run: |
+          docker image ls --format '{{.Repository}}:{{.Tag}}' | grep actenon-airlock && exit 1 || true
+          python scripts/stranger_acceptance.py --python "$(command -v python)" --output stranger-acceptance.json
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: stranger-acceptance-${{ matrix.python }}
+          path: stranger-acceptance.json
   package:
     name: Package and lint
     runs-on: ubuntu-latest
@@ -79,8 +95,8 @@ jobs:
         with:
           python-version: "3.12"
       - run: python -m pip install build ruff
-      - run: ruff check src tests scripts
-      - run: ruff format --check src tests scripts
+      - run: ruff check src tests scripts acceptance/codex-cli containers/codex-cli
+      - run: ruff format --check src tests scripts acceptance/codex-cli containers/codex-cli
       - run: python -m build
       - name: Install built wheel with real pinned dependencies
         run: |
@@ -109,11 +125,29 @@ jobs:
         run: python -m pip install ".[test]"
       - name: Build credential-free compute image
         run: docker build -f containers/Dockerfile.compute -t actenon-airlock-compute:dev .
+      - name: Build the pinned Claude Code image
+        run: docker build -f containers/Dockerfile.claude-code -t actenon-airlock-claude-code:v1 .
+      - name: Build pinned unchanged Codex image
+        run: docker build -f containers/Dockerfile.codex-cli -t actenon-airlock-codex-cli:v1 .
+      - name: Build the documented Go and TypeScript toolchain images
+        run: |
+          docker build -f examples/toolchains/Dockerfile.go -t airlock-example-go:ci examples/toolchains/sample-go
+          docker build -f examples/toolchains/Dockerfile.node -t airlock-example-node:ci examples/toolchains/sample-node
       - name: Run positive workflow and bypass attempts in one contained environment
         env:
+          AIRLOCK_TEST_GO_IMAGE: airlock-example-go:ci
+          AIRLOCK_TEST_NODE_IMAGE: airlock-example-node:ci
           AIRLOCK_TEST_PROTECTED_IMAGE: actenon-airlock-compute:dev
+          AIRLOCK_TEST_CODEX_IMAGE: actenon-airlock-codex-cli:v1
+          AIRLOCK_CODEX_EVIDENCE: ${{ github.workspace }}/codex-evidence
+          AIRLOCK_TEST_CLAUDE_CODE_IMAGE: actenon-airlock-claude-code:v1
           AIRLOCK_PROTECTED_EVIDENCE: ${{ github.workspace }}/protected-evidence
-        run: python -m pytest -q tests/test_protected.py tests/test_github_container.py --junitxml=protected-results.xml
+        run: python -m pytest -q tests/test_protected.py tests/test_github_container.py tests/test_guided_workflow.py tests/test_claude_code_container.py tests/test_anthropic_acceptance.py tests/test_gate5_matched_programme.py tests/test_github_consequence_acceptance.py tests/test_codex_container.py tests/test_protect.py tests/test_verification_profiles.py tests/test_verification_outcomes.py tests/test_first_run_failures.py --junitxml=protected-results.xml
+      - name: Independent containment with working transport controls
+        env:
+          AIRLOCK_TEST_PROTECTED_IMAGE: actenon-airlock-compute:dev
+          AIRLOCK_INDEPENDENT_EVIDENCE: ${{ github.workspace }}/independent-boundary-evidence
+        run: python -m pytest -q tests/test_independent_container.py --junitxml=independent-boundary-results.xml
       - name: Preserve public evidence
         if: always()
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
@@ -122,3 +156,6 @@ jobs:
           path: |
             protected-results.xml
             protected-evidence/
+            codex-evidence/
+            independent-boundary-results.xml
+            independent-boundary-evidence/

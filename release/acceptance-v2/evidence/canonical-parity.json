@@ -1,0 +1,238 @@
+{
+ "schema": "actenon-airlock/canonical-parity/v1",
+ "corpus": "tests/fixtures/independent/canonical.json",
+ "cases": 32,
+ "summary": {
+  "go:MATCH": 32,
+  "rust:MATCH": 28,
+  "rust:SAFE_REFUSAL": 4,
+  "ts:MATCH": 28,
+  "ts:SAFE_REFUSAL": 4
+ },
+ "rows": [
+  {
+   "id": "zero",
+   "expected": "ACCEPT",
+   "ts": "MATCH",
+   "go": "MATCH",
+   "rust": "MATCH"
+  },
+  {
+   "id": "negative_zero",
+   "expected": "ACCEPT",
+   "ts": "MATCH",
+   "go": "MATCH",
+   "rust": "SAFE_REFUSAL"
+  },
+  {
+   "id": "safe_integer",
+   "expected": "ACCEPT",
+   "ts": "MATCH",
+   "go": "MATCH",
+   "rust": "MATCH"
+  },
+  {
+   "id": "above_js_safe",
+   "expected": "ACCEPT",
+   "ts": "SAFE_REFUSAL",
+   "go": "MATCH",
+   "rust": "MATCH"
+  },
+  {
+   "id": "below_i64",
+   "expected": "ACCEPT",
+   "ts": "SAFE_REFUSAL",
+   "go": "MATCH",
+   "rust": "SAFE_REFUSAL"
+  },
+  {
+   "id": "above_u64",
+   "expected": "ACCEPT",
+   "ts": "SAFE_REFUSAL",
+   "go": "MATCH",
+   "rust": "SAFE_REFUSAL"
+  },
+  {
+   "id": "rounded_fraction",
+   "expected": "REFUSE",
+   "ts": "MATCH",
+   "go": "MATCH",
+   "rust": "MATCH"
+  },
+  {
+   "id": "float_one",
+   "expected": "REFUSE",
+   "ts": "MATCH",
+   "go": "MATCH",
+   "rust": "MATCH"
+  },
+  {
+   "id": "exponent_one",
+   "expected": "REFUSE",
+   "ts": "MATCH",
+   "go": "MATCH",
+   "rust": "MATCH"
+  },
+  {
+   "id": "duplicate_member",
+   "expected": "REFUSE",
+   "ts": "MATCH",
+   "go": "MATCH",
+   "rust": "MATCH"
+  },
+  {
+   "id": "escaped_duplicate_member",
+   "expected": "REFUSE",
+   "ts": "MATCH",
+   "go": "MATCH",
+   "rust": "MATCH"
+  },
+  {
+   "id": "case_distinct_members",
+   "expected": "ACCEPT",
+   "ts": "MATCH",
+   "go": "MATCH",
+   "rust": "MATCH"
+  },
+  {
+   "id": "utf8_order",
+   "expected": "ACCEPT",
+   "ts": "MATCH",
+   "go": "MATCH",
+   "rust": "MATCH"
+  },
+  {
+   "id": "unpaired_surrogate",
+   "expected": "REFUSE",
+   "ts": "MATCH",
+   "go": "MATCH",
+   "rust": "MATCH"
+  },
+  {
+   "id": "prototype_data",
+   "expected": "ACCEPT",
+   "ts": "MATCH",
+   "go": "MATCH",
+   "rust": "MATCH"
+  },
+  {
+   "id": "serde_private_data",
+   "expected": "ACCEPT",
+   "ts": "MATCH",
+   "go": "MATCH",
+   "rust": "MATCH"
+  },
+  {
+   "id": "depth_32",
+   "expected": "ACCEPT",
+   "ts": "MATCH",
+   "go": "MATCH",
+   "rust": "MATCH"
+  },
+  {
+   "id": "depth_33",
+   "expected": "REFUSE",
+   "ts": "MATCH",
+   "go": "MATCH",
+   "rust": "MATCH"
+  },
+  {
+   "id": "depth_127",
+   "expected": "REFUSE",
+   "ts": "MATCH",
+   "go": "MATCH",
+   "rust": "MATCH"
+  },
+  {
+   "id": "empty_array",
+   "expected": "ACCEPT",
+   "ts": "MATCH",
+   "go": "MATCH",
+   "rust": "MATCH"
+  },
+  {
+   "id": "null_value",
+   "expected": "ACCEPT",
+   "ts": "MATCH",
+   "go": "MATCH",
+   "rust": "MATCH"
+  },
+  {
+   "id": "trailing_value",
+   "expected": "REFUSE",
+   "ts": "MATCH",
+   "go": "MATCH",
+   "rust": "MATCH"
+  },
+  {
+   "id": "valid_unicode",
+   "expected": "ACCEPT",
+   "ts": "MATCH",
+   "go": "MATCH",
+   "rust": "MATCH"
+  },
+  {
+   "id": "malformed_utf8",
+   "expected": "REFUSE",
+   "ts": "MATCH",
+   "go": "MATCH",
+   "rust": "MATCH"
+  },
+  {
+   "id": "utf16_json",
+   "expected": "REFUSE",
+   "ts": "MATCH",
+   "go": "MATCH",
+   "rust": "MATCH"
+  },
+  {
+   "id": "utf8_bom",
+   "expected": "REFUSE",
+   "ts": "MATCH",
+   "go": "MATCH",
+   "rust": "MATCH"
+  },
+  {
+   "id": "nested_bool_authority",
+   "expected": "ACCEPT",
+   "ts": "MATCH",
+   "go": "MATCH",
+   "rust": "MATCH"
+  },
+  {
+   "id": "nested_integer_authority",
+   "expected": "ACCEPT",
+   "ts": "MATCH",
+   "go": "MATCH",
+   "rust": "MATCH"
+  },
+  {
+   "id": "escaped_nested_duplicate",
+   "expected": "REFUSE",
+   "ts": "MATCH",
+   "go": "MATCH",
+   "rust": "MATCH"
+  },
+  {
+   "id": "signed_zero_float",
+   "expected": "REFUSE",
+   "ts": "MATCH",
+   "go": "MATCH",
+   "rust": "MATCH"
+  },
+  {
+   "id": "unicode_action_order",
+   "expected": "ACCEPT",
+   "ts": "MATCH",
+   "go": "MATCH",
+   "rust": "MATCH"
+  },
+  {
+   "id": "negative_large",
+   "expected": "ACCEPT",
+   "ts": "SAFE_REFUSAL",
+   "go": "MATCH",
+   "rust": "SAFE_REFUSAL"
+  }
+ ]
+}

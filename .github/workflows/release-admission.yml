@@ -1,8 +1,11 @@
 name: Release admission
-# Enforced release requirement: a candidate is admitted only when this gate
-# reaches the requested readiness from authenticated evidence. Dispatch it from
-# main so the rules in release/gates.json come from reviewed code, not from the
-# candidate being judged. Tag pushes require RELEASE READY.
+# Reports a candidate's readiness from authenticated evidence, with a mandatory
+# threshold (exit 1 below it). Dispatch it from main so the rules in
+# release/gates.json come from reviewed code, not from the candidate.
+# This workflow checks readiness; it does not prevent publication. Publication
+# is enforced by release.yml, whose build, publish and tag jobs all need the
+# same gate to pass first. There is deliberately no tag-push trigger: a check
+# triggered by a tag can only run after the tag already exists.
 on:
   workflow_dispatch:
     inputs:
@@ -17,8 +20,6 @@ on:
         options:
           - CANDIDATE READY
           - RELEASE READY
-  push:
-    tags: ["v*"]
 permissions:
   contents: read
   actions: read
@@ -42,8 +43,8 @@ jobs:
       - name: Evaluate candidate against authenticated evidence
         env:
           GH_TOKEN: ${{ github.token }}
-          CANDIDATE: ${{ github.event_name == 'push' && github.sha || inputs.candidate_sha }}
-          REQUIRED: ${{ github.event_name == 'push' && 'RELEASE READY' || inputs.required_status }}
+          CANDIDATE: ${{ inputs.candidate_sha }}
+          REQUIRED: ${{ inputs.required_status }}
         run: |
           python scripts/check_candidate_admission.py \
             --candidate-sha "$CANDIDATE" \

@@ -1,0 +1,8 @@
+{
+  "verdict": "TESTS_PASSED",
+  "detail": "1 tests passed",
+  "candidate_sha256": "d4cfa44d774fe24abf92fcbd64ca644a02e53eb8ad50449161a6e1fee3c125c0",
+  "tests_sha256": "6e9a8dd0c9e74b6ff34bf78fd4bc44ca29e35cf837af56fffd345c530330465c",
+  "image_id": "sha256:c449dec52754bad2a55dea7bb7b1edfbf7a864475464c53edc8ad9489d9d2269",
+  "receipt_id": "receipt_13f81b889d184a2aab9de20bbc8bd806"
+}

@@ -1,0 +1,84 @@
+{
+  "schema": "actenon-airlock/integration-candidate/v1",
+  "status": "candidate under evaluation; not a release",
+  "airlock": {
+    "branch": "integration/candidate-2026-11-03",
+    "built_on": {
+      "pr": "https://github.com/Actenon/actenon-airlock/pull/20",
+      "sha": "11bcaaab1e63cc4a7c08ebdbd248ae78abe69b25"
+    }
+  },
+  "components": [
+    {
+      "repository": "Actenon/actenon-protocol",
+      "pr": 26,
+      "sha": "a2e0e08fcd24b71eb1668204ba6bed00e4c63551",
+      "package": "actenon-protocol",
+      "version": "1.6.0",
+      "wire_version": "1.3.0",
+      "published": false
+    },
+    {
+      "repository": "Actenon/actenon-kernel",
+      "pr": 50,
+      "sha": "ead6a00aa38e7e3e21f6129a8565803f8ac48dd2",
+      "package": "actenon-kernel",
+      "version": "1.3.0",
+      "published": false,
+      "adds_on_top_of_pr_head": [
+        "074ba8f console-script registry gate (skip-with-remediation when the coordinated protocol package is unpublished)",
+        "8fea9b3 51-case adversarial canonicalisation corpus"
+      ]
+    },
+    {
+      "repository": "Actenon/actenon-scan",
+      "pr": 103,
+      "sha": "16388227a55a3b5a3ec392d1c70f3940b0c291c1",
+      "package": "actenon-scan",
+      "version": "1.6.0",
+      "published": false
+    },
+    {
+      "repository": "Actenon/actenon-permit",
+      "pr": 36,
+      "sha": "85aa3ae2a141f76fd78fe95db4aa1d196bc733da",
+      "package": "actenon-permit",
+      "version": "2.0.0rc1",
+      "published": false,
+      "adds_on_top_of_pr_head": [
+        "4868424 LLMAgent grant-state fix (example/test path only, no Airlock protected-path change)",
+        "kernel candidate repin to ead6a00",
+        "merge of PR #36 into main (dafde7584; content-identical, brings the branch current)"
+      ]
+    },
+    {
+      "repository": "Actenon/sdk-go",
+      "branch": "feat/adversarial-canonical-corpus",
+      "sha": "127f7c1160d874536415446d3685701631ef048e",
+      "published": false
+    },
+    {
+      "repository": "Actenon/sdk-rust",
+      "branch": "feat/adversarial-canonical-corpus",
+      "sha": "de85195a5b9c2f5dc364340a7c2d535dbae71624",
+      "published": false
+    },
+    {
+      "repository": "Actenon/blastradius",
+      "pr": 3,
+      "sha": "4246fede97be77030190b4508f79bad75167e207",
+      "package": "blastradius",
+      "airlock_dependency": false,
+      "published": false
+    }
+  ],
+  "graph": "Protocol -> Kernel, Scan -> Permit -> Airlock. Every component's candidate inputs ([tool.uv.sources], uv.lock, .github/candidate-constraints.txt) name these same commits, so pip and uv resolve one graph with no overrides.",
+  "notes": [
+    "None of these versions is on PyPI (latest: protocol 1.4.0, kernel 1.2.1, scan 1.5.0, permit 1.4.0).",
+    "Integration 2026-11-03 advanced the kernel candidate (PR #50 head 7a1ad40 -> ead6a00) with the console-script registry gate and the 51-case adversarial canonicalisation corpus, and the permit candidate (PR #36 head b795a37 -> b63cf8a) with the LLMAgent grant-state fix and the kernel repin. Protocol, Scan and the SDK heads' corpus commits ride on the same graph; sdk-go 127f7c1 and sdk-rust de85195 add only tests/fixtures.",
+    "Correction against the previous session record: the corpus comparison is 251 byte-identical MATCHes plus 4 documented TypeScript safe-integer rejections (i64_min, i64_max, u64_max, two_pow_63), not 255 byte-identical matches across all five implementations. No unexplained divergence exists."
+  ],
+  "verify": [
+    "python scripts/check_candidate_admission.py --candidate-sha <this branch head> --require \"CANDIDATE READY\" --expect-dependency Actenon/actenon-kernel=ead6a00aa38e7e3e21f6129a8565803f8ac48dd2 --expect-dependency Actenon/actenon-permit=85aa3ae2a141f76fd78fe95db4aa1d196bc733da --expect-dependency Actenon/actenon-protocol=a2e0e08fcd24b71eb1668204ba6bed00e4c63551 --expect-dependency Actenon/actenon-scan=16388227a55a3b5a3ec392d1c70f3940b0c291c1"
+  ]
+}

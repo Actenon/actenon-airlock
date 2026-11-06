@@ -1,0 +1,73 @@
+{
+  "source_commit": "d404d34a80e0d3a1e911e2b9e166d97d0f278933",
+  "state_source_sha256": "1fd87d1b5638c7227ea3e522e56ffd980380a5c914fb70f2308cc354feac2421",
+  "method": "Real Ed25519 chains, fsync append, process-shared flock; no provider calls",
+  "cases": [
+    {
+      "initial_rows": 100,
+      "initial_bytes": 71528,
+      "full_verify_s": 0.004163291014265269,
+      "cold_append_s": 0.004320250009186566,
+      "warm_append": {
+        "count": 5,
+        "median_s": 0.00431370799196884,
+        "p95_s": 0.004377332981675863,
+        "total_s": 0.021597874932922423
+      },
+      "concurrent": {
+        "count": 16,
+        "median_s": 0.019505146017763764,
+        "p95_s": 0.03197283303597942,
+        "total_s": 0.3328722101286985
+      },
+      "concurrent_wall_s": 0.09502333303680643,
+      "concurrent_writers": 4,
+      "final_integrity": true,
+      "final_rows": 122
+    },
+    {
+      "initial_rows": 1000,
+      "initial_bytes": 716828,
+      "full_verify_s": 0.04087408405030146,
+      "cold_append_s": 0.04176283301785588,
+      "warm_append": {
+        "count": 5,
+        "median_s": 0.04100770800141618,
+        "p95_s": 0.04515133303357288,
+        "total_s": 0.20901358302216977
+      },
+      "concurrent": {
+        "count": 16,
+        "median_s": 0.16960354201728478,
+        "p95_s": 0.21877837501233444,
+        "total_s": 2.639040584967006
+      },
+      "concurrent_wall_s": 0.7280259580002166,
+      "concurrent_writers": 4,
+      "final_integrity": true,
+      "final_rows": 1022
+    },
+    {
+      "initial_rows": 10000,
+      "initial_bytes": 7178828,
+      "full_verify_s": 0.40958899998804554,
+      "cold_append_s": 0.4186598339583725,
+      "warm_append": {
+        "count": 5,
+        "median_s": 0.40896337502636015,
+        "p95_s": 0.4449945419910364,
+        "total_s": 2.077861458004918
+      },
+      "concurrent": {
+        "count": 16,
+        "median_s": 1.6303511254955083,
+        "p95_s": 1.6799558330094442,
+        "total_s": 23.82400229293853
+      },
+      "concurrent_wall_s": 6.573571749962866,
+      "concurrent_writers": 4,
+      "final_integrity": true,
+      "final_rows": 10022
+    }
+  ]
+}

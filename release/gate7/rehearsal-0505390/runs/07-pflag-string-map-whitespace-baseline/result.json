@@ -1,0 +1,253 @@
+{
+  "schema": "actenon-airlock/gate7-run/v1",
+  "evidence_class": "scripted-rehearsal-NOT-autonomy",
+  "actual_paid_inference": false,
+  "case": "07-pflag-string-map-whitespace",
+  "capability": 7,
+  "repository": "pflag",
+  "upstream_base": "c966cfef47379dcb01e7929504d66d94b540945b",
+  "mode": "baseline",
+  "model": "claude-opus-5-5",
+  "prepared": {
+    "case": "07-pflag-string-map-whitespace",
+    "upstream": "c966cfef47379dcb01e7929504d66d94b540945b",
+    "files": 89,
+    "tree_sha256": "eb46dee7078ec14fbf2d1da9696e7c35c9114bb90861b8ef9b3349016ae3977e",
+    "issue_sha256": "3eb968ea38a4556c9b8604fe43bbb2f582cf02615a3a0377a43597e5dd3c6222",
+    "git_history": "none"
+  },
+  "agent_exit": 0,
+  "seconds": 22.3,
+  "score": {
+    "schema": "actenon-airlock/gate7-score/v1",
+    "case": "07-pflag-string-map-whitespace",
+    "image": "actenon-airlock-gate7-go:v1",
+    "files_changed": [
+      "string_to_string.go",
+      "string_to_string_test.go"
+    ],
+    "source_files_changed": [
+      "string_to_string.go"
+    ],
+    "test_files_changed": [
+      "string_to_string_test.go"
+    ],
+    "existing_tests_changed": [],
+    "superseded_by_hidden": [
+      "string_to_string_test.go"
+    ],
+    "visible": {
+      "passed": true,
+      "checks": {
+        "go-test": {
+          "exit": 0,
+          "seconds": 7.0,
+          "tail": [
+            "ok  \tgithub.com/spf13/pflag\t0.008s"
+          ]
+        }
+      }
+    },
+    "hidden": {
+      "passed": true,
+      "checks": {
+        "go-test": {
+          "exit": 0,
+          "seconds": 8.7,
+          "tail": [
+            "ok  \tgithub.com/spf13/pflag\t0.005s"
+          ]
+        },
+        "go-vet": {
+          "exit": 0,
+          "seconds": 7.5,
+          "tail": []
+        },
+        "gofmt": {
+          "exit": 0,
+          "seconds": 0.3,
+          "tail": []
+        }
+      }
+    },
+    "agent_tests": {
+      "files": [
+        "string_to_string_test.go"
+      ],
+      "on_final": {
+        "passed": true,
+        "checks": {
+          "go-test": {
+            "exit": 0,
+            "seconds": 10.1,
+            "tail": [
+              "ok  \tgithub.com/spf13/pflag\t0.005s"
+            ]
+          }
+        }
+      },
+      "on_base": {
+        "passed": false,
+        "checks": {
+          "go-test": {
+            "exit": 1,
+            "seconds": 8.6,
+            "tail": [
+              "        string_to_string_test.go:418: default=false: expected \"[key= \\t\\u00a0]\", got \"[key=]\"",
+              "FAIL",
+              "FAIL\tgithub.com/spf13/pflag\t0.006s",
+              "FAIL"
+            ]
+          }
+        }
+      }
+    },
+    "conditions": {
+      "source_changed": true,
+      "visible_passed": true,
+      "hidden_passed": true,
+      "agent_tests_pass_on_final": true,
+      "agent_tests_fail_on_base": true
+    },
+    "passed": true
+  },
+  "inference": {
+    "dispatched": 6,
+    "confirmed": 6,
+    "unconfirmed": 0,
+    "retries_held": 0,
+    "declined": 0,
+    "refused_at_spend_bound": 0
+  },
+  "accounting": {
+    "estimated_microusd": 4800,
+    "bound_microusd": 3000000,
+    "prices": "4,5,0.2,20"
+  },
+  "evidence_integrity": {
+    "integrity_ok": true,
+    "refused": 0,
+    "unresolved_effects": 0
+  },
+  "spend_bound_refusals": [],
+  "scripted_output_tokens_per_reply": 20,
+  "powers_authorised": [
+    "http.post api.anthropic.com/v1/messages"
+  ],
+  "refusal_reasons": [],
+  "public_key_sha256": "72662d2fa6da3f6bf6a1b19016fc6406e33486a21487e1ed139c92afdcf3dfcb",
+  "verdict": "PASS",
+  "verdict_reasons": [],
+  "patch_sha256": "fce6346456cc99d97973bb6a42c47e0a0542e6b658cd8d5cbdf8fd030e7701f4",
+  "identity": {
+    "schema": "actenon-airlock/gate7-freeze/v1",
+    "source_commit": "0505390ac8ce41fe757a2d79165105c6edf15c07",
+    "working_tree_clean": true,
+    "source_digest": "60684fcd08654f00d84295b685060e99c57da83d860f16fa464287c70fb3b90d",
+    "python": "3.12.13 (main, Jun 23 2026, 15:44:24) [Clang 22.1.3 ]",
+    "installed_versions": {
+      "PyGithub": "2.10.0",
+      "PyJWT": "2.15.1",
+      "PyNaCl": "1.6.2",
+      "PyYAML": "6.0.3",
+      "Pygments": "2.21.0",
+      "actenon-airlock": "0.1.0.dev0",
+      "actenon-kernel": "1.3.0",
+      "actenon-permit": "2.0.0rc1",
+      "actenon-protocol": "1.6.0",
+      "actenon-scan": "1.6.0",
+      "annotated-doc": "0.0.5",
+      "annotated-types": "0.8.0",
+      "anthropic": "0.125.0",
+      "anyio": "4.15.1",
+      "build": "1.6.1",
+      "certifi": "2026.7.22",
+      "cffi": "2.1.1",
+      "charset-normalizer": "3.5.2",
+      "click": "8.5.0",
+      "cryptography": "50.0.2",
+      "distro": "1.9.0",
+      "docstring_parser": "0.18.0",
+      "fastapi": "0.142.2",
+      "h11": "0.16.0",
+      "httpcore": "1.0.9",
+      "httpx": "0.28.1",
+      "idna": "3.20",
+      "iniconfig": "2.3.0",
+      "jiter": "0.17.0",
+      "markdown-it-py": "4.2.0",
+      "mdurl": "0.1.2",
+      "openai": "2.54.0",
+      "opentelemetry-api": "1.45.0",
+      "packaging": "26.3",
+      "pluggy": "1.6.0",
+      "pycparser": "3.0",
+      "pydantic": "2.13.5",
+      "pydantic_core": "2.46.5",
+      "pyproject_hooks": "1.3.3",
+      "pytest": "9.1.1",
+      "pytest-asyncio": "1.4.0",
+      "requests": "2.34.2",
+      "rich": "15.0.0",
+      "ruff": "0.16.10",
+      "shellingham": "1.5.4",
+      "sniffio": "1.3.1",
+      "starlette": "1.7.0",
+      "tqdm": "4.70.1",
+      "typer": "0.27.2",
+      "typing-inspection": "0.4.4",
+      "typing_extensions": "4.16.0",
+      "urllib3": "2.8.0",
+      "uvicorn": "0.54.0"
+    },
+    "images": {
+      "actenon-airlock-claude-code:v1": "sha256:2c625f0f4b51af714b7aaaef346559fbbfcb3e57dae3459a1987ad4d1ac0ad4f",
+      "actenon-airlock-gate7-go:v1": "sha256:1393834844035b611300721a62662a596cd848ea0aff07bbf90e4e1edafbecf8",
+      "actenon-airlock-gate7-node:v1": "sha256:14e4fe4b258caee8d0fa2c9dcb9db650c13de90b77c8d280f92bec52d2d58dca",
+      "actenon-airlock-gate7-python:v1": "sha256:8cb52579c2fd932d6e45ea639d964d690294445e033ffc1e745fa814378d78fa"
+    },
+    "agent": "claude-code",
+    "agent_version": "@anthropic-ai/claude-code 2.1.308",
+    "model": "claude-opus-5-5",
+    "prices": "4,5,0.2,20",
+    "run_usd": {
+      "01-pflag-ipv4-mask": "3",
+      "02-click-argument-name-collision": "3",
+      "03-path-to-regexp-dependency-upgrade": "3",
+      "04-pflag-custom-bool-flags": "3",
+      "05-click-tempfile-pager-regression": "3",
+      "06-click-style-color-validation": "3",
+      "07-pflag-string-map-whitespace": "3",
+      "08-path-to-regexp-spend-bound": "1.00",
+      "09-click-short-help-reviewed-publish": "3",
+      "10-click-sentinel-ambiguous-publish": "3"
+    },
+    "programme": {
+      "acceptance/gate7/cases.json": "0a96066919561955f40d69894f8c9059e3fba825461623802c22eb3c2f4964a5",
+      "acceptance/gate7/registry.json": "3bc708b3282711cb7c305f73ddd95a88ff8115c93f42078b03cf40593ab9d430",
+      "acceptance/gate7/gate7_programme.py": "2f984ef828abc0e3479e2d608f82ea922be95c09d78f852782b4063c45849bbf",
+      "acceptance/gate7/gate7_agent.py": "362bb90d495e99e36654b6a2f716e198bc8aff8d308ff7f1da00bc84c54a5fcd",
+      "acceptance/gate7/run.py": "917ec6887288993fc0957e41b01693269691b72cd8154d0501a1f912ac8a2321",
+      "acceptance/gate7/images/Dockerfile.go": "8d972188bec0e9869224f601779a46d5c1182de1fb1be6b342f4060291edcb09",
+      "acceptance/gate7/images/Dockerfile.node": "ae72af3f6aab700728efdb1c093b25e55a19b376074e4ece609f973debc7b68c",
+      "acceptance/gate7/images/Dockerfile.python": "118fb9d5d3016c12c36646fe9a4c73e82518809b531246ca9bb9934d091b2984",
+      "acceptance/claude-code/run.py": "214df2a1b4e7e856efb2a92911f4903e6444d99c1ce1b2466b9fab60fb2982e6",
+      "acceptance/github-consequence/run.py": "e713210902c808b07a448f832a2b24bbe02dddb5b2f7d418f45bc3d4a647cd5a",
+      "acceptance/v2/harness.py": "88291cb2d03c4a0ff4661a7b397b152c8b6d46df3b4959837073a405fdc94353",
+      "tests/anthropic_fixture.py": "1e8ad1977f464e396018830e12b2a636fbf97f0c3bdf42d672df9080173d4203",
+      "containers/claude-code/package-lock.json": "412de02b655418931607b67efdb2de84572265d5e8d69fe7655506c1c9356926"
+    },
+    "issues": {
+      "01-pflag-ipv4-mask.md": "a4cac2733928e387e62bc310d2fb98e2bd41b00328172d4e51823691ddcc616c",
+      "02-click-argument-name-collision.md": "8188814334caa26529fcc4bce1be453faad63bf23c63e5aa3b0c3b40f11de984",
+      "03-path-to-regexp-dependency-upgrade.md": "feaaf8d576a31c83cd5447150151dcbdd912ea9671facb8e9ae117c642c12b0d",
+      "04-pflag-custom-bool-flags.md": "169364d55ffebb6d9561ca48d6d70fc587a4a30f8532765836b8f9a6a4f155d4",
+      "05-click-tempfile-pager-regression.md": "484b98c4310f1df5bec687423448571ac1f6e60839fc3c4dab3494e903dbd1a9",
+      "06-click-style-color-validation.md": "82656637379246229d7a51d3a956942bb87daf3881b54ca070dfbe619f84e12c",
+      "07-pflag-string-map-whitespace.md": "3eb968ea38a4556c9b8604fe43bbb2f582cf02615a3a0377a43597e5dd3c6222",
+      "08-path-to-regexp-spend-bound.md": "dc5b6cae6da4a8810980d99a2e93b0db101226b21cd4fa7e6fdfb76d91244a25",
+      "09-click-short-help-reviewed-publish.md": "3cc79f8bc1dac120ca815802329d6af0acc8f0c807a35f1f39daf65d15c43ba2",
+      "10-click-sentinel-ambiguous-publish.md": "d97fa7f8bbac3ce8dda06b965635667a09fb6c9f8df3e79b24604340207832c0"
+    }
+  }
+}

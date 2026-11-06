@@ -1,8 +1,9 @@
 {
-  "candidate-protocol": "d79af481be6badc99b13e15118026b96883fa171",
-  "candidate-kernel": "1491379c40e95b8d64e7332b1be9c98c4b1ee8a8",
-  "candidate-permit": "4d9bc08ab4934cdae5133a42b1b66ae7896ba678",
-  "canonical-scan": "ef8487af836158a028f9a68eb96fd59a0be9cc0b",
-  "candidate-sdk-go": "d8d9aa99e645cf84e4d8831458bc02e7e1f70aa8",
-  "candidate-sdk-rust": "3aecab5bdd3283c0d859f5b59e1720525502be7d"
+  "candidate-protocol": "a2e0e08fcd24b71eb1668204ba6bed00e4c63551",
+  "candidate-kernel": "ead6a00aa38e7e3e21f6129a8565803f8ac48dd2",
+  "candidate-permit": "85aa3ae2a141f76fd78fe95db4aa1d196bc733da",
+  "canonical-scan": "16388227a55a3b5a3ec392d1c70f3940b0c291c1",
+  "candidate-sdk-go": "127f7c1160d874536415446d3685701631ef048e",
+  "candidate-sdk-rust": "de85195a5b9c2f5dc364340a7c2d535dbae71624",
+  "_note": "Pins consumed by integration/candidate-2026-11-03. The permit candidate advanced to the merge of PR #36 into main (dafde7584) plus the LLMAgent fix and the kernel repin (85aa3ae); content equals b63cf8a. Values verified against direct_url.json of the installed environment on 2026-11-03."
 }

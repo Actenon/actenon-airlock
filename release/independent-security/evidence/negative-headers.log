@@ -1,0 +1,201 @@
+/Users/ross/Documents/Codex/2026-10-30/actenon-airlock-independent-north-star-engineering/work/venv/lib/python3.12/site-packages/pytest_asyncio/plugin.py:300: PytestDeprecationWarning: The configuration option "asyncio_default_fixture_loop_scope" is unset.
+The event loop scope for asynchronous fixtures will default to the "fixture" caching scope. Future versions of pytest-asyncio will default the loop scope for asynchronous fixtures to "function" scope. Set the default fixture loop scope explicitly in order to avoid unexpected behavior in the future. Valid fixture loop scopes are: "function", "class", "module", "package", "session"
+
+  warnings.warn(PytestDeprecationWarning(_DEFAULT_FIXTURE_LOOP_SCOPE_UNSET))
+FFFFFFFF                                                                 [100%]
+=================================== FAILURES ===================================
+__________ test_unknown_consequence_headers_never_dispatch[headers0] ___________
+
+project = <function project.<locals>.create at 0x10ab24a40>
+server = ('http://127.0.0.1:61012', [('/a', b'hello', {'Host': '127.0.0.1:61012', 'Accept': '*/*', 'Accept-Encoding': 'gzip, deflate', 'Connection': 'keep-alive', ...})])
+headers = {'Stripe-Account': 'tenant-b'}
+
+    @pytest.mark.parametrize('headers', [
+        {'Stripe-Account':'tenant-b'}, {'OpenAI-Project':'project-b'},
+        {'If-Match':'revision-b'}, {'Idempotency-Key':'new-key'},
+        {'X-HTTP-Method-Override':'DELETE'}, {'Content-Encoding':'gzip'},
+    ])
+    def test_unknown_consequence_headers_never_dispatch(project, server, headers):
+        url, calls = server
+        state = project(f'import requests\nrequests.post("{url}/a")\n')
+        broker = Broker(state, discover(state.root))
+        try:
+            item = message(url + '/a')
+            item['headers'] = headers
+>           assert not broker.handle(item)['ok']
+E           assert not True
+
+tests/test_independent_headers.py:24: AssertionError
+----------------------------- Captured stderr call -----------------------------
+AIRLOCK ALLOW http.post @ http://127.0.0.1:61012/a: effect AMBIGUOUS; duplicate dispatch blocked [receipt_d532695b9e9f4a4b81daa7196b99ee48]
+__________ test_unknown_consequence_headers_never_dispatch[headers1] ___________
+
+project = <function project.<locals>.create at 0x10ab24cc0>
+server = ('http://127.0.0.1:61014', [('/a', b'hello', {'Host': '127.0.0.1:61014', 'Accept': '*/*', 'Accept-Encoding': 'gzip, deflate', 'Connection': 'keep-alive', ...})])
+headers = {'OpenAI-Project': 'project-b'}
+
+    @pytest.mark.parametrize('headers', [
+        {'Stripe-Account':'tenant-b'}, {'OpenAI-Project':'project-b'},
+        {'If-Match':'revision-b'}, {'Idempotency-Key':'new-key'},
+        {'X-HTTP-Method-Override':'DELETE'}, {'Content-Encoding':'gzip'},
+    ])
+    def test_unknown_consequence_headers_never_dispatch(project, server, headers):
+        url, calls = server
+        state = project(f'import requests\nrequests.post("{url}/a")\n')
+        broker = Broker(state, discover(state.root))
+        try:
+            item = message(url + '/a')
+            item['headers'] = headers
+>           assert not broker.handle(item)['ok']
+E           assert not True
+
+tests/test_independent_headers.py:24: AssertionError
+----------------------------- Captured stderr call -----------------------------
+AIRLOCK ALLOW http.post @ http://127.0.0.1:61014/a: effect AMBIGUOUS; duplicate dispatch blocked [receipt_5066b6b38f6849f28b9f9ceb7b23ae21]
+__________ test_unknown_consequence_headers_never_dispatch[headers2] ___________
+
+project = <function project.<locals>.create at 0x10ad300e0>
+server = ('http://127.0.0.1:61016', [('/a', b'hello', {'Host': '127.0.0.1:61016', 'Accept': '*/*', 'Accept-Encoding': 'gzip, deflate', 'Connection': 'keep-alive', ...})])
+headers = {'If-Match': 'revision-b'}
+
+    @pytest.mark.parametrize('headers', [
+        {'Stripe-Account':'tenant-b'}, {'OpenAI-Project':'project-b'},
+        {'If-Match':'revision-b'}, {'Idempotency-Key':'new-key'},
+        {'X-HTTP-Method-Override':'DELETE'}, {'Content-Encoding':'gzip'},
+    ])
+    def test_unknown_consequence_headers_never_dispatch(project, server, headers):
+        url, calls = server
+        state = project(f'import requests\nrequests.post("{url}/a")\n')
+        broker = Broker(state, discover(state.root))
+        try:
+            item = message(url + '/a')
+            item['headers'] = headers
+>           assert not broker.handle(item)['ok']
+E           assert not True
+
+tests/test_independent_headers.py:24: AssertionError
+----------------------------- Captured stderr call -----------------------------
+AIRLOCK ALLOW http.post @ http://127.0.0.1:61016/a: effect AMBIGUOUS; duplicate dispatch blocked [receipt_f0b62d23433d47b7b8e7d7ab732f15fc]
+__________ test_unknown_consequence_headers_never_dispatch[headers3] ___________
+
+project = <function project.<locals>.create at 0x10ab24e00>
+server = ('http://127.0.0.1:61018', [('/a', b'hello', {'Host': '127.0.0.1:61018', 'Accept': '*/*', 'Accept-Encoding': 'gzip, deflate', 'Connection': 'keep-alive', ...})])
+headers = {'Idempotency-Key': 'new-key'}
+
+    @pytest.mark.parametrize('headers', [
+        {'Stripe-Account':'tenant-b'}, {'OpenAI-Project':'project-b'},
+        {'If-Match':'revision-b'}, {'Idempotency-Key':'new-key'},
+        {'X-HTTP-Method-Override':'DELETE'}, {'Content-Encoding':'gzip'},
+    ])
+    def test_unknown_consequence_headers_never_dispatch(project, server, headers):
+        url, calls = server
+        state = project(f'import requests\nrequests.post("{url}/a")\n')
+        broker = Broker(state, discover(state.root))
+        try:
+            item = message(url + '/a')
+            item['headers'] = headers
+>           assert not broker.handle(item)['ok']
+E           assert not True
+
+tests/test_independent_headers.py:24: AssertionError
+----------------------------- Captured stderr call -----------------------------
+AIRLOCK ALLOW http.post @ http://127.0.0.1:61018/a: effect AMBIGUOUS; duplicate dispatch blocked [receipt_d2c6051924bb4a93a6c426184205408e]
+__________ test_unknown_consequence_headers_never_dispatch[headers4] ___________
+
+project = <function project.<locals>.create at 0x10abe6ca0>
+server = ('http://127.0.0.1:61020', [('/a', b'hello', {'Host': '127.0.0.1:61020', 'Accept': '*/*', 'Accept-Encoding': 'gzip, deflate', 'Connection': 'keep-alive', ...})])
+headers = {'X-HTTP-Method-Override': 'DELETE'}
+
+    @pytest.mark.parametrize('headers', [
+        {'Stripe-Account':'tenant-b'}, {'OpenAI-Project':'project-b'},
+        {'If-Match':'revision-b'}, {'Idempotency-Key':'new-key'},
+        {'X-HTTP-Method-Override':'DELETE'}, {'Content-Encoding':'gzip'},
+    ])
+    def test_unknown_consequence_headers_never_dispatch(project, server, headers):
+        url, calls = server
+        state = project(f'import requests\nrequests.post("{url}/a")\n')
+        broker = Broker(state, discover(state.root))
+        try:
+            item = message(url + '/a')
+            item['headers'] = headers
+>           assert not broker.handle(item)['ok']
+E           assert not True
+
+tests/test_independent_headers.py:24: AssertionError
+----------------------------- Captured stderr call -----------------------------
+AIRLOCK ALLOW http.post @ http://127.0.0.1:61020/a: effect AMBIGUOUS; duplicate dispatch blocked [receipt_2307c99d29ec4930bb3dd69a240ea5a1]
+__________ test_unknown_consequence_headers_never_dispatch[headers5] ___________
+
+project = <function project.<locals>.create at 0x10ab267a0>
+server = ('http://127.0.0.1:61022', [('/a', b'hello', {'Host': '127.0.0.1:61022', 'Accept': '*/*', 'Accept-Encoding': 'gzip, deflate', 'Connection': 'keep-alive', ...})])
+headers = {'Content-Encoding': 'gzip'}
+
+    @pytest.mark.parametrize('headers', [
+        {'Stripe-Account':'tenant-b'}, {'OpenAI-Project':'project-b'},
+        {'If-Match':'revision-b'}, {'Idempotency-Key':'new-key'},
+        {'X-HTTP-Method-Override':'DELETE'}, {'Content-Encoding':'gzip'},
+    ])
+    def test_unknown_consequence_headers_never_dispatch(project, server, headers):
+        url, calls = server
+        state = project(f'import requests\nrequests.post("{url}/a")\n')
+        broker = Broker(state, discover(state.root))
+        try:
+            item = message(url + '/a')
+            item['headers'] = headers
+>           assert not broker.handle(item)['ok']
+E           assert not True
+
+tests/test_independent_headers.py:24: AssertionError
+----------------------------- Captured stderr call -----------------------------
+AIRLOCK ALLOW http.post @ http://127.0.0.1:61022/a: effect AMBIGUOUS; duplicate dispatch blocked [receipt_fddcbd7d99304b328d7a5cf91f6a9d44]
+___________ test_content_type_cannot_reset_ambiguous_byte_ownership ____________
+
+project = <function project.<locals>.create at 0x10abe6fc0>
+server = ('http://127.0.0.1:61024', [('/a', b'hello', {'Host': '127.0.0.1:61024', 'Accept': '*/*', 'Accept-Encoding': 'gzip, de...', {'Host': '127.0.0.1:61024', 'Accept': '*/*', 'Accept-Encoding': 'gzip, deflate', 'Connection': 'keep-alive', ...})])
+
+    def test_content_type_cannot_reset_ambiguous_byte_ownership(project, server):
+        url, calls = server
+        state = project(f'import requests\nrequests.post("{url}/a")\n')
+        broker = Broker(state, discover(state.root))
+        try:
+            item = message(url + '/a')
+            item['headers'] = {'Content-Type':'application/json'}
+            assert broker.handle(item)['ok']
+            item['headers'] = {'Content-Type':'application/json; charset=utf-8'}
+>           assert not broker.handle(item)['ok']
+E           assert not True
+
+tests/test_independent_headers.py:41: AssertionError
+----------------------------- Captured stderr call -----------------------------
+AIRLOCK ALLOW http.post @ http://127.0.0.1:61024/a: effect AMBIGUOUS; duplicate dispatch blocked [receipt_2eeca634dce24e5fbb55747b4f2dd3d8]
+AIRLOCK ALLOW http.post @ http://127.0.0.1:61024/a: effect AMBIGUOUS; duplicate dispatch blocked [receipt_b8edf9dcc6434637866482cb401f7c31]
+____________ test_inference_method_override_never_reaches_provider _____________
+
+tmp_path = PosixPath('/private/var/folders/tz/y04t4d0900xdbmz96jp608180000gn/T/pytest-of-ross/pytest-232/test_inference_method_override0')
+
+    def test_inference_method_override_never_reaches_provider(tmp_path):
+        state = model_project(tmp_path, "from openai import OpenAI\nOpenAI().chat.completions.create(model='test-model', messages=[])\n")
+        broker = ProtectedBroker(state, discover(state.root))
+        calls = []
+        broker.http.close()
+        broker.http = httpx.Client(transport=httpx.MockTransport(lambda req:
+            calls.append(req) or httpx.Response(200, json={})))
+        try:
+            item = request()
+            item['headers'] = {'X-HTTP-Method-Override':'DELETE'}
+>           assert not broker.handle(item)['ok']
+E           assert not True
+
+tests/test_independent_headers.py:57: AssertionError
+----------------------------- Captured stderr call -----------------------------
+AIRLOCK ALLOW http.post @ https://api.openai.com/v1/chat/completions: effect AMBIGUOUS; duplicate dispatch blocked [receipt_af3abae3fa5b4c33acca58b8d05d1ec5]
+=========================== short test summary info ============================
+FAILED tests/test_independent_headers.py::test_unknown_consequence_headers_never_dispatch[headers0]
+FAILED tests/test_independent_headers.py::test_unknown_consequence_headers_never_dispatch[headers1]
+FAILED tests/test_independent_headers.py::test_unknown_consequence_headers_never_dispatch[headers2]
+FAILED tests/test_independent_headers.py::test_unknown_consequence_headers_never_dispatch[headers3]
+FAILED tests/test_independent_headers.py::test_unknown_consequence_headers_never_dispatch[headers4]
+FAILED tests/test_independent_headers.py::test_unknown_consequence_headers_never_dispatch[headers5]
+FAILED tests/test_independent_headers.py::test_content_type_cannot_reset_ambiguous_byte_ownership
+FAILED tests/test_independent_headers.py::test_inference_method_override_never_reaches_provider
+8 failed in 3.86s
