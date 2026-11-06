@@ -1,0 +1,15 @@
+# The agent's image plus your Python project's test dependencies, for
+# `airlock protect --image ... --tests ...` when your tests import more than pytest.
+# Build it from your project, which needs a requirements file with hashes:
+#
+#   pip-compile --generate-hashes -o requirements-test.txt requirements.in   # once
+#   docker build -f Dockerfile.python -t my-project-airlock:py /path/to/your/project
+#
+# The sealed container has no network, so packages are installed here, each checked against
+# its hash. They are installed outside the agent's workspace, so the agent cannot change them.
+ARG AGENT_IMAGE=actenon-airlock-claude-code:v1
+FROM ${AGENT_IMAGE}
+ARG REQUIREMENTS=requirements-test.txt
+COPY ${REQUIREMENTS} /opt/airlock-requirements.txt
+RUN python3 -m pip install --no-cache-dir --require-hashes -r /opt/airlock-requirements.txt \
+    && python3 -m pytest --version

@@ -24,6 +24,7 @@ from .manifest import discover
 from .protect import ensure_image
 from .protected import DEFAULT_IMAGE, Docker, launch_protected
 from .state import State
+from .style import paint
 
 STOLEN = {
     "token": "Steal the GitHub token",
@@ -84,7 +85,7 @@ if relay:
 
 
 # Honest about what the real thing needs: a project, a key, and money you approve.
-NEXT_STEP = r"""That is Airlock. To try it with a real agent, make a practice project with one bug
+NEXT_STEP = r"""Next: try it with a real agent. Make a practice project with one bug
 (or cd into a project of your own, set your key and run airlock protect with your task):
 
   mkdir -p ~/airlock-practice && cd ~/airlock-practice
@@ -172,6 +173,10 @@ def verdict(*, control: set[str], protected: set[str], control_fixed, protected_
 
 
 def run() -> int:
+    from .preflight import require_docker
+
+    if not require_docker("airlock demo"):
+        return 2
     ensure_image(DEFAULT_IMAGE)
     docker = Docker()
     docker.verify_engine()
@@ -179,7 +184,8 @@ def run() -> int:
     network, sink, other = (f"airlock-demo-{kind}-{identity}" for kind in ("net", "sink", "sink2"))
     base = Path(tempfile.mkdtemp(prefix="airlock-demo-")).resolve()
     base.chmod(0o755)
-    print("Part 1: an agent turns hostile, and nothing gets out\n")
+    print(paint("ACTENON AIRLOCK", "head") + "  free demo: no key, no model, no account, no cost\n")
+    print(paint("Part 1: an agent turns hostile, and nothing gets out", "head") + "\n")
     print("A script does a small job, then acts like a hijacked agent. Every secret is a fake.\n")
     try:
         docker.call(["network", "create", "--internal", network])
@@ -215,10 +221,20 @@ def run() -> int:
         for label, name in STOLEN.items():
             before = "LEAKED" if label in control_hits else "no"
             after = "LEAKED" if label in protected_hits else "nothing got out"
-            print(f"{name:<{width}}{before:<22}{after}")
-        print(f"{'Change your real files':<{width}}{'yes':<22}no, your files are untouched")
+            print(
+                f"{name:<{width}}"
+                + paint(f"{before:<22}", "bad" if before == "LEAKED" else "dim")
+                + paint(after, "bad" if after == "LEAKED" else "good")
+            )
+        print(
+            f"{'Change your real files':<{width}}{'yes':<22}"
+            + paint("no, your files are untouched", "good" if untouched else "bad")
+        )
         refused = len([r for r in _rows(state) if r.get("decision") == "DENY"])
-        print(f"{'Ask the supervisor to send it':<{width}}{'-':<22}refused, signed receipt")
+        print(
+            f"{'Ask the supervisor to send it':<{width}}{'-':<22}"
+            + paint("REFUSED, signed receipt", "good" if refused else "bad")
+        )
         print(f"\nReached the sink: {len(control_hits)} from the ordinary container, ", end="")
         print(f"{len(protected_hits)} from Protected Mode. Refusals signed: {refused}.")
         if problems or not refused:
@@ -243,6 +259,7 @@ def run() -> int:
             for problem in problems:
                 print("  " + problem)
             return 1
+        print("\n" + "\n".join(summary(len(control_hits), len(protected_hits), facts)))
         print("\n" + NEXT_STEP)
         return 0
     finally:
@@ -254,6 +271,23 @@ def run() -> int:
             [docker.binary, "network", "rm", network], capture_output=True, env=docker.environment
         )
         shutil.rmtree(base, ignore_errors=True)
+
+
+def summary(leaked_open: int, leaked_sealed: int, facts: dict) -> list[str]:
+    """What the two parts showed, built only from what they observed."""
+    final = facts["final"]
+    return [
+        paint("What you just saw", "head"),
+        f"  The same hostile script got {leaked_open} fake secrets out of an ordinary container,",
+        f"  and {leaked_sealed} out of Protected Mode.",
+        "  Its useful fix was kept as a patch for you to review; your files were not touched.",
+        f"  {len(facts['refusals']) + 1} unapproved or repeated writes were refused before "
+        "they were sent.",
+        "  The one approved write was sent once, and Airlock confirmed it only by reading it",
+        "  back, which an independent check agreed with.",
+        f"  Evidence: {final['receipts']} signed receipts, integrity "
+        + ("OK." if final["integrity_ok"] else "FAILED."),
+    ]
 
 
 def _rows(state: State) -> list[dict]:

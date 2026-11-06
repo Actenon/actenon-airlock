@@ -1,0 +1,26 @@
+# The agent's image plus Node, npm and your project's exact dependencies, for
+# `airlock protect --image ... --tests ...` on a JavaScript or TypeScript project. Build it
+# from your project, which needs a package-lock.json:
+#
+#   docker build -f Dockerfile.node -t my-project-airlock:node /path/to/your/project
+#
+# The sealed container has no network, so dependencies are installed here with `npm ci`,
+# checked against your lockfile, with install scripts off. They live at /node_modules,
+# outside the agent's workspace, so the agent cannot change them. Same recipe as Gate 7.
+ARG AGENT_IMAGE=actenon-airlock-claude-code:v1
+FROM node@sha256:4b150b48b4116e2a22f2c39cc27025fbf4f153e2078fd3b14d159fdb5c7279da AS deps
+WORKDIR /deps
+COPY package.json package-lock.json ./
+RUN npm ci --ignore-scripts --no-audit --no-fund
+
+FROM node@sha256:4b150b48b4116e2a22f2c39cc27025fbf4f153e2078fd3b14d159fdb5c7279da AS node
+FROM ${AGENT_IMAGE}
+COPY --from=node /usr/local/bin/node /usr/local/bin/node
+COPY --from=node /usr/local/lib/node_modules/npm /usr/local/lib/node_modules/npm
+COPY --from=deps /deps/node_modules /node_modules
+# Vite writes its bundled config under node_modules/.vite-temp; the image is read-only at
+# run time, so that one directory points at the writable /tmp.
+RUN ln -s /tmp /node_modules/.vite-temp \
+    && ln -s /usr/local/lib/node_modules/npm/bin/npm-cli.js /usr/local/bin/npm \
+    && ln -s /usr/local/lib/node_modules/npm/bin/npx-cli.js /usr/local/bin/npx \
+    && node --version

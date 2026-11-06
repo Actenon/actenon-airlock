@@ -136,28 +136,131 @@ def doctor(root: Path):
             checks.append({"component": "local approval signature", "ok": True})
         except AirlockError:
             checks.append({"component": "local approval signature", "ok": False})
-    protected = availability()
+    from .preflight import docker_problem, installed_commit
+
+    problem = docker_problem("airlock doctor")
+    protected = {"available": False, "reason": problem.category} if problem else availability()
     from .agents import SUPPORTED
 
     agents = {}
     for name, profile in SUPPORTED.items():
-        image = availability(profile["image"]) if protected["available"] else {"available": False}
+        # Unknown (None) while Docker is not usable, never a guess.
+        ready = None if problem else availability(profile["image"])["available"]
         agents[name] = {
             "version": profile["version"],
             "image": profile["image"],
-            "image_ready": image["available"],
+            "image_ready": ready,
             "status": profile.get("status", "scored under acceptance v2"),
         }
+    import platform
+
+    try:
+        version = importlib.metadata.version("actenon-airlock")
+    except importlib.metadata.PackageNotFoundError:
+        version = "unknown"
+    keys = sorted(name for name in ("ANTHROPIC_API_KEY", "OPENAI_API_KEY") if os.environ.get(name))
+    if not all(c["ok"] for c in checks):
+        next_step = "Reinstall Airlock with the command in the README; a component is wrong."
+    elif problem:
+        next_step = problem.fix[0] if problem.fix else "Fix Docker, then run airlock doctor again."
+    elif not keys:
+        next_step = (
+            "Run `airlock demo` (free, no key). Set a model key later for `airlock protect`."
+        )
+    else:
+        next_step = 'Run `airlock demo`, or cd into a project and run `airlock protect "<task>"`.'
     return {
         "schema": "actenon-airlock/doctor/v1",
+        "airlock": {"version": version, "commit": installed_commit()},
+        "system": {
+            "os": {"Darwin": "macOS"}.get(platform.system(), platform.system()),
+            "machine": platform.machine(),
+            "python": platform.python_version(),
+        },  # fmt: skip
+        "docker": None
+        if not problem
+        else {"category": problem.category, "what": problem.what, "fix": problem.fix},
+        "ready": all(c["ok"] for c in checks) and not problem,
+        "demo_image_ready": None if problem else availability()["available"],
+        "next_step": next_step,
         "checks": checks,
         "guarantees": {"local": "cooperative Python interception", "protected": protected},
         "agents": agents,
-        "supervisor_credentials": sorted(
-            name for name in ("ANTHROPIC_API_KEY", "OPENAI_API_KEY") if os.environ.get(name)
-        ),
+        "supervisor_credentials": keys,
         "ok": all(c["ok"] for c in checks),
     }
+
+
+def doctor_text(result: dict) -> str:
+    """What a person needs from doctor: is it ready, and if not, the one thing to do next."""
+    from .style import paint
+
+    w = 13
+    airlock = result["airlock"]
+    where = f", from commit {airlock['commit'][:12]}" if airlock["commit"] else ""
+    lines = [paint("Airlock doctor", "head"), ""]
+    lines.append(
+        f"  {'Airlock':<{w}}{airlock['version']}{where} (development candidate, not a release)"
+    )
+    parts = [c for c in result["checks"] if "version" in c]
+    wrong = [c for c in result["checks"] if not c["ok"]]
+    names = ", ".join(
+        f"{c['component'].removeprefix('actenon-').title()} {c['version']}" for c in parts
+    )
+    lines.append(
+        f"  {'Components':<{w}}{names}: "
+        + (paint("as pinned", "good") if not wrong else paint("PROBLEM", "bad"))
+    )
+    for c in wrong:
+        expected = f" (expected {c['expected']})" if c.get("expected") else ""
+        lines.append(
+            f"  {'':<{w}}{paint('wrong', 'bad')}: {c['component']} {c.get('version', '')}{expected}"
+        )
+    system = result["system"]
+    lines.append(f"  {'System':<{w}}{system['os']} {system['machine']}, Python {system['python']}")
+    docker = result["docker"]
+    if docker:
+        lines.append(f"  {'Docker':<{w}}" + paint(docker["what"].splitlines()[0], "bad"))
+        lines.append(f"  {'Images':<{w}}unknown until Docker is running")
+    else:
+        lines.append(
+            f"  {'Docker':<{w}}" + paint("running", "good") + ", Linux containers, seccomp on"
+        )
+        built = [name for name, a in result["agents"].items() if a["image_ready"]]
+        demo = (
+            "demo image ready"
+            if result["demo_image_ready"]
+            else "demo image builds on first `airlock demo`"
+        )
+        lines.append(f"  {'Images':<{w}}{demo}")
+        lines.append(
+            f"  {'':<{w}}agents ready: {', '.join(built) or 'none yet'}"
+            + ("; the rest build on first use, once" if len(built) < len(result["agents"]) else "")
+        )
+    keys = ", ".join(result["supervisor_credentials"])
+    lines.append(
+        f"  {'Model keys':<{w}}"
+        + (f"{keys} set. Kept by Airlock; never enters the container." if keys
+           else "none set. Only `airlock protect` needs one; `airlock demo` does not.")
+    )  # fmt: skip
+    if not result["ok"]:
+        lines += ["", paint("Not ready.", "bad") + " " + result["next_step"]]
+    elif docker:
+        lines += [
+            "",
+            paint("Not ready", "bad")
+            + " for `airlock demo` or `airlock protect`: "
+            + docker["what"].splitlines()[0],
+            "To fix it:",
+            *(f"  {step}" for step in docker["fix"]),
+            "Then run again:",
+            "  airlock doctor",
+            "",
+            "Local Mode (`airlock init` and `airlock run`) works without Docker.",
+        ]
+    else:
+        lines += ["", paint("Ready.", "good") + " " + result["next_step"]]
+    return "\n".join(lines)
 
 
 WORKFLOW_COMMANDS = {
@@ -684,26 +787,7 @@ def main(argv=None):
             if args.json:
                 print(json.dumps(result, indent=2))
             else:
-                for c in result["checks"]:
-                    print(
-                        ("OK " if c["ok"] else "FAIL ")
-                        + c["component"]
-                        + (" " + c["version"] if "version" in c else "")
-                    )
-                print("Candidate dependencies are pinned; registry releases remain pending.")
-                print("LOCAL MODE: cooperative Python protection")
-                print(
-                    "PROTECTED MODE AVAILABLE"
-                    if result["guarantees"]["protected"]["available"]
-                    else "COOPERATIVE MODE ONLY: " + result["guarantees"]["protected"]["reason"]
-                )
-                for name, agent in result["agents"].items():
-                    print(
-                        f"AGENT {name} ({agent['version']}): image "
-                        f"{'ready' if agent['image_ready'] else 'not built'}; {agent['status']}"
-                    )
-                held = ", ".join(result["supervisor_credentials"]) or "none"
-                print(f"Model credentials in the supervisor: {held}. None enter the container.")
+                print(doctor_text(result))
             return 0 if result["ok"] else 2
         if args.cmd == "checkpoint":
             from .evidence import create_checkpoint

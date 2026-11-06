@@ -219,6 +219,10 @@ OUTCOMES = {
     CONFIG_CHANGED: "INCONCLUSIVE",
     TIMED_OUT: "INCONCLUSIVE",
 }
+# The PATH every check runs with, inside the verification container.
+CHECK_PATH = (
+    "/work/node_modules/.bin:/node_modules/.bin:/usr/local/go/bin:/usr/local/bin:/usr/bin:/bin"
+)
 # Where a check may write a JUnit report that Airlock then reads (index filled in).
 JUNIT = "/out/report-{index}.xml"
 
@@ -450,8 +454,7 @@ def verify_candidate(
             "--env", "HOME=/tmp", "--env", "CI=1", "--env", "NO_COLOR=1",
             "--env", "GOCACHE=/work/.go-cache", "--env", "GOFLAGS=-mod=mod",
             "--env", "GOPROXY=off", "--env", "GOTOOLCHAIN=local",
-            "--env", "PATH=/work/node_modules/.bin:/node_modules/.bin:/usr/local/go/bin:"
-                     "/usr/local/bin:/usr/bin:/bin",
+            "--env", "PATH=" + CHECK_PATH,
             *[a for target, m in mounts.items()
               for a in ("--mount", f"type=bind,source={m['source']},target={target}"
                                    + (",readonly" if not m["rw"] else ""))],

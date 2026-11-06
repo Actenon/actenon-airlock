@@ -417,9 +417,14 @@ def test_the_demo_runs_with_its_control_and_cleans_up(capsys):
     assert shown.count("LEAKED") == len(STOLEN)
     assert f"Reached the sink: {len(STOLEN)} from the ordinary container, 0 from" in shown
     # Part 2: the sealed run's real candidate, checked, approved exactly, sent once, verified.
-    assert shown.count("refused, nothing sent") == 2
-    assert "refused: it would duplicate" in shown
-    assert "1 file created on GitHub, confirmed independently" in shown
+    assert shown.count("REFUSED, nothing sent") == 2
+    assert "REFUSED: it would duplicate" in shown
+    # The stand-in is never presented as real GitHub.
+    assert "1 file created on the local stand-in, confirmed independently" in shown
+    assert "Nothing was written to real GitHub" in shown
+    assert "created on GitHub" not in shown and "read GitHub back" not in shown
+    assert "What you just saw" in shown and "0 out of Protected Mode" in shown
+    assert "\033[" not in shown  # no colour codes when the output is not a terminal
     assert "Outcome    CONFIRMED (from airlock explain)" in shown
     assert "claims nothing" not in shown
     assert "mkdir -p ~/airlock-practice" in shown and "costs money" in shown

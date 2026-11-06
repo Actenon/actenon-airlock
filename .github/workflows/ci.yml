@@ -113,8 +113,14 @@ jobs:
         run: docker build -f containers/Dockerfile.claude-code -t actenon-airlock-claude-code:v1 .
       - name: Build pinned unchanged Codex image
         run: docker build -f containers/Dockerfile.codex-cli -t actenon-airlock-codex-cli:v1 .
+      - name: Build the documented Go and TypeScript toolchain images
+        run: |
+          docker build -f examples/toolchains/Dockerfile.go -t airlock-example-go:ci examples/toolchains/sample-go
+          docker build -f examples/toolchains/Dockerfile.node -t airlock-example-node:ci examples/toolchains/sample-node
       - name: Run positive workflow and bypass attempts in one contained environment
         env:
+          AIRLOCK_TEST_GO_IMAGE: airlock-example-go:ci
+          AIRLOCK_TEST_NODE_IMAGE: airlock-example-node:ci
           AIRLOCK_TEST_PROTECTED_IMAGE: actenon-airlock-compute:dev
           AIRLOCK_TEST_CODEX_IMAGE: actenon-airlock-codex-cli:v1
           AIRLOCK_CODEX_EVIDENCE: ${{ github.workspace }}/codex-evidence

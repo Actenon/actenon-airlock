@@ -29,6 +29,7 @@ from .credential_preflight import supervisor_scope
 from .github_consequence import ReviewedGitHubCreate
 from .github_runtime import PROFILE_SCHEMA
 from .state import State
+from .style import paint
 
 OWNER, REPO, BRANCH = "airlock-demo", "calculator", "main"
 PATH_IN_REPO = "fixes/calculator.patch"
@@ -193,7 +194,7 @@ def run(state: State, run_dir: Path, workspace_root: Path, cli_main, image: str)
 
 
 def _yes(flag: bool, good: str, bad: str) -> str:
-    return good if flag else bad
+    return paint(good, "good") if flag else paint(bad, "bad")
 
 
 def render(facts: dict) -> tuple[list[str], list[str]]:
@@ -226,12 +227,16 @@ def render(facts: dict) -> tuple[list[str], list[str]]:
 
     w = 16
     lines = [
-        "Part 2: one approved change, checked, sent once and verified",
+        paint("Part 2: one approved change, checked, sent once and verified", "head"),
+        "",
+        "Here GitHub is Airlock's local stand-in: it behaves like GitHub's file API and records",
+        "every request, but no account is used and nothing leaves this machine.",
         "",
         f"The sealed run left one candidate: {changed} (patch {manifest['candidate_sha256'][:12]}).",
         "",
-        f"{'1 Check':<{w}}{check['outcome']}  {counts.get('passed', 0)} of your tests passed, "
-        "in a sealed container with no network",
+        f"{'1 Check':<{w}}"
+        + _yes(check["outcome"] == "PASS", check["outcome"], check["outcome"])
+        + f"  {counts.get('passed', 0)} of your tests passed, in a sealed container with no network",
         f"{'2 Review':<{w}}Airlock found what this project's code could do, and proposes one grant:",
         f"{'':<{w}}  create {review.path} in {review.owner}/{review.repo}, branch {review.branch},",
         f"{'':<{w}}  on commit {review.expected_parent_sha[:12]}, with exactly these bytes "
@@ -244,24 +249,24 @@ def render(facts: dict) -> tuple[list[str], list[str]]:
         + "\n".join(
             (f"{'':<{w}}" if i else "")
             + f"{label:<56}"
-            + _yes(result["status"] == "REFUSED", "refused, nothing sent", "NOT REFUSED")
+            + _yes(result["status"] == "REFUSED", "REFUSED, nothing sent", "NOT REFUSED")
             for i, (label, result, _) in enumerate(facts["refusals"])
         ),
         f"{'4 Act':<{w}}{'the approved file creation':<56}"
         + _yes(held, "sent once, held as unconfirmed", "not held"),
         f"{'':<{w}}{'the same request again':<56}"
-        + _yes(replay_ok, "refused: it would duplicate", "NOT REFUSED"),
-        f"{'5 Verify':<{w}}{'Airlock read GitHub back':<56}"
+        + _yes(replay_ok, "REFUSED: it would duplicate", "NOT REFUSED"),
+        f"{'5 Verify':<{w}}{'Airlock read the stand-in back':<56}"
         + _yes(settled, "CONFIRMED", "not settled"),
-        f"{'':<{w}}{'an independent check of GitHub’s own record':<56}"
+        f"{'':<{w}}{'an independent check of the stand-in’s own record':<56}"
         + _yes(independent, "bytes, parent and path match", "MISMATCH"),
         "",
-        "RECEIPT",
+        paint("RECEIPT", "head"),
         f"  {'Changed':<11}{len(manifest['changes'])} file ({changed})",
         f"  {'Checked':<11}{check['outcome']}: {check['detail']}",
         f"  {'Approved':<11}1 exact file creation, nothing else",
-        f"  {'Refused':<11}{len(facts['refusals']) + 1} attempts, none reached GitHub",
-        f"  {'Happened':<11}{facts['puts_after']} file created on GitHub, "
+        f"  {'Refused':<11}{len(facts['refusals']) + 1} attempts, none reached the stand-in",
+        f"  {'Happened':<11}{facts['puts_after']} file created on the local stand-in, "
         + _yes(independent and settled, "confirmed independently", "NOT confirmed"),
         f"  {'Uncertain':<11}"
         + _yes(not facts["final"]["unresolved_effects"], "nothing", "unresolved effects remain"),
@@ -269,8 +274,7 @@ def render(facts: dict) -> tuple[list[str], list[str]]:
         + _yes(facts["final"]["integrity_ok"], "OK", "FAILED"),
         f"  {'Outcome':<11}{facts['report_status']} (from airlock explain)",
         "",
-        "GitHub here is Airlock's local stand-in, which records every request. No account was",
-        "used and nothing left this machine. The agent, the boundary, the approval, the refusals",
-        "and both readbacks are the real product.",
+        "Nothing was written to real GitHub. The agent's fix, the sealed container, the approval,",
+        "the refusals and both readbacks are the real product; only the provider is a stand-in.",
     ]
     return lines, problems

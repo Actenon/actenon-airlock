@@ -11,6 +11,7 @@ import contextlib
 import io
 import json
 import os
+import shlex
 import subprocess
 import sys
 from decimal import Decimal
@@ -80,6 +81,55 @@ def ensure_image(image: str, dockerfile: str | None = None) -> None:
         )
         if built.returncode:
             raise AirlockError(f"Building {tag} failed")
+
+
+LANGUAGE = {"python": "Python", "go": "Go", "node": "JavaScript/TypeScript"}
+
+
+def missing_tools(image: str, commands: list[list[str]]) -> list[str]:
+    """Programs the planned checks need that the image does not have (asked of the image)."""
+    from .workflow import CHECK_PATH
+
+    programs = sorted({c[0] for c in commands})
+    script = 'for p in "$@"; do command -v "$p" >/dev/null 2>&1 || echo "$p"; done'
+    if "python3" in programs:
+        script += '; command -v python3 >/dev/null 2>&1 && { python3 -c "import pytest" 2>/dev/null || echo pytest; }'
+    out = Docker().call(
+        ["run", "--rm", "--network", "none", "--cap-drop", "ALL", "--entrypoint", "sh",
+         "--env", "PATH=" + CHECK_PATH, image, "-c", script, "sh", *programs],
+        timeout=60,
+    )  # fmt: skip
+    return out.split()
+
+
+def check_plan(root: Path, tests: Path, image: str) -> list[list[str]]:
+    """The checks --tests will run, or a refusal before anything is spent."""
+    from .workflow import detect_profile, planned_checks
+
+    if not tests.is_dir():
+        raise AirlockError(f"--tests {tests} is not a folder. Nothing ran and nothing was spent")
+    profile = detect_profile(root)
+    commands = planned_checks(root, profile)
+    missing = missing_tools(image, commands)
+    if missing:
+        from .preflight import REPOSITORY, installed_commit
+
+        recipe = (
+            f"https://raw.githubusercontent.com/{REPOSITORY.removeprefix('https://github.com/')}/"
+            f"{installed_commit() or 'main'}/examples/toolchains/Dockerfile.{profile}"
+        )
+        tag = f"{root.name.lower() or 'project'}-airlock:{profile}"
+        raise AirlockError(
+            f"This looks like a {LANGUAGE[profile]} project. Its checks need "
+            + ", ".join(f"`{m}`" for m in missing)
+            + f", which the image {image} does not have, so they could not run. "
+            "Nothing ran and nothing was spent.\n\n"
+            "Build an image with your toolchain and dependencies, from your project folder:\n"
+            f"  curl -fsSL {recipe} | docker build -t {tag} -f - .\n"
+            f"Then add --image {tag} to the same command. Or leave out --tests. "
+            "See docs/real-project.md"
+        )
+    return commands
 
 
 def _approved(state: State, config: dict) -> bool:
@@ -251,7 +301,12 @@ def protect(args, root: Path, run) -> int:
     prices = args.price_per_mtok or profile["default_prices"]
     image = args.image or profile["image"]
     limit = args.max_run_usd or DEFAULT_MAX_RUN_USD
+    from .preflight import require_docker
+
+    if not require_docker("airlock protect " + shlex.quote(args.task)):
+        return 2
     ensure_image(image, profile["dockerfile"] if image == profile["image"] else None)
+    checks = check_plan(root, args.tests.resolve(), image) if args.tests else None
 
     state = State(root)
     endpoint = args.model_endpoint or DEFAULT_ENDPOINTS[profile.get("provider", "anthropic")]
@@ -274,6 +329,10 @@ def protect(args, root: Path, run) -> int:
             return proposed
         print(f"\n{agent} will run in a sealed container with a copy of this project.\n")
         print(review.getvalue().strip())
+        if checks:
+            shown = "; ".join(" ".join(c) for c in checks)
+            print(f"\nAfter the agent finishes, its change is checked with: {shown}")
+            print(f"using the tests in {args.tests}, in a sealed container with no network.")
         print("\nCheck the prices above against your provider before you approve.\n")
         if not (args.approve or _ask()):
             print("Nothing was approved and nothing ran.")
