@@ -21,7 +21,7 @@ pipx` or `sudo apt install pipx`, then `pipx ensurepath` and open a new terminal
 ## 2. Install Airlock
 
 ~~~sh
-pipx install "git+https://github.com/Actenon/actenon-airlock.git@15f5db3234f48062c894f57df65b3e17971b92f1"
+pipx install "git+https://github.com/Actenon/actenon-airlock.git@733bd48bb391cc4e7fee1c3810bc22b79d0d2c9a"
 ~~~
 
 That is one exact commit of the development candidate. It brings the other Actenon components

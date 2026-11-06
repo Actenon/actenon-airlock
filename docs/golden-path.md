@@ -24,7 +24,7 @@ python acceptance/v2/flagship.py --model qwen2.5-coder:14b --out flagship-run
 ## 1. Install
 
 ```bash
-pipx install "git+https://github.com/Actenon/actenon-airlock.git@15f5db3234f48062c894f57df65b3e17971b92f1"
+pipx install "git+https://github.com/Actenon/actenon-airlock.git@733bd48bb391cc4e7fee1c3810bc22b79d0d2c9a"
 ```
 
 This is the same exact commit as the [README](../README.md#install). pipx keeps Airlock in its
@@ -36,7 +36,7 @@ path, build them from a checkout of the same commit:
 
 ```bash
 git clone https://github.com/Actenon/actenon-airlock.git && cd actenon-airlock
-git checkout 15f5db3234f48062c894f57df65b3e17971b92f1
+git checkout 733bd48bb391cc4e7fee1c3810bc22b79d0d2c9a
 ```
 
 ```bash
