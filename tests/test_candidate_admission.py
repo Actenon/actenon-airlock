@@ -14,6 +14,7 @@ import io
 import json
 import re
 import sys
+import tarfile
 import zipfile
 from pathlib import Path
 from typing import Any
@@ -63,6 +64,67 @@ INDEPENDENT_TEST = (
 )
 
 
+SOURCE_ROOTS = {"actenon-protocol": "python/", "actenon-permit": "src/"}
+
+
+def release_source(name: str, root: str, i: int) -> dict[str, bytes]:
+    """A dependency's tree at its approved release commit."""
+    mod = name.replace("-", "_")
+    return {
+        f"{root}{mod}/__init__.py": f'"""{name}."""\nVALUE = {i}\n'.encode(),
+        f"{root}{mod}/core.py": f"def run():\n    return {i}\n".encode(),
+        "README.md": f"# {name}\n".encode(),
+        "pyproject.toml": f'[project]\nname = "{name}"\nversion = "1.0.0"\n'.encode(),
+        f"tests/test_{mod}.py": b"def test_ok():\n    assert True\n",
+    }
+
+
+def build_wheel(name, version, root, files, *, extra=None, drop=(), change=None, meta=None):
+    mod = name.replace("-", "_")
+    payload = {p[len(root) :]: d for p, d in files.items() if p.startswith(f"{root}{mod}/")}
+    payload.update(extra or {})
+    for path in drop:
+        payload.pop(path)
+    for path, data in (change or {}).items():
+        payload[path] = data
+    info = f"{mod}-{version}.dist-info"
+    buf = io.BytesIO()
+    with zipfile.ZipFile(buf, "w") as archive:
+        for path, data in payload.items():
+            archive.writestr(path, data)
+        name_, version_ = meta or (name, version)
+        archive.writestr(
+            f"{info}/METADATA", f"Metadata-Version: 2.1\nName: {name_}\nVersion: {version_}\n\n"
+        )
+        archive.writestr(f"{info}/RECORD", "")
+    return buf.getvalue()
+
+
+def _targz(top: str, files: dict[str, bytes]) -> bytes:
+    buf = io.BytesIO()
+    with tarfile.open(fileobj=buf, mode="w:gz") as tar:
+        for path, data in files.items():
+            info = tarfile.TarInfo(f"{top}/{path}")
+            info.size = len(data)
+            tar.addfile(info, io.BytesIO(data))
+    return buf.getvalue()
+
+
+def build_sdist(name, version, files, *, extra=None, change=None):
+    mod = name.replace("-", "_")
+    members = dict(files)
+    meta = f"Metadata-Version: 2.1\nName: {name}\nVersion: {version}\n\n".encode()
+    members["PKG-INFO"] = meta
+    members[f"{mod}.egg-info/PKG-INFO"] = meta
+    members.update(extra or {})
+    members.update(change or {})
+    return _targz(f"{mod}-{version}", members)
+
+
+def source_tarball(repo: str, sha: str, files: dict[str, bytes]) -> bytes:
+    return _targz(f"{repo.split('/')[1]}-{sha[:7]}", files)
+
+
 def _load():
     path = ROOT / "scripts" / "check_candidate_admission.py"
     spec = importlib.util.spec_from_file_location("check_candidate_admission", path)
@@ -87,9 +149,15 @@ class Files:
 class FakePyPI:
     def __init__(self) -> None:
         self.published: dict[tuple[str, str], list[dict[str, Any]]] = {}
+        self.blobs: dict[str, bytes] = {}
 
     def files(self, name: str, version: str) -> list[dict[str, Any]] | None:
         return self.published.get((name, version))
+
+    def download(self, url: str) -> bytes:
+        if not url.startswith(gate.PYPI_FILES) or url not in self.blobs:
+            raise gate.EvidenceError(f"no such PyPI file {url}")
+        return self.blobs[url]
 
 
 class FakeGitHub:
@@ -100,6 +168,7 @@ class FakeGitHub:
         self.run_artifacts: dict[int, list[dict[str, Any]]] = {}
         self.blobs: dict[int, bytes] = {}
         self.attested: set[bytes] = set()
+        self.archives: dict[tuple[str, str], bytes] = {}
 
     def check_runs(self, repo, sha):
         return copy.deepcopy(self.checks.get((repo, sha), []))
@@ -121,6 +190,11 @@ class FakeGitHub:
             return False, "wrong signer or source digest"
         ok = path.read_bytes() in self.attested
         return ok, "verified" if ok else "no attestation for these bytes"
+
+    def source_archive(self, repo, sha):
+        if (repo, sha) not in self.archives:
+            raise gate.EvidenceError(f"GitHub API 404 for {repo}@{sha}")
+        return self.archives[(repo, sha)]
 
     def add_artifact(self, run: dict[str, Any], name: str, members: dict[str, bytes], **kw):
         buf = io.BytesIO()
@@ -244,6 +318,17 @@ class World:
                 {"test-results.xml": junit({**ordinary, **skipped})},
             )
 
+    def ci_members(self, name: str) -> dict[str, bytes]:
+        """The files of one CI artifact, as the run uploaded them."""
+        art = next(a for a in self.github.run_artifacts[self.ci_run["id"]] if a["name"] == name)
+        with zipfile.ZipFile(io.BytesIO(self.github.blobs[art["id"]])) as archive:
+            return {n: archive.read(n) for n in archive.namelist()}
+
+    def replace_ci_artifact(self, name: str, members: dict[str, bytes]) -> None:
+        arts = self.github.run_artifacts[self.ci_run["id"]]
+        arts[:] = [a for a in arts if a["name"] != name]
+        self.github.add_artifact(self.ci_run, name, members)
+
     def _dependencies(self) -> None:
         jobs = self.registry["ci_prerequisites"]["dependency_jobs"]
         for repo, rev in DEPS.values():
@@ -331,21 +416,86 @@ class World:
         self.recovered_pass = True
 
     def make_release(self) -> None:
-        wheel = b"published wheel"
-        digest = hashlib.sha256(wheel).hexdigest()
+        """A release candidate whose four dependencies come from PyPI, with full provenance."""
+        self.release: dict[str, dict[str, Any]] = {}
+        for i, (name, (repo, _)) in enumerate(DEPS.items()):
+            root = SOURCE_ROOTS.get(name, "")
+            self.release[name] = {
+                "repo": repo,
+                "commit": str(5 + i) * 40,
+                "root": root,
+                "files": release_source(name, root, i),
+            }
+        self.release_rules = []
+        for name, rel in self.release.items():
+            rel["wheel"] = build_wheel(name, "1.0.0", rel["root"], rel["files"])
+            rel["sdist"] = build_sdist(name, "1.0.0", rel["files"])
+            rule = {
+                "name": name,
+                "version": "1.0.0",
+                "repository": rel["repo"],
+                "source_commit": rel["commit"],
+                "source_root": rel["root"],
+            }
+            self.release_rules.append(rule)
+        self.registry["registry_dependencies"]["packages"] = self.release_rules
         self.pyproject = (
-            b'[project]\nname = "actenon-airlock"\nversion = "1.0.0"\n'
-            b'dependencies = ["actenon-scan>=1,<2"]\n'
+            b'[project]\nname = "actenon-airlock"\nversion = "1.0.0"\ndependencies = ['
+            + ", ".join(f'"{n}==1.0.0"' for n in DEPS).encode()
+            + b"]\n"
         )
         self.config["airlock_dependency_manifest_sha256"] = hashlib.sha256(
             self.pyproject
         ).hexdigest()
-        self.lock = (
-            '[[package]]\nname = "actenon-scan"\nversion = "1.0.0"\n'
-            'source = { registry = "https://pypi.org/simple" }\n'
-            f'wheels = [{{ url = "https://files/x.whl", hash = "sha256:{digest}" }}]\n'
-        ).encode()
-        self.pypi.published[("actenon-scan", "1.0.0")] = [{"digests": {"sha256": digest}}]
+        self.install_override: dict[str, dict[str, Any] | None] = {}
+        self.render()
+
+    def render(self) -> None:
+        """Publish, lock and install the current release state consistently."""
+        jobs = self.registry["ci_prerequisites"]["dependency_jobs"]
+        lock, install = [], []
+        self.pypi.published.clear()
+        self.pypi.blobs.clear()
+        for name, rel in self.release.items():
+            self.github.archives[(rel["repo"], rel["commit"])] = source_tarball(
+                rel["repo"], rel["commit"], rel["files"]
+            )
+            self.github.checks[(rel["repo"], rel["commit"])] = [
+                check(job, 1, check_id=i) for i, job in enumerate(jobs[rel["repo"]], start=1)
+            ]
+            files = []
+            for kind in ("wheel", "sdist"):
+                blob = rel[kind]
+                digest = hashlib.sha256(blob).hexdigest()
+                url = f"{gate.PYPI_FILES}packages/{digest[:2]}/{name}.{kind}"
+                self.pypi.blobs[url] = blob
+                files.append({"url": url, "digests": {"sha256": digest}, "kind": kind})
+            self.pypi.published[(name, "1.0.0")] = files
+            wheel, sdist = files
+            lock.append(
+                f'[[package]]\nname = "{name}"\nversion = "1.0.0"\n'
+                'source = { registry = "https://pypi.org/simple" }\n'
+                f'sdist = {{ url = "{sdist["url"]}", hash = "sha256:{sdist["digests"]["sha256"]}" }}\n'
+                f'wheels = [{{ url = "{wheel["url"]}", hash = "sha256:{wheel["digests"]["sha256"]}" }}]\n'
+            )
+            item = {
+                "metadata": {"name": name, "version": "1.0.0"},
+                "download_info": {
+                    "url": wheel["url"],
+                    "archive_info": {"hashes": {"sha256": wheel["digests"]["sha256"]}},
+                },
+                "is_direct": False,
+            }
+            if name in self.install_override:
+                item = self.install_override[name]
+            if item is not None:
+                install.append(item)
+        self.lock = "\n".join(lock).encode()
+        report = json.dumps({"version": "1", "install": install}).encode()
+        for spec in self.registry["registry_dependencies"]["install_reports"]:
+            members = self.ci_members(spec["artifact"])
+            members[spec["file"]] = report
+            self.replace_ci_artifact(spec["artifact"], members)
 
     def evaluate(self, **kw) -> dict[str, Any]:
         self.gate_files["release/gates.json"] = json.dumps(self.registry).encode()
@@ -681,21 +831,27 @@ def test_candidate_staging_never_satisfies_registry_coherence(world: World) -> N
 
 
 def test_missing_published_artifact_blocks_release(world: World) -> None:
+    """D6: an unpublished registry dependency has no provenance, so not even the candidate passes."""
     world.make_release()
     world.pypi.published.clear()
     world.publish_acceptance()
     world.freeze_definitions()
     report = world.evaluate()
     assert report["release_only"]["registry_coherence"]["status"] == "FAIL"
-    assert report["overall_status"] == "CANDIDATE READY"
+    assert report["prerequisites"]["dependency_graph"]["status"] == "FAIL"
+    assert report["overall_status"] == "NOT READY"
 
 
 def test_published_digest_mismatch_blocks_release(world: World) -> None:
+    """D6: PyPI files that are not the locked ones break provenance as well as coherence."""
     world.make_release()
     world.pypi.published[("actenon-scan", "1.0.0")] = [{"digests": {"sha256": "0" * 64}}]
     world.publish_acceptance()
     world.freeze_definitions()
-    assert world.evaluate()["overall_status"] == "CANDIDATE READY"
+    report = world.evaluate()
+    assert report["release_only"]["registry_coherence"]["status"] == "FAIL"
+    assert report["prerequisites"]["dependency_graph"]["status"] == "FAIL"
+    assert report["overall_status"] == "NOT READY"
 
 
 # --- registry integrity --------------------------------------------------------
@@ -995,3 +1151,286 @@ def test_every_agent_container_test_is_mandatory(module: str) -> None:
     source = (ROOT / "tests" / f"{module}.py").read_text()
     names = re.findall(r"^def (test_\w+)", source, re.MULTILINE)
     assert names and {f"tests.{module}::{name}" for name in names} <= required
+
+
+# --- registry dependency provenance (D6) -----------------------------------------
+#
+# A registry dependency passes only through the chain: owner-approved source commit on main
+# -> that commit's reviewed CI -> PyPI files whose content is that source -> the hashes uv.lock
+# pins -> what every mandated CI report shows pip installed. Each test breaks one link.
+
+
+def graph(world: World) -> dict[str, Any]:
+    return world.evaluate()["prerequisites"]["dependency_graph"]
+
+
+@pytest.fixture
+def release(world: World) -> World:
+    world.make_release()
+    assert graph(world)["status"] == "PASS", graph(world)
+    return world
+
+
+def test_proven_registry_dependencies_pass_with_their_full_chain(release: World) -> None:
+    result = graph(release)
+    assert "0 git and 4 registry dependencies" in result["detail"]
+    for name, rel in release.release.items():
+        assert any(name in e and rel["commit"] in e for e in result["evidence"])
+
+
+def test_committed_rules_approve_no_registry_dependency_yet() -> None:
+    spec = json.loads((ROOT / "release" / "gates.json").read_text())["registry_dependencies"]
+    assert spec["packages"] == []
+    assert {r["artifact"] for r in spec["install_reports"]} == {
+        "integration-python-3.11",
+        "integration-python-3.12",
+        "protected-container-acceptance",
+    }
+
+
+def test_lock_without_any_actenon_dependency_cannot_pass_vacuously(world: World) -> None:
+    world.lock = b'[[package]]\nname = "requests"\nversion = "2.32.0"\n'
+    result = graph(world)
+    assert result["status"] == "FAIL" and "not locked" in result["detail"]
+
+
+def test_git_lock_missing_one_reviewed_dependency_fails(world: World) -> None:
+    world.lock = b"\n".join(
+        block for block in world.lock.split(b"\n\n") if b"actenon-permit" not in block
+    )
+    result = graph(world)
+    assert result["status"] == "FAIL" and "actenon-permit" in result["detail"]
+
+
+def test_registry_dependency_without_approved_source_fails(release: World) -> None:
+    release.registry["registry_dependencies"]["packages"] = release.release_rules[1:]
+    result = graph(release)
+    assert result["status"] == "FAIL" and "no approved source" in result["detail"]
+
+
+def test_locked_version_other_than_the_approved_one_fails(release: World) -> None:
+    release.release_rules[0]["version"] = "1.0.1"
+    assert graph(release)["status"] == "FAIL"
+
+
+def test_artifact_from_another_source_commit_fails(release: World) -> None:
+    """The approved commit's tree is not what the wheel contains (wrong source)."""
+    rel = release.release["actenon-kernel"]
+    rel["files"] = {**rel["files"], "actenon_kernel/core.py": b"def run():\n    return 'other'\n"}
+    release.render()
+    result = graph(release)
+    assert result["status"] == "FAIL" and "is not built from" in result["detail"]
+
+
+def test_wheel_with_a_modified_module_fails(release: World) -> None:
+    rel = release.release["actenon-permit"]
+    rel["wheel"] = build_wheel(
+        "actenon-permit", "1.0.0", rel["root"], rel["files"],
+        change={"actenon_permit/core.py": b"import os\nos.system('exfiltrate')\n"},
+    )  # fmt: skip
+    release.render()
+    assert "actenon_permit/core.py is not the approved source" in graph(release)["detail"]
+
+
+def test_wheel_with_an_extra_file_fails(release: World) -> None:
+    rel = release.release["actenon-scan"]
+    rel["wheel"] = build_wheel(
+        "actenon-scan", "1.0.0", rel["root"], rel["files"], extra={"sitecustomize.py": b"pass"}
+    )
+    release.render()
+    assert "sitecustomize.py is not the approved source" in graph(release)["detail"]
+
+
+def test_wheel_that_drops_an_approved_module_fails(release: World) -> None:
+    rel = release.release["actenon-protocol"]
+    rel["wheel"] = build_wheel(
+        "actenon-protocol", "1.0.0", rel["root"], rel["files"], drop=["actenon_protocol/core.py"]
+    )
+    release.render()
+    assert "missing from the wheel" in graph(release)["detail"]
+
+
+def test_wheel_metadata_for_another_version_fails(release: World) -> None:
+    rel = release.release["actenon-scan"]
+    rel["wheel"] = build_wheel(
+        "actenon-scan", "1.0.0", rel["root"], rel["files"], meta=("actenon-scan", "9.9.9")
+    )
+    release.render()
+    assert "metadata is not" in graph(release)["detail"]
+
+
+@pytest.mark.parametrize(
+    ("change", "expected"),
+    [
+        ({"README.md": b"# replaced\n"}, "differs from the approved source"),
+        ({"setup.py": b"import os; os.system('x')\n"}, "is not in the approved source"),
+    ],
+)
+def test_sdist_that_is_not_the_approved_source_fails(release: World, change, expected) -> None:
+    rel = release.release["actenon-kernel"]
+    rel["sdist"] = build_sdist("actenon-kernel", "1.0.0", rel["files"], change=change)
+    release.render()
+    assert expected in graph(release)["detail"]
+
+
+def test_locked_hash_that_pypi_does_not_serve_fails(release: World) -> None:
+    files = release.pypi.published[("actenon-permit", "1.0.0")]
+    files[0]["digests"]["sha256"] = "0" * 64
+    result = graph(release)
+    assert result["status"] == "FAIL" and "is not on PyPI" in result["detail"]
+
+
+def test_pypi_bytes_that_differ_from_their_digest_fail(release: World) -> None:
+    url = release.pypi.published[("actenon-kernel", "1.0.0")][0]["url"]
+    release.pypi.blobs[url] = b"swapped after upload"
+    assert "served bytes that differ" in graph(release)["detail"]
+
+
+def test_unpublished_dependency_fails(release: World) -> None:
+    del release.pypi.published[("actenon-scan", "1.0.0")]
+    assert "is not published on PyPI" in graph(release)["detail"]
+
+
+def test_owner_pinned_artifact_hashes_must_match_the_lock(release: World) -> None:
+    release.release_rules[2]["artifact_sha256"] = ["a" * 64]
+    assert "not the approved artifacts" in graph(release)["detail"]
+    rel = release.release[release.release_rules[2]["name"]]
+    release.release_rules[2]["artifact_sha256"] = [
+        hashlib.sha256(rel["wheel"]).hexdigest(),
+        hashlib.sha256(rel["sdist"]).hexdigest(),
+    ]
+    assert graph(release)["status"] == "PASS"
+
+
+def test_approved_source_commit_with_failing_ci_fails(release: World) -> None:
+    rel = release.release["actenon-protocol"]
+    release.github.checks[(rel["repo"], rel["commit"])][0]["conclusion"] = "failure"
+    assert graph(release)["status"] == "FAIL"
+
+
+def test_approved_source_commit_without_ci_is_blocked(release: World) -> None:
+    rel = release.release["actenon-protocol"]
+    del release.github.checks[(rel["repo"], rel["commit"])]
+    assert graph(release)["status"] == "BLOCKED"
+
+
+def test_ci_that_installed_a_different_artifact_fails(release: World) -> None:
+    name = "actenon-kernel"
+    url = release.pypi.published[(name, "1.0.0")][0]["url"]
+    release.install_override[name] = {
+        "metadata": {"name": name, "version": "1.0.0"},
+        "download_info": {"url": url, "archive_info": {"hashes": {"sha256": "b" * 64}}},
+    }
+    release.render()
+    assert "not a locked wheel" in graph(release)["detail"]
+
+
+def test_ci_that_installed_from_outside_pypi_fails(release: World) -> None:
+    name = "actenon-permit"
+    digest = hashlib.sha256(release.release[name]["wheel"]).hexdigest()
+    release.install_override[name] = {
+        "metadata": {"name": name, "version": "1.0.0"},
+        "download_info": {
+            "url": "file:///home/runner/wheelhouse/actenon_permit-1.0.0-py3-none-any.whl",
+            "archive_info": {"hashes": {"sha256": digest}},
+        },
+    }
+    release.render()
+    assert "not from PyPI" in graph(release)["detail"]
+
+
+def test_ci_report_that_omits_a_dependency_fails(release: World) -> None:
+    release.install_override["actenon-scan"] = None
+    release.render()
+    assert "do not record installing it" in graph(release)["detail"]
+
+
+def test_missing_install_report_fails_closed(release: World) -> None:
+    members = release.ci_members("protected-container-acceptance")
+    del members["install-report.json"]
+    release.replace_ci_artifact("protected-container-acceptance", members)
+    result = graph(release)
+    assert result["status"] == "FAIL" and "no usable install report" in result["detail"]
+
+
+def test_install_report_that_is_not_a_pip_report_fails(release: World) -> None:
+    members = release.ci_members("integration-python-3.12")
+    members["install-report.json"] = b'{"installed": "everything"}'
+    release.replace_ci_artifact("integration-python-3.12", members)
+    assert "not a pip installation report" in graph(release)["detail"]
+
+
+def test_ci_that_installed_an_unlocked_actenon_package_fails(release: World) -> None:
+    report = json.loads(release.ci_members("integration-python-3.11")["install-report.json"])
+    report["install"].append(
+        {
+            "metadata": {"name": "actenon-shadow", "version": "0.1"},
+            "download_info": {"url": gate.PYPI_FILES + "x.whl", "archive_info": {"hashes": {}}},
+        }
+    )
+    members = release.ci_members("integration-python-3.11")
+    members["install-report.json"] = json.dumps(report).encode()
+    release.replace_ci_artifact("integration-python-3.11", members)
+    assert "not locked" in graph(release)["detail"]
+
+
+def test_registry_provenance_waits_for_passing_candidate_ci(release: World) -> None:
+    release.github.checks[(REPO, CANDIDATE)][0]["conclusion"] = "failure"
+    assert graph(release)["status"] == "BLOCKED"
+
+
+def test_same_dependency_locked_from_git_and_registry_fails(release: World) -> None:
+    repo, rev = DEPS["actenon-scan"]
+    release.lock += (
+        f'\n[[package]]\nname = "actenon-scan-git"\nversion = "1.0.0"\n'
+        f'source = {{ git = "https://github.com/{repo}.git?rev={rev}#{rev}" }}\n'
+    ).encode()
+    release.github.checks[(repo, rev)] = [
+        check(job, 1, check_id=i)
+        for i, job in enumerate(
+            release.registry["ci_prerequisites"]["dependency_jobs"][repo], start=1
+        )
+    ]
+    assert "both from git and from a registry" in graph(release)["detail"]
+
+
+def test_expected_graph_is_checked_against_approved_registry_sources(release: World) -> None:
+    rel = release.release["actenon-kernel"]
+    ok = release.evaluate(expected_graph={rel["repo"]: rel["commit"]})
+    assert ok["prerequisites"]["dependency_graph"]["status"] == "PASS"
+    bad = release.evaluate(expected_graph={rel["repo"]: "9" * 40})
+    assert bad["prerequisites"]["dependency_graph"]["status"] == "FAIL"
+
+
+@pytest.mark.parametrize(
+    "mutate",
+    [
+        lambda s: s.update(install_reports=[]),
+        lambda s: s["packages"].append({"name": "requests", "repository": "x/y"}),
+        lambda s: s["packages"].append(
+            {"name": "actenon-x", "version": "1", "repository": "Actenon/actenon-x",
+             "source_commit": "1" * 40, "source_root": ""}
+        ),
+        lambda s: s["packages"].append(
+            {"name": "actenon-scan", "version": "1", "repository": "Actenon/actenon-scan",
+             "source_commit": "main", "source_root": ""}
+        ),
+        lambda s: s["packages"].append(
+            {"name": "actenon-scan", "version": "1", "repository": "Actenon/actenon-scan",
+             "source_commit": "1" * 40, "source_root": "../elsewhere/"}
+        ),
+        lambda s: s["packages"].append(
+            {"name": "actenon-scan", "version": "1", "repository": "Actenon/actenon-scan",
+             "source_commit": "1" * 40, "source_root": "", "artifact_sha256": ["short"]}
+        ),
+    ],
+)  # fmt: skip
+def test_malformed_dependency_approvals_cannot_be_evaluated(world: World, mutate) -> None:
+    mutate(world.registry["registry_dependencies"])
+    with pytest.raises(gate.AdmissionError):
+        world.evaluate()
+
+
+def test_real_pypi_client_refuses_artifacts_from_other_hosts() -> None:
+    with pytest.raises(gate.EvidenceError, match="outside PyPI"):
+        gate.PyPI().download("https://evil.example/actenon_kernel-1.3.0-py3-none-any.whl")
