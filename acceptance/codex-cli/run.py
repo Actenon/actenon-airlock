@@ -28,7 +28,8 @@ from unittest.mock import patch
 import httpx
 
 ROOT = Path(__file__).resolve().parents[2]
-sys.path[:0] = [str(ROOT / "acceptance/v2"), str(ROOT / "tests")]
+sys.path[:0] = [str(ROOT / "acceptance/v2"), str(ROOT / "tests"), str(ROOT / "acceptance")]
+import dependency_identity  # noqa: E402
 import harness as scoring  # noqa: E402
 from responses_fixture import ScriptedProvider, text, tool  # noqa: E402
 
@@ -78,6 +79,7 @@ def identity(image):
         ROOT / "tests/responses_fixture.py",
         Path(__file__).with_name("attack.py"),
         ROOT / "acceptance/v2/harness.py",
+        ROOT / "acceptance/dependency_identity.py",
         ROOT / "containers/codex-cli/upstream.json",
     ]
     return {
@@ -90,12 +92,11 @@ def identity(image):
         "installed_versions": dict(
             sorted((d.metadata["Name"], d.version) for d in importlib.metadata.distributions())
         ),
-        "candidate_dependency_commits": {
-            name: json.loads(importlib.metadata.distribution(name).read_text("direct_url.json"))[
-                "vcs_info"
-            ]["commit_id"]
-            for name in ("actenon-protocol", "actenon-kernel", "actenon-permit", "actenon-scan")
-        },
+        # Identity v2 (acceptance/dependency_identity.py): the installed dependencies must be
+        # the artifacts uv.lock pins, git commits or registry wheels. The criteria are unchanged.
+        "identity_version": 2,
+        "dependency_identity": dependency_identity.SCHEMA,
+        "candidate_dependencies": dependency_identity.identify(ROOT / "uv.lock"),
         "image": docker.image(image)["Id"],
         "model": MODEL,
         "prices": PRICES,
