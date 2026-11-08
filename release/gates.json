@@ -870,5 +870,23 @@
         "evidence": "accepted"
       }
     ]
+  },
+  "registry_dependencies": {
+    "note": "Owner-approved sources for dependencies the candidate locks from a package registry (D6). Each package binds an approved source commit to the PyPI files whose content is that source, to the hashes uv.lock pins, and to what every listed CI report shows pip installed. A registry dependency with no approved entry here fails, and every reviewed dependency repository must be locked, so the dependency graph can never pass vacuously. Entries are added by a separately reviewed change once each release commit exists.",
+    "install_reports": [
+      {
+        "artifact": "integration-python-3.11",
+        "file": "install-report.json"
+      },
+      {
+        "artifact": "integration-python-3.12",
+        "file": "install-report.json"
+      },
+      {
+        "artifact": "protected-container-acceptance",
+        "file": "install-report.json"
+      }
+    ],
+    "packages": []
   }
 }
