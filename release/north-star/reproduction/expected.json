@@ -1,7 +1,7 @@
 {
  "schema": "actenon-airlock/reproduction-expected/v1",
  "candidate": {
-  "commit": "dc7ed54f93dd8d961029bb1dc50f499ed13e9dce",
+  "commit": "5b1f0f29dba683c6a4f40d74ea404183224e3c7d",
   "source_digest": "da323e93157e33ac05e18e177b0b24060eaac39c34e891f309565bf69e17ec55",
   "installable_commit": "eba7ef796b706643726710bf6b7309726e0fbda5"
  },

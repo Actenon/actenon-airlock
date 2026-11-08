@@ -17,7 +17,7 @@ output are in `~/src/actenon-audit/northstar-evidence/`; they are local, not com
 | Admission gate, the candidate's rules | same, run in the candidate checkout | NOT READY: items 1–4 BLOCKED (no GitHub auth), 5–7 and 9 BLOCKED (no records), 8 FAIL (pre-release), 10 PASS |
 | Skip set against the trusted contract | gate's own `junit_outcomes` | 37 skips not allowed by C1's contract, 60 not allowed by `main`'s (NS-3) |
 
-## Defects found and fixed (on `fix/north-star-blockers`, not pushed)
+## Defects found in C1 and fixed in C2 (`fix/north-star-blockers`, draft PR #29)
 
 | ID | Guarantee affected | Minimal reproducer | Fix | Regression |
 |---|---|---|---|---|
@@ -38,7 +38,47 @@ The Claude Code and Codex contracts reject duplicate keys outright.
 | Independent containment | 1 passed |
 | C2 contract check (`reproduction/check_results.py junit`) | both artifacts OK |
 | Documented install pin | `scripts/check_readme_install.py`: every guide pins `eba7ef7`, which installs C2's code |
-| Exact-head CI | **BLOCKED**: not pushed, because the GitHub CLI token is invalid |
+| Exact-head CI | [Run 42519985401](https://github.com/Actenon/actenon-airlock/actions/runs/42519985401) (`pull_request`, head `dc7ed54`): **all 6 jobs success** |
+| Independent CI verification (`verify_ci.py`) | Every artifact's bytes match GitHub's digest. Container reports: 198 + 1 passed, 0 skipped, all 61 + 1 required passed. CI installed exactly the four pinned dependency commits; pip-audit found 0 vulnerabilities. **Integration reports: 64 skips, and 2 are not allowed by C2's contract** (NS-4) |
+| Source identity on GitHub | The digest of GitHub's tarball of `dc7ed54` and of the wheel CI built is `da323e93…`, with the same 37 files and identical bytes |
+| What a `pull_request` run tests | GitHub's merge commit `d25e54b9…` has exactly C2's tree (`b0d37a76…`), so the run tested C2's bytes |
+| Authenticated admission, C2's rules | dependency graph **PASS** (all four commits' required jobs passed). Bar items 1–4 **FAIL** (the two skips); 5–7 and 9 BLOCKED (no records); 8 FAIL (pre-release); 10 PASS |
+| Authenticated admission, `main`'s rules | NOT READY: 29 UNDEFINED, 11 BLOCKED; `candidate_ci` FAIL |
+
+**NS-4 (release admission could still not admit a green candidate).**
+
+- **Which tests:** `tests/test_readme_install.py::test_the_repository_docs_pin_one_commit_that_installs_this_code`
+  and `::test_an_older_product_commit_is_rejected`.
+- **Why they skip:** both need the pinned product commit and its predecessor. The integration
+  job checked out one commit, so on CI they skip.
+- **Why NS-3 missed it:** NS-3's skip set was measured on a full-history clone, where both run.
+- **Reproducer:** `git clone --depth 1` of C2 shows the same two skips with the same messages.
+- **Fix in C3:** `fetch-depth: 0` on the integration checkout, as the documented-install job
+  already has. The contract data is unchanged.
+- **Regression test:** `tests/test_ci_contract.py::test_the_integration_job_has_the_history_its_required_tests_need`
+  fails on C2's workflow.
+
+## Candidate 3 (`5b1f0f2`; installable product `eba7ef7`, source digest unchanged)
+
+C3 is C2 plus one commit. It changes `.github/workflows/ci.yml` and `tests/test_ci_contract.py`.
+Everything else is byte-identical to C2:
+
+- `src/`, `containers/`, `pyproject.toml` and `uv.lock`;
+- `release/gates.json` and `release/RELEASE_BAR.md`;
+- the admission and identity scripts;
+- all four acceptance harness trees.
+
+| Run | Result |
+|---|---|
+| The pin and contract tests, on a full-history simulation of GitHub's PR merge commit (tree identical to C3) | 19 passed, 0 skipped |
+| Integration, fresh non-editable install (macOS, Python 3.12) | **2,378 passed, 62 skipped, 0 failed**; all 62 skips allowed by C3's contract |
+| Gate 5 freeze (no cost) | `matched-freeze-5b1f0f2.json`, SHA-256 `a17308d0e15aef4509b164529edcd007cb62b6042ae400a9aa699da22f97e0f5`. Of its 84 fields, only `source_commit` differs from the C2 freeze |
+| Exact-head CI | [run 42520916211](https://github.com/Actenon/actenon-airlock/actions/runs/42520916211) (`pull_request`, head `5b1f0f2`): **all 6 jobs success** |
+| What a `pull_request` run tests | GitHub's merge commit `1c3448ad…` has exactly C3's tree (`124cde3e…`) |
+| Independent CI verification (`verify_ci.py`) | **ok, no problems.** Every artifact's bytes match GitHub's digest. Integration 3.11 and 3.12: 2,440 cases each, 0 failed, 62 skipped, all allowed. Container: 198 passed, 0 skipped, plus independent containment 1 passed; all 61 + 1 required passed. CI installed exactly the four pinned dependency commits. pip-audit: 0 vulnerabilities in 54 packages |
+| Source identity on GitHub | GitHub's tarball of `5b1f0f2` and the wheel CI built both give `da323e93…`, with the same 37 files and identical bytes. CI's wheel SHA-256 is `ab4af4af…` |
+| Authenticated admission, C3's rules | **`candidate_ci` PASS. Bar items 1–4 PASS** (run 42520916211). Dependency graph PASS. Items 5–7 and 9 BLOCKED (no owner records), 8 FAIL (pre-release), 10 PASS. Overall **NOT READY** |
+| Authenticated admission, `main`'s rules | NOT READY: 29 UNDEFINED, 11 BLOCKED. `candidate_ci` FAIL, because `main`'s contract allows 2 integration skips and the candidate skips the 62 real-container tests that its container job runs and passes |
 
 ## Independent offline verification
 
@@ -85,8 +125,11 @@ Git fetch, and `airlock doctor` is OK.
 
 ## Not exercised here (BLOCKED or out of scope)
 
-- Exact-head CI for C2, and the admission gate's authenticated checks: they need `gh auth login`
-  by the owner, then a push.
+- Linux container results for C3 come only from its exact-head CI. Locally, C3's container job
+  was not rerun: its container tests, images and product code are byte-identical to C2's,
+  which passed 198 + 1 locally and on Linux CI.
+- The operator dry run (`reproduction/LOCAL_DRY_RUN.md`) was run against C2 and has not been
+  repeated for C3.
 - Linux x86_64 for C2: only C1 ran on Linux, in its exact-head CI.
 - Cross-implementation canonicalisation corpus (Python, TypeScript, Go and Rust SDKs): not rerun
   in this programme. The last recorded comparison is in `release/candidate-manifest.json`.

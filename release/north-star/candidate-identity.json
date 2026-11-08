@@ -1,7 +1,7 @@
 {
   "schema": "actenon-airlock/north-star-candidate-identity/v1",
   "recorded_at": "2026-11-08T19:57:59Z",
-  "decision": "Candidate 2 (C2) is the evaluation candidate for all further acceptance. Candidate 1 (C1) is verified as a baseline and superseded by C2 because no-cost verification found defects NS-1..NS-3; no live evidence exists for either.",
+  "decision": "Candidate 3 (C3) is the evaluation candidate for all further acceptance. C1 was superseded by C2 (no-cost defects NS-1..NS-3); C2 was superseded by C3 because independent verification of C2's green exact-head CI (run 42519985401) found NS-4: the release gate failed bar items 1-4 on two shallow-clone skips. No live evidence exists for any of the three.",
   "candidates": {
     "C1": {
       "commit": "67b348c43a1d39eca7c17d6bc159eb457a2c148d",
@@ -15,7 +15,7 @@
     },
     "C2": {
       "commit": "dc7ed54f93dd8d961029bb1dc50f499ed13e9dce",
-      "branch": "fix/north-star-blockers (local; not pushed: GitHub CLI auth expired)",
+      "branch": "fix/north-star-blockers (pushed; draft PR #29)",
       "installable_commit": "eba7ef796b706643726710bf6b7309726e0fbda5",
       "source_digest": "da323e93157e33ac05e18e177b0b24060eaac39c34e891f309565bf69e17ec55",
       "src_tree": "f113bdd11d1604d8c349d1fb58bc2e37a32e522f",
@@ -28,7 +28,26 @@
         "NS-3 release/gates.json: CI skip contract",
         "tests",
         "docs pin to eba7ef796b706643726710bf6b7309726e0fbda5"
-      ]
+      ],
+      "role": "superseded by C3 (NS-4)",
+      "exact_head_ci": "run 42519985401: all 6 jobs success; release gate items 1-4 FAIL (NS-4)"
+    },
+    "C3": {
+      "commit": "5b1f0f29dba683c6a4f40d74ea404183224e3c7d",
+      "branch": "fix/north-star-ns4 (pushed; draft PR #31, stacked on #29)",
+      "parent": "dc7ed54f93dd8d961029bb1dc50f499ed13e9dce",
+      "installable_commit": "eba7ef796b706643726710bf6b7309726e0fbda5",
+      "source_digest": "da323e93157e33ac05e18e177b0b24060eaac39c34e891f309565bf69e17ec55",
+      "src_tree": "f113bdd11d1604d8c349d1fb58bc2e37a32e522f",
+      "pyproject_blob": "9667a9dcc9c029712a41bceb65eb0796bdce861c",
+      "containers_tree": "81dea66138b4dacd4f190a01c8c004b0c797acea",
+      "uv_lock_blob": "6bb158394a12c815030a96695d1132e67a8f399f",
+      "gates_json_sha256": "7d54af2dea69c9e62a6ba1047ceca92dcbf3fccb23a14a4043698a26b162f3dc",
+      "changes_from_C2": [
+        "NS-4 .github/workflows/ci.yml: integration job checks out full history (fetch-depth: 0)",
+        "tests/test_ci_contract.py: regression test"
+      ],
+      "unchanged_from_C2": "src, containers, pyproject.toml, uv.lock, release/gates.json, release/RELEASE_BAR.md, scripts, every acceptance harness tree"
     }
   },
   "historical_source_digest_of_live_runs": "60684fcd08654f00d84295b685060e99c57da83d860f16fa464287c70fb3b90d",
@@ -150,5 +169,6 @@
     "actenon_scan-1.6.0.tar.gz": "6e10b86b88c478323536fdf1a8147d3cbb46971f33cfabb3da5cf2970ad8b723",
     "actenon_airlock-0.1.0-py3-none-any.whl": "a91165c5604198f6c88803f42c57e108db2753bc565f0d8021e572c3419647e2",
     "actenon_airlock-0.1.0.tar.gz": "a2a1225598de8e8835006931410a13df2e30cb6d41da05362557165271f557e9"
-  }
+  },
+  "recorded_at_C3": "2026-11-08T20:40:00Z"
 }

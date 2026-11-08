@@ -11,7 +11,7 @@ install, a local wheel or a local index **does not count**. Everything below is 
 | actenon-kernel | `ead6a00` | 1.3.0 | up to 1.2.1 | yes (`actenon-protocol>=1.6.0,<2`, pyyaml, cryptography) |
 | actenon-permit | `85aa3ae` | **2.0.0rc1** (pre-release) | 1.4.0 | yes, as a pre-release (`actenon-kernel[asymmetric]>=1.3.0,<2`, `actenon-protocol>=1.6.0,<2`, …) |
 | actenon-scan | `1638822` | 1.6.0 | up to 1.5.0 | yes (no runtime dependencies) |
-| actenon-airlock | C2 / `eba7ef7` | **0.1.0.dev0** | not published | **no**: four `Requires-Dist … @ git+https://…` direct references, which PyPI rejects |
+| actenon-airlock | C3 (same package source as C2) / `eba7ef7` | **0.1.0.dev0** | not published | **no**: four `Requires-Dist … @ git+https://…` direct references, which PyPI rejects |
 
 Local build hashes (wheels, at the pins, built with `python -m build`):
 

@@ -1,5 +1,10 @@
 # Historical Gate 5–7 evidence: what still applies to C2 (2026-11-08)
 
+> **Candidate update, 2026-11-08:** the evaluation candidate is now **C3** (`5b1f0f2`). C3 is C2
+> plus one CI-configuration commit (NS-4). Its `src/`, containers, dependency pins and acceptance
+> harnesses are byte-identical to C2's, so everything below that is said of C2's code applies to
+> C3 unchanged. Records must bind to C3.
+
 Nothing here changes, rebinds or rescores any historical result. Every file under
 `release/gate5-anthropic-live/`, `release/gate5-rerun-gate6/` and `release/gate7/` is unchanged.
 
