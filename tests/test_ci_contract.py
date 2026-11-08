@@ -4,6 +4,10 @@ Two of the credential-isolation tests were skipped in the integration job and we
 container job's file list, so they ran nowhere (NS-2). These checks keep the contract honest:
 every test the integration job may skip, and every test the container job must pass, belongs to
 a file the container job really runs.
+
+The contract was first measured on a full-history clone, but the integration job checked out a
+single commit, so the two documented-install pin tests skipped on every green CI run and the
+release gate failed items 1-4 (NS-4). The integration job must check out full history.
 """
 
 from __future__ import annotations
@@ -58,3 +62,33 @@ def test_the_container_job_allows_no_skips():
     for report in REGISTRY["ci_prerequisites"]["junit"]:
         if report["artifact"] == "protected-container-acceptance":
             assert report["allowed_skips"] == []
+
+
+def job_block(job: str) -> str:
+    """The lines of one top-level job in ci.yml, up to the next job key."""
+    lines = CI.splitlines()
+    start = lines.index(f"  {job}:")
+    end = next(
+        (i for i in range(start + 1, len(lines)) if re.fullmatch(r"  [a-z][\w-]*:", lines[i])),
+        len(lines),
+    )
+    return "\n".join(lines[start:end])
+
+
+HISTORY_TESTS = (
+    "tests.test_readme_install::test_the_repository_docs_pin_one_commit_that_installs_this_code",
+    "tests.test_readme_install::test_an_older_product_commit_is_rejected",
+)
+
+
+def test_the_integration_job_has_the_history_its_required_tests_need():
+    """These tests skip on a shallow clone, and the contract does not allow them to skip."""
+    integration = job_block("integration")
+    checkout = integration.split("actions/checkout@", 1)[1].split("\n      - ", 1)[0]
+    assert re.search(r"^\s+fetch-depth: 0\s*$", checkout, re.M), (
+        "the integration job checks out a shallow clone, so the documented-install pin tests "
+        "skip on every CI run"
+    )
+    for report in REGISTRY["ci_prerequisites"]["junit"]:
+        if report["artifact"].startswith("integration-python-"):
+            assert not set(HISTORY_TESTS) & set(report["allowed_skips"])
