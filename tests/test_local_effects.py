@@ -340,7 +340,10 @@ def test_receipts_are_signed_chained_and_tamper_evident(project, capsys):
     assert rows[1]["signature"]["algorithm"] == "EdDSA"
 
     tampered = dict(rows[-1], target="/elsewhere")
-    state.receipts_path.write_text(lines[0] + "\n" + json.dumps(tampered) + "\n")
+    # Canonical bytes, so this exercises the signature check, not the canonical-form check
+    # (tests/test_receipt_canonical_lines.py covers that).
+    edited = json.dumps(tampered, sort_keys=True, separators=(",", ":"), ensure_ascii=True)
+    state.receipts_path.write_text(lines[0] + "\n" + edited + "\n")
     assert main(["receipts", "--path", str(state.root), "--json"]) == 2
     result = json.loads(capsys.readouterr().out)
     assert result["rows"][-1]["problem"].startswith("signature does not verify")

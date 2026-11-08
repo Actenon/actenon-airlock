@@ -15,7 +15,7 @@ You need macOS or Linux, Python 3.11 or newer, Git, [pipx](https://pipx.pypa.io)
 running. Not sure? `airlock doctor` checks everything after the install.
 
 ~~~sh
-pipx install "git+https://github.com/Actenon/actenon-airlock.git@733bd48bb391cc4e7fee1c3810bc22b79d0d2c9a"
+pipx install "git+https://github.com/Actenon/actenon-airlock.git@eba7ef796b706643726710bf6b7309726e0fbda5"
 airlock doctor
 ~~~
 
@@ -26,7 +26,7 @@ on Debian or Ubuntu, or use a virtual environment:
 
 ~~~sh
 python3 -m venv ~/.airlock
-~/.airlock/bin/pip install "git+https://github.com/Actenon/actenon-airlock.git@733bd48bb391cc4e7fee1c3810bc22b79d0d2c9a"
+~/.airlock/bin/pip install "git+https://github.com/Actenon/actenon-airlock.git@eba7ef796b706643726710bf6b7309726e0fbda5"
 ~/.airlock/bin/airlock doctor
 ~~~
 
