@@ -191,7 +191,10 @@ The smallest path to CANDIDATE READY, in order:
 1. **Done (no cost):** C3 is pushed as draft PR #31, and its exact-head CI is green and independently verified (run `42520916211`).
 2. **Bring the trusted rules to `main`:** draft PR #32 (rules only, verified). **Owner merge
    decision; not authorised.**
-3. **Decide the release identity** (`RELEASE_IDENTITY_DECISION.md`, D1–D9). Then publish the
+3. **Release identity:** decided with revisions (`RELEASE_IDENTITY_REVISION.md`). D6 is draft PR
+   #33 (provenance gate, CI green). D8 and D9 are draft PR #34 (registry-artifact identity, and the
+   security suites on registry installs). D2 is a Permit 2.0.0 version-only commit, tested locally.
+   Then publish the
    four dependencies (owner, irreversible) and create the release-shaped final evaluation SHA,
    C4b. **Live acceptance waits for C4b**, so that it runs only once (owner decision of
    2026-11-08).

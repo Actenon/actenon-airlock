@@ -1,5 +1,16 @@
 # Release identity (R1/R2): what must be decided to freeze the final evaluation SHA
 
+> **Owner decision, 2026-11-08: approved with revisions.**
+> - **Accepted:** D1, D3, D4 and D7.
+> - **D5:** accepted conditionally.
+> - **D2, D6, D8 and D9:** revised. The revised designs, implementations and evidence are in
+>   `RELEASE_IDENTITY_REVISION.md`, which supersedes those four rows below.
+>   - D2: Permit `2.0.0` final.
+>   - D6: provenance in the trusted gate.
+>   - D8: identity v2 recognises registry artifacts, replacing "install from Git".
+>   - D9: CI security suites on registry installs, replacing "install from Git".
+> - The rows are kept as they were proposed.
+
 **Prepared 2026-11-08. Nothing here is decided, published or tagged.** C3
 `5b1f0f29dba683c6a4f40d74ea404183224e3c7d` and its verified CI evidence (run 42520916211) are
 preserved unchanged.

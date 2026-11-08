@@ -14,7 +14,7 @@ unchanged from the first presentation. Only the target commit moves.
 | P1 | The trusted rules are on `main` | Draft PR #32 (rules only) is prepared and verified. **Merge is the owner's decision** |
 | P2 | The final evaluation SHA is frozen | Not yet. It is C4b of `RELEASE_IDENTITY_DECISION.md`: C3 plus release metadata, `uv.lock` and the docs pin. It needs decisions D1–D8 and the four dependencies published first |
 | P3 | That SHA's exact-head CI is green, independently verified, and admitted by `main`'s gate with items 1–4 PASS | Not yet (after P1 and P2) |
-| P4 | A Gate 5 freeze for that SHA exists, made by the unchanged harness | Not yet. The live venv installs the four dependencies from their pinned commits (D8) |
+| P4 | A Gate 5 freeze for that SHA exists | Not yet. It is made with acceptance identity **v2** (revised D8): a versioned, reviewed change to how the runner identifies dependencies, with every original Gate 5 criterion unchanged. The live venv is built exactly as CI installs C4b (`scripts/install_candidate.py`, by locked sha256 from PyPI), so the freeze records the same registry artifacts that CI tested |
 
 **Why not C3:** records bind to the exact commit, and the release commit differs from C3 in
 `pyproject.toml`, `uv.lock`, the docs pin and `src/actenon_airlock/__init__.py`. A pair on C3
@@ -61,7 +61,7 @@ unchanged, at the final evaluation SHA (C4b).
 | Candidate | **C4b `<final evaluation SHA>`**, the release-shaped commit on top of C3 `5b1f0f2` (`RELEASE_IDENTITY_DECISION.md`, step 7). Its source digest will differ from `da323e93…` only by `__version__` |
 | Freeze file | `~/src/actenon-audit/northstar-live/gate5/matched-freeze-<C4b>.json`, created with the unchanged `adversarial_matched.py freeze` from a clean C4b checkout and then made read-only. The C3 and C2 freezes are kept, superseded |
 | Freeze SHA-256 | `<to be recorded when made>` |
-| Binds | the C4b commit and digest; image `sha256:2c625f0f4b51…` (Claude Code 2.1.308); `claude-opus-5-5`; prices 4 / 5 / 0.2 / 20 USD per MTok; `run_usd` 2; the four dependency commits; every installed package version (a new `venv-c4b`: the four dependencies installed from their pinned commits, then C4b; Python 3.12.13); the programme, hook and task hashes; a clean working tree |
+| Binds | the C4b commit and digest; image `sha256:2c625f0f4b51…` (Claude Code 2.1.308); `claude-opus-5-5`; prices 4 / 5 / 0.2 / 20 USD per MTok; `run_usd` 2; the four dependency commits; every installed package version (a new `venv-c4b`, built by `scripts/install_candidate.py` from C4b's `uv.lock`: the registry artifacts by sha256; Python 3.12.13); the programme, hook and task hashes; a clean working tree |
 | Task | The frozen `token-bucket` task with its unchanged tests |
 | Drift rule | Each trial refuses to start if its identity differs from the freeze in any field |
 
