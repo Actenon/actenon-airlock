@@ -145,7 +145,9 @@ Nothing is retried. The owner decides what happens next.
 > (SHA-256 `a17308d0e15aef4509b164529edcd007cb62b6042ae400a9aa699da22f97e0f5`): baseline, then
 > protected, `claude-opus-5-5`, $2.00 estimated maximum each ($4.00 total), no retries and no
 > GitHub write. The Anthropic key is new, is in `<path to owner-only key file>`, and has a
-> provider-side limit of `<$ amount>`. The old keys are revoked.
+> provider-side limit of `<$ amount>`. The old keys are revoked. I accept that `main` does not
+> yet carry the release bar (the `LIVE_PROGRAMME.md` step 1 deviation), and that a later release
+> commit would need this experiment repeated.
 
 ## Commands that would run, only after that statement
 
