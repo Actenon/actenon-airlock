@@ -1,0 +1,879 @@
+{
+ "schema": "actenon-airlock/reproduction-expected/v1",
+ "candidate": {
+  "commit": "dc7ed54f93dd8d961029bb1dc50f499ed13e9dce",
+  "source_digest": "da323e93157e33ac05e18e177b0b24060eaac39c34e891f309565bf69e17ec55",
+  "installable_commit": "eba7ef796b706643726710bf6b7309726e0fbda5"
+ },
+ "dependencies": {
+  "actenon-kernel": "ead6a00aa38e7e3e21f6129a8565803f8ac48dd2",
+  "actenon-permit": "85aa3ae2a141f76fd78fe95db4aa1d196bc733da",
+  "actenon-protocol": "a2e0e08fcd24b71eb1668204ba6bed00e4c63551",
+  "actenon-scan": "16388227a55a3b5a3ec392d1c70f3940b0c291c1"
+ },
+ "independent_verifier": {
+  "source_sha256": "ed109a1b3c8fbec0283bac1f512cba5d3a33bb7812a9d1b0a2c0ee2d893acef0",
+  "go_image": "golang@sha256:2c4c60ef415fbfa5e90300722293bef36c5e63fae17570ce18f580af933dbd73"
+ },
+ "journals": [
+  {
+   "journal": "docs/evidence/github-runtime/integrated-engine/fixture-receipts/allow-ambiguous/receipts.jsonl",
+   "entries": 2,
+   "chain_head_sha256": "524bde144d8dd6283f4a103ea28634906b3b0c1dd42aa9dcb5ec7d7620fcd987",
+   "completeness": "UNANCHORED"
+  },
+  {
+   "journal": "docs/evidence/github-runtime/integrated-engine/fixture-receipts/expansion-refusal/receipts.jsonl",
+   "entries": 1,
+   "chain_head_sha256": "28085e5c412787d51e2cddb901aaa573777e642acc2afae076b201364ceb7436",
+   "completeness": "UNANCHORED"
+  },
+  {
+   "journal": "docs/evidence/github-runtime/integrated-engine/fixture-receipts/preflight-refusal/receipts.jsonl",
+   "entries": 2,
+   "chain_head_sha256": "171e5c4b39cb73aca2fd67261e149417b334ce2ca9be43ef453b4c746c7f9aca",
+   "completeness": "UNANCHORED"
+  },
+  {
+   "journal": "docs/evidence/model-timeouts/fifth-real-agent-failure/receipts.jsonl",
+   "entries": 7,
+   "chain_head_sha256": "87cb3d2d90e82e8fd2ee420c0f4ad66cf86f8c0df5a3965182435e824ebe8ff6",
+   "completeness": "UNANCHORED"
+  },
+  {
+   "journal": "docs/evidence/model-timeouts/fourth-real-agent-failure/receipts.jsonl",
+   "entries": 11,
+   "chain_head_sha256": "81b7322c079e7d108c760f343091dce88add68cd8045d26cd6c59896c1a129c0",
+   "completeness": "UNANCHORED"
+  },
+  {
+   "journal": "docs/evidence/model-timeouts/second-real-timeout/receipts.jsonl",
+   "entries": 3,
+   "chain_head_sha256": "a999de4b78cba8756aedec1c8869da03eea7a826b409eb2ca7d71c80e8440621",
+   "completeness": "UNANCHORED"
+  },
+  {
+   "journal": "docs/evidence/model-timeouts/third-real-agent-failure/receipts.jsonl",
+   "entries": 15,
+   "chain_head_sha256": "d225a356d59f01ece5c5d5c2b6b48e767cc5aeeb4893b22245e11e02c9a1e09e",
+   "completeness": "UNANCHORED"
+  },
+  {
+   "journal": "docs/evidence/protected-supervisor/clean-linux/protected-evidence/receipts.jsonl",
+   "entries": 8,
+   "chain_head_sha256": "ed31afaae684d082577c23943a5fee5245e6bfc0ada7524e139a9adff3950b01",
+   "completeness": "UNANCHORED"
+  },
+  {
+   "journal": "release/gate5-anthropic-live/trials/adversarial-baseline/receipts.jsonl",
+   "entries": 8,
+   "chain_head_sha256": "f5628de944a873ed5925436f9ffd13bb12b6731a050ef4438fa2b9a82c3c3d18",
+   "completeness": "ANCHORED"
+  },
+  {
+   "journal": "release/gate5-anthropic-live/trials/adversarial-protected/receipts.jsonl",
+   "entries": 7,
+   "chain_head_sha256": "60580574d059a634609cab227b2e7040b8f243831944b46331f1819ad76b3c23",
+   "completeness": "ANCHORED"
+  },
+  {
+   "journal": "release/gate5-anthropic-live/trials/baseline-run/receipts.jsonl",
+   "entries": 6,
+   "chain_head_sha256": "bdd1b739ab45820e295fc5f0b93bafb284d720e6c25b0b9011a839f356549a02",
+   "completeness": "ANCHORED"
+  },
+  {
+   "journal": "release/gate5-anthropic-live/trials/protected-run/receipts.jsonl",
+   "entries": 7,
+   "chain_head_sha256": "17515800e7229e48f1d3752f9aea589cff12ee78d186dbcbab0bbef569205389",
+   "completeness": "ANCHORED"
+  },
+  {
+   "journal": "release/gate5-rerun-gate6/live/gate5-matched/baseline/receipts.jsonl",
+   "entries": 6,
+   "chain_head_sha256": "648d065e939c979873aff63bbf745d6d028786ccffdf68c9f9e28a4592902631",
+   "completeness": "ANCHORED"
+  },
+  {
+   "journal": "release/gate5-rerun-gate6/live/gate5-matched/protected/receipts.jsonl",
+   "entries": 7,
+   "chain_head_sha256": "7a95f411021f74caf27f79460dbde803e8e6b7b809ca0b86dd93e9dbea64d584",
+   "completeness": "ANCHORED"
+  },
+  {
+   "journal": "release/gate5-rerun-gate6/live/gate6/receipts.jsonl",
+   "entries": 20,
+   "chain_head_sha256": "bb5984cc482c7990269b19d53287b55c6b184d834426093b113ab4093ac21e2f",
+   "completeness": "ANCHORED"
+  },
+  {
+   "journal": "release/gate5-rerun-gate6/rehearsal/gate5-matched/baseline/receipts.jsonl",
+   "entries": 8,
+   "chain_head_sha256": "981727282a5b4c34ddad3006c89f3ceb1f29ea5a294f34e69825ca3dcaac53ec",
+   "completeness": "ANCHORED"
+  },
+  {
+   "journal": "release/gate5-rerun-gate6/rehearsal/gate5-matched/protected/receipts.jsonl",
+   "entries": 9,
+   "chain_head_sha256": "b88e2c7fe2d7bab0ad96ea436ffd9a54f679c408bf9cf4532c56dcbcb272e604",
+   "completeness": "ANCHORED"
+  },
+  {
+   "journal": "release/gate5-rerun-gate6/rehearsal/gate6-b48db96/receipts.jsonl",
+   "entries": 22,
+   "chain_head_sha256": "44b9a4c6af6db1c0519575ef73432a7fff1f1556c348024557c4be4a09a6b28d",
+   "completeness": "ANCHORED"
+  },
+  {
+   "journal": "release/gate5-rerun-gate6/rehearsal/gate6/receipts.jsonl",
+   "entries": 19,
+   "chain_head_sha256": "9ec4e7993b8973c2478829c3d0a3ae2a972808828c01ff9dd4039135a510bfbe",
+   "completeness": "ANCHORED"
+  },
+  {
+   "journal": "release/gate7/live-batch-a-6868406/runs/01-pflag-ipv4-mask-protected/receipts.jsonl",
+   "entries": 11,
+   "chain_head_sha256": "8ace0ff51da52ca95149cc3706f38f8ca5de348bf63872dd9c4e8c25326e5904",
+   "completeness": "ANCHORED"
+  },
+  {
+   "journal": "release/gate7/live-batch-a-6868406/runs/02-click-argument-name-collision-protected/receipts.jsonl",
+   "entries": 17,
+   "chain_head_sha256": "33614a5a43dab8b3f98d2f597230ed7356667172b0d4a376ded5387671c65afd",
+   "completeness": "ANCHORED"
+  },
+  {
+   "journal": "release/gate7/live-batch-a-6868406/runs/03-path-to-regexp-dependency-upgrade-protected/receipts.jsonl",
+   "entries": 19,
+   "chain_head_sha256": "b1c45c3399f3f051bede5123f323f42134b667e6b2f43285e4528a21c170c4e2",
+   "completeness": "ANCHORED"
+  },
+  {
+   "journal": "release/gate7/live-batch-a-6868406/runs/04-pflag-custom-bool-flags-protected/receipts.jsonl",
+   "entries": 17,
+   "chain_head_sha256": "d7500b0223cbafdfe922b90789bbd7a41438faf6d029715505e8d8e2ba27a906",
+   "completeness": "ANCHORED"
+  },
+  {
+   "journal": "release/gate7/live-batch-a-6868406/runs/05-click-tempfile-pager-regression-protected/receipts.jsonl",
+   "entries": 19,
+   "chain_head_sha256": "452ccddc3ee254f6bc6ed1eb3812fbb5250a73c1ebb64bf1447f898a39e48d84",
+   "completeness": "ANCHORED"
+  },
+  {
+   "journal": "release/gate7/live-batch-a-6868406/runs/06-click-style-color-validation-protected/receipts.jsonl",
+   "entries": 21,
+   "chain_head_sha256": "7b78ba94d974e543a76c7a707804daa2dcb6e9e48b8ecd2296074f93b3c36fd9",
+   "completeness": "ANCHORED"
+  },
+  {
+   "journal": "release/gate7/live-batch-a-6868406/runs/07-pflag-string-map-whitespace-protected/receipts.jsonl",
+   "entries": 19,
+   "chain_head_sha256": "683788d172243349ca2c181fb266bfc3d837eca85939ba05168c3cde8e5c751d",
+   "completeness": "ANCHORED"
+  },
+  {
+   "journal": "release/gate7/rehearsal-0505390/runs/01-pflag-ipv4-mask-baseline/receipts.jsonl",
+   "entries": 8,
+   "chain_head_sha256": "966fd7c99ffc5d97fb8eb122e51d5373d22dcc9fb22e6d3df7d3ad38b1c01b27",
+   "completeness": "ANCHORED"
+  },
+  {
+   "journal": "release/gate7/rehearsal-0505390/runs/01-pflag-ipv4-mask-protected/receipts.jsonl",
+   "entries": 9,
+   "chain_head_sha256": "6ccffa6e8858a235511b6f662ecbac8d7d739e2c1dcb5b8d00b24fdce345a317",
+   "completeness": "ANCHORED"
+  },
+  {
+   "journal": "release/gate7/rehearsal-0505390/runs/02-click-argument-name-collision-baseline/receipts.jsonl",
+   "entries": 10,
+   "chain_head_sha256": "fe68f98c7618f965c6710f70b1f7d3e7687b91ea09b9404555b1fc05526106ab",
+   "completeness": "ANCHORED"
+  },
+  {
+   "journal": "release/gate7/rehearsal-0505390/runs/02-click-argument-name-collision-protected/receipts.jsonl",
+   "entries": 11,
+   "chain_head_sha256": "19043d9b05990769fbcc454d966f71153c77ec52f666a08e7a02779fd6a20f9a",
+   "completeness": "ANCHORED"
+  },
+  {
+   "journal": "release/gate7/rehearsal-0505390/runs/03-path-to-regexp-dependency-upgrade-baseline/receipts.jsonl",
+   "entries": 10,
+   "chain_head_sha256": "555fcc0b2ed627f89d621abadce9e0447942068327258b314e5999a2dc050570",
+   "completeness": "ANCHORED"
+  },
+  {
+   "journal": "release/gate7/rehearsal-0505390/runs/03-path-to-regexp-dependency-upgrade-protected/receipts.jsonl",
+   "entries": 11,
+   "chain_head_sha256": "ea991c71ba4ad30d539db03b28c6b1ca68e8bab4745096b0dd33b003860d3a76",
+   "completeness": "ANCHORED"
+  },
+  {
+   "journal": "release/gate7/rehearsal-0505390/runs/04-pflag-custom-bool-flags-baseline/receipts.jsonl",
+   "entries": 10,
+   "chain_head_sha256": "9f0beb6868b65b8b241bbbcdbf8ce32a2c6c2153c0078dbc5fc9d22c5fcd447b",
+   "completeness": "ANCHORED"
+  },
+  {
+   "journal": "release/gate7/rehearsal-0505390/runs/04-pflag-custom-bool-flags-protected/receipts.jsonl",
+   "entries": 11,
+   "chain_head_sha256": "e3c47e301aea28c6cc64c0fd24f41a8d83a78367388f5660963799063126f982",
+   "completeness": "ANCHORED"
+  },
+  {
+   "journal": "release/gate7/rehearsal-0505390/runs/05-click-tempfile-pager-regression-baseline/receipts.jsonl",
+   "entries": 8,
+   "chain_head_sha256": "a0beca8a0707987b5cff67382957f11f63b83a8995b2b3259aad3c0c19a20f28",
+   "completeness": "ANCHORED"
+  },
+  {
+   "journal": "release/gate7/rehearsal-0505390/runs/05-click-tempfile-pager-regression-protected/receipts.jsonl",
+   "entries": 9,
+   "chain_head_sha256": "b90acf7bfb9c031df3224bc4505b2a6360afd34146af19354cda4aba74a58452",
+   "completeness": "ANCHORED"
+  },
+  {
+   "journal": "release/gate7/rehearsal-0505390/runs/06-click-style-color-validation-baseline/receipts.jsonl",
+   "entries": 10,
+   "chain_head_sha256": "284bc10de51b5c9d68c57d3236074c1533754babdcf969c622a514b38d55576f",
+   "completeness": "ANCHORED"
+  },
+  {
+   "journal": "release/gate7/rehearsal-0505390/runs/06-click-style-color-validation-protected/receipts.jsonl",
+   "entries": 11,
+   "chain_head_sha256": "17d34355226f3c04109c0d9b65cdd9cdc1d344ac074f08b092a462b99a532e34",
+   "completeness": "ANCHORED"
+  },
+  {
+   "journal": "release/gate7/rehearsal-0505390/runs/07-pflag-string-map-whitespace-baseline/receipts.jsonl",
+   "entries": 12,
+   "chain_head_sha256": "187fde9839c4e1b622ccbe2670a5efdfb5554e95ba66e49b5f6e8264ab85c285",
+   "completeness": "ANCHORED"
+  },
+  {
+   "journal": "release/gate7/rehearsal-0505390/runs/07-pflag-string-map-whitespace-protected/receipts.jsonl",
+   "entries": 13,
+   "chain_head_sha256": "f8dfba02b416591f4c7eb0c22be1ca728dd9164a0cc749383fe3bf217197b96d",
+   "completeness": "ANCHORED"
+  },
+  {
+   "journal": "release/gate7/rehearsal-0505390/runs/08-path-to-regexp-spend-bound-protected/receipts.jsonl",
+   "entries": 10,
+   "chain_head_sha256": "2f6baa1c0d555ece4323e2ad94f336bf5fd7c4b3bf7d15d98a948ab06cda107c",
+   "completeness": "ANCHORED"
+  },
+  {
+   "journal": "release/gate7/rehearsal-0505390/runs/09-click-short-help-reviewed-publish-protected/receipts.jsonl",
+   "entries": 22,
+   "chain_head_sha256": "79fe2df1e979c97ea33a6b0729d95442f28806e18ab87ecbd0306bd91c364025",
+   "completeness": "ANCHORED"
+  },
+  {
+   "journal": "release/gate7/rehearsal-0505390/runs/10-click-sentinel-ambiguous-publish-protected/receipts.jsonl",
+   "entries": 22,
+   "chain_head_sha256": "8b3907e6435815ed73480e51bce71a2a0cc4fb542a9bb0f9dd0bba930b86132b",
+   "completeness": "ANCHORED"
+  },
+  {
+   "journal": "release/independent-security/evidence/boundary/receipts.jsonl",
+   "entries": 6,
+   "chain_head_sha256": "97b87fafd4e66c363b39fb33271c3a37c28a7693e279219b8399b95248ae3c94",
+   "completeness": "UNANCHORED"
+  },
+  {
+   "journal": "release/independent-security/integration/evidence/boundary-evidence/receipts.jsonl",
+   "entries": 6,
+   "chain_head_sha256": "2a1914364b74041cb699436878625f40f7aa7ad93c2bf82d6a65f3c5fea23355",
+   "completeness": "UNANCHORED"
+  },
+  {
+   "journal": "release/independent-security/integration/evidence/protected-evidence/github-container/receipts.jsonl",
+   "entries": 8,
+   "chain_head_sha256": "eb9463e4e3a5ba5b2dabd8118f3682fb88ff2674d060a9f1ff2bf5e0f057a888",
+   "completeness": "UNANCHORED"
+  },
+  {
+   "journal": "release/independent-security/integration/evidence/protected-evidence/receipts.jsonl",
+   "entries": 8,
+   "chain_head_sha256": "c303b4cfb39e995c901f2c726605aa02d70288f9f289a40353911c147ccc31ee",
+   "completeness": "UNANCHORED"
+  },
+  {
+   "journal": "release/v42-response-compatibility/containers/codex-evidence/consequence/receipts.jsonl",
+   "entries": 25,
+   "chain_head_sha256": "504c5977dc710695756e22dbb75517d3ffaa7a2b1cecafc641d71d98546dc0e3",
+   "completeness": "ANCHORED"
+  },
+  {
+   "journal": "release/v42-response-compatibility/containers/codex-evidence/project/receipts.jsonl",
+   "entries": 9,
+   "chain_head_sha256": "5c357b5f9d101cb51f38ed28a0335c2e9c4599ac5596e6d78d6ea1c8efb3fdca",
+   "completeness": "UNANCHORED"
+  },
+  {
+   "journal": "release/v42-response-compatibility/containers/codex-evidence/test_codex_executed_transport_0/receipts.jsonl",
+   "entries": 9,
+   "chain_head_sha256": "56c04eb2e88a2c8a491dd14db058dcb8a8f1a65d268fb1cb9380759206cc4549",
+   "completeness": "UNANCHORED"
+  },
+  {
+   "journal": "release/v42-response-compatibility/containers/codex-evidence/test_real_codex_budget_refusal0/receipts.jsonl",
+   "entries": 2,
+   "chain_head_sha256": "86caa1b2a991a4fd05f117e462af03686b775ff846dded085b943362faf14622",
+   "completeness": "UNANCHORED"
+  },
+  {
+   "journal": "release/v42-response-compatibility/containers/codex-evidence/test_real_codex_continues_with0/receipts.jsonl",
+   "entries": 9,
+   "chain_head_sha256": "0ff7450d307bfef87f5688a03ed4bb356e72843179ff03f15b4a0f805e3b2cab",
+   "completeness": "UNANCHORED"
+  },
+  {
+   "journal": "release/v42-response-compatibility/containers/codex-evidence/test_real_codex_executes_edits0/receipts.jsonl",
+   "entries": 9,
+   "chain_head_sha256": "ce7a73ea359dbf94d497b0b86360b229a251359c3cdbff3b9e038c598f566c75",
+   "completeness": "UNANCHORED"
+  },
+  {
+   "journal": "release/v42-response-compatibility/containers/codex-evidence/test_real_codex_lost_ack_stays0/receipts.jsonl",
+   "entries": 3,
+   "chain_head_sha256": "320ac7f7f4124faf1e8fd1f697dc7115caf2913b9c17bf50b507331bdc57f4f9",
+   "completeness": "UNANCHORED"
+  },
+  {
+   "journal": "release/v42-response-compatibility/containers/independent-evidence/receipts.jsonl",
+   "entries": 6,
+   "chain_head_sha256": "37941a019cf474ed9b527bbc25fbecfce21f689a4d2f966af532fe8efda9a402",
+   "completeness": "UNANCHORED"
+  },
+  {
+   "journal": "release/v42-response-compatibility/containers/protected-evidence/github-container/receipts.jsonl",
+   "entries": 8,
+   "chain_head_sha256": "43236eaa61d6eb7c4bb3856c810a6436911afc1a74d5a0454c95ad3c97c52986",
+   "completeness": "UNANCHORED"
+  },
+  {
+   "journal": "release/v42-response-compatibility/containers/protected-evidence/receipts.jsonl",
+   "entries": 8,
+   "chain_head_sha256": "21b54bf2770f785d3cb104ff07e8c0fd15f9a30fed05d61e9160d2d8d7eb5182",
+   "completeness": "UNANCHORED"
+  },
+  {
+   "journal": "release/v42-response-compatibility/scripted-baseline/receipts.jsonl",
+   "entries": 8,
+   "chain_head_sha256": "5d31723f034cb700c92b44d4a4710e1007835b89ed14d1d0059e2127ab47d125",
+   "completeness": "ANCHORED"
+  },
+  {
+   "journal": "release/v42-response-compatibility/scripted-protected/receipts.jsonl",
+   "entries": 9,
+   "chain_head_sha256": "74ae072c9c19e2dbe4992601409f91ba1435b231600a960ab8c379dd48e5902b",
+   "completeness": "ANCHORED"
+  },
+  {
+   "journal": "release/v43-tool-echo/containers/codex-final/consequence/receipts.jsonl",
+   "entries": 25,
+   "chain_head_sha256": "e97ee0a7bd0e90e5f3581b4b53ca74b65da6b85ca4d311dfc0045f52ab502ed4",
+   "completeness": "ANCHORED"
+  },
+  {
+   "journal": "release/v43-tool-echo/containers/codex-final/project/receipts.jsonl",
+   "entries": 9,
+   "chain_head_sha256": "b30a84218383d96c9a70508f388fea84a3dc6d8d72e08fcaf311d04cc63e8363",
+   "completeness": "UNANCHORED"
+  },
+  {
+   "journal": "release/v43-tool-echo/containers/codex-final/test_codex_executed_transport_0/receipts.jsonl",
+   "entries": 9,
+   "chain_head_sha256": "c9728e6358f376954da6304958e7dc7e91d3fec92a7b44dab65a93c18ea58738",
+   "completeness": "UNANCHORED"
+  },
+  {
+   "journal": "release/v43-tool-echo/containers/codex-final/test_real_codex_budget_refusal0/receipts.jsonl",
+   "entries": 2,
+   "chain_head_sha256": "38ec987d5e09342fd80e23f9f9b88da35fba8920f918d499405ef100ce30e4de",
+   "completeness": "UNANCHORED"
+  },
+  {
+   "journal": "release/v43-tool-echo/containers/codex-final/test_real_codex_continues_with0/receipts.jsonl",
+   "entries": 9,
+   "chain_head_sha256": "286afa25298db33dcf75c07c950f18530152261bc70473acb27b5a771d8b8289",
+   "completeness": "UNANCHORED"
+  },
+  {
+   "journal": "release/v43-tool-echo/containers/codex-final/test_real_codex_executes_edits0/receipts.jsonl",
+   "entries": 9,
+   "chain_head_sha256": "11ea9cad15c84f413e7849abbb6b9a30222c626846a6d5c92cde4daffcb2247b",
+   "completeness": "UNANCHORED"
+  },
+  {
+   "journal": "release/v43-tool-echo/containers/codex-final/test_real_codex_lost_ack_stays0/receipts.jsonl",
+   "entries": 3,
+   "chain_head_sha256": "1a784b491b431682e4fdda0a4cc7d6e81e6b63847e01c8f1263c3a3528a19141",
+   "completeness": "UNANCHORED"
+  },
+  {
+   "journal": "release/v43-tool-echo/containers/independent-final/receipts.jsonl",
+   "entries": 6,
+   "chain_head_sha256": "3c57525170a820d753c6037942511f83f9e2b9bafbf0eb5e81d0c110075c062d",
+   "completeness": "UNANCHORED"
+  },
+  {
+   "journal": "release/v43-tool-echo/containers/protected-final-evidence/github-container/receipts.jsonl",
+   "entries": 8,
+   "chain_head_sha256": "75fe18c2654a21bab0d5114a1e991d9c0093f0842224c96025ea958aa8e4c468",
+   "completeness": "UNANCHORED"
+  },
+  {
+   "journal": "release/v43-tool-echo/containers/protected-final-evidence/receipts.jsonl",
+   "entries": 8,
+   "chain_head_sha256": "7497787cf374de9cc5c6727471d3f2305a69b8912635a244b52f4e9f564ab016",
+   "completeness": "UNANCHORED"
+  },
+  {
+   "journal": "release/v43-tool-echo/scripted-baseline/receipts.jsonl",
+   "entries": 8,
+   "chain_head_sha256": "7db801cd5bec8cf666fd4ae50025c9d777065863717c215edc8bea8db95b76bc",
+   "completeness": "ANCHORED"
+  },
+  {
+   "journal": "release/v43-tool-echo/scripted-protected/receipts.jsonl",
+   "entries": 9,
+   "chain_head_sha256": "cf0f6c0d5adb56d7bbbcab1b8f454aaa11563dca27ed2b91156a4027fda286c5",
+   "completeness": "ANCHORED"
+  },
+  {
+   "journal": "release/v43-tool-echo/signed-replay/original_echo/receipts.jsonl",
+   "entries": 4,
+   "chain_head_sha256": "b63173778553c31bcba7d21071ae492d909c238ab97a6ca2bc0f9dd208225eb6",
+   "completeness": "ANCHORED"
+  },
+  {
+   "journal": "release/v43-tool-echo/signed-replay/repaired_changed_schema/receipts.jsonl",
+   "entries": 4,
+   "chain_head_sha256": "c59d3c3489876436a7c1acb9e23e190c38e266b93327ae807436dd325005f75c",
+   "completeness": "ANCHORED"
+  },
+  {
+   "journal": "release/v43-tool-echo/signed-replay/repaired_echo/receipts.jsonl",
+   "entries": 4,
+   "chain_head_sha256": "e9c65e4a9f8aae1612a3f308c69d0db803ae5b67eb058ffc333874663733f3ba",
+   "completeness": "ANCHORED"
+  },
+  {
+   "journal": "release/v43-tool-echo/signed-replay/repaired_partial/receipts.jsonl",
+   "entries": 4,
+   "chain_head_sha256": "eea1c04a23c8fa2863469f32e8aa008950786b8b28fb0c90eb5c0ec7c7c0bf15",
+   "completeness": "ANCHORED"
+  },
+  {
+   "journal": "release/v43-tool-echo/signed-replay/repaired_programmatic/receipts.jsonl",
+   "entries": 4,
+   "chain_head_sha256": "59744869a0b3f719d37402e1ca5b1ef1ff502b7cf3cf102c31a757c5dc69c442",
+   "completeness": "ANCHORED"
+  },
+  {
+   "journal": "release/v43-tool-echo/signed-replay/repaired_unknown/receipts.jsonl",
+   "entries": 4,
+   "chain_head_sha256": "d721a62d21cefe6cd06d4484da226ab04272c6483ce0aa21a9276a48a6a27eb3",
+   "completeness": "ANCHORED"
+  },
+  {
+   "journal": "release/v44-auth-hardening/evidence/codex/consequence/receipts.jsonl",
+   "entries": 25,
+   "chain_head_sha256": "ad4f0e265104d084eec6c6bef639733f4d490d35cd3ad7563b39e3487476e4f5",
+   "completeness": "ANCHORED"
+  },
+  {
+   "journal": "release/v44-auth-hardening/evidence/codex/project/receipts.jsonl",
+   "entries": 9,
+   "chain_head_sha256": "dd76f17dbcd0e46b46f45a41cf7fbd9743f4ada2f6ec63d23a74048a18ea119a",
+   "completeness": "UNANCHORED"
+  },
+  {
+   "journal": "release/v44-auth-hardening/evidence/codex/test_codex_executed_transport_0/receipts.jsonl",
+   "entries": 9,
+   "chain_head_sha256": "bee41cf0033896e7f0fc5262626b7fbf05165db79fe04ac4de87707d9c4ab5e4",
+   "completeness": "UNANCHORED"
+  },
+  {
+   "journal": "release/v44-auth-hardening/evidence/codex/test_real_codex_budget_refusal0/receipts.jsonl",
+   "entries": 2,
+   "chain_head_sha256": "b5a77778ef196195d2e8a85cfe82651e2c4d12bc49a9cbadd31f6d644e8e6b8b",
+   "completeness": "UNANCHORED"
+  },
+  {
+   "journal": "release/v44-auth-hardening/evidence/codex/test_real_codex_continues_with0/receipts.jsonl",
+   "entries": 9,
+   "chain_head_sha256": "391c9e121ccbba9795a3790084b5283967632cd7eec80011c149183105baa308",
+   "completeness": "UNANCHORED"
+  },
+  {
+   "journal": "release/v44-auth-hardening/evidence/codex/test_real_codex_executes_edits0/receipts.jsonl",
+   "entries": 9,
+   "chain_head_sha256": "8a44c3b8d99d0f7d47385336c26924d8931686ce8b477b2ddde1e9c0d8de64f1",
+   "completeness": "UNANCHORED"
+  },
+  {
+   "journal": "release/v44-auth-hardening/evidence/codex/test_real_codex_lost_ack_stays0/receipts.jsonl",
+   "entries": 3,
+   "chain_head_sha256": "28f662579cdf71efa1d3e9a86d67d2c494a82f4b16743e99ef311a20d9b69d2d",
+   "completeness": "UNANCHORED"
+  },
+  {
+   "journal": "release/v44-auth-hardening/evidence/independent/receipts.jsonl",
+   "entries": 6,
+   "chain_head_sha256": "be5259d50cce6d1900e3d836fff10902e7eba2e29da27b91450caf3c0abb57f3",
+   "completeness": "UNANCHORED"
+  },
+  {
+   "journal": "release/v44-auth-hardening/evidence/protected/github-container/receipts.jsonl",
+   "entries": 8,
+   "chain_head_sha256": "4538bc184cbf0135c15abac0a19e0df0c0e4277e01dbbe3d284d754b713f642c",
+   "completeness": "UNANCHORED"
+  },
+  {
+   "journal": "release/v44-auth-hardening/evidence/protected/receipts.jsonl",
+   "entries": 8,
+   "chain_head_sha256": "85c8bf1593670b469310eaedb48ea42947003c0fb3431b875b6b10efd526f0c5",
+   "completeness": "UNANCHORED"
+  },
+  {
+   "journal": "release/v44-auth-hardening/scripted-baseline/receipts.jsonl",
+   "entries": 8,
+   "chain_head_sha256": "03e4d1d3715059a28eab54daf23dbb5424f7d261fd309351ebbab2fa92db5b95",
+   "completeness": "ANCHORED"
+  },
+  {
+   "journal": "release/v44-auth-hardening/scripted-protected/receipts.jsonl",
+   "entries": 9,
+   "chain_head_sha256": "a8da2fd8f2f9f4bf77bb1749e360d0e65545152499d7144a25a4fbd99cb69cea",
+   "completeness": "ANCHORED"
+  },
+  {
+   "journal": "release/v44-contract-observatory/containers/codex-evidence/consequence/receipts.jsonl",
+   "entries": 25,
+   "chain_head_sha256": "1e862b2c24df498f4d46c13a56e4c9eaa4a247ddaf21b54dbb550324f4e8463d",
+   "completeness": "ANCHORED"
+  },
+  {
+   "journal": "release/v44-contract-observatory/containers/codex-evidence/project/receipts.jsonl",
+   "entries": 9,
+   "chain_head_sha256": "a21b5d1e98eacd950985c8b4d78072b5c2524431328fe87d105773d1d7db44bd",
+   "completeness": "UNANCHORED"
+  },
+  {
+   "journal": "release/v44-contract-observatory/containers/codex-evidence/test_codex_executed_transport_0/receipts.jsonl",
+   "entries": 9,
+   "chain_head_sha256": "2c6243584a7cea29d91057d8793c7364c4d5b32279912f1dd3259c155a0ce64c",
+   "completeness": "UNANCHORED"
+  },
+  {
+   "journal": "release/v44-contract-observatory/containers/codex-evidence/test_real_codex_budget_refusal0/receipts.jsonl",
+   "entries": 2,
+   "chain_head_sha256": "37f06c5d332f3c620d82430cbe8c9a431fd53d0fd57818da375199e250f479f8",
+   "completeness": "UNANCHORED"
+  },
+  {
+   "journal": "release/v44-contract-observatory/containers/codex-evidence/test_real_codex_continues_with0/receipts.jsonl",
+   "entries": 9,
+   "chain_head_sha256": "fcc61cd4577083fc77a601de5391de53049beff878c35c0822c788b6e517d4e9",
+   "completeness": "UNANCHORED"
+  },
+  {
+   "journal": "release/v44-contract-observatory/containers/codex-evidence/test_real_codex_executes_edits0/receipts.jsonl",
+   "entries": 9,
+   "chain_head_sha256": "f66884a4fd0106af56a90eb0d33a78fee6718e387870804fc1ca38c6a4984e46",
+   "completeness": "UNANCHORED"
+  },
+  {
+   "journal": "release/v44-contract-observatory/containers/codex-evidence/test_real_codex_lost_ack_stays0/receipts.jsonl",
+   "entries": 3,
+   "chain_head_sha256": "6650e375c96ecf79edd95da8bfebd49d6bfbcba85b6f98cd0870f34749842c3f",
+   "completeness": "UNANCHORED"
+  },
+  {
+   "journal": "release/v44-contract-observatory/containers/independent-evidence/receipts.jsonl",
+   "entries": 6,
+   "chain_head_sha256": "b065a688f20526f44e1be3583a4cd134bf962741190e18045164c5618666ce04",
+   "completeness": "UNANCHORED"
+  },
+  {
+   "journal": "release/v44-contract-observatory/containers/protected-evidence/github-container/receipts.jsonl",
+   "entries": 8,
+   "chain_head_sha256": "c80aa72a481edda8abff612529d54ac945ba3b9d5f79a09d3197c33dda696e71",
+   "completeness": "UNANCHORED"
+  },
+  {
+   "journal": "release/v44-contract-observatory/containers/protected-evidence/receipts.jsonl",
+   "entries": 8,
+   "chain_head_sha256": "98787390a3012e3a8694b7d2cfbe30cbfbd7494ae6c27706de728fa8698f3cea",
+   "completeness": "UNANCHORED"
+  },
+  {
+   "journal": "release/v44-contract-observatory/live-2026-11-04/receipts.jsonl",
+   "entries": 2,
+   "chain_head_sha256": "b66f884dbb8736a174250a23c927d9e17b6a0558873d61ff87ad175ba6b53988",
+   "completeness": "ANCHORED"
+  },
+  {
+   "journal": "release/v44-contract-observatory/review-2026-11-04/evidence/codex/consequence/receipts.jsonl",
+   "entries": 25,
+   "chain_head_sha256": "79c0903b3026370f8b7c6115b5603317d0fc626861aa3f9274c1206e390596a0",
+   "completeness": "ANCHORED"
+  },
+  {
+   "journal": "release/v44-contract-observatory/review-2026-11-04/evidence/codex/project/receipts.jsonl",
+   "entries": 9,
+   "chain_head_sha256": "9a61a8cd97ddcd13072145462493abca1d472c092f7b7ab04fc2cf43a4a495f1",
+   "completeness": "UNANCHORED"
+  },
+  {
+   "journal": "release/v44-contract-observatory/review-2026-11-04/evidence/codex/test_codex_executed_transport_0/receipts.jsonl",
+   "entries": 9,
+   "chain_head_sha256": "a7d48b93e1d6850f587777d4cd08afef2054233f7b08158e07b43c301425f757",
+   "completeness": "UNANCHORED"
+  },
+  {
+   "journal": "release/v44-contract-observatory/review-2026-11-04/evidence/codex/test_real_codex_budget_refusal0/receipts.jsonl",
+   "entries": 2,
+   "chain_head_sha256": "a7d68054cdf8a775089e6415cf9f50abaa89e0da7e5a28dc4f1245357e8eb1a0",
+   "completeness": "UNANCHORED"
+  },
+  {
+   "journal": "release/v44-contract-observatory/review-2026-11-04/evidence/codex/test_real_codex_continues_with0/receipts.jsonl",
+   "entries": 9,
+   "chain_head_sha256": "b1994ad35530ad99c70e437247b4efabb45b3428db7b00bf955878874cf50e5e",
+   "completeness": "UNANCHORED"
+  },
+  {
+   "journal": "release/v44-contract-observatory/review-2026-11-04/evidence/codex/test_real_codex_executes_edits0/receipts.jsonl",
+   "entries": 9,
+   "chain_head_sha256": "140cb3832bde2948d1221173bfecd8e3787c30610f6a39fd561377a3f463480a",
+   "completeness": "UNANCHORED"
+  },
+  {
+   "journal": "release/v44-contract-observatory/review-2026-11-04/evidence/codex/test_real_codex_lost_ack_stays0/receipts.jsonl",
+   "entries": 3,
+   "chain_head_sha256": "c15b3b104afe411d1fa93bedb876241691a344bd73cc47366f5464016e5d6ce1",
+   "completeness": "UNANCHORED"
+  },
+  {
+   "journal": "release/v44-contract-observatory/review-2026-11-04/evidence/independent/receipts.jsonl",
+   "entries": 6,
+   "chain_head_sha256": "d21ca1729cb2a837cb3342580b1dab0218e04cd596d56ce9de8f64e6c13bc6c7",
+   "completeness": "UNANCHORED"
+  },
+  {
+   "journal": "release/v44-contract-observatory/review-2026-11-04/evidence/protected/github-container/receipts.jsonl",
+   "entries": 8,
+   "chain_head_sha256": "41313d4f4d5bfe02760a403e3e22cb01f879561bd16e0f817777421998e9d57a",
+   "completeness": "UNANCHORED"
+  },
+  {
+   "journal": "release/v44-contract-observatory/review-2026-11-04/evidence/protected/receipts.jsonl",
+   "entries": 8,
+   "chain_head_sha256": "302ad98303922a990e85a28384dcc438f6ba5783cdf4b8bf7609ad7174ee04c9",
+   "completeness": "UNANCHORED"
+  },
+  {
+   "journal": "release/v44-contract-observatory/review-2026-11-04/scripted-baseline/receipts.jsonl",
+   "entries": 8,
+   "chain_head_sha256": "392c083fa25f5ac17ea3cdcf1b3403f0d13574ab01d52f56a20adada782f0ae0",
+   "completeness": "ANCHORED"
+  },
+  {
+   "journal": "release/v44-contract-observatory/review-2026-11-04/scripted-protected/receipts.jsonl",
+   "entries": 9,
+   "chain_head_sha256": "f2cf26737fd2f6b5fc5692d4cc2926e926e276a323e94cf2db24e701ee87b84e",
+   "completeness": "ANCHORED"
+  },
+  {
+   "journal": "release/v44-contract-observatory/scripted-baseline/receipts.jsonl",
+   "entries": 8,
+   "chain_head_sha256": "3e5a47f42503433674ba9373db3b1f57f479205f7d202c736f65668971b188f0",
+   "completeness": "ANCHORED"
+  },
+  {
+   "journal": "release/v44-contract-observatory/scripted-protected/receipts.jsonl",
+   "entries": 9,
+   "chain_head_sha256": "6d094c80456c999caae40264cc2e42a009c905c79678bfc666d40b347d9b5d67",
+   "completeness": "ANCHORED"
+  },
+  {
+   "journal": "release/v44-contract-observatory/signed-replay/original_image/receipts.jsonl",
+   "entries": 4,
+   "chain_head_sha256": "251dfb2b64dbb27fe2ccb1ab4ecb6805190061f3a8af431e406c11faf131e3ac",
+   "completeness": "ANCHORED"
+  },
+  {
+   "journal": "release/v44-contract-observatory/signed-replay/repaired_bad_image/receipts.jsonl",
+   "entries": 4,
+   "chain_head_sha256": "396c7ffe1dac6adc80cd8035553f9d0ef491679b8047557ff29bb1c6e69b245a",
+   "completeness": "ANCHORED"
+  },
+  {
+   "journal": "release/v44-contract-observatory/signed-replay/repaired_billing/receipts.jsonl",
+   "entries": 4,
+   "chain_head_sha256": "4acdd5156d591c6394fd12385d7a31124925a8f7bdae03b5c27bf3a97dc3e112",
+   "completeness": "ANCHORED"
+  },
+  {
+   "journal": "release/v44-contract-observatory/signed-replay/repaired_changed/receipts.jsonl",
+   "entries": 4,
+   "chain_head_sha256": "fa99549afc718379fd394507e746371d09d0a84e7773092920188524f2f846cc",
+   "completeness": "ANCHORED"
+  },
+  {
+   "journal": "release/v44-contract-observatory/signed-replay/repaired_disabled/receipts.jsonl",
+   "entries": 4,
+   "chain_head_sha256": "9b94d7599588f749831998e99d2190270ca57a054a71a85d5fcdffe948fbda59",
+   "completeness": "ANCHORED"
+  },
+  {
+   "journal": "release/v44-contract-observatory/signed-replay/repaired_enabled/receipts.jsonl",
+   "entries": 4,
+   "chain_head_sha256": "1a9c2872442718bd6a050ba3d269aa9c0997ccaccd1d588928a21ff6f36f22c8",
+   "completeness": "ANCHORED"
+  },
+  {
+   "journal": "release/v44-contract-observatory/signed-replay/repaired_hosted_only/receipts.jsonl",
+   "entries": 4,
+   "chain_head_sha256": "c708c096d980378ab2191a932fc34a830c57ef9295f6bec0894126f11e6c8cbc",
+   "completeness": "ANCHORED"
+  },
+  {
+   "journal": "release/v44-contract-observatory/signed-replay/repaired_image-hosted/receipts.jsonl",
+   "entries": 4,
+   "chain_head_sha256": "63d023ba40d5f06600deb717865f951193fda34c7d368e1f34d08c6f9a0649da",
+   "completeness": "ANCHORED"
+  },
+  {
+   "journal": "release/v44-contract-observatory/signed-replay/repaired_image-usage/receipts.jsonl",
+   "entries": 4,
+   "chain_head_sha256": "21a4ab0cd1b0d16f26946064fbc091dec8e254ba22f4c6afccff655da8e2aef1",
+   "completeness": "ANCHORED"
+  },
+  {
+   "journal": "release/v44-contract-observatory/signed-replay/repaired_incomplete-output/receipts.jsonl",
+   "entries": 4,
+   "chain_head_sha256": "93342124a7aaeba49ce107c1246833f2beba5b7e857ff86f3bf6d14cc8318966",
+   "completeness": "ANCHORED"
+  },
+  {
+   "journal": "release/v44-contract-observatory/signed-replay/repaired_partial/receipts.jsonl",
+   "entries": 4,
+   "chain_head_sha256": "1404c7d2b16d7c7d36ef5e78f05d0de44af8cbc474862a2995143082b627919c",
+   "completeness": "ANCHORED"
+  },
+  {
+   "journal": "release/v44-contract-observatory/signed-replay/repaired_sequence/receipts.jsonl",
+   "entries": 4,
+   "chain_head_sha256": "ee2a3a8e6bd309e75ab4a0c276cacb24f099b67ed2b348a6f5408ceb035415ba",
+   "completeness": "ANCHORED"
+  },
+  {
+   "journal": "release/v44-contract-observatory/signed-replay/repaired_strict-state/receipts.jsonl",
+   "entries": 4,
+   "chain_head_sha256": "bd5e6973b3d8105a774565d2f5a080f7502f7162bc0b8db23a3e9f644f9340fe",
+   "completeness": "ANCHORED"
+  },
+  {
+   "journal": "release/v44-contract-observatory/signed-replay/repaired_unknown-tools/receipts.jsonl",
+   "entries": 4,
+   "chain_head_sha256": "0be8c758a9469127aabd746685cd17f3f9eec0754c1270018adde42d115cb459",
+   "completeness": "ANCHORED"
+  },
+  {
+   "journal": "release/v44-contract-observatory/signed-replay/repaired_unknown_billing/receipts.jsonl",
+   "entries": 4,
+   "chain_head_sha256": "71210236aac4f9003cb9bda8dc76d285b3864f61ce5d6534a29c6f48ce4a3674",
+   "completeness": "ANCHORED"
+  },
+  {
+   "journal": "release/v44b-credential-isolation/evidence/codex/consequence/receipts.jsonl",
+   "entries": 25,
+   "chain_head_sha256": "7cb5c9ae331fe46f69ee66ad18abd3c628010aea525d07907611b0a0f4f78ad5",
+   "completeness": "ANCHORED"
+  },
+  {
+   "journal": "release/v44b-credential-isolation/evidence/codex/project/receipts.jsonl",
+   "entries": 9,
+   "chain_head_sha256": "e61d7c86599feeb32532c2701372c13d8053fd3bf312674bd282817b90ee38a0",
+   "completeness": "UNANCHORED"
+  },
+  {
+   "journal": "release/v44b-credential-isolation/evidence/codex/test_codex_executed_transport_0/receipts.jsonl",
+   "entries": 9,
+   "chain_head_sha256": "c31a414fd955555c59471d5ee37d1057479d7f4e3a00037f9ded1b8e7651ede2",
+   "completeness": "UNANCHORED"
+  },
+  {
+   "journal": "release/v44b-credential-isolation/evidence/codex/test_protected_contained_agent0/receipts.jsonl",
+   "entries": 5,
+   "chain_head_sha256": "035c4c3264d9db5b4792d3aab19166b8dff910c135fb4b72e6a5298d56117dbc",
+   "completeness": "UNANCHORED"
+  },
+  {
+   "journal": "release/v44b-credential-isolation/evidence/codex/test_real_codex_budget_refusal0/receipts.jsonl",
+   "entries": 2,
+   "chain_head_sha256": "4fce4f79455c9c77f8fa31b04cdf8cb4724cacff848026fa5a13c8418a904741",
+   "completeness": "UNANCHORED"
+  },
+  {
+   "journal": "release/v44b-credential-isolation/evidence/codex/test_real_codex_continues_with0/receipts.jsonl",
+   "entries": 9,
+   "chain_head_sha256": "627a0cb5bb07022e059ce6c69ea69830e458b5b015207f1de169c725c028e41c",
+   "completeness": "UNANCHORED"
+  },
+  {
+   "journal": "release/v44b-credential-isolation/evidence/codex/test_real_codex_executes_edits0/receipts.jsonl",
+   "entries": 9,
+   "chain_head_sha256": "f378ce698e613bb52b4eeed63c9409d24e44514ea5e918bc067f80f4bd6ec3e0",
+   "completeness": "UNANCHORED"
+  },
+  {
+   "journal": "release/v44b-credential-isolation/evidence/codex/test_real_codex_lost_ack_stays0/receipts.jsonl",
+   "entries": 3,
+   "chain_head_sha256": "ec75eee23dda6153fc7ada4545623319dac1d1f55e627f534bb835628488d014",
+   "completeness": "UNANCHORED"
+  },
+  {
+   "journal": "release/v44b-credential-isolation/evidence/independent/receipts.jsonl",
+   "entries": 6,
+   "chain_head_sha256": "b172a57bcff0262158a63c4c313c64a7e1d42de2b600db320ad383b98c819703",
+   "completeness": "UNANCHORED"
+  },
+  {
+   "journal": "release/v44b-credential-isolation/evidence/protected/github-container/receipts.jsonl",
+   "entries": 8,
+   "chain_head_sha256": "1644c8f3f14716cb8473b7d8d5abdd5c41113fe6f0f4e468a62b17986369938f",
+   "completeness": "UNANCHORED"
+  },
+  {
+   "journal": "release/v44b-credential-isolation/evidence/protected/receipts.jsonl",
+   "entries": 8,
+   "chain_head_sha256": "db04bec1640523d3d1a470eae6d58b745fb1267b4f063aaf26e28b660ea1a6e9",
+   "completeness": "UNANCHORED"
+  },
+  {
+   "journal": "release/v44b-credential-isolation/scripted-baseline/receipts.jsonl",
+   "entries": 8,
+   "chain_head_sha256": "6098e7f1438392b6fd08997be62ad4647823887033b4399304fec2af67b387cb",
+   "completeness": "ANCHORED"
+  },
+  {
+   "journal": "release/v44b-credential-isolation/scripted-protected/receipts.jsonl",
+   "entries": 9,
+   "chain_head_sha256": "9a1fc1f0e4847ccf451760ee22e54bc3ba3cb1718dbef4a8881dfafa351b9788",
+   "completeness": "ANCHORED"
+  }
+ ],
+ "expected_outcomes": {
+  "integration": "0 failed; skips exactly within the candidate's CI contract (62 measured on macOS)",
+  "container": "0 failed, 0 skipped; every must_pass test passed (61 + 1)",
+  "journals": "142 journals, 1237 receipts, all integrity OK",
+  "tamper_self_test": "3 of 3 tampered journals rejected",
+  "provider_gate6_historical": "reviewed bytes, Airlock readback and owner readback agree"
+ }
+}
