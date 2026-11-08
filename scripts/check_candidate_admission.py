@@ -1,5 +1,9 @@
 #!/usr/bin/env python3
-"""Release-admission gate for Actenon Airlock (G1-G40).
+"""Release-admission gate for Actenon Airlock.
+
+The owner's accepted release bar is the requirement when ``release_bar`` is in
+``release/gates.json``. G1-G40 are still evaluated and reported, as superseded
+history. Without that block the G1-G40 path applies as before.
 
 Every PASS is derived from evidence this script fetches itself from an
 authenticated source and binds to the exact candidate commit:
@@ -21,6 +25,10 @@ authenticated source and binds to the exact candidate commit:
   working tree.
 * Registry coherence (release only) queries PyPI and compares published file
   digests with ``uv.lock``.
+* Bar items that happen outside GitHub (a real model, a live provider, other
+  operators) need an owner record bound to the exact commit. Records are read
+  from the gate's own reviewed checkout, never the candidate. A record says the
+  owner reviewed that evidence; it does not make the evidence true.
 
 Missing, malformed, stale, skipped, inconsistent or unauthenticated evidence
 never yields PASS. Gates whose frozen definition is not committed are
@@ -64,6 +72,8 @@ from typing import Any, Protocol
 STATUSES = ("NOT READY", "CANDIDATE READY", "RELEASE READY")
 PASS, FAIL, BLOCKED, UNDEFINED = "PASS", "FAIL", "BLOCKED", "UNDEFINED"
 GATE_IDS = tuple(f"G{n}" for n in range(1, 41))
+BAR_EVIDENCE = {"candidate_ci", "owner_record", "registry_coherence", "accepted"}
+BAR_RECORD_SCHEMA = "actenon-airlock/release-bar-record/v1"
 SHA_RE = re.compile(r"^[0-9a-f]{40}$")
 MAX_ARTIFACT_BYTES = 64 * 1024 * 1024
 FAILED_CONCLUSIONS = {"failure", "cancelled", "timed_out", "action_required", "startup_failure"}
@@ -285,6 +295,21 @@ def load_registry(raw: bytes | None) -> dict[str, Any]:
     for section in scope["sections"]:
         if section.get("evidence") is not None:
             raise AdmissionError(f"section {section['id']}: unknown evidence producer")
+    bar = registry.get("release_bar")
+    if bar is not None:
+        items = bar.get("items")
+        if (
+            not bar.get("sha256")
+            or not bar.get("accepted_on")
+            or not isinstance(items, list)
+            or [item.get("id") for item in items] != list(range(1, 11))
+        ):
+            raise AdmissionError("release_bar must pin its document and list items 1-10")
+        for item in items:
+            if item.get("evidence") not in BAR_EVIDENCE:
+                raise AdmissionError(f"bar item {item['id']}: unknown evidence producer")
+            if item.get("required_for") not in {"candidate", "release"}:
+                raise AdmissionError(f"bar item {item['id']}: unknown level")
     return registry
 
 
@@ -306,6 +331,55 @@ def check_recovered_scope(registry: dict[str, Any], tree: Tree) -> dict[str, Res
         )
         for s in spec["sections"]
     }
+
+
+def _owner_record(item: int, gate_files: Tree, candidate_sha: str) -> Result:
+    """One item's reviewed record, bound to this commit. Anything less does not pass."""
+    path = f"release/bar-records/item-{item}.json"
+    raw = gate_files.read(path)
+    if raw is None:
+        return Result(BLOCKED, f"no owner record at {path}")
+    try:
+        record = json.loads(raw)
+    except json.JSONDecodeError:
+        return Result(FAIL, f"{path} is malformed")
+    if (
+        not isinstance(record, dict)
+        or record.get("schema") != BAR_RECORD_SCHEMA
+        or record.get("item") != item
+    ):
+        return Result(FAIL, f"{path} is not a record for item {item}")
+    if record.get("candidate_sha") != candidate_sha:
+        return Result(BLOCKED, f"{path} records another commit")
+    if record.get("result") != PASS:
+        return Result(FAIL, f"{path} records {record.get('result')!r}")
+    evidence = record.get("evidence_path")
+    data = gate_files.read(evidence) if isinstance(evidence, str) else None
+    if data is None or hashlib.sha256(data).hexdigest() != record.get("evidence_sha256"):
+        return Result(FAIL, f"{path} names evidence that is missing or differs from its hash")
+    return Result(PASS, f"owner record for {candidate_sha}", [evidence])
+
+
+def check_release_bar(
+    registry: dict[str, Any], gate_files: Tree, candidate_sha: str, ci: Result, coherence: Result
+) -> dict[int, tuple[dict[str, Any], Result]]:
+    spec = registry["release_bar"]
+    text = gate_files.read(spec["path"])
+    if text is None or hashlib.sha256(text).hexdigest() != spec["sha256"]:
+        bad = Result(FAIL, f"{spec['path']} is missing or differs from its pinned sha256")
+        return {item["id"]: (item, bad) for item in spec["items"]}
+    accepted = Result(PASS, f"accepted by the {spec['accepted_by']} on {spec['accepted_on']}")
+    results = {}
+    for item in spec["items"]:
+        source = item["evidence"]
+        if source == "owner_record":
+            result = _owner_record(item["id"], gate_files, candidate_sha)
+        else:
+            result = {"candidate_ci": ci, "registry_coherence": coherence, "accepted": accepted}[
+                source
+            ]
+        results[item["id"]] = (item, result)
+    return results
 
 
 def check_frozen_definitions(registry: dict[str, Any], tree: Tree) -> Result:
@@ -702,10 +776,31 @@ def evaluate(
         "dependency_graph": graph.as_dict(),
         **{f"recovered_section_{k}": v.as_dict() for k, v in recovered.items()},
     }
-    candidate_ok = all(p["status"] == PASS for p in prerequisites.values()) and all(
-        g["status"] == PASS for g in gates.values()
-    )
-    if candidate_ok and coherence.status == PASS:
+    bar_report = None
+    if "release_bar" in registry:
+        bar = check_release_bar(registry, gate_files, candidate_sha, ci, coherence)
+        at_level = lambda level: [r for item, r in bar.values() if item["required_for"] == level]  # noqa: E731
+        foundation = [graph, *at_level("candidate")]
+        changed_goal = any(r.status == FAIL for r in recovered.values())
+        candidate_ok = not changed_goal and all(r.status == PASS for r in foundation)
+        release_ok = candidate_ok and all(r.status == PASS for r in at_level("release"))
+        bar_report = {
+            "accepted_on": registry["release_bar"]["accepted_on"],
+            "items": {
+                str(number): {
+                    "title": item["title"],
+                    "required_for": item["required_for"],
+                    **result.as_dict(),
+                }
+                for number, (item, result) in bar.items()
+            },
+        }
+    else:
+        candidate_ok = all(p["status"] == PASS for p in prerequisites.values()) and all(
+            g["status"] == PASS for g in gates.values()
+        )
+        release_ok = candidate_ok and coherence.status == PASS
+    if release_ok:
         overall = "RELEASE READY"
     elif candidate_ok:
         overall = "CANDIDATE READY"
@@ -719,6 +814,8 @@ def evaluate(
         "repository": repository,
         "candidate_sha": candidate_sha,
         "overall_status": overall,
+        "requirement": "release_bar" if bar_report else "G1-G40",
+        "release_bar": bar_report,
         "gate_counts": counts,
         "prerequisites": prerequisites,
         "release_only": {"registry_coherence": coherence.as_dict()},
