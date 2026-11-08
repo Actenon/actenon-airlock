@@ -92,3 +92,54 @@ def test_the_integration_job_has_the_history_its_required_tests_need():
     for report in REGISTRY["ci_prerequisites"]["junit"]:
         if report["artifact"].startswith("integration-python-"):
             assert not set(HISTORY_TESTS) & set(report["allowed_skips"])
+
+
+# --- D9: the registry path is tested, and its evidence exists for the gate ----------------
+
+
+def _jobs() -> dict:
+    import yaml
+
+    return yaml.safe_load(CI)["jobs"]
+
+
+def _upload(job: dict, artifact: str) -> list[str]:
+    for step in job["steps"]:
+        if "upload-artifact" in str(step.get("uses", "")):
+            name = step["with"]["name"].replace("${{ matrix.python }}", "{py}")
+            if name.format(py=artifact.rsplit("-", 1)[-1]) == artifact or name == artifact:
+                return step["with"]["path"].split()
+    return []
+
+
+def test_every_install_report_the_gate_reads_is_uploaded() -> None:
+    jobs = _jobs()
+    for spec in REGISTRY["registry_dependencies"]["install_reports"]:
+        job = jobs[
+            "protected" if spec["artifact"] == "protected-container-acceptance" else "integration"
+        ]
+        assert spec["file"] in _upload(job, spec["artifact"]), spec
+
+
+def test_the_security_jobs_install_exactly_what_the_lock_pins() -> None:
+    jobs = _jobs()
+    for name in ("integration", "protected", "registry-rehearsal"):
+        runs = "\n".join(str(s.get("run", "")) for s in jobs[name]["steps"])
+        assert "scripts/install_candidate.py" in runs, name
+        assert 'pip install ".[test]"' not in runs, name
+
+
+def test_the_registry_rehearsal_runs_the_same_security_suites() -> None:
+    jobs = _jobs()
+
+    def suite(job: str) -> list[list[str]]:
+        lines = [
+            str(s.get("run", ""))
+            for s in jobs[job]["steps"]
+            if "python -m pytest" in str(s.get("run", ""))
+        ]
+        return [sorted(re.findall(r"tests/test_\w+\.py", line)) for line in lines]
+
+    protected, rehearsal = suite("protected"), suite("registry-rehearsal")
+    assert protected and all(files in rehearsal for files in protected)
+    assert any(files == [] for files in rehearsal), "the full integration suite must run too"
