@@ -58,6 +58,7 @@ import re
 import shutil
 import subprocess
 import sys
+import tarfile
 import tempfile
 import tomllib
 import urllib.error
@@ -77,6 +78,11 @@ BAR_RECORD_SCHEMA = "actenon-airlock/release-bar-record/v1"
 SHA_RE = re.compile(r"^[0-9a-f]{40}$")
 MAX_ARTIFACT_BYTES = 64 * 1024 * 1024
 FAILED_CONCLUSIONS = {"failure", "cancelled", "timed_out", "action_required", "startup_failure"}
+HEX64_RE = re.compile(r"^[0-9a-f]{64}$")
+# Published Actenon artifacts are fetched only from PyPI's own file host.
+PYPI_FILES = "https://files.pythonhosted.org/"
+# Metadata an sdist build generates. Every other sdist member must be the approved source.
+SDIST_GENERATED = re.compile(r"^(PKG-INFO|setup\.cfg|(.+/)?[^/]+\.egg-info/[^/]+)$")
 
 
 class AdmissionError(Exception):
@@ -92,6 +98,8 @@ class Result:
     status: str
     detail: str
     evidence: list[str] = field(default_factory=list)
+    # The trusted CI run a PASS came from, so later checks read the same run's artifacts.
+    run_id: int | None = None
 
     def as_dict(self) -> dict[str, Any]:
         return {"status": self.status, "detail": self.detail, "evidence": self.evidence}
@@ -106,10 +114,12 @@ class GitHub(Protocol):
     def verify_attestation(
         self, repo: str, path: Path, signer_workflow: str, sha: str
     ) -> tuple[bool, str]: ...
+    def source_archive(self, repo: str, sha: str) -> bytes: ...
 
 
 class Registry(Protocol):
     def files(self, name: str, version: str) -> list[dict[str, Any]] | None: ...
+    def download(self, url: str) -> bytes: ...
 
 
 class Tree(Protocol):
@@ -205,6 +215,10 @@ class GitHubAPI:
             return False, (proc.stderr or proc.stdout).strip()[:500]
         return True, f"Sigstore attestation verified for {path.name}"
 
+    def source_archive(self, repo: str, sha: str) -> bytes:
+        """The gzipped tarball GitHub serves for exactly this commit."""
+        return self._request(f"{self._api}/repos/{repo}/tarball/{sha}")
+
 
 class PyPI:
     def files(self, name: str, version: str) -> list[dict[str, Any]] | None:
@@ -218,6 +232,18 @@ class PyPI:
             raise EvidenceError(f"PyPI {exc.code} for {name}=={version}") from exc
         except OSError as exc:
             raise EvidenceError(f"PyPI unreachable for {name}=={version}: {exc}") from exc
+
+    def download(self, url: str) -> bytes:
+        if not url.startswith(PYPI_FILES):
+            raise EvidenceError(f"refusing to fetch an artifact from outside PyPI: {url}")
+        try:
+            with urllib.request.urlopen(url, timeout=60) as resp:
+                body = resp.read(MAX_ARTIFACT_BYTES + 1)
+        except OSError as exc:
+            raise EvidenceError(f"PyPI file unreachable: {url}: {exc}") from exc
+        if len(body) > MAX_ARTIFACT_BYTES:
+            raise EvidenceError(f"{url} exceeds {MAX_ARTIFACT_BYTES} bytes")
+        return body
 
 
 class WorkingTree:
@@ -310,7 +336,47 @@ def load_registry(raw: bytes | None) -> dict[str, Any]:
                 raise AdmissionError(f"bar item {item['id']}: unknown evidence producer")
             if item.get("required_for") not in {"candidate", "release"}:
                 raise AdmissionError(f"bar item {item['id']}: unknown level")
+    _validate_registry_dependencies(registry)
     return registry
+
+
+def _validate_registry_dependencies(registry: dict[str, Any]) -> None:
+    """The owner-approved source of every registry dependency, reviewed onto main."""
+    spec = registry.get("registry_dependencies")
+    if spec is None:
+        return
+    jobs = registry.get("ci_prerequisites", {}).get("dependency_jobs", {})
+    reports = spec.get("install_reports")
+    if not isinstance(reports, list) or not reports:
+        raise AdmissionError("registry_dependencies must name the CI install reports")
+    for report in reports:
+        if not (isinstance(report, dict) and report.get("artifact") and report.get("file")):
+            raise AdmissionError("each install report needs an artifact and a file")
+    packages = spec.get("packages")
+    if not isinstance(packages, list):
+        raise AdmissionError("registry_dependencies.packages must be a list")
+    seen: set[str] = set()
+    for pkg in packages:
+        name = pkg.get("name", "")
+        if not name.startswith("actenon-") or name in seen:
+            raise AdmissionError(f"approved dependency {name!r} is not a unique Actenon package")
+        seen.add(name)
+        if pkg.get("repository") not in jobs:
+            raise AdmissionError(f"{name}: approved repository has no reviewed CI contract")
+        if not SHA_RE.match(str(pkg.get("source_commit", ""))):
+            raise AdmissionError(f"{name}: approved source must be a full commit id")
+        if not isinstance(pkg.get("version"), str) or not pkg["version"]:
+            raise AdmissionError(f"{name}: approved version is missing")
+        root = pkg.get("source_root")
+        if not isinstance(root, str) or ".." in root.split("/") or root.startswith("/"):
+            raise AdmissionError(f"{name}: source_root must be a relative directory")
+        if root and not root.endswith("/"):
+            raise AdmissionError(f"{name}: source_root must end with '/'")
+        pinned = pkg.get("artifact_sha256")
+        if pinned is not None and (
+            not isinstance(pinned, list) or not pinned or not all(HEX64_RE.match(h) for h in pinned)
+        ):
+            raise AdmissionError(f"{name}: artifact_sha256 must list sha256 digests")
 
 
 def check_recovered_scope(registry: dict[str, Any], tree: Tree) -> dict[str, Result]:
@@ -521,7 +587,9 @@ def check_ci_prerequisites(registry: dict[str, Any], gh: GitHub, repo: str, sha:
             evidence.append(f"{report['artifact']}: {len(outcomes)} cases, skips {sorted(skipped)}")
     except EvidenceError as exc:
         return Result(BLOCKED, str(exc), evidence)
-    return Result(PASS, f"all required CI jobs passed in run {ci_run['id']}", evidence)
+    return Result(
+        PASS, f"all required CI jobs passed in run {ci_run['id']}", evidence, run_id=ci_run["id"]
+    )
 
 
 def git_dependencies(lock: bytes | None) -> list[tuple[str, str, str]]:
@@ -546,47 +614,351 @@ def git_dependencies(lock: bytes | None) -> list[tuple[str, str, str]]:
     return deps
 
 
+def _dependency_ci(gh: GitHub, repo: str, rev: str, jobs: list[str]) -> Result | None:
+    """None when every reviewed job passed at ``rev``; otherwise why not."""
+    checks = gh.check_runs(repo, rev)
+    bad = [
+        c["name"] for c in checks
+        if (c.get("app") or {}).get("slug") == "github-actions"
+        and c.get("conclusion") in FAILED_CONCLUSIONS
+    ]  # fmt: skip
+    for job in jobs:
+        check = _latest_by_name(checks, job)
+        if check is None or check.get("conclusion") != "success":
+            state = "missing" if check is None else check.get("conclusion")
+            return Result(
+                BLOCKED if check is None else FAIL, f"{repo}@{rev[:12]}: {job!r} is {state}"
+            )
+    if bad:
+        return Result(FAIL, f"{repo}@{rev[:12]}: failing checks {sorted(set(bad))}")
+    return None
+
+
+def _canonical_name(name: str) -> str:
+    return re.sub(r"[-_.]+", "-", name).lower()
+
+
+def registry_packages(lock: bytes | None) -> list[dict[str, Any]]:
+    """Actenon packages the candidate locks from a package registry."""
+    if lock is None:
+        raise EvidenceError("uv.lock is absent from the candidate commit")
+    try:
+        data = tomllib.loads(lock.decode("utf-8"))
+    except (UnicodeDecodeError, tomllib.TOMLDecodeError) as exc:
+        raise EvidenceError(f"uv.lock is malformed: {exc}") from exc
+    return [
+        pkg for pkg in data.get("package", [])
+        if _canonical_name(str(pkg.get("name", ""))).startswith("actenon-")
+        and "registry" in (pkg.get("source") or {})
+    ]  # fmt: skip
+
+
+def source_files(archive: bytes) -> dict[str, bytes]:
+    """Regular files of a GitHub commit tarball, without its top-level directory."""
+    files: dict[str, bytes] = {}
+    try:
+        with tarfile.open(fileobj=io.BytesIO(archive), mode="r:gz") as tar:
+            for member in tar.getmembers():
+                parts = member.name.split("/", 1)
+                if member.isfile() and len(parts) == 2 and ".." not in parts[1].split("/"):
+                    handle = tar.extractfile(member)
+                    if handle is not None:
+                        files[parts[1]] = handle.read()
+    except (tarfile.TarError, OSError, EOFError) as exc:
+        raise EvidenceError(f"source archive is unreadable: {exc}") from exc
+    if not files:
+        raise EvidenceError("source archive is empty")
+    return files
+
+
+def _metadata(text: bytes) -> tuple[str, str]:
+    fields = {}
+    for line in text.decode("utf-8", "replace").splitlines():
+        if not line.strip():
+            break
+        key, _, value = line.partition(":")
+        fields.setdefault(key.strip().lower(), value.strip())
+    return _canonical_name(fields.get("name", "")), fields.get("version", "")
+
+
+def wheel_problem(
+    blob: bytes, source: dict[str, bytes], root: str, name: str, version: str
+) -> str | None:
+    """None when every payload file is the approved source, byte for byte."""
+    try:
+        archive = zipfile.ZipFile(io.BytesIO(blob))
+        names = [n for n in archive.namelist() if not n.endswith("/")]
+    except zipfile.BadZipFile as exc:
+        return f"not a valid wheel: {exc}"
+    if any(n.startswith("/") or ".." in n.split("/") for n in names):
+        return "wheel contains an unsafe path"
+    infos = {n.split("/", 1)[0] for n in names if n.split("/", 1)[0].endswith(".dist-info")}
+    if len(infos) != 1 or any(n.split("/", 1)[0].endswith(".data") for n in names):
+        return "wheel must have exactly one .dist-info and no .data directory"
+    info = infos.pop()
+    meta = archive.read(f"{info}/METADATA") if f"{info}/METADATA" in names else b""
+    if _metadata(meta) != (_canonical_name(name), version):
+        return f"wheel metadata is not {name} {version}"
+    payload = [n for n in names if not n.startswith(info + "/")]
+    if not payload:
+        return "wheel has no payload"
+    for path in payload:
+        if source.get(root + path) != archive.read(path):
+            return f"{path} is not the approved source file {root + path}"
+    tops = {p.split("/", 1)[0] for p in payload}
+    dropped = sorted(
+        path[len(root):] for path in source
+        if path.startswith(root) and path.endswith(".py")
+        and path[len(root):].split("/", 1)[0] in tops
+        and path[len(root):] not in payload
+        and "/tests/" not in "/" + path[len(root):]
+    )  # fmt: skip
+    if dropped:
+        return f"approved source modules are missing from the wheel: {dropped[:3]}"
+    return None
+
+
+def sdist_problem(blob: bytes, source: dict[str, bytes], name: str, version: str) -> str | None:
+    """None when every sdist member is the approved source or generated build metadata."""
+    try:
+        with tarfile.open(fileobj=io.BytesIO(blob), mode="r:gz") as tar:
+            members = tar.getmembers()
+            if any(not (m.isfile() or m.isdir()) for m in members):
+                return "sdist contains a link or special file"
+            files = {}
+            tops = set()
+            for m in members:
+                top, _, rest = m.name.partition("/")
+                tops.add(top)
+                if m.isfile():
+                    if not rest or ".." in rest.split("/") or m.name.startswith("/"):
+                        return "sdist contains an unsafe path"
+                    handle = tar.extractfile(m)
+                    files[rest] = handle.read() if handle else b""
+    except (tarfile.TarError, OSError, EOFError) as exc:
+        return f"not a valid sdist: {exc}"
+    if len(tops) != 1:
+        return "sdist must have exactly one top-level directory"
+    if _metadata(files.get("PKG-INFO", b"")) != (_canonical_name(name), version):
+        return f"sdist PKG-INFO is not {name} {version}"
+    for path, data in files.items():
+        if path in source:
+            if source[path] != data:
+                return f"{path} differs from the approved source"
+        elif not SDIST_GENERATED.match(path):
+            return f"{path} is not in the approved source"
+    return None
+
+
+class ProvenanceFailure(Exception):
+    """Provenance evidence exists and contradicts the approved source: FAIL, never BLOCKED."""
+
+
+def _installed_artifacts(
+    registry: dict[str, Any], gh: GitHub, repo: str, sha: str, run_id: int
+) -> tuple[dict[str, set[tuple[str, str]]], dict[str, set[str]]]:
+    """What pip recorded installing, per Actenon package and per mandated CI report."""
+    installed: dict[str, set[tuple[str, str]]] = {}
+    per_report: dict[str, set[str]] = {}
+    for spec in registry["registry_dependencies"]["install_reports"]:
+        blob = _artifact_bytes(gh, repo, {"id": run_id}, spec["artifact"], sha)
+        try:
+            report = json.loads(_zip_member(blob, spec["file"]))
+        except (EvidenceError, json.JSONDecodeError) as exc:
+            raise ProvenanceFailure(f"{spec['artifact']}: no usable install report: {exc}") from exc
+        if not isinstance(report, dict) or report.get("version") != "1":
+            raise ProvenanceFailure(f"{spec['artifact']}: not a pip installation report")
+        names = per_report.setdefault(spec["artifact"], set())
+        for item in report.get("install") or []:
+            name = _canonical_name(str((item.get("metadata") or {}).get("name", "")))
+            if not name.startswith("actenon-") or name == "actenon-airlock":
+                continue
+            info = item.get("download_info") or {}
+            digest = ((info.get("archive_info") or {}).get("hashes") or {}).get("sha256", "")
+            installed.setdefault(name, set()).add((str(digest), str(info.get("url", ""))))
+            names.add(name)
+    return installed, per_report
+
+
+def _locked_files(pkg: dict[str, Any]) -> dict[str, str]:
+    """sha256 -> 'wheel' or 'sdist' for every file uv.lock pins for this package."""
+    entries = [("wheel", w) for w in pkg.get("wheels", [])]
+    if "sdist" in pkg:
+        entries.append(("sdist", pkg["sdist"]))
+    return {str(e.get("hash", "")).removeprefix("sha256:"): kind for kind, e in entries}
+
+
+def _prove_package(
+    rule: dict[str, Any],
+    pkg: dict[str, Any],
+    gh: GitHub,
+    pypi: Registry,
+    jobs: list[str],
+    installed: set[tuple[str, str]],
+    reports_missing: list[str],
+) -> Result | None:
+    """None when this registry package is proven; otherwise the first contradiction."""
+    name, version = _canonical_name(pkg["name"]), pkg["version"]
+    failed = _dependency_ci(gh, rule["repository"], rule["source_commit"], jobs)
+    if failed is not None:
+        return failed
+    files = pypi.files(pkg["name"], version)
+    if not files:
+        return Result(FAIL, f"{name}=={version} is not published on PyPI")
+    published = {(f.get("digests") or {}).get("sha256"): f for f in files}
+    locked = _locked_files(pkg)
+    if "wheel" not in locked.values():
+        return Result(FAIL, f"{name} locks no wheel")
+    if rule.get("artifact_sha256") is not None and set(locked) != set(rule["artifact_sha256"]):
+        return Result(FAIL, f"{name}: locked artifacts are not the approved artifacts")
+    source = source_files(gh.source_archive(rule["repository"], rule["source_commit"]))
+    for digest, kind in sorted(locked.items()):
+        entry = published.get(digest)
+        if entry is None:
+            return Result(FAIL, f"{name}: locked {kind} {digest[:12]} is not on PyPI")
+        blob = pypi.download(str(entry.get("url", "")))
+        if hashlib.sha256(blob).hexdigest() != digest:
+            return Result(FAIL, f"{name}: PyPI served bytes that differ from {digest[:12]}")
+        if kind == "wheel":
+            problem = wheel_problem(blob, source, rule["source_root"], name, version)
+        else:
+            problem = sdist_problem(blob, source, name, version)
+        if problem:
+            commit = rule["source_commit"][:12]
+            return Result(FAIL, f"{name}: {kind} is not built from {commit}: {problem}")
+    if reports_missing:
+        return Result(FAIL, f"{name}: CI reports {reports_missing} do not record installing it")
+    wheels = {d for d, kind in locked.items() if kind == "wheel"}
+    for digest, url in sorted(installed):
+        if digest not in wheels:
+            shown = digest[:12] or "an unhashed artifact"
+            return Result(FAIL, f"{name}: CI installed {shown}, which is not a locked wheel")
+        if not url.startswith(PYPI_FILES):
+            return Result(FAIL, f"{name}: CI installed it from {url!r}, not from PyPI")
+    return None
+
+
+def _registry_provenance(
+    registry: dict[str, Any],
+    gh: GitHub,
+    pypi: Registry,
+    pkgs: list[dict[str, Any]],
+    repo: str,
+    sha: str,
+    ci: Result,
+) -> tuple[Result | None, dict[str, str], list[str]]:
+    """Bind approved source commit -> published artifact -> locked hash -> CI install."""
+    spec = registry.get("registry_dependencies") or {"packages": []}
+    approved = {_canonical_name(p["name"]): p for p in spec.get("packages", [])}
+    jobs = registry["ci_prerequisites"]["dependency_jobs"]
+    covered: dict[str, str] = {}
+    evidence: list[str] = []
+    for pkg in pkgs:
+        name = _canonical_name(pkg["name"])
+        rule = approved.get(name)
+        if rule is None:
+            detail = f"{name} is locked from a registry but has no approved source on main"
+            return Result(FAIL, detail), {}, evidence
+        if pkg.get("version") != rule["version"]:
+            detail = f"{name} is locked at {pkg.get('version')} but {rule['version']} is approved"
+            return Result(FAIL, detail), {}, evidence
+        covered[rule["repository"]] = rule["source_commit"]
+    if ci.status != PASS or ci.run_id is None:
+        detail = "installed artifacts cannot be checked until candidate CI passes"
+        return Result(BLOCKED, detail), covered, evidence
+    try:
+        installed, per_report = _installed_artifacts(registry, gh, repo, sha, ci.run_id)
+    except ProvenanceFailure as exc:
+        return Result(FAIL, str(exc)), covered, evidence
+    locked_names = {_canonical_name(p["name"]) for p in pkgs}
+    for pkg in pkgs:
+        name = _canonical_name(pkg["name"])
+        rule = approved[name]
+        missing = sorted(a for a, names in per_report.items() if name not in names)
+        failed = _prove_package(
+            rule, pkg, gh, pypi, jobs[rule["repository"]], installed.get(name, set()), missing
+        )
+        if failed is not None:
+            return failed, covered, evidence
+        evidence.append(
+            f"{name}=={pkg['version']}: {rule['repository']}@{rule['source_commit']} -> "
+            f"PyPI {sorted(d[:12] for d in _locked_files(pkg))} -> CI installed "
+            f"{sorted(d[:12] for d, _ in installed.get(name, set()))}"
+        )
+    unlocked = sorted(set(installed) - locked_names)
+    if unlocked:
+        return (
+            Result(FAIL, f"CI installed Actenon packages that are not locked: {unlocked}"),
+            covered,
+            evidence,
+        )
+    return None, covered, evidence
+
+
 def check_dependency_graph(
-    registry: dict[str, Any], gh: GitHub, tree: Tree, expected: dict[str, str]
+    registry: dict[str, Any],
+    gh: GitHub,
+    tree: Tree,
+    expected: dict[str, str],
+    *,
+    pypi: Registry | None = None,
+    repo: str = "Actenon/actenon-airlock",
+    sha: str = "",
+    ci: Result | None = None,
 ) -> Result:
+    """Every reviewed dependency repository must be locked and proven; nothing passes vacuously.
+
+    A git pin is proven by the pinned commit's reviewed CI. A registry pin is proven by an
+    approved source commit on main, its reviewed CI, PyPI files whose content is that source,
+    and the CI reports of what the candidate actually installed.
+    """
     required = registry["ci_prerequisites"]["dependency_jobs"]
     evidence: list[str] = []
     try:
-        deps = git_dependencies(tree.read("uv.lock"))
-        pinned = {repo: rev for _, repo, rev in deps}
-        for repo, rev in sorted(expected.items()):
-            if pinned.get(repo) != rev:
+        lock = tree.read("uv.lock")
+        deps = git_dependencies(lock)
+        pkgs = registry_packages(lock)
+        pinned = {repo_: rev for _, repo_, rev in deps}
+        for name, repo_, rev in deps:
+            jobs = required.get(repo_)
+            if jobs is None:
+                return Result(FAIL, f"{name} comes from {repo_}, which has no reviewed CI contract")
+            failed = _dependency_ci(gh, repo_, rev, jobs)
+            if failed is not None:
+                failed.evidence = evidence
+                return failed
+            evidence.append(f"{repo_}@{rev}: {len(jobs)} required jobs passed")
+        if pkgs:
+            if pypi is None:
+                return Result(BLOCKED, "registry dependencies need PyPI access", evidence)
+            failed, covered, proven = _registry_provenance(
+                registry, gh, pypi, pkgs, repo, sha, ci or Result(BLOCKED, "no CI result")
+            )
+            evidence.extend(proven)
+            if failed is not None:
+                failed.evidence = evidence
+                return failed
+            for repo_, rev in covered.items():
+                if repo_ in pinned:
+                    return Result(FAIL, f"{repo_} is locked both from git and from a registry")
+                pinned[repo_] = rev
+        missing = sorted(set(required) - set(pinned))
+        if missing:
+            return Result(FAIL, f"reviewed dependencies are not locked: {missing}", evidence)
+        for repo_, rev in sorted(expected.items()):
+            if pinned.get(repo_) != rev:
                 return Result(
                     FAIL,
-                    f"{repo} is locked at {pinned.get(repo)} but the candidate graph expects {rev}",
+                    f"{repo_} is locked at {pinned.get(repo_)} but the candidate graph expects {rev}",
+                    evidence,
                 )
-        for name, repo, rev in deps:
-            jobs = required.get(repo)
-            if jobs is None:
-                return Result(FAIL, f"{name} comes from {repo}, which has no reviewed CI contract")
-            checks = gh.check_runs(repo, rev)
-            bad = [
-                c["name"] for c in checks
-                if (c.get("app") or {}).get("slug") == "github-actions"
-                and c.get("conclusion") in FAILED_CONCLUSIONS
-            ]  # fmt: skip
-            for job in jobs:
-                check = _latest_by_name(checks, job)
-                if check is None or check.get("conclusion") != "success":
-                    state = "missing" if check is None else check.get("conclusion")
-                    return Result(
-                        BLOCKED if check is None else FAIL,
-                        f"{repo}@{rev[:12]}: {job!r} is {state}",
-                        evidence,
-                    )
-            if bad:
-                return Result(
-                    FAIL, f"{repo}@{rev[:12]}: failing checks {sorted(set(bad))}", evidence
-                )
-            evidence.append(f"{repo}@{rev}: {len(jobs)} required jobs passed")
     except EvidenceError as exc:
         return Result(BLOCKED, str(exc), evidence)
-    return Result(PASS, f"{len(deps)} locked candidate dependencies have passing CI", evidence)
+    return Result(
+        PASS,
+        f"{len(deps)} git and {len(pkgs)} registry dependencies are proven against reviewed sources",
+        evidence,
+    )
 
 
 def check_frozen_acceptance(registry: dict[str, Any], gh: GitHub, tree: Tree, sha: str) -> Result:
@@ -755,7 +1127,10 @@ def evaluate(
         ci, graph, acceptance = unauth, unauth, unauth
     else:
         ci = check_ci_prerequisites(registry, github, repository, candidate_sha)
-        graph = check_dependency_graph(registry, github, tree, expected_graph or {})
+        graph = check_dependency_graph(
+            registry, github, tree, expected_graph or {},
+            pypi=pypi, repo=repository, sha=candidate_sha, ci=ci,
+        )  # fmt: skip
         acceptance = check_frozen_acceptance(registry, github, tree, candidate_sha)
     coherence = check_registry_coherence(tree, pypi)
 
