@@ -1,0 +1,174 @@
+{
+  "schema": "actenon-airlock/north-star-candidate-identity/v1",
+  "recorded_at": "2026-11-08T19:57:59Z",
+  "decision": "Candidate 3 (C3) is the evaluation candidate for all further acceptance. C1 was superseded by C2 (no-cost defects NS-1..NS-3); C2 was superseded by C3 because independent verification of C2's green exact-head CI (run 42519985401) found NS-4: the release gate failed bar items 1-4 on two shallow-clone skips. No live evidence exists for any of the three.",
+  "candidates": {
+    "C1": {
+      "commit": "67b348c43a1d39eca7c17d6bc159eb457a2c148d",
+      "role": "superseded baseline (PR #28 head at audit start)",
+      "installable_commit": "733bd48bb391cc4e7fee1c3810bc22b79d0d2c9a",
+      "source_digest": "45d935f64508051fd4a61a57d519d9cef3f5f20f7d301e13f61fe333d3f75774",
+      "src_tree": "574aecdd9acd8897b663d0bf58850c46050c972f",
+      "pyproject_blob": "9667a9dcc9c029712a41bceb65eb0796bdce861c",
+      "containers_tree": "81dea66138b4dacd4f190a01c8c004b0c797acea",
+      "uv_lock_blob": "6bb158394a12c815030a96695d1132e67a8f399f"
+    },
+    "C2": {
+      "commit": "dc7ed54f93dd8d961029bb1dc50f499ed13e9dce",
+      "branch": "fix/north-star-blockers (pushed; draft PR #29)",
+      "installable_commit": "eba7ef796b706643726710bf6b7309726e0fbda5",
+      "source_digest": "da323e93157e33ac05e18e177b0b24060eaac39c34e891f309565bf69e17ec55",
+      "src_tree": "f113bdd11d1604d8c349d1fb58bc2e37a32e522f",
+      "pyproject_blob": "9667a9dcc9c029712a41bceb65eb0796bdce861c",
+      "containers_tree": "81dea66138b4dacd4f190a01c8c004b0c797acea",
+      "uv_lock_blob": "6bb158394a12c815030a96695d1132e67a8f399f",
+      "changes_from_C1": [
+        "NS-1 src/actenon_airlock/state.py: canonical receipt lines",
+        "NS-2 .github/workflows/ci.yml: run credential-isolation tests",
+        "NS-3 release/gates.json: CI skip contract",
+        "tests",
+        "docs pin to eba7ef796b706643726710bf6b7309726e0fbda5"
+      ],
+      "role": "superseded by C3 (NS-4)",
+      "exact_head_ci": "run 42519985401: all 6 jobs success; release gate items 1-4 FAIL (NS-4)"
+    },
+    "C3": {
+      "commit": "5b1f0f29dba683c6a4f40d74ea404183224e3c7d",
+      "branch": "fix/north-star-ns4 (pushed; draft PR #31, stacked on #29)",
+      "parent": "dc7ed54f93dd8d961029bb1dc50f499ed13e9dce",
+      "installable_commit": "eba7ef796b706643726710bf6b7309726e0fbda5",
+      "source_digest": "da323e93157e33ac05e18e177b0b24060eaac39c34e891f309565bf69e17ec55",
+      "src_tree": "f113bdd11d1604d8c349d1fb58bc2e37a32e522f",
+      "pyproject_blob": "9667a9dcc9c029712a41bceb65eb0796bdce861c",
+      "containers_tree": "81dea66138b4dacd4f190a01c8c004b0c797acea",
+      "uv_lock_blob": "6bb158394a12c815030a96695d1132e67a8f399f",
+      "gates_json_sha256": "7d54af2dea69c9e62a6ba1047ceca92dcbf3fccb23a14a4043698a26b162f3dc",
+      "changes_from_C2": [
+        "NS-4 .github/workflows/ci.yml: integration job checks out full history (fetch-depth: 0)",
+        "tests/test_ci_contract.py: regression test"
+      ],
+      "unchanged_from_C2": "src, containers, pyproject.toml, uv.lock, release/gates.json, release/RELEASE_BAR.md, scripts, every acceptance harness tree"
+    }
+  },
+  "historical_source_digest_of_live_runs": "60684fcd08654f00d84295b685060e99c57da83d860f16fa464287c70fb3b90d",
+  "dependencies": {
+    "actenon-kernel": {
+      "version": "1.3.0",
+      "commit": "ead6a00aa38e7e3e21f6129a8565803f8ac48dd2",
+      "repository": "https://github.com/Actenon/actenon-kernel"
+    },
+    "actenon-permit": {
+      "version": "2.0.0rc1",
+      "commit": "85aa3ae2a141f76fd78fe95db4aa1d196bc733da",
+      "repository": "https://github.com/Actenon/actenon-permit"
+    },
+    "actenon-protocol": {
+      "version": "1.6.0",
+      "commit": "a2e0e08fcd24b71eb1668204ba6bed00e4c63551",
+      "repository": "https://github.com/Actenon/actenon-protocol"
+    },
+    "actenon-scan": {
+      "version": "1.6.0",
+      "commit": "16388227a55a3b5a3ec392d1c70f3940b0c291c1",
+      "repository": "https://github.com/Actenon/actenon-scan"
+    }
+  },
+  "docker": {
+    "note": "Dockerfiles are byte-identical to those used by every historical live run, but builds are not bit-reproducible (unpinned apt/npm/pip layers), so images are frozen by ID. These IDs are the ones recorded in the Gate 5 matched and Gate 6 evidence (claude-code) and in Gate 7 Batch A (gate7-*).",
+    "base_images": {
+      "python": "python@sha256:cdbd05fb6f457ca275ff51ce00d93d865ca0b6a25f5ffb08262d94f6835771e5",
+      "node": "node@sha256:4b150b48b4116e2a22f2c39cc27025fbf4f153e2078fd3b14d159fdb5c7279da",
+      "golang": "golang@sha256:2c4c60ef415fbfa5e90300722293bef36c5e63fae17570ce18f580af933dbd73"
+    },
+    "frozen_image_ids": {
+      "actenon-airlock-compute:dev": "sha256:8ccf4af11d3af9b9c967b4b82474156b96ce6ccb6b5f73d0df43bb2163c71586",
+      "actenon-airlock-claude-code:v1": "sha256:2c625f0f4b51af714b7aaaef346559fbbfcb3e57dae3459a1987ad4d1ac0ad4f",
+      "actenon-airlock-codex-cli:v1": "sha256:c449dec52754bad2a55dea7bb7b1edfbf7a864475464c53edc8ad9489d9d2269",
+      "actenon-airlock-aider:v2": "sha256:b575a8f44b6144c449cd4beadb85136099d234b4bd4020b4ad4a5cac1e7c27fe",
+      "airlock-example-go:ci": "sha256:de2977b859a61d18dcf70cc4ccec8da61ffb300b1ddedc9a9e16389219cf9871",
+      "airlock-example-node:ci": "sha256:94ee768990166a02a43a34ac439d513d3b2f67cc21be9c949b4be079bb2edb14",
+      "actenon-airlock-gate7-python:v1": "sha256:8cb52579c2fd932d6e45ea639d964d690294445e033ffc1e745fa814378d78fa",
+      "actenon-airlock-gate7-go:v1": "sha256:1393834844035b611300721a62662a596cd848ea0aff07bbf90e4e1edafbecf8",
+      "actenon-airlock-gate7-node:v1": "sha256:14e4fe4b258caee8d0fa2c9dcb9db650c13de90b77c8d280f92bec52d2d58dca"
+    }
+  },
+  "agents": {
+    "claude-code": {
+      "version": "@anthropic-ai/claude-code 2.1.308",
+      "model": "claude-opus-5-5",
+      "prices_usd_per_mtok": "input 4, cache_write 5, cache_read 0.2, output 20 (checked against the Claude API reference, 2026-11-08)",
+      "default_max_run_usd": "2.00",
+      "image": "sha256:2c625f0f4b51af714b7aaaef346559fbbfcb3e57dae3459a1987ad4d1ac0ad4f"
+    },
+    "codex-cli": {
+      "version": "codex-cli 0.166.0",
+      "model": "gpt-5.5-2026-04-23",
+      "prices_usd_per_mtok": "5,0,0.5,30 (NOT independently checked; owner to confirm)",
+      "image": "sha256:c449dec52754bad2a55dea7bb7b1edfbf7a864475464c53edc8ad9489d9d2269"
+    },
+    "aider": {
+      "version": "aider-chat 0.86.2",
+      "image": "sha256:b575a8f44b6144c449cd4beadb85136099d234b4bd4020b4ad4a5cac1e7c27fe",
+      "status": "local model only (acceptance v2)"
+    }
+  },
+  "acceptance_harnesses_at_C2": {
+    "acceptance/claude-code": {
+      "files": 14,
+      "sha256": "27e387e59a0d0c9ecda2177e6bf3e50f6c2b1bed189c11b29868f5742c288d03",
+      "git_tree": "cf62818e7ece453348a3b57d91ce6bdc416bf368"
+    },
+    "acceptance/gate7": {
+      "files": 20,
+      "sha256": "11fe2dc81e8408e7bf38a3d9d37dce1f04f15232dff0742e80548aadadc27cc9",
+      "git_tree": "9961313a6baff02e8154c6e3d39bfbd070a2e4f4"
+    },
+    "acceptance/github-consequence": {
+      "files": 1,
+      "sha256": "3aa234b61c25cdb4970594483eae6b5a60bcf7346e31ed6ea7288bfaa64020af",
+      "git_tree": "50cf27963f93a73398228c7afc4489963d94ad4a"
+    },
+    "acceptance/live-github": {
+      "files": 1,
+      "sha256": "b306425de7b9f9dd716f4cbdc09d77e07976b312fd22ceb843300c5c9c8734ce",
+      "git_tree": "0ac19136824265221a32649b7a46583b55f3936d"
+    }
+  },
+  "scripts_at_C2": {
+    "scripts/check_candidate_admission.py": "5c5ecb18f9cc11fe3ad74faba0a5ccaa10bcbc09169e474cdd7142d77b082542",
+    "scripts/source_identity.py": "153be990d2fc151d55953a23d0d5b513be3bfb8d026a4031c5a816c9cf690746",
+    "scripts/stranger_acceptance.py": "bd4f10a340918cf2cfeda682b6ab050084c3d26eeb802ef2f5dfb5df44191eef",
+    "scripts/check_readme_install.py": "140a4cae0bcfadb2618ec16648bd58ef39e435c720977b42e4dba6815978d1ad"
+  },
+  "release_admission_rules": {
+    "trusted_checkout": "main at a9732afde98cc1813df7c30fb99d11f01794fab8 (has NO release_bar block and NO RELEASE_BAR.md)",
+    "gates_json_sha256": {
+      "main": "ba4ca936071457322ef880fa620c261842d43f3c0b7876ad1f64173a1cc2aed6",
+      "C1": "c6ee667471222e17dfc695a04e91d3e6bc28bc47e62d3695fb8f6d5c24f9db56",
+      "C2": "7d54af2dea69c9e62a6ba1047ceca92dcbf3fccb23a14a4043698a26b162f3dc"
+    },
+    "release_bar_sha256_C2": "51aae87ddde416c6401c47b590e4b171418e87a490dfb23d5e4e0715b33e66a0",
+    "release_bar_pinned_in_gates_json": "51aae87ddde416c6401c47b590e4b171418e87a490dfb23d5e4e0715b33e66a0"
+  },
+  "independent_verifier": {
+    "source": "release/north-star/verifier/airlock_verify.go (programme branch)",
+    "source_sha256": "ed109a1b3c8fbec0283bac1f512cba5d3a33bb7812a9d1b0a2c0ee2d893acef0",
+    "build": "go build -trimpath, golang@sha256:2c4c60ef\u2026, go1.25.14 linux/arm64, offline",
+    "binary_sha256_linux_arm64": "d6b56f3084cf2328fe3e179d93cf6e9c987bd0ac75cdf58cc8246bfb8cfc4f3c"
+  },
+  "locally_built_distributions_sha256": {
+    "actenon_airlock-0.1.0.dev0-py3-none-any.whl": "34913da982b292101a4029b1c21b1785438874d871ed1bae7865652243b426c5",
+    "actenon_airlock-0.1.0.dev0.tar.gz": "caabf5f2f6563039f0ebd4fd8677b0316c31e56568bdbd533198a212c53b5f1c",
+    "actenon_kernel-1.3.0-py3-none-any.whl": "be9dc4672432e786d594578678973b0bf0106ac374212a9d9cc047278f92a385",
+    "actenon_kernel-1.3.0.tar.gz": "c207de190f739c95621d8c2e5c49d55cce28575f59d0f0e049ff4a1da3a4dd45",
+    "actenon_permit-2.0.0rc1-py3-none-any.whl": "4aecfd58d670df6f3900647246ae2450800fa25502c523a83ad205f702d5b781",
+    "actenon_permit-2.0.0rc1.tar.gz": "62c4896460108c665c2d387fa20314f0983b0bef017f54b6f1e5e54ea8ef21ce",
+    "actenon_protocol-1.6.0-py3-none-any.whl": "94db4212170456587912420b3ca4149ef8c7c1e75b1eadcb33f5cf70666efa03",
+    "actenon_protocol-1.6.0.tar.gz": "2bfff53631d83fb7568e7e5c813c3e1b89908389694f2e1a6e2166542b6a7e18",
+    "actenon_scan-1.6.0-py3-none-any.whl": "71dc3a06470484f423c95b87808bba0c03e6911850555bf74486cede88eb7bb4",
+    "actenon_scan-1.6.0.tar.gz": "6e10b86b88c478323536fdf1a8147d3cbb46971f33cfabb3da5cf2970ad8b723",
+    "actenon_airlock-0.1.0-py3-none-any.whl": "a91165c5604198f6c88803f42c57e108db2753bc565f0d8021e572c3419647e2",
+    "actenon_airlock-0.1.0.tar.gz": "a2a1225598de8e8835006931410a13df2e30cb6d41da05362557165271f557e9"
+  },
+  "recorded_at_C3": "2026-11-08T20:40:00Z"
+}
