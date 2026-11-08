@@ -304,6 +304,11 @@ def _verify_receipt_suffix(lines: list[bytes], public: str, prev: str | None) ->
                 problem = "unsupported receipt signature encoding"
             elif "signer_key_id" in row and row["signer_key_id"] != signature.get("key_id"):
                 problem = "signature key identifier differs from the signed receipt"
+            elif canonical(row) != line:
+                # The signature covers canonical(row), so the stored line must be exactly those
+                # bytes. Otherwise a reformatted line, or one with a duplicate member that a
+                # first-wins JSON reader would see differently, would still verify.
+                problem = "receipt line is not the exact canonical bytes that were signed"
             elif row.get("prev") != prev:
                 problem = "hash chain broken (a receipt was removed, reordered, or edited)"
             else:
