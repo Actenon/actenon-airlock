@@ -1,27 +1,25 @@
 # Gate 5 (release-bar item 5): bounded live-experiment authorisation request
 
-**Status: prepared 2026-11-08, NOT authorised, NOT started.** Nothing here runs without the
-owner's explicit statement in chat, quoted in section 10.
+**Status: re-presented 2026-11-08 after the owner's decision. NOT authorised, NOT started.**
+Nothing here runs without the owner's explicit statement in chat (section 10).
 
-## 0. Before approving: two open points
+**Owner decision of 2026-11-08:** Experiment A is not yet authorised on C3. First, the two
+prerequisites below are to be closed. The trials, scoring, caps, credentials and verification are
+unchanged from the first presentation. Only the target commit moves.
 
-1. **A pre-registered precondition is only partly met.**
-   - `LIVE_PROGRAMME.md` step 1 requires the candidate to be pushed, its exact-head CI to pass,
-     and the trusted rules on `main` to evaluate it.
-   - The first two hold for C3. The third does not in substance. `main` (`a9732af`) has no
-     release bar, so its gate can only report NOT READY structurally.
-   - Bringing the rules to `main` needs a merge, which is not authorised.
-   - Approving Experiment A now therefore means the owner **explicitly accepts this deviation**.
-     It is not silently waived.
-   - A record for item 5 names the evaluated commit, C3. It would still apply once `main`
-     carries the rules, provided the gate evaluates C3.
-2. **The release-commit question** (`REGISTRY_READINESS.md`, "What still blocks item 8").
-   - A publishable release needs a metadata-only commit (release version, registry pins).
-   - Items 1–7 must then be evaluated on that commit, so a Gate 5 pair on C3 would have to be
-     repeated on it, at about $4 more at the cap.
-   - Running A on C3 now gives the first live evidence for the current grant context, at low
-     cost. Deciding R1–R2 first avoids running twice.
-   - This is the owner's choice.
+## 0. Preconditions before this request can be approved
+
+| # | Precondition | State |
+|---|---|---|
+| P1 | The trusted rules are on `main` | Draft PR #32 (rules only) is prepared and verified. **Merge is the owner's decision** |
+| P2 | The final evaluation SHA is frozen | Not yet. It is C4b of `RELEASE_IDENTITY_DECISION.md`: C3 plus release metadata, `uv.lock` and the docs pin. It needs decisions D1–D8 and the four dependencies published first |
+| P3 | That SHA's exact-head CI is green, independently verified, and admitted by `main`'s gate with items 1–4 PASS | Not yet (after P1 and P2) |
+| P4 | A Gate 5 freeze for that SHA exists, made by the unchanged harness | Not yet. The live venv installs the four dependencies from their pinned commits (D8) |
+
+**Why not C3:** records bind to the exact commit, and the release commit differs from C3 in
+`pyproject.toml`, `uv.lock`, the docs pin and `src/actenon_airlock/__init__.py`. A pair on C3
+would have to be repeated. The C3 freeze (`matched-freeze-5b1f0f2.json`, `a17308d0…`) is kept as
+a no-cost record.
 
 ## 1. Why the existing evidence cannot satisfy item 5
 
@@ -35,7 +33,7 @@ owner's explicit statement in chat, quoted in section 10.
 ## 2. The experiment
 
 **Experiment A of `LIVE_PROGRAMME.md`:** the frozen Gate 5 matched adversarial programme,
-unchanged, at candidate C3.
+unchanged, at the final evaluation SHA (C4b).
 
 - **Two live trials, in this order:** a matched **baseline**, then **protected**.
 - **Same everywhere:** agent, model, task, image and limits. The only differences are what
@@ -60,10 +58,10 @@ unchanged, at candidate C3.
 
 | | |
 |---|---|
-| Candidate | C3 `5b1f0f29dba683c6a4f40d74ea404183224e3c7d`, source digest `da323e93157e33ac05e18e177b0b24060eaac39c34e891f309565bf69e17ec55` |
-| Freeze file | `~/src/actenon-audit/northstar-live/gate5/matched-freeze-5b1f0f2.json` (read-only). The C2 freeze `matched-freeze-dc7ed54.json` is superseded and kept; it differs only in `source_commit` |
-| Freeze SHA-256 | `a17308d0e15aef4509b164529edcd007cb62b6042ae400a9aa699da22f97e0f5` |
-| Binds | C3 commit and digest; image `sha256:2c625f0f4b51…` (Claude Code 2.1.308); `claude-opus-5-5`; prices 4 / 5 / 0.2 / 20 USD per MTok; `run_usd` 2; the four dependency commits; every installed package version (`~/src/actenon-audit/northstar-live/venv-c3`, Python 3.12.13); the programme, hook and task hashes; a clean working tree |
+| Candidate | **C4b `<final evaluation SHA>`**, the release-shaped commit on top of C3 `5b1f0f2` (`RELEASE_IDENTITY_DECISION.md`, step 7). Its source digest will differ from `da323e93…` only by `__version__` |
+| Freeze file | `~/src/actenon-audit/northstar-live/gate5/matched-freeze-<C4b>.json`, created with the unchanged `adversarial_matched.py freeze` from a clean C4b checkout and then made read-only. The C3 and C2 freezes are kept, superseded |
+| Freeze SHA-256 | `<to be recorded when made>` |
+| Binds | the C4b commit and digest; image `sha256:2c625f0f4b51…` (Claude Code 2.1.308); `claude-opus-5-5`; prices 4 / 5 / 0.2 / 20 USD per MTok; `run_usd` 2; the four dependency commits; every installed package version (a new `venv-c4b`: the four dependencies installed from their pinned commits, then C4b; Python 3.12.13); the programme, hook and task hashes; a clean working tree |
 | Task | The frozen `token-bucket` task with its unchanged tests |
 | Drift rule | Each trial refuses to start if its identity differs from the freeze in any field |
 
@@ -140,24 +138,22 @@ Nothing is retried. The owner decides what happens next.
 
 ## 10. The authorisation statement (send in chat, filled in)
 
-> **Experiment A (Gate 5).** I authorise exactly two live Gate 5 matched trials on candidate
-> `5b1f0f29dba683c6a4f40d74ea404183224e3c7d`, from freeze `matched-freeze-5b1f0f2.json`
-> (SHA-256 `a17308d0e15aef4509b164529edcd007cb62b6042ae400a9aa699da22f97e0f5`): baseline, then
-> protected, `claude-opus-5-5`, $2.00 estimated maximum each ($4.00 total), no retries and no
-> GitHub write. The Anthropic key is new, is in `<path to owner-only key file>`, and has a
-> provider-side limit of `<$ amount>`. The old keys are revoked. I accept that `main` does not
-> yet carry the release bar (the `LIVE_PROGRAMME.md` step 1 deviation), and that a later release
-> commit would need this experiment repeated.
+> **Experiment A (Gate 5).** I authorise exactly two live Gate 5 matched trials on the final
+> evaluation commit `<C4b sha>`, from freeze `matched-freeze-<C4b>.json` (SHA-256
+> `<freeze sha256>`): baseline, then protected, `claude-opus-5-5`, original scoring, $2.00
+> estimated maximum each ($4.00 total), no retries and no GitHub write. The Anthropic key is
+> new, is in `<path to owner-only key file>`, and has a provider-side limit of `<$ amount>`. The
+> old keys are revoked.
 
 ## Commands that would run, only after that statement
 
 ```text
-cd ~/src/actenon-audit/airlock-ns-c3               # C3, clean
-P=~/src/actenon-audit/northstar-live/venv-c3/bin/python
+cd <clean C4b checkout>
+P=~/src/actenon-audit/northstar-live/venv-c4b/bin/python
 O=~/src/actenon-audit/northstar-live/gate5          # outside the repository
 $P acceptance/claude-code/referee.py --record $O/referee-baseline.json --out $O/baseline -- \
   acceptance/claude-code/adversarial_matched.py baseline --out $O/baseline \
-  --config $O/matched-freeze-5b1f0f2.json --live --authorized-usd 2 \
+  --config $O/matched-freeze-<C4b>.json --live --authorized-usd 2 \
   --credential-file <owner-only key file> --key-pin-log $O/key-pins.jsonl
 # only if no stop condition: the same with "protected", --record $O/referee-protected.json --out $O/protected
 ```

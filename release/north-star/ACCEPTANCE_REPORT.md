@@ -189,13 +189,17 @@ See `REGISTRY_READINESS.md`.
 The smallest path to CANDIDATE READY, in order:
 
 1. **Done (no cost):** C3 is pushed as draft PR #31, and its exact-head CI is green and independently verified (run `42520916211`).
-2. **Bring the trusted rules to `main`.** Merge the reviewed stack (PR #28, #29 and #31), or a
-   rules-only PR, with a merge commit, so the gate on `main` reads the bar and C3's CI contract.
-   **Owner decision; not authorised.**
-3. **Decide the release commit question** (`REGISTRY_READINESS.md` R1–R2), then freeze the final
-   evaluation commit.
-4. **Run Experiments A, B and C** on that commit, each separately approved, then the owner
-   reviews and writes records 5–7.
+2. **Bring the trusted rules to `main`:** draft PR #32 (rules only, verified). **Owner merge
+   decision; not authorised.**
+3. **Decide the release identity** (`RELEASE_IDENTITY_DECISION.md`, D1–D9). Then publish the
+   four dependencies (owner, irreversible) and create the release-shaped final evaluation SHA,
+   C4b. **Live acceptance waits for C4b**, so that it runs only once (owner decision of
+   2026-11-08).
+4. **Run Experiments A, B and C** on C4b, each separately approved. The owner then reviews the
+   evidence and writes records 5–7 onto `main`.
 
-RELEASE READY additionally needs items 8 (publication) and 9 (two operators, bound to the
-release commit).
+RELEASE READY additionally needs:
+
+- **Item 8:** the four dependencies published, with their hashes matching C4b's `uv.lock`. The
+  gate checks only the dependencies; Airlock itself is published afterwards, by `release.yml`.
+- **Item 9:** two operators, bound to C4b.

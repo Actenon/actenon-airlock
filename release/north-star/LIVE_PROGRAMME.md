@@ -11,8 +11,11 @@ gate evaluates** (`release/RELEASE_BAR.md`, "Any later commit needs a new record
 
 - Every historical live result (Gate 5 matched, Gate 6, Gate 7 Batch A) evaluated source digest
   `60684fcd…` at `f04f60f`, `9fd8b94` and `6868406`.
-- The candidate is **C3** `5b1f0f2` (see `candidate-identity.json`), source digest `da323e93…`.
-  C3 is C2 plus one CI-configuration commit (NS-4); its source is byte-identical to C2's.
+- The verified candidate is **C3** `5b1f0f2` (see `candidate-identity.json`), source digest
+  `da323e93…`. C3 is C2 plus one CI-configuration commit (NS-4).
+- **Owner decision of 2026-11-08:** live experiments run only on the **final evaluation SHA**
+  (C4b, the release-shaped commit in `RELEASE_IDENTITY_DECISION.md`), so that they are not
+  repeated. None is authorised yet.
 - 28 of C3's 37 modules are byte-identical to the live-run source, including the whole
   enforcement core. But the approval path (`cli.py`, `protect.py`) and the receipt verifier
   (`state.py`, NS-1) changed, and a record cannot be rebound to another commit.
@@ -22,10 +25,10 @@ So none of the historical results can pass items 5–7 for C3. They are informat
 
 ## Before any experiment: freeze and preflight (no cost)
 
-1. **Freeze C3.** C3 must be pushed, its exact-head CI must pass all four required jobs, and
+1. **Freeze the final evaluation SHA.** It must be pushed, its exact-head CI must pass all four required jobs, and
    the trusted rules on `main` must evaluate it (see the gate notes in `ACCEPTANCE_REPORT.md`).
    Then record a freeze file binding:
-   - the C3 commit and its source digest `da323e93…`;
+   - that commit and its source digest;
    - the four dependency commits;
    - the frozen image IDs (`candidate-identity.json`);
    - the model and prices, the per-run cap, and the harness hashes.
@@ -141,17 +144,17 @@ After the last approved experiment:
 ## Exact authorisation requests (fill in, then send in chat)
 
 > **Experiment A.** I authorise exactly two live Gate 5 matched trials on candidate
-> `<C3 sha>` (freeze `<freeze sha256>`): baseline then protected, `claude-opus-5-5`, $2.00
+> `<final evaluation sha>` (freeze `<freeze sha256>`): baseline then protected, `claude-opus-5-5`, $2.00
 > estimated maximum each, no retries, no GitHub write. The Anthropic key is new and has a
 > provider-side limit of `<$ amount>`.
 
-> **Experiment B.** I authorise one live Gate 6 run on candidate `<C3 sha>` (same freeze), $2.00
+> **Experiment B.** I authorise one live Gate 6 run on candidate `<final evaluation sha>` (same freeze), $2.00
 > estimated maximum, and exactly one create-only GitHub file write to
 > `<owner>/<disposable repo>` (ID `<repo_id>`, node `<node_id>`), branch `main`, path
 > `airlock-north-star/gate6.patch`, with content I will approve by its SHA-256 prefix. Tokens
 > expire in 7 days and are revoked after.
 
-> **Experiment C.** I authorise programme gate7-v2 on candidate `<C3 sha>`: 10 protected runs
+> **Experiment C.** I authorise programme gate7-v2 on candidate `<final evaluation sha>`: 10 protected runs
 > (cases 1–10) and 7 baselines (cases 1–7, egress limited to the model API), $3.00 estimated
 > maximum each, $51.00 in total, no retries, and two create-only writes (cases 9 and 10) to the
 > same repository at the paths above, each approved by its SHA-256 prefix.
