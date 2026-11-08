@@ -212,9 +212,11 @@ jobs:
           python scripts/install_candidate.py --python /tmp/rehearsal-venv/bin/python --index http://127.0.0.1:8765/simple --report "$RUNNER_TEMP/install-report.json"
           echo "/tmp/rehearsal-venv/bin" >> "$GITHUB_PATH"
           /tmp/rehearsal-venv/bin/python -m pip freeze > "$RUNNER_TEMP/installed.txt"
+          # Identity v2 takes locked wheels only from PyPI or its content-addressed store; the
+          # referee scrubs the runner's environment, so seed the default store itself.
+          mkdir -p "$HOME/.cache/actenon-airlock/acceptance-artifacts"
+          cp /tmp/rehearsal/index/files/*.whl "$HOME/.cache/actenon-airlock/acceptance-artifacts/"
       - name: Integration suite on the registry install
-        env:
-          AIRLOCK_ACCEPTANCE_ARTIFACTS: /tmp/rehearsal/index/files
         run: python -m pytest -q --junitxml=rehearsal-integration-results.xml
       - name: Build the images the container suite needs
         run: |
@@ -225,7 +227,6 @@ jobs:
           docker build -f examples/toolchains/Dockerfile.node -t airlock-example-node:ci examples/toolchains/sample-node
       - name: Container security suite on the registry install
         env:
-          AIRLOCK_ACCEPTANCE_ARTIFACTS: /tmp/rehearsal/index/files
           AIRLOCK_TEST_GO_IMAGE: airlock-example-go:ci
           AIRLOCK_TEST_NODE_IMAGE: airlock-example-node:ci
           AIRLOCK_TEST_PROTECTED_IMAGE: actenon-airlock-compute:dev
