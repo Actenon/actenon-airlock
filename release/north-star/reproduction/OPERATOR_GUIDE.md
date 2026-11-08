@@ -92,6 +92,17 @@ Classify each difference, in `OPERATOR_RECORD.md`, as exactly one of:
   values. Do not try to fix it.
 - **NON-REPRODUCIBLE:** image IDs. These are expected to differ (the builds are not
   bit-reproducible), and they are recorded but not scored.
+- **INTERMITTENT ENVIRONMENT** (pre-registered 2026-11-08, before any operator run):
+  - **When it applies:** a container test failed **only** with
+    `AirlockError: Protected Mode Docker operation failed: <command>`, Docker refusing an
+    operation, never with an assertion.
+  - **What to do:** rerun that single test once (the command is in `results/protected.log`) and
+    report **both** outcomes.
+  - **How it counts:** if the rerun passes, the step is INTERMITTENT ENVIRONMENT, and the owner
+    decides whether that reproduction counts. If the rerun fails, it is a MISMATCH.
+  - **Why the rule exists:** the authors' own dry run hit this twice under heavy load on Docker
+    Desktop, and the reruns passed 7 of 7 (`LOCAL_DRY_RUN.md`).
+  - **Any other failure is a MISMATCH.**
 
 ## Sending your evidence
 

@@ -66,6 +66,16 @@ GitHub did. The Gate 6 records (the reviewed bytes, Airlock's readback and the o
 separate-token readback) agree offline. Only someone with read access to the private repository
 can confirm GitHub's state directly.
 
+## Operator harness dry run (`reproduction/reproduce.sh`, fresh images)
+
+- **All other checks matched `expected.json`.**
+- **Two container tests failed once,** with `Docker operation failed: run`, under load. Reruns
+  on the same images passed 7 of 7, and with the frozen images both passed in every full run
+  today.
+- **Classified INTERMITTENT ENVIRONMENT**, and kept as a reproducibility limitation: Docker
+  Desktop sometimes refuses a `docker run` on a just-created IPv6 network under load. See
+  `reproduction/LOCAL_DRY_RUN.md`.
+
 ## Release artifacts (Gate 8, dry run; nothing published)
 
 See `REGISTRY_READINESS.md`. All five distributions build. The candidate's Airlock wheel

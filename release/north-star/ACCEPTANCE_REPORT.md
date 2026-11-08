@@ -115,8 +115,17 @@ See `LIVE_PROGRAMME.md`. It is pre-registered and **not authorised**:
 - `check_results.py`, standard library only;
 - `expected.json`.
 
-It was run end to end on this machine against C2 (see `reproduction/LOCAL_DRY_RUN.md`). This
-machine's own run is a technical rehearsal, **not** an operator result. **0 human operators.**
+It was run end to end on this machine against C2, with freshly built images (see
+`reproduction/LOCAL_DRY_RUN.md`).
+
+- **Matched:** identity, wheel build, dependency commits, doctor, the integration contract
+  (2,377 passed), the independent verifier (142 journals), the tamper self-test (3 of 3) and the
+  provider records.
+- **Did not match:** two container tests hit `Docker operation failed: run` under heavy load.
+  Immediate reruns passed 7 of 7. This is classified INTERMITTENT ENVIRONMENT, not a pass, and
+  the operator guide now pre-registers how operators report it.
+
+This machine's run is a technical rehearsal, **not** an operator result. **0 human operators.**
 
 ## 8. Registry readiness (item 8)
 
