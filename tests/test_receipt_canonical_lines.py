@@ -50,7 +50,10 @@ def test_a_reformatted_final_line_is_refused():
     lines[-1] = json.dumps(json.loads(lines[-1]), sort_keys=True).encode()  # spaces added
     result = verify_receipt_lines(lines, public)
     assert not result["ok"]
-    assert result["rows"][-1]["problem"] == "receipt line is not the exact canonical bytes that were signed"
+    assert (
+        result["rows"][-1]["problem"]
+        == "receipt line is not the exact canonical bytes that were signed"
+    )
 
 
 def test_a_duplicate_member_in_the_final_line_is_refused():

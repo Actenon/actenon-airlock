@@ -55,6 +55,8 @@ DOCKER_TESTS = [
     "tests.test_claude_code_container::test_provider_rate_limit_retries_as_a_new_call_with_the_real_client",
     "tests.test_claude_code_container::test_a_lost_reply_ends_the_real_client_without_a_second_dispatch",
     "tests.test_claude_code_container::test_supervisor_spend_bound_stops_the_real_client",
+    "tests.test_supervisor_credential_isolation::test_baseline_contained_agent_gets_only_the_dummy_credential",
+    "tests.test_supervisor_credential_isolation::test_protected_contained_agent_never_holds_the_supervisor_key",
 ]
 INDEPENDENT_TEST = (
     "tests.test_independent_container::test_owned_transport_controls_and_protected_boundary"
@@ -219,15 +221,22 @@ class World:
             for i, name in enumerate(prereq["candidate_jobs"], start=1)
         ]
         ordinary = {"tests.test_broker::test_denies_unapproved": "passed"}
+        # The genuine container job passes every test the contract requires of it, and the
+        # integration job skips exactly the tests that contract allows it to skip.
+        reports = {(r["artifact"], r["file"]): r for r in prereq["junit"]}
+        required = reports[("protected-container-acceptance", "protected-results.xml")]
         self.github.add_artifact(
             self.ci_run,
             "protected-container-acceptance",
             {
-                "protected-results.xml": junit({n: "passed" for n in DOCKER_TESTS}),
+                "protected-results.xml": junit(
+                    {n: "passed" for n in [*DOCKER_TESTS, *required["must_pass"]]}
+                ),
                 "independent-boundary-results.xml": junit({INDEPENDENT_TEST: "passed"}),
             },
         )
-        skipped = {n: "skipped" for n in [*DOCKER_TESTS, INDEPENDENT_TEST]}
+        allowed = reports[("integration-python-3.12", "test-results.xml")]["allowed_skips"]
+        skipped = {n: "skipped" for n in [*DOCKER_TESTS, INDEPENDENT_TEST, *allowed]}
         for py in ("3.11", "3.12"):
             self.github.add_artifact(
                 self.ci_run,
@@ -564,6 +573,11 @@ def test_green_unit_tests_cannot_override_missing_real_agent_evidence(world: Wor
 
 def test_independent_boundary_skip_fails_mandatory_ci(world: World) -> None:
     run = world.ci_run
+    required = next(
+        r["must_pass"]
+        for r in world.registry["ci_prerequisites"]["junit"]
+        if r["file"] == "protected-results.xml"
+    )
     world.github.run_artifacts[run["id"]] = [
         artifact
         for artifact in world.github.run_artifacts[run["id"]]
@@ -573,7 +587,7 @@ def test_independent_boundary_skip_fails_mandatory_ci(world: World) -> None:
         run,
         "protected-container-acceptance",
         {
-            "protected-results.xml": junit({n: "passed" for n in DOCKER_TESTS}),
+            "protected-results.xml": junit({n: "passed" for n in [*DOCKER_TESTS, *required]}),
             "independent-boundary-results.xml": junit({INDEPENDENT_TEST: "skipped"}),
         },
     )
