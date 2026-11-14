@@ -206,7 +206,12 @@ class Broker:
             audience="service:actenon-permit-gateway",
             issuer="service:actenon-permit",
             capabilities=tuple(sorted(self.allowed)) or ("airlock.none",),
-            replay_protector=ReplayProtector(SqliteReplayStore(state.local / "replay.sqlite3")),
+            # The broker owns this database for its whole life. Holding one connection open
+            # stops each request's close from checkpointing and deleting the WAL; the second
+            # store below shares the same file, so it benefits too.
+            replay_protector=ReplayProtector(
+                SqliteReplayStore(state.local / "replay.sqlite3", keep_open=True)
+            ),
             revocation_checker=StoreRevocationChecker(self.store),
         )
         self.effect_namespace = "airlock-local:" + hashlib.sha256(key.public_key_bytes).hexdigest()
