@@ -6,6 +6,7 @@ import base64
 import hashlib
 import json
 import os
+import secrets
 import subprocess
 import threading
 from contextlib import contextmanager
@@ -26,11 +27,21 @@ RECEIPT_SCHEMA = "actenon-airlock/receipt/v1"
 # Domain separation: a receipt signature can never verify as an approval signature.
 RECEIPT_DOMAIN = b"actenon-airlock/receipt/v1\n"
 _RECEIPT_THREAD_LOCK = threading.RLock()
+_APPROVAL_THREAD_LOCK = threading.Lock()
+
+
+def _temporary_sibling(path: Path) -> Path:
+    """A name no other writer uses, so the final rename is the only shared step.
+
+    A fixed name made concurrent writers of one file fail each other with
+    FileExistsError, and one left behind by a killed process blocked every later write.
+    """
+    return path.with_name(f"{path.name}.{os.getpid()}.{secrets.token_hex(8)}.tmp")
 
 
 def atomic_json(path: Path, data: dict, mode: int = 0o600) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
-    tmp = path.with_name(path.name + ".tmp")
+    tmp = _temporary_sibling(path)
     fd = os.open(tmp, os.O_WRONLY | os.O_CREAT | os.O_EXCL, mode)
     try:
         with os.fdopen(fd, "wb") as stream:
@@ -62,14 +73,62 @@ class State:
         self.local = self.path / "local"
         self.key_path = self.local / "key.json"
 
-    def initialize(self) -> None:
+    @contextmanager
+    def _approval_lock(self):
+        """Serialise key creation and approval across threads and processes.
+
+        First-time setup checks for a key and then creates several files. Unlocked,
+        racing approvers each generated a key and left a private key that no longer
+        matched public-key.json, which no later command could repair.
+
+        Not re-entrant: a second flock on the same file blocks even within one process.
+        """
         if self.path.is_symlink() or self.local.is_symlink():
             raise AirlockError("Airlock state may not be a symlink")
         self.local.mkdir(parents=True, exist_ok=True, mode=0o700)
         os.chmod(self.local, 0o700)
+        with _APPROVAL_THREAD_LOCK:
+            if os.name != "posix":
+                # No flock; the runtime is POSIX-only, so keep approving as before.
+                yield
+                return
+            import fcntl
+
+            flags = os.O_CREAT | os.O_RDWR | os.O_CLOEXEC | os.O_NOFOLLOW
+            fd = os.open(self.local / "approval.lock", flags, 0o600)
+            try:
+                fcntl.flock(fd, fcntl.LOCK_EX)
+                yield
+            finally:
+                os.close(fd)  # releasing the lock also works after process death
+
+    def initialize(self) -> None:
+        with self._approval_lock():
+            self._initialize_locked()
+
+    def _create_keys(self) -> None:
+        """Write the grant key, then the signing key in a single rename.
+
+        key.json is what marks a project as initialised, so it lands last and whole:
+        a crash or a concurrent reader sees either no signing key or a complete one,
+        never a signing key without its grant key.
+        """
+        atomic_json(self.local / "grant-key.json", {"key": os.urandom(32).hex()})
+        tmp = _temporary_sibling(self.key_path)
+        try:
+            save_ed25519_keypair(generate_ed25519_keypair(), tmp)
+            fd = os.open(tmp, os.O_RDONLY)
+            try:
+                os.fsync(fd)
+            finally:
+                os.close(fd)
+            os.replace(tmp, self.key_path)
+        finally:
+            tmp.unlink(missing_ok=True)
+
+    def _initialize_locked(self) -> None:
         if not self.key_path.exists():
-            save_ed25519_keypair(generate_ed25519_keypair(), self.key_path)
-            atomic_json(self.local / "grant-key.json", {"key": os.urandom(32).hex()})
+            self._create_keys()
         key = load_ed25519_keypair(self.key_path)
         public = base64.b64encode(key.public_key_bytes).decode()
         public_path = self.path / "public-key.json"
@@ -82,20 +141,21 @@ class State:
             ignore.write_text("local/\nproposed.json\n")
 
     def approve(self, manifest: dict) -> None:
-        self.initialize()
-        key = load_ed25519_keypair(self.key_path)
-        payload = dict(manifest, approved_at=datetime.now(UTC).isoformat())
-        signature = Ed25519PrivateKey.from_private_bytes(key.private_key_bytes).sign(
-            canonical(payload)
-        )
-        atomic_json(
-            self.path / "approved.json",
-            {
-                "payload": payload,
-                "signature": base64.b64encode(signature).decode(),
-            },
-            0o644,
-        )
+        with self._approval_lock():
+            self._initialize_locked()
+            key = load_ed25519_keypair(self.key_path)
+            payload = dict(manifest, approved_at=datetime.now(UTC).isoformat())
+            signature = Ed25519PrivateKey.from_private_bytes(key.private_key_bytes).sign(
+                canonical(payload)
+            )
+            atomic_json(
+                self.path / "approved.json",
+                {
+                    "payload": payload,
+                    "signature": base64.b64encode(signature).decode(),
+                },
+                0o644,
+            )
 
     def approved(self) -> dict:
         try:
